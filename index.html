@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ফেইসবুক পাঠশালা — যাচাই পরীক্ষা</title>
+<script>
+window.FACEBOOK_PATHSHALA_CONFIG = {
+  SUPABASE_URL: "https://ydvbnalhcnfqpxkkmywr.supabase.co",
+  SUPABASE_KEY: "sb_publishable_xCbSWDkASsbUPl-WmygyMw_eVrJY_9a",
+  FACEBOOK_PAGE_URL: "https://www.facebook.com/facebook.pathshala",
+  FACEBOOK_GROUP_URL: "https://www.facebook.com/groups/facebookpathshala",
+  FACEBOOK_PROFILE_URL: "https://www.facebook.com/mdbayzidmostofa"
+};
+</script>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:"Noto Sans Bengali",Arial,sans-serif;background:#f3f6fb;color:#1f2937}.header{background:#2563eb;color:#fff;text-align:center;padding:20px 15px}.header h1{margin:0;font-size:25px} .slogan{margin:7px 0 4px;font-size:15px;font-weight:500}.exam-label{font-size:14px;opacity:.95}.container{max-width:760px;margin:22px auto;padding:0 14px}.exam-summary{background:linear-gradient(135deg,#eff6ff,#ffffff);border:2px solid #bfdbfe;border-radius:16px;padding:18px;margin:14px 0 20px}.exam-summary-title{font-size:22px;font-weight:800;color:#1d4ed8;margin:0 0 12px}.exam-summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.exam-summary-box{background:#fff;border-radius:11px;padding:11px;text-align:center;border:1px solid #dbeafe}.exam-summary-box span{display:block;font-size:13px;color:#6b7280;margin-bottom:4px}.exam-summary-box strong{font-size:18px;color:#111827}.form-title{font-size:18px;font-weight:800;margin:4px 0 2px}.confirm-note{font-size:14px;color:#4b5563;margin:0 0 10px}@media(max-width:600px){.exam-summary-grid{grid-template-columns:repeat(2,1fr)}}.card{background:#fff;border-radius:14px;padding:22px;box-shadow:0 4px 15px rgba(0,0,0,.08);margin-bottom:18px}h2{margin-top:0;font-size:21px}label.field{display:block;margin-top:15px;margin-bottom:6px;font-weight:700}input,select{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:8px;font-size:16px;background:#fff}.btn{border:0;border-radius:8px;padding:12px 18px;font-size:16px;cursor:pointer}.start-btn{width:100%;margin-top:22px;background:#2563eb;color:#fff}.next-btn{background:#2563eb;color:#fff}.prev-btn{background:#6b7280;color:#fff}.submit-btn{background:#16a34a;color:#fff}.btn:disabled{opacity:.55;cursor:not-allowed}.question{font-size:20px;font-weight:700;line-height:1.55;margin-bottom:18px}.option{display:flex;align-items:flex-start;gap:8px;background:#f8fafc;border:1px solid #e5e7eb;padding:13px;margin:10px 0;border-radius:9px;cursor:pointer}.option:hover{background:#eff6ff}.option.locked{cursor:default}.option input{width:auto;margin-top:3px}.topbar{display:flex;justify-content:space-between;gap:10px;margin-bottom:15px;font-weight:700}.timer{color:#dc2626}.progress{color:#2563eb}.nav-buttons{display:flex;justify-content:space-between;gap:10px;margin-top:20px}.nav-buttons button{flex:1}.status{padding:12px;border-radius:8px;margin-top:15px;background:#eff6ff;color:#1d4ed8}.error{background:#fef2f2;color:#b91c1c}.success{background:#f0fdf4;color:#15803d}.result{text-align:center}.score{font-size:40px;font-weight:800;color:#2563eb;margin:18px 0}.result-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:18px 0}.result-box{background:#f8fafc;border-radius:10px;padding:14px}.result-box strong{display:block;font-size:24px}.review{text-align:left;margin-top:20px}.review-item{border:1px solid #e5e7eb;border-radius:10px;padding:14px;margin:10px 0}.correct{color:#15803d}.wrong{color:#b91c1c}.muted{color:#6b7280}.social{margin-top:20px;padding:15px;border:1px solid #dbeafe;background:#eff6ff;border-radius:12px}.social-title{font-weight:800;color:#1d4ed8;margin-bottom:8px}.social-links{display:grid;grid-template-columns:1fr 1fr;gap:9px}.social-links a{display:none;text-decoration:none;background:#fff;border:1px solid #bfdbfe;border-radius:10px;padding:11px;color:#1d4ed8;font-weight:700}.social-links a:hover{background:#dbeafe}@media(max-width:600px){.social-links{grid-template-columns:1fr}}@media(max-width:600px){.header h1{font-size:21px}.card{padding:17px}.question{font-size:18px}.result-grid{grid-template-columns:1fr}.nav-buttons{flex-wrap:wrap}.nav-buttons button{min-width:45%}}
+.hidden{display:none!important}</style>
+</head>
+<body>
+<div class="header"><h1>📚 ফেইসবুক পাঠশালা</h1><p class="slogan">তোমার জ্ঞানের আলোয় আলোকিত হোক চারপাশ</p><div class="exam-label">MCQ Online Exam</div></div>
+<div class="container">
+<div id="startPage" class="card">
+<div class="exam-summary">
+<h2 id="examTitle" class="exam-summary-title">পরীক্ষার তথ্য লোড হচ্ছে...</h2>
+<div class="exam-summary-grid">
+<div class="exam-summary-box"><span>মোট প্রশ্ন</span><strong id="summaryQuestions">—</strong></div>
+<div class="exam-summary-box"><span>মোট নম্বর</span><strong id="summaryMarks">—</strong></div>
+<div class="exam-summary-box"><span>সময়</span><strong id="summaryDuration">—</strong></div>
+<div class="exam-summary-box"><span>পরীক্ষক</span><strong id="summaryExaminer">—</strong></div>
+</div>
+<p id="examInfo" class="confirm-note">পরীক্ষা শুরু করার আগে উপরের তথ্যগুলো নিশ্চিত করুন।</p>
+<p id="examinerInfo" class="muted"></p>
+</div>
+<div class="form-title">পরীক্ষার্থীর তথ্য পূরণ করুন</div>
+<p class="confirm-note">পরীক্ষার তথ্য নিশ্চিত হওয়ার পর নিচের তথ্যগুলো পূরণ করে পরীক্ষা শুরু করুন।</p>
+<label class="field" for="studentName">নাম</label><input id="studentName" type="text" placeholder="আপনার নাম লিখুন" autocomplete="name">
+<label class="field" for="facebookName">ফেইসবুক আইডির নাম</label><input id="facebookName" type="text" placeholder="ফেইসবুকে ব্যবহৃত নাম লিখুন">
+<label class="field" for="district">নিজ জেলা</label>
+<input id="district" type="text" placeholder="নিজ জেলার নাম লিখুন" autocomplete="address-level2">
+<label class="field" for="mobile">মোবাইল নম্বর</label><input id="mobile" type="tel" inputmode="numeric" placeholder="01XXXXXXXXX" maxlength="11" autocomplete="tel">
+<button class="btn start-btn" id="startButton" onclick="startExam()">🚀 পরীক্ষা শুরু করুন</button>
+<div id="startStatus"></div>
+</div>
+<div id="examPage" class="hidden"><div class="card"><div id="examStatus" class="status hidden"></div>
+<div class="topbar"><div id="progress" class="progress">প্রশ্ন ১</div><div id="timer" class="timer">00:00</div></div>
+<div id="questionText" class="question"></div><div id="options"></div>
+<div class="nav-buttons"><button id="prevBtn" class="btn prev-btn" onclick="previousQuestion()">← পূর্বের</button><button id="nextBtn" class="btn next-btn" onclick="nextQuestion()">পরের →</button><button id="submitBtn" class="btn submit-btn hidden" onclick="submitExam(false)">জমা দিন</button></div>
+</div></div>
+<div id="resultPage" class="card result hidden" aria-hidden="true"><h2>🎉 পরীক্ষা সম্পন্ন</h2><p id="resultMessage">আপনার ফলাফল:</p><div id="score" class="score">0</div><div class="result-grid"><div class="result-box">প্রাপ্ত নম্বর<strong id="marks">0</strong></div><div class="result-box">শতকরা<strong id="percentage">0%</strong></div><div class="result-box">অবস্থান<strong id="rank">—</strong></div><div class="result-box">মোট পরীক্ষার্থী<strong id="rankTotal">—</strong></div></div><p id="passStatus"></p><div id="review" class="review hidden"></div><div id="resultSocial" class="social hidden"><div class="social-title">📣 ফেইসবুক পাঠশালার সাথে যুক্ত থাকুন</div><div class="muted">নতুন পরীক্ষা, MCQ ও শিক্ষামূলক আপডেট পেতে আমাদের Page ও Group-এ যুক্ত থাকুন।</div><div class="social-links"><a id="resultPageLink" target="_blank" rel="noopener">📘 Facebook Page</a><a id="resultGroupLink" target="_blank" rel="noopener">👥 Facebook Group</a></div></div></div>
+</div>
+<script>
+const APP_CONFIG=window.FACEBOOK_PATHSHALA_CONFIG||{};
+const SUPABASE_URL=APP_CONFIG.SUPABASE_URL;
+const SUPABASE_KEY=APP_CONFIG.SUPABASE_KEY;
+
+const bnDigits="০১২৩৪৫৬৭৮৯", optionLetters={A:"ক",B:"খ",C:"গ",D:"ঘ"};
+let exam=null,settings=null,questions=[],currentQuestion=0,answers={},timerInterval=null,timeLeft=0,student={},deviceToken="",resultData=null,optionMaps={};
+function bn(n){return String(n).replace(/\d/g,d=>bnDigits[d])}
+function getDhakaDate(){return new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Dhaka"}).format(new Date())}
+function getExamId(){const p=new URLSearchParams(location.search).get("exam");return p&&/^\d+$/.test(p)?Number(p):4}
+function getDeviceToken(){const k="mcq_exam_device_token_v1";let t="";try{t=localStorage.getItem(k)||""}catch(e){}if(!t){t="d-"+Date.now()+"-"+Math.random().toString(36).slice(2);try{localStorage.setItem(k,t)}catch(e){}}return t}
+function showStartError(m){const s=document.getElementById("startStatus");s.className="status error";s.textContent="❌ "+m}
+function escapeHtml(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#039;")}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+async function sbFetch(path,options={}){
+ if(!SUPABASE_URL||!SUPABASE_KEY)throw new Error("Supabase সংযোগের তথ্য পাওয়া যায়নি।");
+ const headers={apikey:SUPABASE_KEY,Authorization:"Bearer "+SUPABASE_KEY,"Content-Type":"application/json",...(options.headers||{})};
+ const r=await fetch(SUPABASE_URL+path,{...options,headers});
+ const text=await r.text();
+ let data=null;try{data=text?JSON.parse(text):null}catch(e){data=text}
+ if(!r.ok){const msg=data?.message||data?.error_description||data?.hint||data?.details||text||("HTTP "+r.status);throw new Error(msg)}
+ return data;
+}
+async function sbRpc(name,body){return sbFetch("/rest/v1/rpc/"+encodeURIComponent(name),{method:"POST",body:JSON.stringify(body)})}
+
+async function loadExam(){
+ const status=document.getElementById("startStatus");
+ try{
+  const examId=getExamId();
+  const exams=await sbFetch("/rest/v1/exams?id=eq."+examId+"&select=*&limit=1");
+  if(!Array.isArray(exams)||!exams.length)throw new Error("কোনো সক্রিয়/নির্বাচিত পরীক্ষা পাওয়া যায়নি।");
+  exam=exams[0];
+  if(exam.status!=="active")throw new Error("এই পরীক্ষা এখন সক্রিয় নয়।");
+  document.getElementById("examTitle").textContent=exam.exam_name;
+  settings={duration_minutes:20,total_questions:0,total_marks:0,pass_mark:0,marks_per_question:1,negative_mark:0,show_answers:false,random_questions:false,random_options:false,exam_date:null,start_date:null,end_date:null,start_time:null,end_time:null,examiner_name:null};
+  try{const st=await sbFetch("/rest/v1/exam_settings?exam_id=eq."+exam.id+"&select=*&limit=1");if(st?.length)settings={...settings,...st[0]}}catch(_){ }
+  const allQuestions=await sbRpc("get_public_exam_questions",{p_exam_id:exam.id});
+  if(!Array.isArray(allQuestions)||!allQuestions.length)throw new Error("এই পরীক্ষায় কোনো প্রশ্ন নেই।");
+  questions=allQuestions.slice();
+  if(settings.random_questions)shuffle(questions);
+  if(Number(settings.total_questions||0)>0)questions=questions.slice(0,Number(settings.total_questions));
+  optionMaps={};questions.forEach(q=>{let arr=["A","B","C","D"];if(settings.random_options)shuffle(arr);optionMaps[q.id]=arr});
+  const totalMarks=Number(settings.total_marks||0)||questions.length*Number(settings.marks_per_question||1);
+  document.getElementById("examInfo").textContent=exam.exam_name+" — উপরের পরীক্ষার তথ্য নিশ্চিত করে নিচের ফরম পূরণ করুন।";
+  document.getElementById("examinerInfo").textContent=settings.examiner_name?"পরীক্ষক: "+settings.examiner_name:"পরীক্ষক: নির্ধারিত নয়";
+  document.getElementById("summaryQuestions").textContent=bn(questions.length);
+  document.getElementById("summaryMarks").textContent=bn(totalMarks);
+  document.getElementById("summaryDuration").textContent=bn(Number(settings.duration_minutes||20))+" মিনিট";
+  document.getElementById("summaryExaminer").textContent=settings.examiner_name||"—";
+  const pageUrl=settings.facebook_page_url||APP_CONFIG.FACEBOOK_PAGE_URL,groupUrl=settings.facebook_group_url||APP_CONFIG.FACEBOOK_GROUP_URL;
+  const resultPageLink=document.getElementById("resultPageLink"),resultGroupLink=document.getElementById("resultGroupLink");
+  if(pageUrl){resultPageLink.href=pageUrl;resultPageLink.style.display="inline-block"}if(groupUrl){resultGroupLink.href=groupUrl;resultGroupLink.style.display="inline-block"}document.getElementById("resultSocial").classList.remove("hidden");
+  status.className="status success";status.textContent="পরীক্ষা শুরু করার জন্য তথ্য পূরণ করুন।";
+ }catch(e){console.error(e);status.className="status error";status.textContent="সমস্যা হয়েছে: "+(e.message||e)}
+}
+
+async function startExam(){
+ const name=document.getElementById("studentName").value.trim(),facebookName=document.getElementById("facebookName").value.trim(),district=document.getElementById("district").value.trim(),mobile=document.getElementById("mobile").value.replace(/\D/g,"").trim();
+ if(!name)return showStartError("নাম লিখুন.");
+ if(!facebookName)return showStartError("ফেইসবুক আইডির নাম লিখুন.");
+ if(!district)return showStartError("নিজ জেলার নাম লিখুন.");
+ if(!/^01[3-9]\d{8}$/.test(mobile))return showStartError("সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন.");
+ const status=document.getElementById("startStatus"),btn=document.getElementById("startButton");
+ status.className="status";status.textContent="পরীক্ষার প্রশ্নপত্র প্রস্তুত হচ্ছে...";btn.disabled=true;
+ student={name,facebookName,district,mobile};deviceToken=getDeviceToken();
+ // প্রথমে পেজে প্রবেশ করানো হবে; প্রশ্ন লোড হওয়া এর পরে হবে।
+ document.getElementById("startPage").classList.add("hidden");
+ document.getElementById("examPage").classList.remove("hidden");
+ const examStatus=document.getElementById("examStatus");
+ examStatus.className="status";examStatus.textContent="প্রশ্নপত্র লোড হচ্ছে...";
+ try{
+  if(!exam||!questions.length){await loadExam();}
+  if(!exam||!questions.length)throw new Error("এই পরীক্ষায় কোনো প্রশ্ন পাওয়া যায়নি.");
+  const check=await sbRpc("check_exam_attempt",{p_exam_id:exam.id,p_mobile:mobile,p_device_token:deviceToken,p_attempt_date:getDhakaDate()});
+  if(check?.already_attempted)throw new Error(check.reason||"এই পরীক্ষাটি আজ ইতিমধ্যে দেওয়া হয়েছে.");
+  timeLeft=Number(settings.duration_minutes||20)*60;currentQuestion=0;answers={};
+  examStatus.className="status hidden";
+  renderQuestion();startTimer();
+ }catch(e){
+  console.error(e);
+  examStatus.className="status error";examStatus.textContent="❌ "+(e.message||"পরীক্ষা শুরু করতে সমস্যা হয়েছে.");
+  btn.disabled=false;
+ }
+}
+function renderQuestion(){try{const q=questions[currentQuestion];if(!q)throw new Error("প্রশ্ন পাওয়া যায়নি।");document.getElementById("progress").textContent=`প্রশ্ন ${bn(currentQuestion+1)} / ${bn(questions.length)}`;document.getElementById("questionText").textContent=q.question_text;const options=document.getElementById("options");options.innerHTML="";const map=optionMaps[q.id]||["A","B","C","D"];map.forEach((originalLetter,displayIndex)=>{const text=q["option_"+originalLetter.toLowerCase()];const label=document.createElement("label");label.className="option";const checked=answers[q.id]===originalLetter;label.innerHTML=`<input type="radio" name="answer" value="${originalLetter}" ${checked?"checked":""}><strong>${optionLetters[String.fromCharCode(65+displayIndex)]}.</strong><span>${escapeHtml(text)}</span>`;const input=label.querySelector("input");input.addEventListener("change",()=>{answers[q.id]=input.value;renderQuestion()});options.appendChild(label)});document.getElementById("prevBtn").style.visibility=currentQuestion===0?"hidden":"visible";const last=currentQuestion===questions.length-1;document.getElementById("nextBtn").classList.toggle("hidden",last);document.getElementById("submitBtn").classList.toggle("hidden",!last);const es=document.getElementById("examStatus");if(es)es.className="status hidden"}catch(e){console.error(e);const es=document.getElementById("examStatus");if(es){es.className="status error";es.textContent="❌ প্রশ্ন দেখাতে সমস্যা: "+(e.message||e)}}}
+function nextQuestion(){if(currentQuestion<questions.length-1){currentQuestion++;renderQuestion()}}
+function previousQuestion(){if(currentQuestion>0){currentQuestion--;renderQuestion()}}
+function startTimer(){updateTimer();clearInterval(timerInterval);timerInterval=setInterval(()=>{timeLeft--;updateTimer();if(timeLeft<=0){clearInterval(timerInterval);submitExam(true)}},1000)}
+function updateTimer(){const m=Math.floor(Math.max(0,timeLeft)/60),s=Math.max(0,timeLeft)%60;document.getElementById("timer").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0")}
+async function submitExam(autoSubmit=false){
+ if(!autoSubmit&&!confirm("আপনি কি পরীক্ষা জমা দিতে চান?"))return;if(!exam||!student.mobile)return;if(Object.keys(answers).length!==questions.length){alert("সব প্রশ্নের উত্তর দেওয়া বাধ্যতামূলক।");return}clearInterval(timerInterval);const btn=document.getElementById("submitBtn");btn.disabled=true;
+ const payload=Object.fromEntries(Object.entries(answers).map(([k,v])=>[String(k),v]));
+ try{const rpc=await sbRpc("submit_exam",{p_exam_id:exam.id,p_name:student.name,p_facebook_name:student.facebookName,p_district:student.district,p_mobile:student.mobile,p_device_token:deviceToken,p_answers:payload});if(!rpc?.success)throw new Error(rpc?.message||"পরীক্ষা জমা দেওয়া যায়নি।");resultData=rpc;showResult(autoSubmit)}catch(e){console.error(e);alert(e.message||"পরীক্ষা জমা দিতে সমস্যা হয়েছে।");btn.disabled=false}
+}
+function showResult(autoSubmit=false){document.getElementById("examPage").classList.add("hidden");document.getElementById("resultPage").classList.remove("hidden");document.getElementById("resultPage").setAttribute("aria-hidden","false");const d=resultData||{},marks=d.marks_awarded??d.score??d.marks??"—",total=Number(settings?.total_marks||questions.length*Number(settings?.marks_per_question||1)||0),pct=d.percentage??(typeof marks==="number"&&total?((marks/total)*100).toFixed(2)+"%":"—");document.getElementById("score").textContent=marks;document.getElementById("marks").textContent=marks;document.getElementById("percentage").textContent=pct;document.getElementById("rank").textContent=d.rank??"—";document.getElementById("rankTotal").textContent=d.rank_total??d.total_participants??"—";document.getElementById("resultMessage").textContent=d.message||"আপনার পরীক্ষা সফলভাবে জমা হয়েছে।";document.getElementById("passStatus").textContent=d.passed===true?"পাস করেছেন।":d.passed===false?"পাস করেননি।":"";if(settings?.show_answers&&Array.isArray(d.review))renderReview(d.review)}
+function renderReview(items){const box=document.getElementById("review");box.classList.remove("hidden");box.innerHTML="<h3>উত্তর পর্যালোচনা</h3>";items.forEach((r,i)=>{const ok=r.is_correct,div=document.createElement("div");div.className="review-item";div.innerHTML=`<strong>${bn(i+1)}. ${escapeHtml(r.question_text||"")}</strong><p>আপনার উত্তর: <span class="${ok?"correct":"wrong"}">${r.selected_option?optionLetters[r.selected_option]+". "+escapeHtml(r.selected_text||""):"দেওয়া হয়নি"}</span></p><p>সঠিক উত্তর: <span class="correct">${optionLetters[r.correct_option]}. ${escapeHtml(r.correct_text||"")}</span></p>`;box.appendChild(div)})}
+window.addEventListener("error",e=>{const s=document.getElementById("startStatus");if(s&&e.message){s.className="status error";s.textContent="❌ "+e.message}});
+window.addEventListener("unhandledrejection",e=>{const s=document.getElementById("startStatus");if(s){s.className="status error";s.textContent="❌ "+(e.reason?.message||String(e.reason||"অজানা ত্রুটি"))}});
+window.addEventListener("DOMContentLoaded",loadExam);
+</script>
+</body>
+</html>
