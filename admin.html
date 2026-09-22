@@ -75,6 +75,12 @@ const SUBJECTS={1:"বাংলা সাহিত্য",2:"বাংলা ব
 function bn(x){return String(x).replace(/\d/g,d=>BN[d])}
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
 function sourceLabel(v){return {verification_test:"যাচাই পরীক্ষা",job_solution:"জব সলিউশন",current_affairs:"সাম্প্রতিক প্রশ্নোত্তর"}[v]||v}
+async function nextId(table){
+  const {data,error}=await client.from(table).select("id").order("id",{ascending:false}).limit(1);
+  if(error) throw error;
+  const last=Array.isArray(data)&&data.length?Number(data[0].id):0;
+  return last+1;
+}
 function getExamId(){const m=location.search.match(/[?&]exam=(\d+)/);return m?Number(m[1]):null}
 async function doAdminLogin(){const email=loginEmail.value.trim(),password=loginPassword.value;loginStatus.textContent="প্রবেশ করা হচ্ছে...";const {error}=await client.auth.signInWithPassword({email,password});if(error){loginStatus.className="status error";loginStatus.textContent="❌ "+error.message}else{loginStatus.className="status success";loginStatus.textContent="সফল";await init()}}
 async function logout(){await client.auth.signOut();location.reload()}
