@@ -25,14 +25,42 @@ async function loadList(){
   const listEl=document.getElementById("list");
   try{
     listEl.innerHTML='<div class="card muted">পরীক্ষাগুলো লোড হচ্ছে…</div>';
-    const [a,b]=await Promise.all([
-      sb.from("exams").select("id,exam_name,status,total_questions").order("id",{ascending:false}),
-      sb.from("exam_settings").select("exam_id,total_questions,total_marks,duration_minutes,exam_date,start_time,end_date,end_time,show_answers,facebook_page_url,facebook_group_url")
-    ]);
-    if(a.error)throw a.error;
-    if(b.error)throw b.error;
-    const settingsById=new Map((b.data||[]).map(x=>[String(x.exam_id),x]));
-    exams=(a.data||[]).map(e=>({...e,...(settingsById.get(String(e.id))||{})}));
+
+    // Exams are the primary source. Settings are supplementary, so a temporary
+    // settings/RLS/network problem must not make the whole exam list disappear.
+    const pageSize=1000;
+    let allExams=[];
+    for(let from=0;;from+=pageSize){
+      const to=from+pageSize-1;
+      const r=await sb.from("exams")
+        .select("id,exam_name,status,total_questions")
+        .order("id",{ascending:false})
+        .range(from,to);
+      if(r.error)throw r.error;
+      const rows=r.data||[];
+      allExams.push(...rows);
+      if(rows.length<pageSize)break;
+    }
+
+    let settingsRows=[];
+    try{
+      for(let from=0;;from+=pageSize){
+        const to=from+pageSize-1;
+        const r=await sb.from("exam_settings")
+          .select("exam_id,total_questions,total_marks,duration_minutes,exam_date,start_time,end_date,end_time,show_answers,facebook_page_url,facebook_group_url")
+          .range(from,to);
+        if(r.error)throw r.error;
+        const rows=r.data||[];
+        settingsRows.push(...rows);
+        if(rows.length<pageSize)break;
+      }
+    }catch(settingsError){
+      // Keep the exams visible even if settings cannot be read.
+      console.warn("exam_settings could not be loaded:",settingsError);
+    }
+
+    const settingsById=new Map(settingsRows.map(x=>[String(x.exam_id),x]));
+    exams=allExams.map(e=>({...e,...(settingsById.get(String(e.id))||{})}));
     renderList();
   }catch(e){
     listEl.innerHTML='<div class="card error">পরীক্ষাগুলো লোড করা যাচ্ছে না। '+esc(e.message||"অজানা সমস্যা")+'</div>';
@@ -48,7 +76,9 @@ function renderList(){
   });
   listEl.innerHTML=rows.length?rows.map(e=>{
     const active=String(e.status||"").toLowerCase()==="active";
-    return `<article class="exam"><span class="badge"${active?"":" style=\"background:#e2e8f0;color:#475569\""}>${active?"● সক্রিয়":"● নিষ্ক্রিয়"}</span><h2>${esc(e.exam_name||"নামহীন পরীক্ষা")}</h2><div class="meta">প্রশ্ন: ${bn(e.total_questions||0)}টি · মোট নম্বর: ${bn(e.total_marks||0)}${e.duration_minutes?" · সময়: "+bn(e.duration_minutes)+" মিনিট":""}${e.exam_date?"<br>তারিখ: "+esc(e.exam_date):""}</div>${active?`<a class="btn" href="?exam=${encodeURIComponent(e.id)}">পরীক্ষা শুরু করুন →</a>`:`<span class="btn secondary" style="opacity:.7;cursor:not-allowed">পরীক্ষা বর্তমানে বন্ধ</span>`}</article>`;
+    const totalQ=e.total_questions??0;
+    const totalM=e.total_marks??0;
+    return `<article class="exam"><span class="badge"${active?"":" style=\"background:#e2e8f0;color:#475569\""}>${active?"● সক্রিয়":"● নিষ্ক্রিয়"}</span><h2>${esc(e.exam_name||"নামহীন পরীক্ষা")}</h2><div class="meta">প্রশ্ন: ${bn(totalQ)}টি · মোট নম্বর: ${bn(totalM)}${e.duration_minutes?" · সময়: "+bn(e.duration_minutes)+" মিনিট":""}${e.exam_date?"<br>তারিখ: "+esc(e.exam_date):""}</div>${active?`<a class="btn" href="?exam=${encodeURIComponent(e.id)}">পরীক্ষা শুরু করুন →</a>`:`<span class="btn secondary" style="opacity:.7;cursor:not-allowed">পরীক্ষা বর্তমানে বন্ধ</span>`}</article>`;
   }).join(""):'<div class="card muted">এই মুহূর্তে কোনো পরীক্ষা পাওয়া যায়নি।</div>';
 }
 async function loadExam(id){try{const listPageEl=document.getElementById("listPage"),startPageEl=document.getElementById("startPage"),examNameEl=document.getElementById("examName"),totalQEl=document.getElementById("totalQ"),totalMEl=document.getElementById("totalM"),durationEl=document.getElementById("duration");const a=await sb.from("exams").select("*").eq("id",id).eq("status","active").maybeSingle();if(a.error)throw a.error;if(!a.data)throw new Error("পরীক্ষাটি পাওয়া যায়নি বা সক্রিয় নয়।");const b=await sb.from("exam_settings").select("*").eq("exam_id",id).maybeSingle();if(b.error)throw b.error;current=a.data;settings=b.data||{};listPageEl.classList.add("hidden");startPageEl.classList.remove("hidden");examNameEl.textContent=current.exam_name;totalQEl.textContent=bn(settings.total_questions||current.total_questions||0);totalMEl.textContent=bn(settings.total_marks||0);durationEl.textContent=bn(settings.duration_minutes||20)+" মিনিট"}catch(e){document.getElementById("listPage").innerHTML='<div class="card error">❌ '+esc(e.message)+'</div>'}}
