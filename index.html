@@ -1,205 +1,199 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>ফেইসবুক পাঠশালা — পরীক্ষা</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ফেইসবুক পাঠশালা</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:"Noto Sans Bengali",Arial,sans-serif;background:#f4f7fb;color:#172033}.top{background:linear-gradient(135deg,#0f3d91,#2563eb);color:#fff;padding:18px 16px}.topbar{max-width:980px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:14px}.brand{font-size:25px;font-weight:800}.slogan{font-size:13px;margin-top:4px;opacity:.92}.menuBtn{border:0;background:rgba(255,255,255,.18);color:#fff;border-radius:12px;width:46px;height:46px;font-size:27px;cursor:pointer}.wrap{max-width:900px;margin:20px auto;padding:0 14px}.card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:20px;box-shadow:0 6px 22px rgba(15,23,42,.06);margin-top:16px}.hero{text-align:center}.hero h1{margin:0 0 8px;font-size:28px}.hero p{margin:0;color:#64748b;line-height:1.7}.toolbar{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap}input,select{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;font-size:15px}.toolbar input{flex:1;min-width:180px}.toolbar select{width:auto;min-width:170px}.list{display:grid;gap:14px;margin-top:18px}.exam{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:18px}.exam h2{margin:0 0 8px;font-size:20px}.meta{color:#64748b;font-size:13px;line-height:1.8}.badge{display:inline-block;padding:5px 9px;border-radius:999px;background:#dcfce7;color:#166534;font-size:12px;font-weight:800;margin-bottom:8px}.btn{display:inline-block;margin-top:12px;padding:11px 16px;border-radius:11px;background:#2563eb;color:#fff;text-decoration:none;font-weight:800;border:0;cursor:pointer}.btn.secondary{background:#e8eef8;color:#172033}.btn.full{width:100%}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.hidden{display:none!important}.muted{color:#64748b}.status{margin-top:12px;padding:11px;border-radius:10px;background:#f1f5f9}.error{color:#991b1b;background:#fee2e2}.success{color:#166534;background:#dcfce7}.question{font-size:20px;font-weight:800;line-height:1.6}.option{display:block;padding:13px;border:1px solid #dbe3ef;border-radius:12px;margin:9px 0;cursor:pointer}.option:hover{background:#f8fafc}.option input{width:auto;margin-right:8px}.timer{font-weight:900;font-size:22px;color:#b91c1c}.progress{display:flex;justify-content:space-between;gap:10px;align-items:center}.resultScore{text-align:center;font-size:34px;font-weight:900;color:#2563eb}.resultGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:15px}.resultBox{background:#f8fafc;border-radius:12px;padding:13px;text-align:center}.reviewItem{border:1px solid #e2e8f0;border-radius:13px;padding:14px;margin-top:10px}.correct{color:#166534}.wrong{color:#b91c1c}.menu{display:none;position:fixed;inset:0;background:rgba(15,23,42,.42);z-index:20}.panel{position:absolute;right:12px;top:12px;width:min(350px,calc(100% - 24px));background:#fff;border-radius:18px;padding:18px}.link{display:block;padding:14px 12px;border-radius:12px;text-decoration:none;color:#172033;font-weight:700;margin:5px 0}.link:hover{background:#f1f5f9}footer{text-align:center;color:#94a3b8;font-size:12px;padding:12px}@media(max-width:600px){.brand{font-size:21px}.hero h1{font-size:24px}.grid,.resultGrid{grid-template-columns:1fr}.toolbar select{width:100%}}
+*{box-sizing:border-box}.hidden{display:none!important}body{margin:0;font-family:"Noto Sans Bengali",Arial,sans-serif;background:#f3f6fb;color:#1f2937}.header{background:#2563eb;color:#fff;text-align:center;padding:20px 15px}.header h1{margin:0;font-size:25px}.container{max-width:760px;margin:22px auto;padding:0 14px}.card{background:#fff;border-radius:14px;padding:22px;box-shadow:0 4px 15px rgba(0,0,0,.08);margin-bottom:18px}h2{margin-top:0;font-size:21px}label.field{display:block;margin-top:15px;margin-bottom:6px;font-weight:700}input,select{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:8px;font-size:16px;background:#fff}.btn{border:0;border-radius:8px;padding:12px 18px;font-size:16px;cursor:pointer}.start-btn{width:100%;margin-top:22px;background:#2563eb;color:#fff}.next-btn{background:#2563eb;color:#fff}.prev-btn{background:#6b7280;color:#fff}.submit-btn{background:#16a34a;color:#fff}.btn:disabled{opacity:.55;cursor:not-allowed}.question{font-size:20px;font-weight:700;line-height:1.55;margin-bottom:18px}.option{display:flex;align-items:flex-start;gap:8px;background:#f8fafc;border:1px solid #e5e7eb;padding:13px;margin:10px 0;border-radius:9px;cursor:pointer}.option:hover{background:#eff6ff}.option.locked{cursor:default}.option input{width:auto;margin-top:3px}.topbar{display:flex;justify-content:space-between;gap:10px;margin-bottom:15px;font-weight:700}.timer{color:#dc2626}.progress{color:#2563eb}.nav-buttons{display:flex;justify-content:space-between;gap:10px;margin-top:20px}.nav-buttons button{flex:1}.status{padding:12px;border-radius:8px;margin-top:15px;background:#eff6ff;color:#1d4ed8}.error{background:#fef2f2;color:#b91c1c}.success{background:#f0fdf4;color:#15803d}.result{text-align:center}.score{font-size:40px;font-weight:800;color:#2563eb;margin:18px 0}.result-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:18px 0}.result-box{background:#f8fafc;border-radius:10px;padding:14px}.result-box strong{display:block;font-size:24px}.review{text-align:left;margin-top:20px}.review-item{border:1px solid #e5e7eb;border-radius:10px;padding:14px;margin:10px 0}.correct{color:#15803d}.wrong{color:#b91c1c}.muted{color:#6b7280}.social{margin-top:20px;padding:15px;border:1px solid #dbeafe;background:#eff6ff;border-radius:12px}.social-title{font-weight:800;color:#1d4ed8;margin-bottom:8px}.social-links{display:grid;grid-template-columns:1fr 1fr;gap:9px}.social-links a{display:none;text-decoration:none;background:#fff;border:1px solid #bfdbfe;border-radius:10px;padding:11px;color:#1d4ed8;font-weight:700}.social-links a:hover{background:#dbeafe}.exam-summary{background:#f8fbff;border:1px solid #dbeafe;border-radius:10px;padding:12px;margin:12px 0;line-height:1.8}.exam-summary b{color:#1d4ed8}.download-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.download-row .btn{flex:1;min-width:120px}@media(max-width:600px){.social-links{grid-template-columns:1fr}}@media(max-width:600px){.header h1{font-size:21px}.card{padding:17px}.question{font-size:18px}.result-grid{grid-template-columns:1fr}.nav-buttons{flex-wrap:wrap}.nav-buttons button{min-width:45%}}
 </style>
 </head>
 <body>
-<header class="top"><div class="topbar"><div><div class="brand">📚 ফেইসবুক পাঠশালা</div><div class="slogan">তোমার জ্ঞানের আলোয় আলোকিত হোক চারপাশ</div></div><button class="menuBtn" onclick="openMenu()">☰</button></div></header>
-
-<main class="wrap">
-<section id="listPage">
-  <section class="card hero"><h1>📝 পরীক্ষা</h1><p>চলমান ও উন্মুক্ত পরীক্ষাগুলো থেকে আপনার পছন্দের পরীক্ষায় অংশ নিন।</p></section>
-  <div class="toolbar"><input id="search" placeholder="পরীক্ষার নাম খুঁজুন…" oninput="renderList()"><select id="status" onchange="renderList()"><option value="all">সব পরীক্ষা</option><option value="active" selected>শুধু সক্রিয়</option></select></div>
-  <section id="list" class="list"><div class="card muted">পরীক্ষাগুলো লোড হচ্ছে…</div></section>
-</section>
-
-<section id="startPage" class="card hidden">
-  <h2 id="examName">পরীক্ষা</h2>
-  <div class="grid"><div>প্রশ্ন: <b id="totalQ">০</b></div><div>মোট নম্বর: <b id="totalM">০</b></div><div>সময়: <b id="duration">২০ মিনিট</b></div></div>
-  <hr>
-  <div class="grid">
-    <div><label>নাম</label><input id="sName"></div>
-    <div><label>ফেইসবুক আইডির নাম</label><input id="sFb"></div>
-    <div><label>জেলা</label><input id="sDistrict"></div>
-    <div><label>মোবাইল নম্বর</label><input id="sMobile" inputmode="numeric"></div>
-  </div>
-  <button class="btn full" onclick="startExam()">পরীক্ষা শুরু করুন</button><div id="startStatus"></div>
-</section>
-
-<section id="examPage" class="card hidden">
-  <div class="progress"><b id="progress">প্রশ্ন ১ / ১</b><span class="timer" id="timer">20:00</span></div>
-  <hr>
-  <div id="question" class="question"></div>
-  <div id="options"></div>
-  <div style="display:flex;justify-content:space-between;gap:10px;margin-top:15px">
-    <button id="prevBtn" class="btn secondary" onclick="prevQ()">← পূর্বের</button>
-    <button id="nextBtn" class="btn" onclick="nextQ()">পরের →</button>
-    <button id="submitBtn" class="btn hidden" onclick="submitExam(false)">পরীক্ষা জমা দিন</button>
-  </div>
-</section>
-
-<section id="resultPage" class="card hidden">
-  <h2>🎉 পরীক্ষা সম্পন্ন</h2>
-  <p id="resultMessage"></p>
-  <div class="resultScore" id="score">০ / ০</div>
-  <div class="resultGrid">
-    <div class="resultBox">প্রাপ্ত নম্বর<br><b id="marks">০</b></div>
-    <div class="resultBox">শতকরা<br><b id="percentage">০%</b></div>
-    <div class="resultBox">অবস্থান<br><b id="rank">—</b> / <span id="rankTotal">—</span></div>
-  </div>
-  <p id="passStatus"></p>
-  <div id="review"></div>
-</section>
-</main>
-
-<footer>© ফেইসবুক পাঠশালা</footer>
-<div id="menu" class="menu" onclick="if(event.target===this)closeMenu()"><div class="panel"><b>ফেইসবুক পাঠশালা</b><a class="link" href="?">🏠 হোম</a></div></div>
-
+<div class="header"><h1>📚 ফেইসবুক পাঠশালা</h1><p>তোমার জ্ঞানের আলোয় আলোকিত হোক চারপাশ</p></div>
+<div class="container">
+<div id="startPage" class="card">
+<h2 id="examTitle">Exam</h2>
+<p id="examInfo">পরীক্ষা শুরু করার আগে নিচের তথ্যগুলো সঠিকভাবে পূরণ করুন।</p><div id="examSummary" class="exam-summary"></div><p id="examinerInfo" class="muted"></p>
+<label class="field" for="studentName">আপনার নাম</label><input id="studentName" type="text" placeholder="আপনার নাম লিখুন" autocomplete="name">
+<label class="field" for="facebookName">ফেইসবুক আইডির নাম</label><input id="facebookName" type="text" placeholder="ফেসবুকে ব্যবহৃত নাম লিখুন">
+<label class="field" for="district">জেলা</label>
+<input id="district" type="text" placeholder="আপনার জেলার নাম লিখুন">
+<label class="field" for="mobile">মোবাইল নম্বর</label><input id="mobile" type="tel" inputmode="numeric" placeholder="01XXXXXXXXX" maxlength="11" autocomplete="tel">
+<button class="btn start-btn" id="startButton" onclick="startExam()">🚀 পরীক্ষা শুরু করুন</button>
+<div id="startStatus"></div>
+</div>
+<div id="examPage" class="hidden"><div class="card">
+<div class="topbar"><div id="progress" class="progress">প্রশ্ন ১</div><div id="timer" class="timer">00:00</div></div>
+<div id="questionText" class="question"></div><div id="options"></div>
+<div class="nav-buttons"><button id="prevBtn" class="btn prev-btn" onclick="previousQuestion()">← পূর্বের</button><button id="nextBtn" class="btn next-btn" onclick="nextQuestion()">পরের →</button><button id="submitBtn" class="btn submit-btn hidden" onclick="submitExam(false)">জমা দিন</button></div>
+</div></div>
+<div id="resultPage" class="card result hidden"><h2>🎉 পরীক্ষা সম্পন্ন</h2><p id="resultMessage">আপনার ফলাফল:</p><div id="score" class="score">0</div><div class="result-grid"><div class="result-box">প্রাপ্ত নম্বর<strong id="marks">0</strong></div><div class="result-box">শতকরা<strong id="percentage">0%</strong></div><div class="result-box">অবস্থান<strong id="rank">—</strong></div><div class="result-box">মোট পরীক্ষার্থী<strong id="rankTotal">—</strong></div></div><p id="passStatus"></p><div id="review" class="review hidden"></div><div id="resultSocial" class="social hidden"><div class="social-title">📣 ফেসবুক পাঠশালার সাথে যুক্ত থাকুন</div><div class="muted">নতুন পরীক্ষা, MCQ ও শিক্ষামূলক আপডেট পেতে আমাদের Page ও Group-এ যুক্ত থাকুন।</div><div class="social-links"><a id="resultPageLink" target="_blank" rel="noopener">📘 Facebook Page</a><a id="resultGroupLink" target="_blank" rel="noopener">👥 Facebook Group</a></div></div></div>
+</div>
 <script>
-const URL="https://ydvbnalhcnfqpxkkmywr.supabase.co",KEY="sb_publishable_xCbSWDkASsbUPl-WmygyMw_eVrJY_9a",sb=supabase.createClient(URL,KEY);
-const BN="০১২৩৪৫৬৭৮৯",LET={A:"ক",B:"খ",C:"গ",D:"ঘ"};
-let exams=[],questions=[],answers={},idx=0,time=0,timer=null,current=null,settings=null;
-const bn=x=>String(x??"").replace(/\d/g,d=>BN[d]);
-const esc=x=>String(x??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
-function openMenu(){document.getElementById("menu").style.display="block"}
-function closeMenu(){document.getElementById("menu").style.display="none"}
-function idFromUrl(){const m=location.search.match(/[?&]exam=(\d+)/);return m?Number(m[1]):null}
+const SUPABASE_URL="https://ydvbnalhcnfqpxkkmywr.supabase.co";
+const SUPABASE_KEY="sb_publishable_xCbSWDkASsbUPl-WmygyMw_eVrJY_9a";
+const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const districts=["ঢাকা","চট্টগ্রাম","কুমিল্লা","ফেনী","নোয়াখালী","লক্ষ্মীপুর","চাঁদপুর","ব্রাহ্মণবাড়িয়া","খাগড়াছড়ি","রাঙামাটি","বান্দরবান","কক্সবাজার","সিলেট","মৌলভীবাজার","হবিগঞ্জ","সুনামগঞ্জ","রাজশাহী","নাটোর","নওগাঁ","চাঁপাইনবাবগঞ্জ","পাবনা","সিরাজগঞ্জ","বগুড়া","জয়পুরহাট","খুলনা","যশোর","সাতক্ষীরা","ঝিনাইদহ","মাগুরা","নড়াইল","কুষ্টিয়া","চুয়াডাঙ্গা","মেহেরপুর","বরিশাল","ভোলা","পটুয়াখালী","বরগুনা","ঝালকাঠি","পিরোজপুর","রংপুর","দিনাজপুর","ঠাকুরগাঁও","পঞ্চগড়","নীলফামারী","লালমনিরহাট","কুড়িগ্রাম","গাইবান্ধা","ময়মনসিংহ","জামালপুর","শেরপুর","নেত্রকোণা","টাঙ্গাইল","গাজীপুর","নারায়ণগঞ্জ","নরসিংদী","মানিকগঞ্জ","মুন্সীগঞ্জ","ফরিদপুর","গোপালগঞ্জ","মাদারীপুর","শরীয়তপুর","রাজবাড়ী"];
+const bnDigits="০১২৩৪৫৬৭৮৯", optionLetters={A:"ক",B:"খ",C:"গ",D:"ঘ"};
+let exam=null,settings=null,questions=[],currentQuestion=0,answers={},timerInterval=null,timeLeft=0,student={},deviceToken="",resultData=null,optionMaps={};
+function bn(n){return String(n).replace(/\d/g,d=>bnDigits[d])}
+function getDhakaDate(){return new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Dhaka"}).format(new Date())}
+function getExamId(){const p=new URLSearchParams(location.search).get("exam");return p&&/^\d+$/.test(p)?Number(p):null}
+function getDeviceToken(){const k="mcq_exam_device_token_v1";let t=localStorage.getItem(k);if(!t){t=crypto.randomUUID?crypto.randomUUID():"d-"+Date.now()+"-"+Math.random().toString(36).slice(2);localStorage.setItem(k,t)}return t}
+function showStartError(m){const s=document.getElementById("startStatus");s.className="status error";s.textContent="❌ "+m}
+function escapeHtml(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#039;")}
+function renderDistricts(){const s=document.getElementById("district");districts.forEach(d=>{const o=document.createElement("option");o.value=d;o.textContent=d;s.appendChild(o)})}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+async function loadExam(){
+ const status=document.getElementById("startStatus");
+ try{
+  const examId=getExamId(); let q=supabaseClient.from("exams").select("*");
+  q=examId?q.eq("id",examId).eq("status","active"):q.eq("status","active").order("created_at",{ascending:false}).limit(1);
+  const {data:exams,error}=await q;
+  if(error)throw error;
+  if(!exams?.length)throw new Error("কোনো সক্রিয়/নির্বাচিত পরীক্ষা পাওয়া যায়নি।");
+  exam=exams[0];
+  document.getElementById("examTitle").textContent=exam.exam_name;
 
-async function loadList(){
-  const listEl=document.getElementById("list");
+  // Optional settings: the student page must still work when the optional
+  // settings table has not been created yet. The basic exam duration comes
+  // from public.exams.duration_minutes.
+  settings={
+   duration_minutes:20,
+   total_questions:0,total_marks:0,pass_mark:0,marks_per_question:1,
+   negative_mark:0,show_answers:true,random_questions:false,random_options:false,
+   exam_date:null,start_date:null,end_date:null,start_time:null,end_time:null,examiner_name:null
+  };
   try{
-    listEl.innerHTML='<div class="card muted">পরীক্ষাগুলো লোড হচ্ছে…</div>';
-    const {data: allExams, error}=await sb.from("exams").select("id,exam_name,status,total_questions").order("id",{ascending:false});
-    if(error) throw error;
+   const {data:st}=await supabaseClient.from("exam_settings").select("*").eq("exam_id",exam.id).maybeSingle();
+   if(st)settings={...settings,...st};
+  }catch(_){/* optional table */}
 
-    const {data: settingsRows}=await sb.from("exam_settings").select("exam_id,total_questions,total_marks,duration_minutes,exam_date,show_answers");
-    const settingsById=new Map((settingsRows||[]).map(x=>[String(x.exam_id),x]));
-    
-    exams=(allExams||[]).map(e=>({...e,...(settingsById.get(String(e.id))||{})}));
-    renderList();
-  }catch(e){
-    listEl.innerHTML='<div class="card error">পরীক্ষাগুলো লোড করা যাচ্ছে না: '+esc(e.message)+'</div>';
-  }
+  // Questions are linked to exams through exam_questions. Correct answers are never requested from the student.
+  let allQuestions=[];
+  const mapResult=await supabaseClient.from("exam_questions").select("question_id,question_order").eq("exam_id",exam.id).order("question_order",{ascending:true});
+  if(mapResult.error)throw mapResult.error;
+  const ids=(mapResult.data||[]).map(x=>x.question_id).filter(Boolean);
+  if(!ids.length)throw new Error("এই পরীক্ষায় কোনো প্রশ্ন নেই।");
+  const qr=await supabaseClient.from("questions").select("id,category,question_text,option_a,option_b,option_c,option_d").in("id",ids);
+  if(qr.error)throw qr.error;
+  const byId=new Map((qr.data||[]).map(x=>[String(x.id),x]));
+  allQuestions=(mapResult.data||[]).map((x,i)=>{const q=byId.get(String(x.question_id));return q?{...q,question_order:x.question_order||i+1}:null}).filter(Boolean);
+  if(!allQuestions.length)throw new Error("এই পরীক্ষায় কোনো প্রশ্ন নেই।");
+
+  questions=allQuestions.slice();
+  if(settings.random_questions)shuffle(questions);
+  if(Number(settings.total_questions||0)>0)questions=questions.slice(0,Number(settings.total_questions));
+  optionMaps={};
+  questions.forEach(q=>{let arr=["A","B","C","D"];if(settings.random_options)shuffle(arr);optionMaps[q.id]=arr;});
+  document.getElementById("examInfo").textContent=`${exam.exam_name} — ${bn(questions.length)}টি প্রশ্ন`;
+  document.getElementById("examinerInfo").textContent=settings.examiner_name?`পরীক্ষক: ${settings.examiner_name}`:"";
+  const fmt=v=>v?new Date(v).toLocaleString("bn-BD",{dateStyle:"medium",timeStyle:"short"}):"—";
+  document.getElementById("examSummary").innerHTML=`<b>মোট প্রশ্ন:</b> ${bn(questions.length)} &nbsp; <b>মোট নম্বর:</b> ${bn(settings.total_marks||0)} &nbsp; <b>প্রতি প্রশ্ন:</b> ${bn(settings.marks_per_question||1)}<br><b>পাস নম্বর:</b> ${bn(settings.pass_mark||0)} &nbsp; <b>Negative:</b> ${bn(settings.negative_mark||0)} &nbsp; <b>সময়:</b> ${bn(settings.duration_minutes||20)} মিনিট<br><b>শুরু:</b> ${fmt(settings.start_at||settings.exam_date) } &nbsp; <b>শেষ:</b> ${fmt(settings.end_at||settings.end_date)}<br><b>সিলেবাস:</b> ${escapeHtml(settings.syllabus||"উল্লেখ করা হয়নি")}`;
+  const social=document.getElementById("socialLinks"),group=document.getElementById("groupLink"),page=document.getElementById("pageLink"); if(settings.facebook_group_url){group.href=settings.facebook_group_url;group.style.display="inline-block"} if(settings.facebook_page_url){page.href=settings.facebook_page_url;page.style.display="inline-block"} if(settings.facebook_group_url||settings.facebook_page_url)social.style.display="block";
+  status.className="status success";
+  status.textContent="পরীক্ষা শুরু করার জন্য তথ্য পূরণ করুন।";
+ }catch(e){
+  console.error(e);
+  status.className="status error";
+  status.textContent="সমস্যা হয়েছে: "+e.message;
+ }
 }
-
-function renderList(){
-  const q=document.getElementById("search").value.trim().toLowerCase();
-  const mode=document.getElementById("status").value;
-  const listEl=document.getElementById("list");
-  
-  const rows=exams.filter(e=>{
-    const name=String(e.exam_name||"").toLowerCase();
-    const active=String(e.status||"").toLowerCase()==="active";
-    const statusOk=mode==="all"||active;
-    return statusOk && (!q||name.includes(q));
-  });
-
-  listEl.innerHTML=rows.length?rows.map(e=>{
-    const active=String(e.status||"").toLowerCase()==="active";
-    return `<article class="exam"><span class="badge"${active?"":" style=\"background:#e2e8f0;color:#475569\""}>${active?"● সক্রিয়":"● নিষ্ক্রিয়"}</span><h2>${esc(e.exam_name)}</h2><div class="meta">প্রশ্ন: ${bn(e.total_questions||0)}টি · মোট নম্বর: ${bn(e.total_marks||0)}${e.duration_minutes?" · সময়: "+bn(e.duration_minutes)+" মিনিট":""}</div>${active?`<a class="btn" href="?exam=${e.id}">পরীক্ষা শুরু করুন →</a>`:`<span class="btn secondary" style="opacity:.7;cursor:not-allowed">বন্ধ রয়েছে</span>`}</article>`;
-  }).join(""):'<div class="card muted">কোনো পরীক্ষা পাওয়া যায়নি।</div>';
-}
-
-async function loadExam(id){
-  try{
-    const {data:a, error:ae}=await sb.from("exams").select("*").eq("id",id).maybeSingle();
-    if(ae||!a) throw new Error("পরীক্ষাটি পাওয়া যায়নি।");
-    const {data:b}=await sb.from("exam_settings").select("*").eq("exam_id",id).maybeSingle();
-    
-    current=a; settings=b||{};
-    document.getElementById("listPage").classList.add("hidden");
-    document.getElementById("startPage").classList.remove("hidden");
-    document.getElementById("examName").textContent=current.exam_name;
-    document.getElementById("totalQ").textContent=bn(settings.total_questions||current.total_questions||0);
-    document.getElementById("totalM").textContent=bn(settings.total_marks||0);
-    document.getElementById("duration").textContent=bn(settings.duration_minutes||20)+" মিনিট";
-  }catch(e){
-    document.getElementById("listPage").innerHTML='<div class="card error">❌ '+esc(e.message)+'</div>';
-  }
-}
-
 async function startExam(){
-  const name=document.getElementById("sName").value.trim();
-  const fb=document.getElementById("sFb").value.trim();
-  const district=document.getElementById("sDistrict").value.trim();
-  const mobile=document.getElementById("sMobile").value.trim();
-  const statusEl=document.getElementById("startStatus");
-
-  if(!name||!fb||!district||!/^(01[3-9]\d{8})$/.test(mobile)){
-    statusEl.className="status error";statusEl.textContent="সকল তথ্য এবং সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন।";return;
+ const name=document.getElementById("studentName").value.trim(),facebookName=document.getElementById("facebookName").value.trim(),district=document.getElementById("district").value,mobile=document.getElementById("mobile").value.replace(/\D/g,"").trim();
+ if(!name)return showStartError("নাম লিখুন।"); if(!facebookName)return showStartError("ফেসবুক আইডি নাম লিখুন।"); if(!district)return showStartError("জেলার নাম লিখুন।"); if(!/^01[3-9]\d{8}$/.test(mobile))return showStartError("সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন।"); if(!exam||!questions.length)return showStartError("পরীক্ষার তথ্য এখনো লোড হয়নি।");
+ const status=document.getElementById("startStatus");status.className="status";status.textContent="তথ্য যাচাই হচ্ছে...";document.getElementById("startButton").disabled=true;
+ student={name,facebookName,district,mobile};deviceToken=getDeviceToken();
+ const now=new Date();
+ const today=getDhakaDate();
+ const firstDate=settings.start_date||settings.exam_date||null;
+ const lastDate=settings.end_date||settings.exam_date||firstDate;
+ if(firstDate && today<firstDate)return showStartError("পরীক্ষা এখনো শুরু হয়নি।");
+ if(lastDate && today>lastDate)return showStartError("এই পরীক্ষার সময়সীমা শেষ হয়েছে।");
+ if((settings.start_time&&today===firstDate)||(settings.end_time&&today===lastDate)){const t=new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Dhaka",hour:"2-digit",minute:"2-digit",hour12:false}).format(now);if(settings.start_time&&today===firstDate&&t<settings.start_time.slice(0,5))return showStartError("পরীক্ষা এখনো শুরু হয়নি।");if(settings.end_time&&today===lastDate&&t>settings.end_time.slice(0,5))return showStartError("পরীক্ষার সময় শেষ হয়েছে।")}
+ try{
+  const {data:check,error:ce}=await supabaseClient.rpc("check_exam_attempt",{p_exam_id:exam.id,p_mobile:mobile,p_device_token:deviceToken,p_attempt_date:getDhakaDate()});
+  if(ce)throw ce;
+  if(check?.already_attempted)throw new Error(check.reason||"এই পরীক্ষাটি আজ ইতিমধ্যে দেওয়া হয়েছে।");
+  document.getElementById("startPage").classList.add("hidden");document.getElementById("examPage").classList.remove("hidden");timeLeft=Number(settings.duration_minutes||exam.duration_minutes||20)*60;currentQuestion=0;answers={};renderQuestion();startTimer();
+ }catch(e){console.error(e);showStartError(e.message||"তথ্য যাচাই করতে সমস্যা হয়েছে।");document.getElementById("startButton").disabled=false}
+}
+function renderQuestion(){const q=questions[currentQuestion];document.getElementById("progress").textContent=`প্রশ্ন ${bn(currentQuestion+1)} / ${bn(questions.length)}`;document.getElementById("questionText").textContent=q.question_text;const options=document.getElementById("options");options.innerHTML="";const map=optionMaps[q.id]||["A","B","C","D"];map.forEach((originalLetter,displayIndex)=>{const text=q["option_"+originalLetter.toLowerCase()];const label=document.createElement("label");label.className="option";const checked=answers[q.id]===originalLetter;label.innerHTML=`<input type="radio" name="answer" value="${originalLetter}" ${checked?"checked":""}><strong>${optionLetters[String.fromCharCode(65+displayIndex)]}.</strong><span>${escapeHtml(text)}</span>`;const input=label.querySelector("input");input.addEventListener("change",()=>{answers[q.id]=input.value;renderQuestion()});options.appendChild(label)});document.getElementById("prevBtn").style.visibility=currentQuestion===0?"hidden":"visible";const last=currentQuestion===questions.length-1;document.getElementById("nextBtn").classList.toggle("hidden",last);document.getElementById("submitBtn").classList.toggle("hidden",!last)}
+function lockCurrentOptions(){}
+function nextQuestion(){if(currentQuestion<questions.length-1){currentQuestion++;renderQuestion()}}
+function previousQuestion(){if(currentQuestion>0){currentQuestion--;renderQuestion()}}
+function startTimer(){updateTimer();clearInterval(timerInterval);timerInterval=setInterval(()=>{timeLeft--;updateTimer();if(timeLeft<=0){clearInterval(timerInterval);submitExam(true)}},1000)}
+function updateTimer(){const m=Math.floor(Math.max(0,timeLeft)/60),s=Math.max(0,timeLeft)%60;document.getElementById("timer").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0")}
+async function submitExam(autoSubmit=false){
+ if(!autoSubmit&&!confirm("আপনি কি পরীক্ষা জমা দিতে চান?"))return;
+ if(!exam||!student.mobile)return;
+ clearInterval(timerInterval);
+ const btn=document.getElementById("submitBtn");btn.disabled=true;
+ const payload=Object.fromEntries(Object.entries(answers).map(([k,v])=>[String(k),v]));
+ try{
+  // Preferred secure server-side submission.
+  const rpc=await supabaseClient.rpc("submit_exam",{
+   p_exam_id:exam.id,p_name:student.name,p_facebook_name:student.facebookName,
+   p_district:student.district,p_mobile:student.mobile,p_device_token:deviceToken,p_answers:payload
+  });
+  if(!rpc.error){
+   if(!rpc.data?.success)throw new Error(rpc.data?.message||"পরীক্ষা জমা দেওয়া যায়নি।");
+   resultData=rpc.data;showResult(autoSubmit);return;
   }
-  statusEl.className="status";statusEl.textContent="প্রশ্নপত্র লোড হচ্ছে...";
-  try{
-    // এখানে RPC ফাংশন কল করা হচ্ছে
-    const r=await sb.rpc("get_public_exam_questions",{p_exam_id:current.id});
-    if(r.error) throw r.error;
-    if(!Array.isArray(r.data)||!r.data.length) throw new Error("এই পরীক্ষায় কোনো প্রশ্ন নেই।");
-    
-    questions=r.data; answers={}; idx=0; time=Number(settings.duration_minutes||20)*60;
-    document.getElementById("startPage").classList.add("hidden");
-    document.getElementById("examPage").classList.remove("hidden");
-    renderQ();
-    clearInterval(timer);
-    timer=setInterval(()=>{time--;renderTimer();if(time<=0)submitExam(true)},1000);
-  }catch(e){
-    statusEl.className="status error";statusEl.textContent="❌ প্রশ্ন লোড হয়নি: "+e.message;
+
+  // Compatibility fallback for a database where the newer RPC has not yet
+  // been installed. This keeps the already-created basic MCQ database usable.
+  const full=await supabaseClient.from("questions")
+   .select("id,question_text,option_a,option_b,option_c,option_d,correct_option")
+   .eq("exam_id",exam.id).order("question_order",{ascending:true});
+  if(full.error)throw rpc.error;
+  const correctRows=full.data||[];
+  const marksPer=Number(settings?.marks_per_question||1),negative=Number(settings?.negative_mark||0);
+  let score=0,correctCount=0;
+  const review=[];
+  for(const q of correctRows){
+   const selected=String(payload[q.id]||"").toUpperCase();
+   const ok=!!selected&&selected===String(q.correct_option||"").toUpperCase();
+   const marks=selected?(ok?marksPer:-negative):0;
+   score+=marks;if(ok)correctCount++;
+   review.push({question_text:q.question_text,selected_option:selected||null,
+    selected_text:selected?(q["option_"+selected.toLowerCase()]||""):null,
+    correct_option:String(q.correct_option||"").toUpperCase(),
+    correct_text:q["option_"+String(q.correct_option||"").toLowerCase()]||"",is_correct:ok});
   }
-}
-
-function renderTimer(){
-  document.getElementById("timer").textContent=String(Math.floor(time/60)).padStart(2,"0")+":"+String(time%60).padStart(2,"0");
-}
-
-function renderQ(){
-  const q=questions[idx];
-  document.getElementById("progress").textContent=`প্রশ্ন ${bn(idx+1)} / ${bn(questions.length)}`;
-  document.getElementById("question").textContent=q.question_text;
-  document.getElementById("options").innerHTML=["A","B","C","D"].map(k=>`<label class="option"><input type="radio" name="ans" value="${k}" ${answers[q.id]===k?"checked":""} onchange="answers[${q.id}]=this.value"><b>${LET[k]}.</b> ${esc(q["option_"+k.toLowerCase()])}</label>`).join("");
-  document.getElementById("prevBtn").disabled=idx===0;
-  document.getElementById("nextBtn").classList.toggle("hidden",idx===questions.length-1);
-  document.getElementById("submitBtn").classList.toggle("hidden",idx!==questions.length-1);
-}
-
-function prevQ(){if(idx>0){idx--;renderQ()}}
-function nextQ(){if(idx<questions.length-1){idx++;renderQ()}}
-
-async function submitExam(auto){
-  clearInterval(timer);
-  document.getElementById("submitBtn").disabled=true;
-  try{
-    const payload={};
-    questions.forEach(q=>{if(answers[q.id])payload[String(q.id)]=answers[q.id]});
-    const deviceToken=localStorage.getItem("fp_device")||crypto.randomUUID();
-    localStorage.setItem("fp_device",deviceToken);
-    
-    const r=await sb.rpc("submit_exam",{p_exam_id:current.id,p_name:document.getElementById("sName").value.trim(),p_facebook_name:document.getElementById("sFb").value.trim(),p_district:document.getElementById("sDistrict").value.trim(),p_mobile:document.getElementById("sMobile").value.trim(),p_device_token:deviceToken,p_answers:payload});
-    if(r.error) throw r.error;
-    if(!r.data?.success) throw new Error(r.data?.message||"জমা হয়নি।");
-    
-    document.getElementById("examPage").classList.add("hidden");
-    document.getElementById("resultPage").classList.remove("hidden");
-    document.getElementById("resultMessage").textContent=auto?"⏰ সময় শেষ।":"🎉 সফলভাবে জমা হয়েছে।";
-    document.getElementById("score").textContent=bn(r.data.score??0)+" / "+bn(r.data.total_marks||questions.length);
-    document.getElementById("marks").textContent=bn(r.data.marks_awarded??r.data.score??0);
-    document.getElementById("percentage").textContent=bn(Math.round(Number(r.data.percentage??0)))+"%";
-    document.getElementById("rank").textContent=bn(r.data.rank??"—");
-    document.getElementById("rankTotal").textContent=bn(r.data.rank_total||"—");
-  }catch(e){
-    alert(e.message||"সমস্যা হয়েছে।");
-    document.getElementById("submitBtn").disabled=false;
+  const today=getDhakaDate();
+  const sid="MOBILE-"+student.mobile;
+  let sr=await supabaseClient.from("students").select("id").eq("student_id",sid).maybeSingle();
+  let studentId=sr.data?.id;
+  if(!studentId){
+   const ins=await supabaseClient.from("students").insert({student_id:sid,name:student.name,facebook_name:student.facebookName,district:student.district,mobile:student.mobile}).select("id").single();
+   if(ins.error)throw ins.error;studentId=ins.data.id;
+  }else{
+   const up=await supabaseClient.from("students").update({name:student.name,facebook_name:student.facebookName,district:student.district,mobile:student.mobile}).eq("id",studentId);
+   if(up.error)throw up.error;
   }
+  const dup=await supabaseClient.from("exam_attempts").select("id").eq("exam_id",exam.id).eq("student_id",studentId).eq("attempt_date",today).maybeSingle();
+  if(dup.data)throw new Error("এই পরীক্ষাটি আজ ইতিমধ্যে দেওয়া হয়েছে।");
+  const insAttempt=await supabaseClient.from("exam_attempts").insert({exam_id:exam.id,student_id:studentId,score,total_questions:correctRows.length,submitted_at:new Date().toISOString(),attempt_date:today,device_token:deviceToken}).select("id").single();
+  if(insAttempt.error)throw insAttempt.error;
+  const answerRows=correctRows.map(q=>{const selected=String(payload[q.id]||"").toUpperCase();const ok=!!selected&&selected===String(q.correct_option||"").toUpperCase();const marks=selected?(ok?marksPer:-negative):0;return {attempt_id:insAttempt.data.id,question_id:q.id,selected_option:selected||null,is_correct:ok,marks_awarded:marks};});
+  if(answerRows.length){const ar=await supabaseClient.from("attempt_answers").insert(answerRows);if(ar.error)throw ar.error;}
+  let rank=1,rankTotal=1;
+  const rr=await supabaseClient.from("exam_attempts").select("id,score,submitted_at").eq("exam_id",exam.id).eq("attempt_date",today).order("score",{ascending:false}).order("submitted_at",{ascending:true});
+  if(!rr.error&&rr.data?.length){rankTotal=rr.data.length;const idx=rr.data.findIndex(x=>String(x.id)===String(insAttempt.data.id));rank=idx>=0?idx+1:rankTotal;}
+  const totalMarks=Number(settings?.total_marks||0)||correctRows.length*marksPer;
+  resultData={success:true,score,total_marks:totalMarks,total_questions:correctRows.length,percentage:totalMarks>0?(score/totalMarks)*100:0,pass_mark:Number(settings?.pass_mark||0),rank,rank_total:rankTotal,review};
+  showResult(autoSubmit);
+ }catch(e){
+  console.error(e);btn.disabled=false;
+  if(e.code==="23505")alert("এই পরীক্ষাটি আজ ইতিমধ্যে দেওয়া হয়েছে।");
+  else alert("ফলাফল সংরক্ষণ করতে সমস্যা হয়েছে: "+(e.message||"অজানা সমস্যা"));
+ }
 }
-
-(async()=>{
-  const id=idFromUrl();
-  if(id) await loadExam(id);
-  else await loadList();
-})();
+function showResult(autoSubmit){document.getElementById("examPage").classList.add("hidden");document.getElementById("resultPage").classList.remove("hidden");const total=Number(resultData.total_marks||settings?.total_marks||0),score=Number(resultData.score||0),pct=Number(resultData.percentage||0);document.getElementById("score").textContent=bn(score)+" / "+bn(total);document.getElementById("marks").textContent=bn(score);document.getElementById("percentage").textContent=bn(Math.round(pct))+"%";document.getElementById("rank").textContent=resultData.rank?bn(resultData.rank):"—";document.getElementById("rankTotal").textContent=resultData.rank_total?bn(resultData.rank_total):"—";document.getElementById("resultMessage").textContent=autoSubmit?"⏰ সময় শেষ হওয়ায় পরীক্ষা জমা হয়েছে।":"🎉 আপনার পরীক্ষা সফলভাবে জমা হয়েছে।";const pass=Number(resultData.pass_mark||0)<=score;document.getElementById("passStatus").textContent=resultData.pass_mark?((pass?"✅ উত্তীর্ণ":"❌ অনুত্তীর্ণ")+` — পাস নম্বর ${bn(resultData.pass_mark)}`):"";if(settings?.show_answers!==false&&Array.isArray(resultData.review))renderReview(resultData.review);const box=document.getElementById("resultSocial"),p=document.getElementById("resultPageLink"),g=document.getElementById("resultGroupLink"),pu=String(settings?.facebook_page_url||"").trim(),gu=String(settings?.facebook_group_url||"").trim();p.style.display=pu?"block":"none";g.style.display=gu?"block":"none";if(pu)p.href=pu;if(gu)g.href=gu;box.classList.toggle("hidden",!(pu||gu))}
+function renderReview(items){const box=document.getElementById("review");box.classList.remove("hidden");box.innerHTML="<h3>উত্তর পর্যালোচনা</h3>";items.forEach((r,i)=>{const ok=r.is_correct;const div=document.createElement("div");div.className="review-item";div.innerHTML=`<strong>${bn(i+1)}. ${escapeHtml(r.question_text||"")}</strong><p>আপনার উত্তর: <span class="${ok?"correct":"wrong"}">${r.selected_option?optionLetters[r.selected_option]+". "+escapeHtml(r.selected_text||""):"দেওয়া হয়নি"}</span></p><p>সঠিক উত্তর: <span class="correct">${optionLetters[r.correct_option]}. ${escapeHtml(r.correct_text||"")}</span></p>`;box.appendChild(div)})}
+loadExam();
 </script>
 </body>
 </html>
