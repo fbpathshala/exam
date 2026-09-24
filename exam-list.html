@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ফেইসবুক পাঠশালা — পরীক্ষা</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f7fb;color:#172033}.top{background:#2563eb;color:#fff;padding:20px}.wrap{max-width:900px;margin:20px auto;padding:0 14px}.card{background:#fff;border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 4px 16px #0001}input,select{padding:12px;border:1px solid #ccd5e1;border-radius:10px;font-size:16px}input{width:100%}.exam{border:1px solid #e2e8f0;border-radius:14px;padding:16px;margin-top:12px}.btn{display:inline-block;background:#2563eb;color:#fff;padding:11px 15px;border-radius:10px;text-decoration:none;font-weight:bold;margin-top:10px}.error{background:#fee2e2;color:#991b1b}.muted{color:#64748b}
+</style>
+</head>
+<body>
+<header class="top"><b>📚 ফেইসবুক পাঠশালা</b><div>পরীক্ষা</div></header>
+<main class="wrap">
+<section class="card"><h2>📝 পরীক্ষার তালিকা</h2><input id="search" placeholder="পরীক্ষার নাম খুঁজুন" oninput="render()"><br><br><select id="filter" onchange="render()"><option value="all">সব পরীক্ষা</option><option value="active">সক্রিয় পরীক্ষা</option></select></section>
+<section id="list" class="card muted">পরীক্ষাগুলো লোড হচ্ছে…</section>
+</main>
+<script>
+const sb=supabase.createClient('https://ydvbnalhcnfqpxkkmywr.supabase.co','sb_publishable_xCbSWDkASsbUPl-WmygyMw_eVrJY_9a');
+const BN='০১২৩৪৫৬৭৮৯';let exams=[];
+const bn=x=>String(x??'').replace(/\d/g,d=>BN[d]);
+const esc=x=>String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+async function load(){
+ try{
+  const r=await sb.from('exams').select('id,exam_name,status,total_questions').order('id',{ascending:false});
+  if(r.error) throw r.error;
+  exams=r.data||[];
+  const s=await sb.from('exam_settings').select('exam_id,total_questions,total_marks,duration_minutes,exam_date');
+  if(!s.error){const map=new Map((s.data||[]).map(x=>[String(x.exam_id),x]));exams=exams.map(x=>({...x,...(map.get(String(x.id))||{})}));}
+  render();
+ }catch(e){const el=document.getElementById('list');el.className='card error';el.textContent='পরীক্ষাগুলো লোড করা যাচ্ছে না: '+(e.message||'অজানা সমস্যা');}
+}
+function render(){
+ const q=document.getElementById('search').value.toLowerCase().trim(),f=document.getElementById('filter').value;
+ const rows=exams.filter(e=>(f==='all'||String(e.status||'').toLowerCase()==='active')&&(!q||String(e.exam_name||'').toLowerCase().includes(q)));
+ document.getElementById('list').innerHTML=rows.length?rows.map(e=>{const active=String(e.status||'').toLowerCase()==='active';return `<div class="exam"><b>${esc(e.exam_name||'নামহীন পরীক্ষা')}</b><p>প্রশ্ন: ${bn(e.total_questions||0)}টি · মোট নম্বর: ${bn(e.total_marks||0)}${e.duration_minutes?' · সময়: '+bn(e.duration_minutes)+' মিনিট':''}</p>${active?`<a class="btn" href="index.html?exam=${encodeURIComponent(e.id)}">পরীক্ষা শুরু করুন →</a>`:'পরীক্ষাটি বর্তমানে বন্ধ'}</div>`}).join(''):'কোনো পরীক্ষা পাওয়া যায়নি';
+}
+load();
+</script>
+</body></html>
