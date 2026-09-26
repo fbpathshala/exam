@@ -43,6 +43,7 @@ textarea{resize:vertical}button{background:var(--primary);color:#fff;border:0;fo
     <input id="password" type="password" placeholder="Password">
     <button id="loginBtn">Login</button>
     <div id="loginMsg" class="msg"></div>
+    <div id="loginDiag" class="msg"></div>
   </div>
 
   <div id="app" class="hidden">
@@ -277,11 +278,11 @@ textarea{resize:vertical}button{background:var(--primary);color:#fff;border:0;fo
   </div>
 </div>
 
-<script src="config.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script>
-const SUPABASE_URL=window.FACEBOOK_PATHSHALA_CONFIG.SUPABASE_URL;
-const SUPABASE_KEY=window.FACEBOOK_PATHSHALA_CONFIG.SUPABASE_KEY;
+const SUPABASE_URL="https://ydvbnalhcnfqpxkkmywr.supabase.co";
+const SUPABASE_KEY="sb_publishable_xCbSWDkASsbUPl-WmygyMw_eVrJY_9a";
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const CATEGORIES=["বাংলা সাহিত্য","বাংলা ব্যাকরণ","গণিত","ইংরেজি","বাংলাদেশ","আন্তর্জাতিক","বিজ্ঞান","কম্পিউটার ও তথ্যপ্রযুক্তি","সাম্প্রতিক প্রশ্নোত্তর","ভূগোল"];
 let exams=[],questions=[],results=[],uploadRows=[];
@@ -314,6 +315,8 @@ function fillAllSelects(){
  fillExam("bankExam","সব পরীক্ষা"); fillExam("resultExam","সব পরীক্ষা");
  fillCategory("manualCategory",false); fillCategory("editCategory",false); fillCategory("bankCategory",true); fillCategory("builderCategory",true); populateJobExam(); loadBuilderSources();
 }
+window.addEventListener("error",e=>{const d=$("loginDiag");if(d&&e?.message)d.textContent="System error: "+e.message});
+
 async function session(){
  const {data}=await db.auth.getSession();
  if(data.session){$("loginView").classList.add("hidden");$("app").classList.remove("hidden");$("adminEmail").textContent=data.session.user.email||"";await loadAll();}
