@@ -68,7 +68,7 @@ textarea{resize:vertical}button{background:var(--primary);color:#fff;border:0;fo
         <div>
           <div class="dashboardKicker">MCQ EXAM ADMIN</div>
           <h2>🏠 Dashboard</h2>
-          <p>আপনার পরীক্ষা ও Master Question Bank-এর বর্তমান অবস্থা এক নজরে দেখুন।</p>
+          <p>আপনার পরীক্ষার পুরো ব্যবস্থাপনা এক নজরে দেখুন। প্রয়োজনীয় বিভাগগুলো উপরের <b>⋮</b> মেনু থেকে খুলুন।</p>
         </div>
         <div class="dashboardBadge">⚡ Live Overview</div>
       </div>
@@ -80,7 +80,7 @@ textarea{resize:vertical}button{background:var(--primary);color:#fff;border:0;fo
         </div>
         <div class="dashStat dashPurple">
           <div class="dashIcon">📝</div>
-          <div class="dashText"><span>Question Bank-এ মোট প্রশ্ন</span><strong id="dashQuestionCount">0</strong></div>
+          <div class="dashText"><span>মোট প্রশ্ন</span><strong id="dashQuestionCount">0</strong></div>
         </div>
         <div class="dashStat dashGreen">
           <div class="dashIcon">📊</div>
@@ -183,11 +183,10 @@ textarea{resize:vertical}button{background:var(--primary);color:#fff;border:0;fo
       <div id="manualBox" class="card hidden" hidden>
         <h3>Manual Add</h3>
         <div class="grid">
-          <select id="manualSourceType" onchange="sourceNameOptions('manualSourceName',this.value)"><option value="verification_test">🧪 যাচাই পরীক্ষা</option><option value="job_solution">💼 Job Solution</option><option value="recent_information">📰 সাম্প্রতিক</option><option value="subject">📚 অন্যান্য</option></select>
-          <div class="right" style="align-items:center"><select id="manualSourceName" style="flex:1"><option value="">Folder / Set নির্বাচন করুন</option></select><button type="button" class="light" onclick="createBankFolder('manualSourceType','manualSourceName')">➕ নতুন Folder</button></div>
+          <select id="manualSourceType"><option value="verification_test">📝 যাচাই পরীক্ষা</option><option value="job_solution">💼 Job Solution</option><option value="recent_information">📰 সাম্প্রতিক তথ্য</option><option value="subject">📚 বিষয়ভিত্তিক প্রশ্ন</option></select>
+          <input id="manualSourceName" placeholder="Source / Set-এর নাম (যেমন ৫০তম BCS)">
           <select id="manualCategory"></select>
         </div>
-        <div class="small" style="margin-top:6px">Category = Question Bank-এর প্রধান বিভাগ। Folder/Set = ওই বিভাগের ভেতরের আপনার তৈরি সেট। বিষয় আলাদা করে নিচে নির্বাচন করুন।</div>
         <textarea id="qText" rows="3" placeholder="Question"></textarea>
         <div class="grid">
           <input id="optA" placeholder="ক) Option A"><input id="optB" placeholder="খ) Option B">
@@ -201,11 +200,7 @@ textarea{resize:vertical}button{background:var(--primary);color:#fff;border:0;fo
       <div id="bulkBox" class="card hidden" hidden>
         <h3>Excel / CSV Upload</h3>
         <p class="small">প্রশ্ন সরাসরি Master Question Bank-এ যাবে। Source ও Category Question Bank-এর metadata হিসেবে থাকবে; কোনো Exam-এর সঙ্গে upload-এর সময় প্রশ্ন যুক্ত হবে না।</p>
-        <div class="grid">
-          <select id="bulkSourceType" onchange="sourceNameOptions('bulkSourceName',this.value)"><option value="verification_test">🧪 যাচাই পরীক্ষা</option><option value="job_solution">💼 Job Solution</option><option value="recent_information">📰 সাম্প্রতিক</option><option value="subject">📚 অন্যান্য</option></select>
-          <div class="right" style="align-items:center"><select id="bulkSourceName" style="flex:1"><option value="">Folder / Set নির্বাচন করুন</option></select><button type="button" class="light" onclick="createBankFolder('bulkSourceType','bulkSourceName')">➕ নতুন Folder</button></div>
-          <select id="bulkCategory"></select>
-        </div>
+        <div class="grid"><select id="bulkSourceType"><option value="verification_test">📝 যাচাই পরীক্ষা</option><option value="job_solution">💼 Job Solution</option><option value="recent_information">📰 সাম্প্রতিক তথ্য</option><option value="subject">📚 বিষয়ভিত্তিক প্রশ্ন</option></select><input id="bulkSourceName" placeholder="Source / Set-এর নাম"></div>
         <input id="fileInput" type="file" accept=".xlsx,.xls,.csv">
         <div class="actions"><button id="previewBtn">Preview</button><button id="uploadBtn">Upload</button></div>
         <div id="uploadMsg" class="msg"></div>
@@ -216,7 +211,7 @@ textarea{resize:vertical}button{background:var(--primary);color:#fff;border:0;fo
     <section id="view-bank" class="view">
       <div class="card">
         <h2>🗂️ Question Bank</h2>
-        <p class="small">প্রথমে প্রধান Category, তারপর Folder/Set, তারপর বিষয় নির্বাচন করুন। Question Bank-এর প্রশ্নগুলো এখান থেকেই দেখা ও পরিচালনা করা যাবে।</p>
+        <p class="small">Category = সব পরীক্ষা জুড়ে ঐ ক্যাটাগরির প্রশ্ন একত্রে দেখাবে। Exam দিলে নির্দিষ্ট পরীক্ষার প্রশ্নগুলো দেখাবে।</p>
         <div class="actions" style="margin:10px 0">
           <button onclick="showView('questions');document.getElementById('manualBox').classList.remove('hidden')">➕ Manual Question</button>
           <button class="light" onclick="showView('questions');document.getElementById('bulkBox').classList.remove('hidden')">📥 CSV / Excel Upload</button>
@@ -225,10 +220,10 @@ textarea{resize:vertical}button{background:var(--primary);color:#fff;border:0;fo
         <div class="toolbar">
           <select id="bankSourceType"><option value="">সব Source</option><option value="job_solution">💼 Job Solution</option><option value="verification_test">📝 যাচাই পরীক্ষা</option><option value="recent_information">📰 সাম্প্রতিক তথ্য</option><option value="subject">📚 বিষয়ভিত্তিক প্রশ্ন</option></select>
           <select id="bankSourceName"><option value="">সব সেট</option></select>
-          <select id="bankCategory"><option value="">সব বিষয়</option></select>
+          <select id="bankCategory"><option value="">সব Category</option></select>
           <input id="bankSearch" placeholder="প্রশ্ন খুঁজুন">
         </div>
-        <div class="bankSectionLabel">Category → Folder/Set → বিষয় অনুযায়ী প্রশ্ন দেখুন</div>
+        <div class="bankSectionLabel">Source / Category অনুযায়ী প্রশ্ন দেখুন</div>
         <div id="bankCategories" class="categoryChips"></div>
         <div id="bankInfo" class="msg"></div>
         <div id="bankList" class="bankList"></div>
@@ -317,7 +312,7 @@ function fillAllSelects(){
  if($('distCategory')) $('distCategory').innerHTML='<option value="">Category নির্বাচন করুন</option>'+CATEGORIES.map(c=>`<option value="${safe(c)}">${safe(c)}</option>`).join("");
  ["settingsExam","paperExam","answerExam","builderExam"].forEach(id=>fillExam(id));
  fillExam("bankExam","সব পরীক্ষা"); fillExam("resultExam","সব পরীক্ষা");
- fillCategory("manualCategory",false); fillCategory("editCategory",false); fillCategory("bulkCategory",false); fillCategory("bankCategory",true); fillCategory("builderCategory",true); sourceNameOptions("manualSourceName",$("manualSourceType")?.value||"verification_test"); sourceNameOptions("bulkSourceName",$("bulkSourceType")?.value||"verification_test"); populateJobExam(); loadBuilderSources();
+ fillCategory("manualCategory",false); fillCategory("editCategory",false); fillCategory("bankCategory",true); fillCategory("builderCategory",true); populateJobExam(); loadBuilderSources();
 }
 async function session(){
  const {data}=await db.auth.getSession();
@@ -467,15 +462,9 @@ async function clearExamQuestions(){const examId=$('builderExam').value;if(!exam
 $('builderExam').onchange=renderExamBuilder;$('builderCategory').onchange=renderExamBuilder;$('builderSearch').oninput=renderExamBuilder;$('builderJobSource').onchange=()=>{};$('importJobToExamBtn').onclick=importJobToExam;$('saveSelectedBankBtn').onclick=saveSelectedBankQuestions;$('randomBankToExamBtn').onclick=randomBankQuestions;$('clearExamQuestionsBtn').onclick=clearExamQuestions;
 
 async function loadQuestions(){
- const [listR,countR]=await Promise.all([
-  db.from("questions").select("*, exams(title)").order("question_order",{ascending:true}).limit(5000),
-  db.from("questions").select("id",{count:"exact",head:true})
- ]);
- if(listR.error){console.error(listR.error);msg("manualMsg",listR.error.message,"error");return}
- questions=(listR.data||[]).map(q=>({...q,category:normCat(q.category)}));
- const total=countR.error?questions.length:(countR.count||0);
- $("dashQuestionCount").textContent=bn(total);
- fillCategory("bankCategory",true);renderBankCategories(canonicalCat($("bankCategory").value));renderBank();loadSettings();renderExamBuilder();
+ const {data,error}=await db.from("questions").select("*, exams(title)").order("question_order",{ascending:true});
+ if(error){console.error(error);msg("manualMsg",error.message,"error");return}
+ questions=(data||[]).map(q=>({...q,category:normCat(q.category)}));$("dashQuestionCount").textContent=questions.length;$("dashQuestionCount").textContent=bn(questions.length);fillCategory("bankCategory",true);renderBankCategories(canonicalCat($("bankCategory").value));renderBank();loadSettings();renderExamBuilder();
 }
 $("manualAddBtn").onclick=()=>{$("manualBox").hidden=false;$("manualBox").classList.remove("hidden");$("bulkBox").hidden=true;$("bulkBox").classList.add("hidden")};
 $("bulkUploadBtn").onclick=()=>{$("bulkBox").hidden=false;$("bulkBox").classList.remove("hidden");$("manualBox").hidden=true;$("manualBox").classList.add("hidden")};
@@ -485,26 +474,7 @@ $("saveQuestionBtn").onclick=async()=>{
  const {error}=await db.from("questions").insert(row);if(error)msg("manualMsg",error.message,"error");else{msg("manualMsg","Question সংরক্ষণ হয়েছে","success");["qText","optA","optB","optC","optD","qExplanation"].forEach(id=>$(id).value="");$("correct").value="";await loadQuestions()}
 };
 
-function sourceNameOptions(id,type){
- const el=$(id);if(!el)return;
- const vals=[...new Set(questions.filter(q=>!type||q.source_type===type).map(q=>q.source_name).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'bn'));
- const cur=el.value;
- el.innerHTML='<option value="">Folder / Set নির্বাচন করুন</option>'+vals.map(v=>`<option value="${safe(v)}">${safe(v)}</option>`).join('');
- if(vals.includes(cur))el.value=cur;
-}
-
-async function createBankFolder(typeId,nameId){
- const type=$(typeId)?.value||'verification_test', name=prompt('নতুন Folder / Set-এর নাম দিন:');
- if(name===null)return;
- const folder=name.trim();if(!folder){alert('Folder / Set-এর নাম দিন।');return}
- try{
-  const existing=await db.from('question_sources').select('id').eq('source_category',type).eq('source_name',folder).limit(1).maybeSingle();
-  if(existing.error)throw existing.error;
-  if(!existing.data){const ins=await db.from('question_sources').insert({source_category:type,source_name:folder}).select('id').single();if(ins.error)throw ins.error;}
-  sourceNameOptions(nameId,type);$(nameId).value=folder;
- }catch(e){alert('Folder তৈরি করা যায়নি: '+(e.message||e))}
-}
-
+function sourceNameOptions(id,type){const el=$(id);if(!el)return;const vals=[...new Set(questions.filter(q=>!type||q.source_type===type).map(q=>q.source_name).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b)));const cur=el.value;el.innerHTML='<option value="">সব সেট</option>'+vals.map(v=>`<option value="${safe(v)}">${safe(v)}</option>`).join('');if(vals.includes(cur))el.value=cur;}
 function renderBank(){
  const st=$("bankSourceType")?.value||"",sn=$("bankSourceName")?.value||"",cat=canonicalCat($("bankCategory")?.value||""),s=$("bankSearch").value.trim().toLowerCase();
  const f=questions.filter(q=>(!st||q.source_type===st)&&(!sn||String(q.source_name||"")===String(sn))&&(!cat||canonicalCat(q.category)===cat)&&(!s||String(q.question_text||"").toLowerCase().includes(s)));
@@ -606,7 +576,7 @@ $("downloadResultExcelBtn").onclick=downloadResultExcel;$("printResultBtn").oncl
 function renderLinks(){$("linksList").innerHTML=exams.map(e=>`<div class="card"><b>${safe(e.title)}</b><div class="small" style="word-break:break-all">${safe(examLink(e.id))}</div><div class="actions"><button onclick="copyLink('${e.id}')">📋 Copy Link</button><button class="light" onclick="window.open('${examLink(e.id)}','_blank')">↗️ Open</button></div></div>`).join("")}
 
 function populateJobExam(){const e=$("jobSourceExam");if(!e)return;const old=e.value;e.innerHTML='<option value="">Exam নির্বাচন করুন (ঐচ্ছিক)</option>'+exams.map(x=>`<option value="${x.id}">${safe(x.title)}</option>`).join('');if(old)e.value=old;}
-function updateDashboard(){if($("dashExamCount"))$("dashExamCount").textContent=bn(exams.length);if($("dashQuestionCount")&&$("dashQuestionCount").textContent==="0")$("dashQuestionCount").textContent=bn(questions.length);if($("dashResultCount")){const ids=new Set((results||[]).map(r=>String(r.student_id||r.students?.id||r.students?.mobile||r.id)));$("dashResultCount").textContent=bn(ids.size);}}
+function updateDashboard(){if($("dashExamCount"))$("dashExamCount").textContent=bn(exams.length);if($("dashQuestionCount"))$("dashQuestionCount").textContent=bn(questions.length);if($("dashResultCount"))$("dashResultCount").textContent=bn(results.length);}
 async function loadJobSolutions(){const r=await db.from('job_solutions').select('*').order('created_at',{ascending:false});if(r.error){$('jobList').innerHTML='<div class="msg error">Job Solution এখনো database-এ সক্রিয় হয়নি। নিচের SQL ফাইলটি একবার Supabase-এ চালাতে হবে।</div>';if($('jobCount'))$('jobCount').textContent='০';return;}const rows=r.data||[];if($('jobCount'))$('jobCount').textContent=bn(rows.length);$('jobList').innerHTML=rows.map(j=>`<div class="card"><b>${safe(j.title)}</b><div class="small">${safe(j.exam_id?'Exam-linked':'Independent Job Solution')}</div><div class="actions"><button onclick="syncJob('${j.id}','${j.exam_id||''}')">🔄 Exam থেকে প্রশ্ন Sync</button><button class="light" onclick="window.open('job-solution.html?job=${encodeURIComponent(j.id)}','_blank')">↗️ Open</button><button class="danger" onclick="deleteJob('${j.id}')">🗑️ Delete</button></div></div>`).join('')||'<div class="msg">এখনো কোনো Job Solution তৈরি হয়নি।</div>';}
 async function createJob(){const title=$("jobTitle").value.trim(),examId=$("jobSourceExam").value||null;if(!title){msg('jobMsg','Job Solution-এর নাম দিন','error');return}const r=await db.from('job_solutions').insert({title,exam_id:examId}).select().single();if(r.error){msg('jobMsg','Job Solution চালু হয়নি: '+r.error.message+' — SQL লাগবে।','error');return}$("jobTitle").value='';if(examId)await syncJob(r.data.id,examId,true);else{msg('jobMsg','Job Solution তৈরি হয়েছে।','success');await loadJobSolutions();}}
 async function syncJob(jobId,examId,quiet=false){if(!examId){const j=await db.from('job_solutions').select('exam_id').eq('id',jobId).single();examId=j.data?.exam_id||null;}if(!examId){if(!quiet)msg('jobMsg','এই Job Solution-এর সাথে কোনো Exam যুক্ত নেই।','error');return}const qs=questions.filter(q=>String(q.exam_id)===String(examId));if(!qs.length){if(!quiet)msg('jobMsg','এই Exam-এ কোনো প্রশ্ন নেই।','error');return}const rows=qs.map((q,i)=>({job_solution_id:jobId,question_id:q.id,question_order:q.question_order||i+1}));const r=await db.from('job_solution_questions').upsert(rows,{onConflict:'job_solution_id,question_id'});if(r.error){if(!quiet)msg('jobMsg','Sync ব্যর্থ: '+r.error.message,'error');return}if(!quiet)msg('jobMsg',`${bn(rows.length)}টি প্রশ্ন Job Solution-এ যুক্ত হয়েছে।`,'success');await loadJobSolutions();}
@@ -635,7 +605,7 @@ function parseUpload(){
  const reader=new FileReader();reader.onload=e=>{try{const wb=XLSX.read(new Uint8Array(e.target.result),{type:"array",raw:false}),sheet=wb.Sheets[wb.SheetNames[0]],raw=XLSX.utils.sheet_to_json(sheet,{defval:"",raw:false});const norm=v=>String(v??"").replace(/^\ufeff/,"").trim(),key=s=>String(s??"").toLowerCase().replace(/[\s_\-\.]/g,"");const get=(r,names)=>{for(const n of names){const k=key(n);const h=Object.keys(r).find(x=>key(x)===k);if(h!==undefined)return norm(r[h])}return""};uploadRows=raw.map((r,i)=>{const a=get(r,["option_a","optiona","option a","ক"]),b=get(r,["option_b","optionb","option b","খ"]),c=get(r,["option_c","optionc","option c","গ"]),d=get(r,["option_d","optiond","option d","ঘ"]);return{question_order:get(r,["question_order","questionorder","ক্রম","serial","index"])||String(i+1),category:normCat(get(r,["category","ক্যাটাগরি","বিভাগ"])),question_text:get(r,["question_text","question","প্রশ্ন"]),option_a:a,option_b:b,option_c:c,option_d:d,correct_option:normalizeCorrect(get(r,["correct_option","correct_answer","correctanswer","correct","সঠিক উত্তর","সঠিক","answer"]),{a,b,c,d}),explanation:get(r,["explanation","ব্যাখ্যা","explain"])}}).filter(r=>r.question_text);const bad=uploadRows.findIndex(r=>!r.option_a||!r.option_b||!r.option_c||!r.option_d||!["A","B","C","D"].includes(r.correct_option));$("previewHead").innerHTML="<tr>"+["ক্রম","Category","Question","ক","খ","গ","ঘ","Correct","ব্যাখ্যা"].map(x=>`<th>${x}</th>`).join("")+"</tr>";$("previewBody").innerHTML=uploadRows.slice(0,50).map(r=>`<tr><td>${safe(r.question_order)}</td><td>${safe(r.category||"সাধারণ")}</td><td>${safe(r.question_text)}</td><td>${safe(r.option_a)}</td><td>${safe(r.option_b)}</td><td>${safe(r.option_c)}</td><td>${safe(r.option_d)}</td><td>${safe(answerBn(r.correct_option))}</td><td>${safe(r.explanation||"")}</td></tr>`).join("");if(bad>=0)return msg("uploadMsg",`প্রশ্ন ${bn(bad+1)}-এর Options অথবা Correct Answer ঠিকভাবে শনাক্ত হয়নি।`,"error");msg("uploadMsg",`${bn(uploadRows.length)}টি প্রশ্ন পাওয়া গেছে। Preview ঠিক আছে। Upload করলে সরাসরি Question Bank-এ যাবে।`,"success")}catch(err){uploadRows=[];msg("uploadMsg","ফাইল পড়তে সমস্যা: "+err.message,"error")}};reader.readAsArrayBuffer(file);
 }
 $("previewBtn").onclick=parseUpload;
-$("uploadBtn").onclick=async()=>{if(!uploadRows.length){msg("uploadMsg","আগে Preview করুন","error");return}const st=$("bulkSourceType").value,sn=$("bulkSourceName").value.trim()||null;const rows=uploadRows.map((r,i)=>({exam_id:null,source_type:st,source_name:sn,category:canonicalCat($('bulkCategory').value||r.category||"")||null,question_text:r.question_text,option_a:r.option_a,option_b:r.option_b,option_c:r.option_c,option_d:r.option_d,correct_option:r.correct_option,explanation:r.explanation||"",question_order:questions.length+i+1}));const {error}=await db.from("questions").insert(rows);if(error)msg("uploadMsg","Upload ব্যর্থ: "+error.message,"error");else{msg("uploadMsg",`${bn(rows.length)}টি প্রশ্ন Master Question Bank-এ যুক্ত হয়েছে।`,"success");uploadRows=[];await loadQuestions()}};
+$("uploadBtn").onclick=async()=>{if(!uploadRows.length){msg("uploadMsg","আগে Preview করুন","error");return}const st=$("bulkSourceType").value,sn=$("bulkSourceName").value.trim()||null;const rows=uploadRows.map((r,i)=>({exam_id:null,source_type:st,source_name:sn,category:canonicalCat(r.category||"")||null,question_text:r.question_text,option_a:r.option_a,option_b:r.option_b,option_c:r.option_c,option_d:r.option_d,correct_option:r.correct_option,explanation:r.explanation||"",question_order:questions.length+i+1}));const {error}=await db.from("questions").insert(rows);if(error)msg("uploadMsg","Upload ব্যর্থ: "+error.message,"error");else{msg("uploadMsg",`${bn(rows.length)}টি প্রশ্ন Master Question Bank-এ যুক্ত হয়েছে।`,"success");uploadRows=[];await loadQuestions()}};
 
 async function loadDocxFallback(){if(window.docx)return window.docx;for(const url of ['https://unpkg.com/docx@8.5.0/build/index.umd.js','https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js']){try{await new Promise((resolve,reject)=>{const sc=document.createElement('script');sc.src=url;sc.onload=resolve;sc.onerror=reject;document.head.appendChild(sc)});if(window.docx)return window.docx;}catch(e){}}return null;}
 
