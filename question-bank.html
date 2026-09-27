@@ -3,16 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>প্রশ্ন ব্যাংক</title>
+<title>Question Bank</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
   background:#f5f7fb;
   color:#172033;
-  font-family:Arial,sans-serif
+  font-family:Arial,"Noto Sans Bengali",sans-serif;
 }
 
 header{
@@ -20,23 +22,27 @@ header{
   color:#fff;
   padding:14px 16px;
   display:flex;
-  align-items:center
+  align-items:center;
+  gap:10px;
 }
 
-header b{font-size:18px}
+header b{
+  font-size:18px;
+}
 
 header button{
   margin-left:auto;
   width:auto;
-  background:none;
+  background:transparent;
+  border:1px solid rgba(255,255,255,.4);
   color:#fff;
-  border:0
+  padding:8px 12px;
 }
 
 main{
-  max-width:1050px;
+  max-width:1000px;
   margin:auto;
-  padding:14px
+  padding:14px;
 }
 
 .card{
@@ -44,35 +50,40 @@ main{
   border:1px solid #e2e8f0;
   border-radius:14px;
   padding:15px;
-  margin-bottom:12px
+  margin-bottom:13px;
 }
 
 h3{
-  margin:0 0 12px
+  margin:0 0 12px;
+  font-size:17px;
 }
 
 label{
   display:block;
-  font-size:14px;
   font-weight:700;
-  margin-bottom:5px
+  margin-bottom:6px;
 }
 
-select,input,textarea,button{
+input,
+select,
+textarea,
+button{
   width:100%;
   padding:11px;
   border-radius:9px;
-  font:inherit
+  font:inherit;
 }
 
-select,input,textarea{
+input,
+select,
+textarea{
   border:1px solid #cbd5e1;
-  background:#fff
+  background:#fff;
 }
 
 textarea{
-  min-height:85px;
-  resize:vertical
+  min-height:90px;
+  resize:vertical;
 }
 
 button{
@@ -80,184 +91,220 @@ button{
   background:#1769aa;
   color:#fff;
   font-weight:700;
-  cursor:pointer
+  cursor:pointer;
+}
+
+button.secondary{
+  background:#64748b;
+}
+
+button.green{
+  background:#15803d;
+}
+
+button.danger{
+  background:#dc2626;
+}
+
+button.small{
+  width:auto;
+  padding:9px 12px;
 }
 
 .category-buttons{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:7px
+  gap:8px;
 }
 
 .category-buttons button{
-  background:#fff;
+  background:#e2e8f0;
   color:#172033;
-  border:1px solid #cbd5e1
 }
 
 .category-buttons button.active{
   background:#1769aa;
-  color:#fff
+  color:#fff;
 }
 
-.select-row{
+.section-title{
+  font-size:15px;
+  font-weight:700;
+  margin-bottom:8px;
+}
+
+.selector-row{
   display:grid;
   grid-template-columns:1fr auto;
   gap:8px;
-  margin-bottom:10px
+  align-items:end;
+  margin-bottom:12px;
 }
 
-.select-row button{
+.selector-row .select-wrap{
+  min-width:0;
+}
+
+.selector-row button{
   width:auto;
-  min-width:115px;
-  white-space:nowrap
+  white-space:nowrap;
 }
 
-.small-form{
+.create-box{
   display:none;
   background:#f8fafc;
-  border:1px solid #e2e8f0;
-  padding:10px;
+  border:1px solid #dbe3ed;
   border-radius:10px;
-  margin:6px 0 12px
+  padding:10px;
+  margin-top:8px;
 }
 
-.small-form.show{
-  display:block
+.create-box.show{
+  display:block;
 }
 
-.small-form-row{
+.create-actions{
   display:grid;
-  grid-template-columns:1fr auto;
-  gap:8px
-}
-
-.small-form-row button{
-  width:auto;
-  min-width:90px
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:8px;
 }
 
 .status{
-  margin-top:7px;
-  font-size:13px;
-  color:#475569
-}
-
-.section-note{
-  background:#eff6ff;
-  border-radius:9px;
   padding:9px 11px;
-  font-size:13px;
-  color:#1e40af;
-  margin-bottom:12px
-}
-
-.grid2{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:10px
-}
-
-.grid3{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px
-}
-
-.question{
-  background:#fff;
-  border:1px solid #e2e8f0;
-  border-radius:10px;
-  padding:13px;
-  margin-top:9px
-}
-
-.question-title{
-  font-weight:700;
-  line-height:1.6
-}
-
-.option{
-  margin-top:5px;
-  line-height:1.5
-}
-
-.meta{
-  color:#64748b;
-  font-size:13px;
-  line-height:1.7;
-  margin-top:9px
-}
-
-.badge{
-  display:inline-block;
-  background:#e0f2fe;
-  color:#075985;
-  border-radius:20px;
-  padding:3px 8px;
-  margin:2px 3px 2px 0;
-  font-size:12px
-}
-
-.question-actions{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:7px;
-  margin-top:10px
-}
-
-.secondary{
-  background:#475569
-}
-
-.danger{
-  background:#dc2626
-}
-
-.success{
-  background:#15803d
-}
-
-.message{
+  background:#f1f5f9;
+  border-radius:8px;
+  color:#475569;
   font-size:13px;
   margin-top:8px;
-  color:#475569
+}
+
+.selected-info{
+  background:#eff6ff;
+  border:1px solid #bfdbfe;
+  color:#1e40af;
+  padding:10px;
+  border-radius:9px;
+  margin-top:5px;
+  font-size:14px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.full{
+  grid-column:1/-1;
+}
+
+.option-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+.radio-row{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+}
+
+.radio-box{
+  border:1px solid #cbd5e1;
+  border-radius:9px;
+  padding:10px;
+  text-align:center;
+  cursor:pointer;
+}
+
+.radio-box input{
+  width:auto;
+  margin-right:5px;
+}
+
+.form-actions{
+  margin-top:12px;
+}
+
+.filter-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:10px;
+}
+
+.q{
+  border:1px solid #e2e8f0;
+  border-radius:11px;
+  padding:12px;
+  margin-top:9px;
+  background:#fff;
+}
+
+.q-number{
+  font-weight:700;
+  margin-bottom:7px;
+}
+
+.q-options{
+  margin-top:8px;
+  line-height:1.8;
+}
+
+.q-meta{
+  color:#64748b;
+  font-size:12px;
+  margin-top:8px;
+}
+
+.q-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:7px;
+  margin-top:10px;
+}
+
+.empty{
+  color:#64748b;
+  padding:15px 0;
+  text-align:center;
 }
 
 .count{
   font-weight:700;
-  margin-top:10px
+  color:#1769aa;
+}
+
+.hidden{
+  display:none!important;
 }
 
 @media(max-width:700px){
-
   .category-buttons{
-    grid-template-columns:1fr
+    grid-template-columns:1fr;
   }
 
-  .select-row{
-    grid-template-columns:1fr
+  .grid,
+  .filter-grid,
+  .option-grid{
+    grid-template-columns:1fr;
   }
 
-  .select-row button{
-    width:100%
+  .selector-row{
+    grid-template-columns:1fr;
   }
 
-  .small-form-row{
-    grid-template-columns:1fr
+  .selector-row button{
+    width:100%;
   }
 
-  .small-form-row button{
-    width:100%
+  .radio-row{
+    grid-template-columns:1fr 1fr;
   }
 
-  .grid2,
-  .grid3{
-    grid-template-columns:1fr
-  }
-
-  .question-actions{
-    grid-template-columns:1fr
+  .q-actions{
+    grid-template-columns:1fr;
   }
 }
 </style>
@@ -266,388 +313,309 @@ button{
 <body>
 
 <header>
-  <b>প্রশ্ন ব্যাংক</b>
+  <b>Question Bank</b>
   <button onclick="go('dashboard.html')">ড্যাশবোর্ড</button>
 </header>
 
-
 <main>
 
-<!-- =========================
-     ১. CATEGORY
-========================= -->
+  <!-- CATEGORY -->
+  <div class="card">
+    <h3>ক্যাটাগরি</h3>
 
-<div class="card">
+    <div class="category-buttons">
+      <button id="catRecruitment" onclick="changeCategory('recruitment')">
+        নিয়োগ পরীক্ষা
+      </button>
 
-  <h3>ক্যাটাগরি</h3>
+      <button id="catVerification" onclick="changeCategory('verification_test')">
+        যাচাই পরীক্ষা
+      </button>
 
-  <div class="category-buttons">
+      <button id="catRecent" onclick="changeCategory('recent')">
+        সাম্প্রতিক প্রশ্ন
+      </button>
+    </div>
 
-    <button
-      id="catRecruitment"
-      class="active"
-      onclick="changeCategory('recruitment')">
-      নিয়োগ পরীক্ষা
-    </button>
-
-    <button
-      id="catVerification"
-      onclick="changeCategory('verification_test')">
-      যাচাই পরীক্ষা
-    </button>
-
-    <button
-      id="catRecent"
-      onclick="changeCategory('recent')">
-      সাম্প্রতিক প্রশ্ন
-    </button>
-
-  </div>
-
-  <div
-    id="categoryStatus"
-    class="status">
-    বর্তমান বিভাগ: নিয়োগ পরীক্ষা
-  </div>
-
-</div>
-
-
-<!-- =========================
-     ২. FOLDER + SET
-========================= -->
-
-<div class="card">
-
-  <h3>ফোল্ডার ও সেট</h3>
-
-  <div class="section-note">
-    প্রথমে ফোল্ডার নির্বাচন করুন। তারপর সেই ফোল্ডারের সেট নির্বাচন করুন।
+    <div id="currentCategoryText" class="selected-info"></div>
   </div>
 
 
-  <!-- FOLDER -->
+  <!-- FOLDER + SET -->
+  <div class="card">
 
-  <label>ফোল্ডার</label>
+    <h3>ফোল্ডার ও সেট নির্বাচন</h3>
 
-  <div class="select-row">
+    <!-- FOLDER -->
+    <div class="section-title">ফোল্ডার</div>
 
-    <select
-      id="folderSelect"
-      onchange="folderChanged()">
+    <div class="selector-row">
 
-      <option value="">
-        ফোল্ডার নির্বাচন করুন
-      </option>
+      <div class="select-wrap">
+        <select id="folderSelect" onchange="folderChanged()">
+          <option value="">ফোল্ডার নির্বাচন করুন</option>
+        </select>
+      </div>
 
-    </select>
+      <button class="small" onclick="toggleFolderCreate()">
+        ＋ নতুন ফোল্ডার
+      </button>
 
-    <button
-      type="button"
-      onclick="toggleFolderForm()">
-      ＋ নতুন ফোল্ডার
-    </button>
+    </div>
 
-  </div>
+    <div id="folderCreateBox" class="create-box">
 
-
-  <!-- NEW FOLDER FORM -->
-
-  <div
-    id="folderForm"
-    class="small-form">
-
-    <label>
-      নতুন ফোল্ডারের নাম
-    </label>
-
-    <div class="small-form-row">
+      <label>নতুন ফোল্ডারের নাম</label>
 
       <input
         id="newFolderName"
-        placeholder="যেমন: ব্রেইন বুস্টার মডেল টেস্ট">
+        placeholder="যেমন: ব্রেইন বুস্টার মডেল টেস্ট"
+      >
+
+      <div class="create-actions">
+        <button class="green" onclick="createFolder()">
+          তৈরি করুন
+        </button>
+
+        <button class="secondary" onclick="closeFolderCreate()">
+          বাতিল
+        </button>
+      </div>
+
+    </div>
+
+
+    <!-- SET -->
+    <div class="section-title" style="margin-top:15px;">সেট</div>
+
+    <div class="selector-row">
+
+      <div class="select-wrap">
+        <select id="setSelect" onchange="setChanged()">
+          <option value="">আগে ফোল্ডার নির্বাচন করুন</option>
+        </select>
+      </div>
 
       <button
-        onclick="createFolder()">
-        তৈরি করুন
+        id="newSetButton"
+        class="small"
+        onclick="toggleSetCreate()"
+        disabled
+      >
+        ＋ নতুন সেট
       </button>
 
     </div>
 
-    <div
-      id="folderMessage"
-      class="message">
-    </div>
+    <div id="setCreateBox" class="create-box">
 
-  </div>
-
-
-  <!-- SET -->
-
-  <label>সেট</label>
-
-  <div class="select-row">
-
-    <select
-      id="setSelect"
-      onchange="setChanged()">
-
-      <option value="">
-        আগে ফোল্ডার নির্বাচন করুন
-      </option>
-
-    </select>
-
-    <button
-      type="button"
-      onclick="toggleSetForm()">
-      ＋ নতুন সেট
-    </button>
-
-  </div>
-
-
-  <!-- NEW SET FORM -->
-
-  <div
-    id="setForm"
-    class="small-form">
-
-    <label>
-      নতুন সেটের নাম
-    </label>
-
-    <div class="small-form-row">
+      <label>নতুন সেটের নাম</label>
 
       <input
         id="newSetName"
-        placeholder="যেমন: সেট ১">
+        placeholder="যেমন: সেট–১"
+      >
 
-      <button
-        onclick="createSet()">
-        তৈরি করুন
-      </button>
+      <div class="create-actions">
+        <button class="green" onclick="createSet()">
+          তৈরি করুন
+        </button>
+
+        <button class="secondary" onclick="closeSetCreate()">
+          বাতিল
+        </button>
+      </div>
 
     </div>
 
-    <div
-      id="setMessage"
-      class="message">
+
+    <div id="selectionStatus" class="status">
+      ফোল্ডার ও সেট নির্বাচন করুন।
     </div>
 
   </div>
 
 
-  <div
-    id="selectionStatus"
-    class="status">
-    ফোল্ডার ও সেট নির্বাচন করুন।
+  <!-- ADD QUESTION -->
+  <div class="card">
+
+    <h3>প্রশ্ন যোগ করুন</h3>
+
+    <div id="addQuestionNotice" class="selected-info">
+      আগে একটি ফোল্ডার ও সেট নির্বাচন করুন।
+    </div>
+
+    <div id="questionForm" class="hidden">
+
+      <div class="grid">
+
+        <div>
+          <label>প্রশ্ন নম্বর</label>
+          <input id="questionNumber" type="number" min="1" placeholder="যেমন: ১">
+        </div>
+
+        <div>
+          <label>বিষয়</label>
+
+          <select id="subjectSelect">
+            <option value="">বিষয় নির্বাচন করুন</option>
+          </select>
+        </div>
+
+        <div class="full">
+
+          <label>Source</label>
+
+          <select id="sourceSelect">
+            <option value="">Source নির্বাচন করুন</option>
+          </select>
+
+        </div>
+
+        <div class="full">
+
+          <label>প্রশ্ন</label>
+
+          <textarea
+            id="questionText"
+            placeholder="প্রশ্ন লিখুন"
+          ></textarea>
+
+        </div>
+
+      </div>
+
+
+      <div class="option-grid">
+
+        <div>
+          <label>ক</label>
+          <input id="optionA" placeholder="অপশন ক">
+        </div>
+
+        <div>
+          <label>খ</label>
+          <input id="optionB" placeholder="অপশন খ">
+        </div>
+
+        <div>
+          <label>গ</label>
+          <input id="optionC" placeholder="অপশন গ">
+        </div>
+
+        <div>
+          <label>ঘ</label>
+          <input id="optionD" placeholder="অপশন ঘ">
+        </div>
+
+      </div>
+
+
+      <div style="margin-top:12px;">
+
+        <label>সঠিক উত্তর</label>
+
+        <div class="radio-row">
+
+          <label class="radio-box">
+            <input type="radio" name="correctAnswer" value="ক">
+            ক
+          </label>
+
+          <label class="radio-box">
+            <input type="radio" name="correctAnswer" value="খ">
+            খ
+          </label>
+
+          <label class="radio-box">
+            <input type="radio" name="correctAnswer" value="গ">
+            গ
+          </label>
+
+          <label class="radio-box">
+            <input type="radio" name="correctAnswer" value="ঘ">
+            ঘ
+          </label>
+
+        </div>
+
+      </div>
+
+
+      <div style="margin-top:12px;">
+
+        <label>ব্যাখ্যা</label>
+
+        <textarea
+          id="explanation"
+          placeholder="প্রয়োজনে ব্যাখ্যা লিখুন"
+        ></textarea>
+
+      </div>
+
+
+      <div class="form-actions">
+
+        <button id="saveQuestionButton" onclick="saveQuestion()">
+          প্রশ্ন যোগ করুন
+        </button>
+
+      </div>
+
+      <div id="questionMessage" class="status"></div>
+
+    </div>
+
   </div>
 
-</div>
 
+  <!-- QUESTION FILTER -->
+  <div class="card">
 
-<!-- =========================
-     ৩. QUESTION ADD
-========================= -->
+    <h3>প্রশ্ন খুঁজুন</h3>
 
-<div class="card">
+    <div class="filter-grid">
 
-  <h3>প্রশ্ন যোগ করুন</h3>
+      <select id="filterFolder" onchange="loadFilterSets()">
+        <option value="">সব ফোল্ডার</option>
+      </select>
 
-  <div class="section-note">
-    উপরের ফোল্ডার ও সেট নির্বাচন করার পর এখানে প্রশ্ন যোগ করুন।
-  </div>
+      <select id="filterSet" onchange="loadQuestions()">
+        <option value="">সব সেট</option>
+      </select>
 
-
-  <div class="grid3">
-
-    <div>
-
-      <label>বিষয়</label>
-
-      <select id="subjectSelect">
-
-        <option value="">
-          বিষয় নির্বাচন করুন
-        </option>
-
+      <select id="filterSubject" onchange="loadQuestions()">
+        <option value="">সব বিষয়</option>
       </select>
 
     </div>
 
-
-    <div>
-
-      <label>Source</label>
-
-      <select id="sourceSelect">
-
-        <option value="">
-          Source নির্বাচন করুন
-        </option>
-
-      </select>
-
-    </div>
-
-
-    <div>
-
-      <label>প্রশ্ন নম্বর</label>
+    <div style="margin-top:10px;">
 
       <input
-        id="questionNumber"
-        type="number"
-        min="1"
-        placeholder="যেমন: ১">
+        id="searchText"
+        placeholder="প্রশ্ন লিখে খুঁজুন..."
+        oninput="loadQuestions()"
+      >
 
     </div>
 
   </div>
 
 
-  <div style="margin-top:10px">
+  <!-- QUESTION LIST -->
+  <div class="card">
 
-    <label>প্রশ্ন</label>
+    <h3>
+      প্রশ্ন তালিকা
+      <span class="count" id="questionCount">মোট প্রশ্ন: ০</span>
+    </h3>
 
-    <textarea
-      id="questionText"
-      placeholder="প্রশ্ন লিখুন">
-    </textarea>
-
-  </div>
-
-
-  <div
-    class="grid2"
-    style="margin-top:10px">
-
-    <input
-      id="optionA"
-      placeholder="ক অপশন">
-
-    <input
-      id="optionB"
-      placeholder="খ অপশন">
-
-    <input
-      id="optionC"
-      placeholder="গ অপশন">
-
-    <input
-      id="optionD"
-      placeholder="ঘ অপশন">
+    <div id="questionList">
+      <div class="empty">কোনো প্রশ্ন পাওয়া যায়নি</div>
+    </div>
 
   </div>
-
-
-  <div
-    class="grid2"
-    style="margin-top:10px">
-
-    <select id="correctAnswer">
-
-      <option value="">
-        সঠিক উত্তর নির্বাচন করুন
-      </option>
-
-      <option value="A">ক</option>
-      <option value="B">খ</option>
-      <option value="C">গ</option>
-      <option value="D">ঘ</option>
-
-    </select>
-
-
-    <textarea
-      id="explanation"
-      placeholder="ব্যাখ্যা (ঐচ্ছিক)">
-    </textarea>
-
-  </div>
-
-
-  <button
-    id="saveButton"
-    class="success"
-    style="margin-top:10px"
-    onclick="saveQuestion()">
-
-    প্রশ্ন যোগ করুন
-
-  </button>
-
-
-  <div
-    id="saveMessage"
-    class="message">
-  </div>
-
-</div>
-
-
-<!-- =========================
-     ৪. QUESTION LIST
-========================= -->
-
-<div class="card">
-
-  <h3>প্রশ্ন ব্যাংক</h3>
-
-  <div class="grid3">
-
-    <select
-      id="filterFolder"
-      onchange="filterFolderChanged()">
-
-      <option value="">
-        সব ফোল্ডার
-      </option>
-
-    </select>
-
-
-    <select
-      id="filterSet">
-
-      <option value="">
-        সব সেট
-      </option>
-
-    </select>
-
-
-    <select
-      id="filterSubject">
-
-      <option value="">
-        সব বিষয়
-      </option>
-
-    </select>
-
-  </div>
-
-
-  <button
-    style="margin-top:10px"
-    onclick="loadQuestions()">
-
-    প্রশ্ন দেখুন
-
-  </button>
-
-
-  <div
-    id="questionCount"
-    class="count">
-  </div>
-
-
-  <div id="questionList"></div>
-
-</div>
 
 </main>
 
@@ -656,101 +624,42 @@ button{
 
 <script>
 
-/* =========================
-   SUPABASE
-========================= */
+const SUPABASE_URL =
+  "https://ydvbnalhcnfqpxkkmywr.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_xCbSWDkASsbUPl-WmygyMw_eVrJY_9a";
 
 const sb = supabase.createClient(
-  "https://ydvbnalhcnfqpxkkmywr.supabase.co",
-  "sb_publishable_xCbSWDkASsbUPl-WmygyMw_eVrJY_9a"
+  SUPABASE_URL,
+  SUPABASE_KEY
 );
 
 
 /* =========================
-   GLOBAL VARIABLES
+   CATEGORY
 ========================= */
 
-let currentCategory = "recruitment";
+const CATS = {
+  recruitment: "নিয়োগ পরীক্ষা",
+  verification_test: "যাচাই পরীক্ষা",
+  recent: "সাম্প্রতিক প্রশ্ন"
+};
 
-let editingId = null;
-
-let subjects = [];
-
-let sources = [];
-
-
-/* =========================
-   HELPERS
-========================= */
-
-function go(page){
-  location.href = page;
-}
-
-
-function bn(value){
-
-  return String(value ?? "")
-    .replace(
-      /\d/g,
-      d => "০১২৩৪৫৬৭৮৯"[d]
-    );
-
-}
-
-
-function esc(value){
-
-  return String(value ?? "")
-    .replace(
-      /[&<>"']/g,
-      char => ({
-        "&":"&amp;",
-        "<":"&lt;",
-        ">":"&gt;",
-        '"':"&quot;",
-        "'":"&#39;"
-      }[char])
-    );
-
-}
-
-
-function answerBn(answer){
-
-  return {
-    A:"ক",
-    B:"খ",
-    C:"গ",
-    D:"ঘ"
-  }[answer] || answer || "";
-
-}
-
-
-function categoryTitle(category){
-
-  return {
-    recruitment:"নিয়োগ পরীক্ষা",
-    verification_test:"যাচাই পরীক্ষা",
-    recent:"সাম্প্রতিক প্রশ্ন"
-  }[category] || category;
-
-}
+let currentCategory = "verification_test";
 
 
 /* =========================
    AUTH
 ========================= */
 
-async function checkAuth(){
+async function auth(){
 
   const {
     data:{
       session
     }
   } = await sb.auth.getSession();
-
 
   if(!session){
 
@@ -759,405 +668,164 @@ async function checkAuth(){
     return false;
   }
 
-
   return true;
 }
 
 
 /* =========================
-   CATEGORY
+   NAVIGATION
+========================= */
+
+function go(page){
+
+  location.href = page;
+
+}
+
+
+/* =========================
+   CATEGORY CHANGE
 ========================= */
 
 async function changeCategory(category){
 
   currentCategory = category;
 
+  document
+    .getElementById("catRecruitment")
+    .classList.toggle(
+      "active",
+      category === "recruitment"
+    );
 
   document
-    .querySelectorAll(".category-buttons button")
-    .forEach(
-      button =>
-        button.classList.remove("active")
+    .getElementById("catVerification")
+    .classList.toggle(
+      "active",
+      category === "verification_test"
+    );
+
+  document
+    .getElementById("catRecent")
+    .classList.toggle(
+      "active",
+      category === "recent"
     );
 
 
-  if(category === "recruitment")
-    catRecruitment.classList.add("active");
+  document.getElementById(
+    "currentCategoryText"
+  ).textContent =
+    "বর্তমান বিভাগ: " + CATS[category];
 
 
-  if(category === "verification_test")
-    catVerification.classList.add("active");
-
-
-  if(category === "recent")
-    catRecent.classList.add("active");
-
-
-  categoryStatus.textContent =
-    "বর্তমান বিভাগ: " +
-    categoryTitle(category);
-
-
-  closeForms();
-
-  clearQuestionForm();
+  closeFolderCreate();
+  closeSetCreate();
 
 
   await loadFolders();
 
-  await loadQuestions();
+  await loadSources();
+
+  await loadFilterFolders();
+
+  resetQuestionForm();
 
 }
 
 
 /* =========================
-   LOAD SUBJECTS
-========================= */
-
-async function loadSubjects(){
-
-  const result =
-    await sb
-      .from("subjects")
-      .select("id,name")
-      .order("id");
-
-
-  if(result.error){
-
-    saveMessage.textContent =
-      result.error.message;
-
-    return;
-  }
-
-
-  subjects =
-    result.data || [];
-
-
-  subjectSelect.innerHTML =
-    '<option value="">বিষয় নির্বাচন করুন</option>' +
-
-    subjects
-      .map(subject =>
-
-        `<option value="${subject.id}">
-          ${esc(subject.name)}
-        </option>`
-
-      )
-      .join("");
-
-
-  filterSubject.innerHTML =
-    '<option value="">সব বিষয়</option>' +
-
-    subjects
-      .map(subject =>
-
-        `<option value="${subject.id}">
-          ${esc(subject.name)}
-        </option>`
-
-      )
-      .join("");
-
-}
-
-
-/* =========================
-   LOAD SOURCES
-========================= */
-
-async function loadSources(){
-
-  const result =
-    await sb
-      .from("question_sources")
-      .select("id,source_name")
-      .order(
-        "id",
-        {ascending:false}
-      );
-
-
-  if(result.error){
-
-    sourceSelect.innerHTML =
-      '<option value="">Source পাওয়া যায়নি</option>';
-
-    return;
-  }
-
-
-  sources =
-    result.data || [];
-
-
-  sourceSelect.innerHTML =
-    '<option value="">Source নির্বাচন করুন</option>' +
-
-    sources
-      .map(source =>
-
-        `<option value="${source.id}">
-          ${esc(source.source_name || "")}
-        </option>`
-
-      )
-      .join("");
-
-}
-
-
-/* =========================
-   FOLDER FORM
-========================= */
-
-function toggleFolderForm(){
-
-  folderForm.classList.toggle("show");
-
-  if(
-    folderForm.classList.contains("show")
-  ){
-
-    newFolderName.focus();
-
-  }
-
-}
-
-
-function toggleSetForm(){
-
-  if(!folderSelect.value){
-
-    alert(
-      "নতুন সেট তৈরি করতে আগে একটি ফোল্ডার নির্বাচন করুন।"
-    );
-
-    return;
-  }
-
-
-  setForm.classList.toggle("show");
-
-
-  if(
-    setForm.classList.contains("show")
-  ){
-
-    newSetName.focus();
-
-  }
-
-}
-
-
-function closeForms(){
-
-  folderForm.classList.remove("show");
-
-  setForm.classList.remove("show");
-
-}
-
-
-/* =========================
-   LOAD FOLDERS
+   FOLDER
 ========================= */
 
 async function loadFolders(){
+
+  const folderSelect =
+    document.getElementById("folderSelect");
+
 
   folderSelect.innerHTML =
     '<option value="">ফোল্ডার নির্বাচন করুন</option>';
 
 
-  filterFolder.innerHTML =
-    '<option value="">সব ফোল্ডার</option>';
+  const {
+    data,
+    error
+  } = await sb
+    .from("question_bank_folders")
+    .select("id,sub_category,folder_name")
+    .eq(
+      "sub_category",
+      CATS[currentCategory]
+    )
+    .order("folder_name");
 
 
-  const result =
-    await sb
-      .from("question_bank_folders")
-      .select(
-        "id,folder_name"
-      )
-      .eq(
-        "sub_category",
-        currentCategory
-      )
-      .order("folder_name");
+  if(error){
 
+    folderSelect.innerHTML =
+      '<option value="">ফোল্ডার লোড হয়নি</option>';
 
-  if(result.error){
-
-    folderMessage.textContent =
-      result.error.message;
+    console.error(error);
 
     return;
   }
 
 
-  const rows =
-    result.data || [];
-
-
-  rows.forEach(folder => {
+  (data || []).forEach(folder => {
 
     const option =
       document.createElement("option");
 
-    option.value =
-      folder.id;
+    option.value = folder.id;
 
     option.textContent =
       folder.folder_name;
 
     folderSelect.appendChild(option);
 
-
-    const filterOption =
-      document.createElement("option");
-
-    filterOption.value =
-      folder.id;
-
-    filterOption.textContent =
-      folder.folder_name;
-
-    filterFolder.appendChild(
-      filterOption
-    );
-
   });
 
 
-  await loadSets();
-
-  await loadFilterSets();
+  loadSets();
 
 }
 
 
 /* =========================
-   FOLDER CHANGE
+   CREATE FOLDER UI
 ========================= */
 
-async function folderChanged(){
+function toggleFolderCreate(){
 
-  setSelect.innerHTML =
-    '<option value="">সেট নির্বাচন করুন</option>';
-
-
-  selectionStatus.textContent =
-    "সেট নির্বাচন করুন।";
-
-
-  await loadSets();
-
-}
-
-
-/* =========================
-   LOAD SETS
-========================= */
-
-async function loadSets(){
-
-  const folderId =
-    Number(folderSelect.value);
-
-
-  setSelect.innerHTML =
-    '<option value="">সেট নির্বাচন করুন</option>';
-
-
-  if(!folderId){
-
-    setSelect.innerHTML =
-      '<option value="">আগে ফোল্ডার নির্বাচন করুন</option>';
-
-    return;
-  }
-
-
-  const result =
-    await sb
-      .from("question_bank_sets")
-      .select(
-        "id,set_name"
-      )
-      .eq(
-        "folder_id",
-        folderId
-      )
-      .order("set_name");
-
-
-  if(result.error){
-
-    setMessage.textContent =
-      result.error.message;
-
-    return;
-  }
-
-
-  const rows =
-    result.data || [];
-
-
-  rows.forEach(set => {
-
-    const option =
-      document.createElement("option");
-
-    option.value =
-      set.id;
-
-    option.textContent =
-      set.set_name;
-
-    setSelect.appendChild(option);
-
-  });
-
-}
-
-
-/* =========================
-   SET CHANGE
-========================= */
-
-function setChanged(){
-
-  const folder =
-    folderSelect.options[
-      folderSelect.selectedIndex
-    ]?.textContent || "";
-
-
-  const set =
-    setSelect.options[
-      setSelect.selectedIndex
-    ]?.textContent || "";
-
+  document
+    .getElementById("folderCreateBox")
+    .classList.toggle("show");
 
   if(
-    folderSelect.value &&
-    setSelect.value
+    document
+      .getElementById("folderCreateBox")
+      .classList.contains("show")
   ){
 
-    selectionStatus.textContent =
-      "নির্বাচিত: " +
-      folder +
-      " → " +
-      set;
+    document
+      .getElementById("newFolderName")
+      .focus();
 
   }
+
+}
+
+
+function closeFolderCreate(){
+
+  document
+    .getElementById("folderCreateBox")
+    .classList.remove("show");
+
+  document
+    .getElementById("newFolderName")
+    .value = "";
 
 }
 
@@ -1168,87 +836,277 @@ function setChanged(){
 
 async function createFolder(){
 
+  const input =
+    document.getElementById("newFolderName");
+
   const name =
-    newFolderName.value.trim();
+    input.value.trim();
 
 
   if(!name){
 
-    folderMessage.textContent =
-      "ফোল্ডারের নাম লিখুন।";
+    alert("ফোল্ডারের নাম লিখুন।");
+
+    input.focus();
 
     return;
   }
 
 
-  const result =
-    await sb
-      .from("question_bank_folders")
-      .insert({
+  const {
+    data: existing,
+    error: checkError
+  } = await sb
+    .from("question_bank_folders")
+    .select("id")
+    .eq(
+      "sub_category",
+      CATS[currentCategory]
+    )
+    .eq(
+      "folder_name",
+      name
+    )
+    .limit(1);
 
-        sub_category:
-          currentCategory,
 
-        folder_name:
-          name
+  if(checkError){
 
-      });
-
-
-  if(result.error){
-
-    folderMessage.textContent =
-      result.error.message;
+    alert(checkError.message);
 
     return;
   }
 
 
-  folderMessage.textContent =
-    "ফোল্ডার তৈরি হয়েছে।";
+  if(existing && existing.length){
+
+    alert("এই নামে ফোল্ডার আগে থেকেই আছে।");
+
+    return;
+  }
 
 
-  newFolderName.value = "";
+  const {
+    data,
+    error
+  } = await sb
+    .from("question_bank_folders")
+    .insert({
 
+      sub_category:
+        CATS[currentCategory],
+
+      folder_name:
+        name
+
+    })
+    .select()
+    .single();
+
+
+  if(error){
+
+    alert(error.message);
+
+    return;
+  }
+
+
+  closeFolderCreate();
 
   await loadFolders();
 
 
-  /* নতুন তৈরি ফোল্ডারটি খুঁজে নির্বাচন */
+  if(data && data.id){
 
-  const created =
-    await sb
-      .from("question_bank_folders")
-      .select("id")
-      .eq(
-        "sub_category",
-        currentCategory
-      )
-      .eq(
-        "folder_name",
-        name
-      )
-      .single();
+    document.getElementById(
+      "folderSelect"
+    ).value = data.id;
 
-
-  if(
-    !created.error &&
-    created.data
-  ){
-
-    folderSelect.value =
-      created.data.id;
-
-    await loadSets();
+    await folderChanged();
 
   }
 
 
-  setTimeout(() => {
+  alert("ফোল্ডার তৈরি হয়েছে।");
 
-    folderForm.classList.remove("show");
+}
 
-  },500);
+
+/* =========================
+   FOLDER CHANGE
+========================= */
+
+async function folderChanged(){
+
+  const folderId =
+    document.getElementById("folderSelect").value;
+
+
+  closeSetCreate();
+
+
+  if(!folderId){
+
+    document.getElementById(
+      "newSetButton"
+    ).disabled = true;
+
+
+    document.getElementById(
+      "setSelect"
+    ).innerHTML =
+      '<option value="">আগে ফোল্ডার নির্বাচন করুন</option>';
+
+
+    document.getElementById(
+      "selectionStatus"
+    ).textContent =
+      "ফোল্ডার নির্বাচন করুন।";
+
+
+    resetQuestionForm();
+
+    return;
+  }
+
+
+  document.getElementById(
+    "newSetButton"
+  ).disabled = false;
+
+
+  await loadSets();
+
+
+  resetQuestionForm();
+
+}
+
+
+/* =========================
+   SET
+========================= */
+
+async function loadSets(){
+
+  const folderId =
+    document.getElementById("folderSelect").value;
+
+  const setSelect =
+    document.getElementById("setSelect");
+
+
+  if(!folderId){
+
+    setSelect.innerHTML =
+      '<option value="">আগে ফোল্ডার নির্বাচন করুন</option>';
+
+    document.getElementById(
+      "newSetButton"
+    ).disabled = true;
+
+    return;
+  }
+
+
+  setSelect.innerHTML =
+    '<option value="">সেট নির্বাচন করুন</option>';
+
+
+  const {
+    data,
+    error
+  } = await sb
+    .from("question_bank_sets")
+    .select("id,folder_id,set_name")
+    .eq(
+      "folder_id",
+      Number(folderId)
+    )
+    .order("set_name");
+
+
+  if(error){
+
+    setSelect.innerHTML =
+      '<option value="">সেট লোড হয়নি</option>';
+
+    console.error(error);
+
+    return;
+  }
+
+
+  (data || []).forEach(set => {
+
+    const option =
+      document.createElement("option");
+
+    option.value = set.id;
+
+    option.textContent =
+      set.set_name;
+
+    setSelect.appendChild(option);
+
+  });
+
+
+  document.getElementById(
+    "newSetButton"
+  ).disabled = false;
+
+}
+
+
+/* =========================
+   CREATE SET UI
+========================= */
+
+function toggleSetCreate(){
+
+  const folderId =
+    document.getElementById("folderSelect").value;
+
+
+  if(!folderId){
+
+    alert("আগে একটি ফোল্ডার নির্বাচন করুন।");
+
+    return;
+  }
+
+
+  document
+    .getElementById("setCreateBox")
+    .classList.toggle("show");
+
+
+  if(
+    document
+      .getElementById("setCreateBox")
+      .classList.contains("show")
+  ){
+
+    document
+      .getElementById("newSetName")
+      .focus();
+
+  }
+
+}
+
+
+function closeSetCreate(){
+
+  document
+    .getElementById("setCreateBox")
+    .classList.remove("show");
+
+  document
+    .getElementById("newSetName")
+    .value = "";
 
 }
 
@@ -1260,17 +1118,18 @@ async function createFolder(){
 async function createSet(){
 
   const folderId =
-    Number(folderSelect.value);
+    document.getElementById("folderSelect").value;
 
+  const input =
+    document.getElementById("newSetName");
 
   const name =
-    newSetName.value.trim();
+    input.value.trim();
 
 
   if(!folderId){
 
-    setMessage.textContent =
-      "আগে ফোল্ডার নির্বাচন করুন।";
+    alert("আগে একটি ফোল্ডার নির্বাচন করুন।");
 
     return;
   }
@@ -1278,171 +1137,446 @@ async function createSet(){
 
   if(!name){
 
-    setMessage.textContent =
-      "সেটের নাম লিখুন।";
+    alert("সেটের নাম লিখুন।");
+
+    input.focus();
 
     return;
   }
 
 
-  const result =
-    await sb
-      .from("question_bank_sets")
-      .insert({
+  const {
+    data: existing,
+    error: checkError
+  } = await sb
+    .from("question_bank_sets")
+    .select("id")
+    .eq(
+      "folder_id",
+      Number(folderId)
+    )
+    .eq(
+      "set_name",
+      name
+    )
+    .limit(1);
 
-        folder_id:
-          folderId,
 
-        set_name:
-          name
+  if(checkError){
 
-      });
-
-
-  if(result.error){
-
-    setMessage.textContent =
-      result.error.message;
+    alert(checkError.message);
 
     return;
   }
 
 
-  setMessage.textContent =
-    "সেট তৈরি হয়েছে।";
+  if(existing && existing.length){
+
+    alert("এই নামে সেট আগে থেকেই আছে।");
+
+    return;
+  }
 
 
-  newSetName.value = "";
+  const {
+    data,
+    error
+  } = await sb
+    .from("question_bank_sets")
+    .insert({
 
+      folder_id:
+        Number(folderId),
+
+      set_name:
+        name
+
+    })
+    .select()
+    .single();
+
+
+  if(error){
+
+    alert(error.message);
+
+    return;
+  }
+
+
+  closeSetCreate();
 
   await loadSets();
 
 
-  /* নতুন তৈরি সেটটি নির্বাচন */
+  if(data && data.id){
 
-  const created =
-    await sb
-      .from("question_bank_sets")
-      .select("id")
-      .eq(
-        "folder_id",
-        folderId
-      )
-      .eq(
-        "set_name",
-        name
-      )
-      .single();
+    document.getElementById(
+      "setSelect"
+    ).value = data.id;
 
-
-  if(
-    !created.error &&
-    created.data
-  ){
-
-    setSelect.value =
-      created.data.id;
-
-    setChanged();
+    await setChanged();
 
   }
 
 
-  setTimeout(() => {
-
-    setForm.classList.remove("show");
-
-  },500);
+  alert("সেট তৈরি হয়েছে।");
 
 }
 
 
 /* =========================
-   QUESTION FORM
+   SET CHANGE
 ========================= */
 
-function clearQuestionForm(){
+async function setChanged(){
 
-  editingId = null;
+  const folderSelect =
+    document.getElementById("folderSelect");
 
-
-  saveButton.textContent =
-    "প্রশ্ন যোগ করুন";
-
-
-  questionText.value = "";
-
-  optionA.value = "";
-
-  optionB.value = "";
-
-  optionC.value = "";
-
-  optionD.value = "";
-
-  questionNumber.value = "";
-
-  correctAnswer.value = "";
-
-  explanation.value = "";
-
-}
-
-
-async function saveQuestion(){
-
-  saveMessage.textContent = "";
+  const setSelect =
+    document.getElementById("setSelect");
 
 
   const folderId =
-    Number(folderSelect.value);
+    folderSelect.value;
 
   const setId =
-    Number(setSelect.value);
-
-  const subjectId =
-    Number(subjectSelect.value);
-
-  const sourceId =
-    Number(sourceSelect.value);
+    setSelect.value;
 
 
-  const question =
-    questionText.value.trim();
+  if(!folderId || !setId){
 
-  const a =
-    optionA.value.trim();
+    document.getElementById(
+      "selectionStatus"
+    ).textContent =
+      "ফোল্ডার ও সেট নির্বাচন করুন।";
 
-  const b =
-    optionB.value.trim();
-
-  const c =
-    optionC.value.trim();
-
-  const d =
-    optionD.value.trim();
-
-  const answer =
-    correctAnswer.value;
-
-  const number =
-    Number(questionNumber.value) ||
-    null;
-
-
-  if(!folderId){
-
-    saveMessage.textContent =
-      "আগে ফোল্ডার নির্বাচন করুন।";
+    resetQuestionForm();
 
     return;
   }
 
 
-  if(!setId){
+  const folderName =
+    folderSelect.options[
+      folderSelect.selectedIndex
+    ].textContent;
 
-    saveMessage.textContent =
-      "আগে সেট নির্বাচন করুন।";
+
+  const setName =
+    setSelect.options[
+      setSelect.selectedIndex
+    ].textContent;
+
+
+  document.getElementById(
+    "selectionStatus"
+  ).textContent =
+    "নির্বাচিত: " +
+    folderName +
+    " → " +
+    setName;
+
+
+  document.getElementById(
+    "addQuestionNotice"
+  ).textContent =
+    "বর্তমান সেট: " +
+    folderName +
+    " → " +
+    setName;
+
+
+  document.getElementById(
+    "questionForm"
+  ).classList.remove("hidden");
+
+
+  await suggestQuestionNumber();
+
+}
+
+
+/* =========================
+   SUBJECTS
+========================= */
+
+async function loadSubjects(){
+
+  const {
+    data,
+    error
+  } = await sb
+    .from("subjects")
+    .select("id,name")
+    .order("id");
+
+
+  const select =
+    document.getElementById("subjectSelect");
+
+  const filter =
+    document.getElementById("filterSubject");
+
+
+  select.innerHTML =
+    '<option value="">বিষয় নির্বাচন করুন</option>';
+
+  filter.innerHTML =
+    '<option value="">সব বিষয়</option>';
+
+
+  if(error){
+
+    console.error(error);
+
+    return;
+  }
+
+
+  (data || []).forEach(subject => {
+
+    const o1 =
+      document.createElement("option");
+
+    o1.value = subject.id;
+
+    o1.textContent = subject.name;
+
+    select.appendChild(o1);
+
+
+    const o2 =
+      document.createElement("option");
+
+    o2.value = subject.id;
+
+    o2.textContent = subject.name;
+
+    filter.appendChild(o2);
+
+  });
+
+}
+
+
+/* =========================
+   SOURCES
+========================= */
+
+async function loadSources(){
+
+  const select =
+    document.getElementById("sourceSelect");
+
+
+  select.innerHTML =
+    '<option value="">Source নির্বাচন করুন</option>';
+
+
+  const {
+    data,
+    error
+  } = await sb
+    .from("question_sources")
+    .select(
+      "id,source_name,source_category"
+    )
+    .eq(
+      "source_category",
+      CATS[currentCategory]
+    )
+    .order("source_name");
+
+
+  if(error){
+
+    console.error(error);
+
+    return;
+  }
+
+
+  (data || []).forEach(source => {
+
+    const option =
+      document.createElement("option");
+
+    option.value = source.id;
+
+    option.textContent =
+      source.source_name;
+
+    select.appendChild(option);
+
+  });
+
+}
+
+
+/* =========================
+   QUESTION NUMBER
+========================= */
+
+async function suggestQuestionNumber(){
+
+  const folderId =
+    document.getElementById("folderSelect").value;
+
+  const setId =
+    document.getElementById("setSelect").value;
+
+
+  if(!folderId || !setId){
+
+    return;
+  }
+
+
+  const {
+    data,
+    error
+  } = await sb
+    .from("questions")
+    .select("question_number")
+    .eq(
+      "folder_id",
+      Number(folderId)
+    )
+    .eq(
+      "set_id",
+      Number(setId)
+    )
+    .order(
+      "question_number",
+      {
+        ascending:false
+      }
+    )
+    .limit(1);
+
+
+  if(error){
+
+    return;
+  }
+
+
+  let next = 1;
+
+
+  if(data && data.length){
+
+    next =
+      Number(data[0].question_number || 0) + 1;
+
+  }
+
+
+  document.getElementById(
+    "questionNumber"
+  ).value = next;
+
+}
+
+
+/* =========================
+   SAVE QUESTION
+========================= */
+
+async function saveQuestion(){
+
+  const folderId =
+    document.getElementById("folderSelect").value;
+
+  const setId =
+    document.getElementById("setSelect").value;
+
+
+  if(!folderId || !setId){
+
+    alert("আগে ফোল্ডার ও সেট নির্বাচন করুন।");
+
+    return;
+  }
+
+
+  const questionText =
+    document.getElementById(
+      "questionText"
+    ).value.trim();
+
+
+  const optionA =
+    document.getElementById(
+      "optionA"
+    ).value.trim();
+
+  const optionB =
+    document.getElementById(
+      "optionB"
+    ).value.trim();
+
+  const optionC =
+    document.getElementById(
+      "optionC"
+    ).value.trim();
+
+  const optionD =
+    document.getElementById(
+      "optionD"
+    ).value.trim();
+
+
+  const subjectId =
+    document.getElementById(
+      "subjectSelect"
+    ).value;
+
+
+  const sourceId =
+    document.getElementById(
+      "sourceSelect"
+    ).value;
+
+
+  const questionNumber =
+    Number(
+      document.getElementById(
+        "questionNumber"
+      ).value
+    );
+
+
+  const explanation =
+    document.getElementById(
+      "explanation"
+    ).value.trim();
+
+
+  const answerRadio =
+    document.querySelector(
+      'input[name="correctAnswer"]:checked'
+    );
+
+
+  if(!questionText){
+
+    alert("প্রশ্ন লিখুন।");
+
+    return;
+  }
+
+
+  if(
+    !optionA ||
+    !optionB ||
+    !optionC ||
+    !optionD
+  ){
+
+    alert("চারটি অপশন পূরণ করুন।");
 
     return;
   }
@@ -1450,8 +1584,7 @@ async function saveQuestion(){
 
   if(!subjectId){
 
-    saveMessage.textContent =
-      "বিষয় নির্বাচন করুন।";
+    alert("বিষয় নির্বাচন করুন।");
 
     return;
   }
@@ -1459,319 +1592,177 @@ async function saveQuestion(){
 
   if(!sourceId){
 
-    saveMessage.textContent =
-      "Source নির্বাচন করুন।";
+    alert("Source নির্বাচন করুন।");
 
     return;
   }
 
 
-  if(
-    !question ||
-    !a ||
-    !b ||
-    !c ||
-    !d ||
-    !answer
-  ){
+  if(!answerRadio){
 
-    saveMessage.textContent =
-      "প্রশ্ন, চারটি অপশন এবং সঠিক উত্তর পূরণ করুন।";
+    alert("সঠিক উত্তর নির্বাচন করুন।");
 
     return;
   }
 
 
-  /*
-    DUPLICATE PROTECTION
-  */
+  if(!questionNumber){
 
-  if(!editingId){
+    alert("প্রশ্ন নম্বর দিন।");
 
-    const duplicate =
-      await sb
-        .from("questions")
-        .select("id")
-        .eq(
-          "source_type",
-          currentCategory
-        )
-        .eq(
-          "folder_id",
-          folderId
-        )
-        .eq(
-          "set_id",
-          setId
-        )
-        .eq(
-          "question_text",
-          question
-        )
-        .limit(1);
-
-
-    if(duplicate.error){
-
-      saveMessage.textContent =
-        duplicate.error.message;
-
-      return;
-    }
-
-
-    if(
-      duplicate.data &&
-      duplicate.data.length
-    ){
-
-      saveMessage.textContent =
-        "এই সেটে একই প্রশ্ন ইতিমধ্যে আছে।";
-
-      return;
-    }
-
+    return;
   }
 
 
-  const source =
-    sources.find(
-      item =>
-        Number(item.id) ===
-        sourceId
+  const correctAnswer =
+    answerRadio.value;
+
+
+  /* DUPLICATE CHECK */
+
+  const {
+    data: duplicate,
+    error: duplicateError
+  } = await sb
+    .from("questions")
+    .select("id")
+    .eq(
+      "source_type",
+      currentCategory
+    )
+    .eq(
+      "folder_id",
+      Number(folderId)
+    )
+    .eq(
+      "set_id",
+      Number(setId)
+    )
+    .eq(
+      "question_text",
+      questionText
+    )
+    .limit(1);
+
+
+  if(duplicateError){
+
+    alert(duplicateError.message);
+
+    return;
+  }
+
+
+  if(duplicate && duplicate.length){
+
+    alert(
+      "এই প্রশ্নটি এই সেটে আগে থেকেই আছে।"
     );
 
-
-  const payload = {
-
-    question_text:
-      question,
-
-    option_a:
-      a,
-
-    option_b:
-      b,
-
-    option_c:
-      c,
-
-    option_d:
-      d,
-
-    correct_answer:
-      answer,
-
-    explanation:
-      explanation.value.trim() ||
-      null,
-
-    subject_id:
-      subjectId,
-
-    source_id:
-      sourceId,
-
-    category:
-      categoryTitle(
-        currentCategory
-      ),
-
-    source_type:
-      currentCategory,
-
-    source_name:
-      source?.source_name ||
-      null,
-
-    folder_id:
-      folderId,
-
-    set_id:
-      setId,
-
-    question_number:
-      number
-
-  };
-
-
-  let result;
-
-
-  if(editingId){
-
-    result =
-      await sb
-        .from("questions")
-        .update(payload)
-        .eq(
-          "id",
-          editingId
-        );
-
-  }else{
-
-    result =
-      await sb
-        .from("questions")
-        .insert(payload);
-
-  }
-
-
-  if(result.error){
-
-    saveMessage.textContent =
-      result.error.message;
-
     return;
   }
 
 
-  saveMessage.textContent =
-    editingId
-      ? "প্রশ্ন আপডেট হয়েছে।"
-      : "প্রশ্ন যোগ হয়েছে।";
-
-
-  clearQuestionForm();
-
-
-  await loadQuestions();
-
-}
-
-
-/* =========================
-   EDIT QUESTION
-========================= */
-
-async function editQuestion(id){
-
-  const result =
+  const sourceResult =
     await sb
-      .from("questions")
-      .select("*")
-      .eq("id",id)
-      .single();
-
-
-  if(result.error){
-
-    alert(result.error.message);
-
-    return;
-  }
-
-
-  const q =
-    result.data;
-
-
-  editingId =
-    q.id;
-
-
-  folderSelect.value =
-    q.folder_id || "";
-
-
-  await loadSets();
-
-
-  setSelect.value =
-    q.set_id || "";
-
-
-  subjectSelect.value =
-    q.subject_id || "";
-
-
-  sourceSelect.value =
-    q.source_id || "";
-
-
-  questionNumber.value =
-    q.question_number || "";
-
-
-  questionText.value =
-    q.question_text || "";
-
-
-  optionA.value =
-    q.option_a || "";
-
-
-  optionB.value =
-    q.option_b || "";
-
-
-  optionC.value =
-    q.option_c || "";
-
-
-  optionD.value =
-    q.option_d || "";
-
-
-  correctAnswer.value =
-    q.correct_answer || "";
-
-
-  explanation.value =
-    q.explanation || "";
-
-
-  saveButton.textContent =
-    "প্রশ্ন আপডেট করুন";
-
-
-  setChanged();
-
-
-  window.scrollTo({
-    top:0,
-    behavior:"smooth"
-  });
-
-}
-
-
-/* =========================
-   DELETE QUESTION
-========================= */
-
-async function deleteQuestion(id){
-
-  if(
-    !confirm(
-      "এই প্রশ্নটি Question Bank থেকে মুছবেন?"
-    )
-  )
-    return;
-
-
-  const result =
-    await sb
-      .from("questions")
-      .delete()
+      .from("question_sources")
+      .select(
+        "source_name"
+      )
       .eq(
         "id",
-        id
-      );
+        Number(sourceId)
+      )
+      .single();
 
 
-  if(result.error){
+  if(sourceResult.error){
 
     alert(
-      result.error.message
+      sourceResult.error.message
     );
 
     return;
   }
 
+
+  const {
+    data,
+    error
+  } = await sb
+    .from("questions")
+    .insert({
+
+      question_text:
+        questionText,
+
+      option_a:
+        optionA,
+
+      option_b:
+        optionB,
+
+      option_c:
+        optionC,
+
+      option_d:
+        optionD,
+
+      correct_answer:
+        correctAnswer,
+
+      explanation:
+        explanation || null,
+
+      subject_id:
+        Number(subjectId),
+
+      source_id:
+        Number(sourceId),
+
+      category:
+        CATS[currentCategory],
+
+      source_type:
+        currentCategory,
+
+      source_name:
+        sourceResult.data?.source_name || null,
+
+      folder_id:
+        Number(folderId),
+
+      set_id:
+        Number(setId),
+
+      question_number:
+        questionNumber
+
+    })
+    .select()
+    .single();
+
+
+  if(error){
+
+    document.getElementById(
+      "questionMessage"
+    ).textContent =
+      error.message;
+
+    return;
+  }
+
+
+  document.getElementById(
+    "questionMessage"
+  ).textContent =
+    "প্রশ্ন সফলভাবে যোগ হয়েছে।";
+
+
+  clearQuestionFields();
+
+  await suggestQuestionNumber();
 
   await loadQuestions();
 
@@ -1779,62 +1770,123 @@ async function deleteQuestion(id){
 
 
 /* =========================
-   QUESTION DETAILS
+   CLEAR QUESTION FIELDS
 ========================= */
 
-async function showQuestion(id){
+function clearQuestionFields(){
 
-  const result =
-    await sb
-      .from("questions")
-      .select("*")
-      .eq("id",id)
-      .single();
+  document.getElementById(
+    "questionText"
+  ).value = "";
+
+  document.getElementById(
+    "optionA"
+  ).value = "";
+
+  document.getElementById(
+    "optionB"
+  ).value = "";
+
+  document.getElementById(
+    "optionC"
+  ).value = "";
+
+  document.getElementById(
+    "optionD"
+  ).value = "";
+
+  document.getElementById(
+    "explanation"
+  ).value = "";
 
 
-  if(result.error){
-
-    alert(
-      result.error.message
+  document
+    .querySelectorAll(
+      'input[name="correctAnswer"]'
+    )
+    .forEach(
+      radio => radio.checked = false
     );
+
+}
+
+
+/* =========================
+   RESET QUESTION FORM
+========================= */
+
+function resetQuestionForm(){
+
+  document.getElementById(
+    "questionForm"
+  ).classList.add("hidden");
+
+
+  document.getElementById(
+    "addQuestionNotice"
+  ).textContent =
+    "আগে একটি ফোল্ডার ও সেট নির্বাচন করুন।";
+
+
+  document.getElementById(
+    "selectionStatus"
+  ).textContent =
+    "ফোল্ডার ও সেট নির্বাচন করুন।";
+
+}
+
+
+/* =========================
+   FILTER FOLDERS
+========================= */
+
+async function loadFilterFolders(){
+
+  const select =
+    document.getElementById("filterFolder");
+
+
+  select.innerHTML =
+    '<option value="">সব ফোল্ডার</option>';
+
+
+  const {
+    data,
+    error
+  } = await sb
+    .from("question_bank_folders")
+    .select("id,folder_name")
+    .eq(
+      "sub_category",
+      CATS[currentCategory]
+    )
+    .order("folder_name");
+
+
+  if(error){
+
+    console.error(error);
 
     return;
   }
 
 
-  const q =
-    result.data;
+  (data || []).forEach(folder => {
+
+    const option =
+      document.createElement("option");
+
+    option.value = folder.id;
+
+    option.textContent =
+      folder.folder_name;
+
+    select.appendChild(option);
+
+  });
 
 
-  alert(
-
-    "প্রশ্ন: " +
-    q.question_text +
-
-    "\n\nক. " +
-    q.option_a +
-
-    "\nখ. " +
-    q.option_b +
-
-    "\nগ. " +
-    q.option_c +
-
-    "\nঘ. " +
-    q.option_d +
-
-    "\n\nসঠিক উত্তর: " +
-    answerBn(
-      q.correct_answer
-    ) +
-
-    "\n\nব্যাখ্যা: " +
-    (
-      q.explanation ||
-      "নেই"
-    )
-
-  );
+  loadFilterSets();
 
 }
 
@@ -1843,118 +1895,68 @@ async function showQuestion(id){
    FILTER SETS
 ========================= */
 
-async function filterFolderChanged(){
+async function loadFilterSets(){
 
   const folderId =
-    Number(filterFolder.value);
+    document.getElementById(
+      "filterFolder"
+    ).value;
+
+  const select =
+    document.getElementById(
+      "filterSet"
+    );
 
 
-  filterSet.innerHTML =
+  select.innerHTML =
     '<option value="">সব সেট</option>';
 
 
   if(!folderId){
 
-    await loadQuestions();
+    loadQuestions();
 
     return;
   }
 
 
-  const result =
-    await sb
-      .from("question_bank_sets")
-      .select(
-        "id,set_name"
-      )
-      .eq(
-        "folder_id",
-        folderId
-      )
-      .order("set_name");
+  const {
+    data,
+    error
+  } = await sb
+    .from("question_bank_sets")
+    .select("id,set_name")
+    .eq(
+      "folder_id",
+      Number(folderId)
+    )
+    .order("set_name");
 
 
-  if(result.error)
+  if(error){
+
+    console.error(error);
+
     return;
+  }
 
 
-  (result.data || [])
-    .forEach(set => {
+  (data || []).forEach(set => {
 
-      const option =
-        document.createElement(
-          "option"
-        );
+    const option =
+      document.createElement("option");
 
-      option.value =
-        set.id;
+    option.value = set.id;
 
-      option.textContent =
-        set.set_name;
+    option.textContent =
+      set.set_name;
 
-      filterSet.appendChild(
-        option
-      );
+    select.appendChild(option);
 
-    });
-
-}
+  });
 
 
-/* =========================
-   LOAD FILTER SETS
-========================= */
-
-async function loadFilterSets(){
-
-  const folderId =
-    Number(filterFolder.value);
-
-
-  filterSet.innerHTML =
-    '<option value="">সব সেট</option>';
-
-
-  if(!folderId)
-    return;
-
-
-  const result =
-    await sb
-      .from("question_bank_sets")
-      .select(
-        "id,set_name"
-      )
-      .eq(
-        "folder_id",
-        folderId
-      )
-      .order("set_name");
-
-
-  if(result.error)
-    return;
-
-
-  (result.data || [])
-    .forEach(set => {
-
-      const option =
-        document.createElement(
-          "option"
-        );
-
-      option.value =
-        set.id;
-
-      option.textContent =
-        set.set_name;
-
-      filterSet.appendChild(
-        option
-      );
-
-    });
+  loadQuestions();
 
 }
 
@@ -1965,41 +1967,54 @@ async function loadFilterSets(){
 
 async function loadQuestions(){
 
-  questionList.innerHTML =
-    "লোড হচ্ছে...";
-
-
   const folderId =
-    Number(filterFolder.value);
-
+    document.getElementById(
+      "filterFolder"
+    ).value;
 
   const setId =
-    Number(filterSet.value);
-
+    document.getElementById(
+      "filterSet"
+    ).value;
 
   const subjectId =
-    Number(filterSubject.value);
+    document.getElementById(
+      "filterSubject"
+    ).value;
+
+  const search =
+    document.getElementById(
+      "searchText"
+    ).value.trim();
 
 
   let query =
     sb
       .from("questions")
-      .select(
-        "*,subjects(name),question_bank_folders(folder_name),question_bank_sets(set_name),question_sources(source_name)"
-      )
+      .select(`
+        id,
+        question_text,
+        option_a,
+        option_b,
+        option_c,
+        option_d,
+        correct_answer,
+        explanation,
+        question_number,
+        source_name,
+        folder_id,
+        set_id,
+        subject_id,
+        subjects(name),
+        question_bank_folders(folder_name),
+        question_bank_sets(set_name)
+      `)
       .eq(
         "source_type",
         currentCategory
       )
       .order(
         "question_number",
-        {
-          ascending:true,
-          nullsFirst:false
-        }
-      )
-      .order(
-        "id",
         {
           ascending:true
         }
@@ -2011,7 +2026,7 @@ async function loadQuestions(){
     query =
       query.eq(
         "folder_id",
-        folderId
+        Number(folderId)
       );
 
   }
@@ -2022,7 +2037,7 @@ async function loadQuestions(){
     query =
       query.eq(
         "set_id",
-        setId
+        Number(setId)
       );
 
   }
@@ -2033,177 +2048,68 @@ async function loadQuestions(){
     query =
       query.eq(
         "subject_id",
-        subjectId
+        Number(subjectId)
       );
 
   }
 
 
-  const result =
-    await query;
+  if(search){
+
+    query =
+      query.ilike(
+        "question_text",
+        "%" + search + "%"
+      );
+
+  }
 
 
-  if(result.error){
+  const {
+    data,
+    error
+  } = await query;
 
-    questionList.innerHTML = "";
 
-    questionCount.textContent =
-      result.error.message;
+  const list =
+    document.getElementById(
+      "questionList"
+    );
+
+
+  if(error){
+
+    list.innerHTML =
+      '<div class="empty">' +
+      error.message +
+      '</div>';
 
     return;
   }
 
 
-  const rows =
-    result.data || [];
-
-
-  questionCount.textContent =
+  document.getElementById(
+    "questionCount"
+  ).textContent =
     "মোট প্রশ্ন: " +
-    bn(rows.length);
+    (data || []).length;
 
 
-  if(!rows.length){
+  if(!data || !data.length){
 
-    questionList.innerHTML =
-      "কোনো প্রশ্ন পাওয়া যায়নি.";
+    list.innerHTML =
+      '<div class="empty">' +
+      'কোনো প্রশ্ন পাওয়া যায়নি' +
+      '</div>';
 
     return;
   }
 
 
-  questionList.innerHTML =
-    rows
+  list.innerHTML =
+    data
       .map(
-        (q,index) => {
-
-          const subject =
-            q.subjects?.name ||
-            "";
-
-          const folder =
-            q.question_bank_folders
-              ?.folder_name ||
-            "";
-
-          const set =
-            q.question_bank_sets
-              ?.set_name ||
-            "";
-
-          const source =
-            q.question_sources
-              ?.source_name ||
-            q.source_name ||
-            "";
-
-
-          return `
-
-          <div class="question">
-
-            <div class="question-title">
-
-              ${bn(index + 1)}.
-              ${esc(q.question_text)}
-
-            </div>
-
-
-            <div class="option">
-              ক. ${esc(q.option_a)}
-            </div>
-
-            <div class="option">
-              খ. ${esc(q.option_b)}
-            </div>
-
-            <div class="option">
-              গ. ${esc(q.option_c)}
-            </div>
-
-            <div class="option">
-              ঘ. ${esc(q.option_d)}
-            </div>
-
-
-            <div class="meta">
-
-              <span class="badge">
-                ${esc(subject)}
-              </span>
-
-              <span class="badge">
-                ${esc(
-                  categoryTitle(
-                    currentCategory
-                  )
-                )}
-              </span>
-
-              <br>
-
-              ফোল্ডার:
-              ${esc(folder)}
-
-              |
-
-              সেট:
-              ${esc(set)}
-
-              |
-
-              প্রশ্ন নম্বর:
-              ${bn(
-                q.question_number ||
-                "—"
-              )}
-
-              <br>
-
-              Source:
-              ${esc(source)}
-
-              |
-
-              সঠিক উত্তর:
-              ${esc(
-                answerBn(
-                  q.correct_answer
-                )
-              )}
-
-            </div>
-
-
-            <div class="question-actions">
-
-              <button
-                onclick="editQuestion(${q.id})">
-                এডিট
-              </button>
-
-
-              <button
-                class="secondary"
-                onclick="showQuestion(${q.id})">
-                বিস্তারিত
-              </button>
-
-
-              <button
-                class="danger"
-                onclick="deleteQuestion(${q.id})">
-                মুছুন
-              </button>
-
-            </div>
-
-          </div>
-
-          `;
-
-        }
+        question => renderQuestion(question)
       )
       .join("");
 
@@ -2211,17 +2117,364 @@ async function loadQuestions(){
 
 
 /* =========================
-   START
+   RENDER QUESTION
+========================= */
+
+function renderQuestion(q){
+
+  const number =
+    q.question_number || "";
+
+  const subject =
+    q.subjects?.name || "";
+
+
+  const folder =
+    q.question_bank_folders?.folder_name || "";
+
+
+  const set =
+    q.question_bank_sets?.set_name || "";
+
+
+  return `
+
+    <div class="q">
+
+      <div class="q-number">
+        ${number}. ${escapeHtml(q.question_text)}
+      </div>
+
+      <div class="q-options">
+
+        <div>ক) ${escapeHtml(q.option_a)}</div>
+
+        <div>খ) ${escapeHtml(q.option_b)}</div>
+
+        <div>গ) ${escapeHtml(q.option_c)}</div>
+
+        <div>ঘ) ${escapeHtml(q.option_d)}</div>
+
+      </div>
+
+      <div class="q-meta">
+
+        বিষয়: ${escapeHtml(subject)}
+        <br>
+
+        ফোল্ডার: ${escapeHtml(folder)}
+        <br>
+
+        সেট: ${escapeHtml(set)}
+        <br>
+
+        সঠিক উত্তর:
+        ${escapeHtml(q.correct_answer)}
+
+        ${
+          q.source_name
+            ? "<br>Source: " +
+              escapeHtml(q.source_name)
+            : ""
+        }
+
+      </div>
+
+      ${
+        q.explanation
+          ? `
+            <div class="q-meta">
+              ব্যাখ্যা:
+              ${escapeHtml(q.explanation)}
+            </div>
+          `
+          : ""
+      }
+
+
+      <div class="q-actions">
+
+        <button
+          onclick="viewQuestion(${q.id})"
+        >
+          বিস্তারিত
+        </button>
+
+        <button
+          class="secondary"
+          onclick="editQuestion(${q.id})"
+        >
+          এডিট
+        </button>
+
+        <button
+          class="danger"
+          onclick="deleteQuestion(${q.id})"
+        >
+          মুছুন
+        </button>
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+/* =========================
+   VIEW QUESTION
+========================= */
+
+async function viewQuestion(id){
+
+  const {
+    data,
+    error
+  } = await sb
+    .from("questions")
+    .select(`
+      *,
+      subjects(name),
+      question_bank_folders(folder_name),
+      question_bank_sets(set_name)
+    `)
+    .eq("id",id)
+    .single();
+
+
+  if(error){
+
+    alert(error.message);
+
+    return;
+  }
+
+
+  if(!data){
+
+    return;
+  }
+
+
+  const text =
+`
+প্রশ্ন:
+${data.question_text}
+
+ক) ${data.option_a}
+
+খ) ${data.option_b}
+
+গ) ${data.option_c}
+
+ঘ) ${data.option_d}
+
+সঠিক উত্তর: ${data.correct_answer}
+
+বিষয়: ${data.subjects?.name || ""}
+
+ফোল্ডার: ${data.question_bank_folders?.folder_name || ""}
+
+সেট: ${data.question_bank_sets?.set_name || ""}
+
+Source: ${data.source_name || ""}
+
+ব্যাখ্যা:
+${data.explanation || "নেই"}
+`;
+
+
+  alert(text);
+
+}
+
+
+/* =========================
+   EDIT QUESTION
+========================= */
+
+async function editQuestion(id){
+
+  const {
+    data,
+    error
+  } = await sb
+    .from("questions")
+    .select("*")
+    .eq("id",id)
+    .single();
+
+
+  if(error){
+
+    alert(error.message);
+
+    return;
+  }
+
+
+  if(!data){
+
+    return;
+  }
+
+
+  const newQuestion =
+    prompt(
+      "প্রশ্নটি সম্পাদনা করুন:",
+      data.question_text
+    );
+
+
+  if(newQuestion === null){
+
+    return;
+  }
+
+
+  const cleaned =
+    newQuestion.trim();
+
+
+  if(!cleaned){
+
+    alert("প্রশ্ন খালি রাখা যাবে না।");
+
+    return;
+  }
+
+
+  const {
+    error:updateError
+  } = await sb
+    .from("questions")
+    .update({
+
+      question_text:
+        cleaned,
+
+      updated_at:
+        new Date().toISOString()
+
+    })
+    .eq(
+      "id",
+      id
+    );
+
+
+  if(updateError){
+
+    alert(updateError.message);
+
+    return;
+  }
+
+
+  alert("প্রশ্ন আপডেট হয়েছে।");
+
+  loadQuestions();
+
+}
+
+
+/* =========================
+   DELETE QUESTION
+========================= */
+
+async function deleteQuestion(id){
+
+  const ok =
+    confirm(
+      "এই প্রশ্নটি মুছে ফেলবেন?"
+    );
+
+
+  if(!ok){
+
+    return;
+  }
+
+
+  const {
+    error
+  } = await sb
+    .from("questions")
+    .delete()
+    .eq(
+      "id",
+      id
+    );
+
+
+  if(error){
+
+    alert(error.message);
+
+    return;
+  }
+
+
+  loadQuestions();
+
+}
+
+
+/* =========================
+   ESCAPE HTML
+========================= */
+
+function escapeHtml(value){
+
+  if(value === null || value === undefined){
+
+    return "";
+
+  }
+
+
+  return String(value)
+
+    .replaceAll("&","&amp;")
+
+    .replaceAll("<","&lt;")
+
+    .replaceAll(">","&gt;")
+
+    .replaceAll('"',"&quot;")
+
+    .replaceAll("'","&#039;");
+
+}
+
+
+/* =========================
+   INITIAL LOAD
 ========================= */
 
 (async function(){
 
-  const loggedIn =
-    await checkAuth();
+  const ok =
+    await auth();
 
 
-  if(!loggedIn)
+  if(!ok){
+
     return;
+  }
+
+
+  document.getElementById(
+    "catVerification"
+  ).classList.add("active");
+
+
+  document.getElementById(
+    "currentCategoryText"
+  ).textContent =
+    "বর্তমান বিভাগ: যাচাই পরীক্ষা";
 
 
   await loadSubjects();
@@ -2230,11 +2483,7 @@ async function loadQuestions(){
 
   await loadFolders();
 
-  categoryStatus.textContent =
-    "বর্তমান বিভাগ: " +
-    categoryTitle(
-      currentCategory
-    );
+  await loadFilterFolders();
 
   await loadQuestions();
 
