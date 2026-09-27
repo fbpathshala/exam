@@ -76,6 +76,11 @@ input,select,textarea{
   background:#fff
 }
 
+textarea{
+  min-height:80px;
+  resize:vertical
+}
+
 button{
   border:0;
   background:#1769aa;
@@ -155,4 +160,1431 @@ button{
   margin-right:4px
 }
 
-@media(max-width:700
+@media(max-width:700px){
+  .grid,.grid3{
+    grid-template-columns:1fr
+  }
+
+  .tabs{
+    grid-template-columns:1fr
+  }
+
+  .actions{
+    grid-template-columns:1fr
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <b>প্রশ্ন ব্যাংক</b>
+  <button onclick="go('dashboard.html')">ড্যাশবোর্ড</button>
+</header>
+
+<main>
+
+<!-- CATEGORY -->
+<div class="card">
+  <h3>ক্যাটাগরি</h3>
+
+  <div class="tabs">
+
+    <button
+      class="tab active"
+      id="tabRecruitment"
+      onclick="setCategory('recruitment')">
+      নিয়োগ পরীক্ষা
+    </button>
+
+    <button
+      class="tab"
+      id="tabVerification"
+      onclick="setCategory('verification_test')">
+      যাচাই পরীক্ষা
+    </button>
+
+    <button
+      class="tab"
+      id="tabRecent"
+      onclick="setCategory('recent')">
+      সাম্প্রতিক প্রশ্ন
+    </button>
+
+  </div>
+
+  <div id="categoryMsg" class="msg"></div>
+</div>
+
+
+<!-- FOLDER AND SET -->
+<div class="card">
+
+  <h3>ফোল্ডার ও সেট</h3>
+
+  <div class="grid">
+
+    <div>
+      <label>ফোল্ডার</label>
+
+      <select
+        id="folderSelect"
+        onchange="loadSets()">
+
+        <option value="">
+          ফোল্ডার নির্বাচন করুন
+        </option>
+
+      </select>
+    </div>
+
+
+    <div>
+
+      <label>সেট</label>
+
+      <select id="setSelect">
+
+        <option value="">
+          সেট নির্বাচন করুন
+        </option>
+
+      </select>
+
+    </div>
+
+  </div>
+
+
+  <div
+    class="grid"
+    style="margin-top:10px">
+
+    <input
+      id="newFolder"
+      placeholder="নতুন ফোল্ডারের নাম">
+
+    <button onclick="createFolder()">
+      ফোল্ডার তৈরি
+    </button>
+
+  </div>
+
+
+  <div
+    class="grid"
+    style="margin-top:10px">
+
+    <input
+      id="newSet"
+      placeholder="নতুন সেটের নাম">
+
+    <button onclick="createSet()">
+      সেট তৈরি
+    </button>
+
+  </div>
+
+
+  <div class="actions">
+
+    <button
+      class="secondary"
+      onclick="loadFolders()">
+      ফোল্ডার রিফ্রেশ
+    </button>
+
+    <button
+      class="secondary"
+      onclick="loadSets()">
+      সেট রিফ্রেশ
+    </button>
+
+    <button
+      class="secondary"
+      onclick="clearForm()">
+      ফর্ম পরিষ্কার
+    </button>
+
+  </div>
+
+  <div
+    id="folderMsg"
+    class="msg">
+  </div>
+
+</div>
+
+
+<!-- ADD QUESTION -->
+<div class="card">
+
+  <h3>প্রশ্ন যোগ করুন</h3>
+
+
+  <div class="grid3">
+
+    <div>
+
+      <label>বিষয়</label>
+
+      <select id="subjectSelect">
+
+        <option value="">
+          বিষয় নির্বাচন করুন
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div>
+
+      <label>Source</label>
+
+      <select id="sourceSelect">
+
+        <option value="">
+          Source নির্বাচন করুন
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div>
+
+      <label>প্রশ্ন নম্বর</label>
+
+      <input
+        id="questionNumber"
+        type="number"
+        min="1"
+        placeholder="যেমন: ১">
+
+    </div>
+
+  </div>
+
+
+  <div style="margin-top:10px">
+
+    <label>প্রশ্ন</label>
+
+    <textarea
+      id="questionText"
+      placeholder="প্রশ্ন লিখুন">
+    </textarea>
+
+  </div>
+
+
+  <div
+    class="grid"
+    style="margin-top:10px">
+
+    <input
+      id="optionA"
+      placeholder="ক অপশন">
+
+    <input
+      id="optionB"
+      placeholder="খ অপশন">
+
+    <input
+      id="optionC"
+      placeholder="গ অপশন">
+
+    <input
+      id="optionD"
+      placeholder="ঘ অপশন">
+
+  </div>
+
+
+  <div
+    class="grid"
+    style="margin-top:10px">
+
+    <select id="correctAnswer">
+
+      <option value="">
+        সঠিক উত্তর নির্বাচন করুন
+      </option>
+
+      <option value="A">ক</option>
+      <option value="B">খ</option>
+      <option value="C">গ</option>
+      <option value="D">ঘ</option>
+
+    </select>
+
+
+    <textarea
+      id="explanation"
+      placeholder="ব্যাখ্যা (ঐচ্ছিক)">
+    </textarea>
+
+  </div>
+
+
+  <button
+    id="saveBtn"
+    class="success"
+    style="margin-top:10px"
+    onclick="saveQuestion()">
+
+    প্রশ্ন যোগ করুন
+
+  </button>
+
+
+  <div
+    id="saveMsg"
+    class="msg">
+  </div>
+
+</div>
+
+
+<!-- SEARCH -->
+<div class="card">
+
+  <h3>প্রশ্ন খুঁজুন</h3>
+
+
+  <div class="grid3">
+
+    <select
+      id="filterFolder"
+      onchange="loadFilterSets()">
+
+      <option value="">
+        সব ফোল্ডার
+      </option>
+
+    </select>
+
+
+    <select id="filterSet">
+
+      <option value="">
+        সব সেট
+      </option>
+
+    </select>
+
+
+    <select id="filterSubject">
+
+      <option value="">
+        সব বিষয়
+      </option>
+
+    </select>
+
+  </div>
+
+
+  <div class="actions">
+
+    <button onclick="loadQuestions()">
+      প্রশ্ন দেখুন
+    </button>
+
+    <button
+      class="secondary"
+      onclick="clearFilters()">
+      ফিল্টার পরিষ্কার
+    </button>
+
+    <button
+      class="secondary"
+      onclick="loadQuestions()">
+      রিফ্রেশ
+    </button>
+
+  </div>
+
+
+  <div
+    id="questionCount"
+    class="msg">
+  </div>
+
+
+  <div id="questionList"></div>
+
+</div>
+
+</main>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+const sb = supabase.createClient(
+  "https://ydvbnalhcnfqpxkkmywr.supabase.co",
+  "sb_publishable_xCbSWDkASsbUPl-WmygyMw_eVrJY_9a"
+);
+
+
+let category = "recruitment";
+let editingId = null;
+let subjects = [];
+let sources = [];
+
+
+const bn = n =>
+  String(n ?? "").replace(
+    /\d/g,
+    d => "০১২৩৪৫৬৭৮৯"[d]
+  );
+
+
+const esc = s =>
+  String(s ?? "").replace(
+    /[&<>"']/g,
+    m => ({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#39;"
+    }[m])
+  );
+
+
+const answerBn = a =>
+  ({
+    A:"ক",
+    B:"খ",
+    C:"গ",
+    D:"ঘ"
+  }[a] || a || "");
+
+
+const categoryName = c =>
+  ({
+    recruitment:"নিয়োগ পরীক্ষা",
+    verification_test:"যাচাই পরীক্ষা",
+    recent:"সাম্প্রতিক প্রশ্ন"
+  }[c] || c);
+
+
+function go(x){
+  location.href = x;
+}
+
+
+async function auth(){
+
+  const {
+    data:{
+      session
+    }
+  } = await sb.auth.getSession();
+
+  if(!session){
+
+    location.href = "admin.html";
+
+    return false;
+  }
+
+  return true;
+}
+
+
+function setCategory(c){
+
+  category = c;
+
+  document
+    .querySelectorAll(".tab")
+    .forEach(
+      x => x.classList.remove("active")
+    );
+
+
+  if(c === "recruitment")
+    tabRecruitment.classList.add("active");
+
+
+  if(c === "verification_test")
+    tabVerification.classList.add("active");
+
+
+  if(c === "recent")
+    tabRecent.classList.add("active");
+
+
+  categoryMsg.textContent =
+    "বর্তমান বিভাগ: " +
+    categoryName(c);
+
+
+  clearForm();
+
+  loadFolders();
+
+  loadQuestions();
+}
+
+
+async function loadSubjects(){
+
+  const r = await sb
+    .from("subjects")
+    .select("id,name")
+    .order("id");
+
+
+  if(r.error){
+
+    saveMsg.textContent =
+      r.error.message;
+
+    return;
+  }
+
+
+  subjects = r.data || [];
+
+
+  subjectSelect.innerHTML =
+    '<option value="">বিষয় নির্বাচন করুন</option>' +
+
+    subjects.map(x =>
+      `<option value="${x.id}">
+        ${esc(x.name)}
+      </option>`
+    ).join("");
+
+
+  filterSubject.innerHTML =
+    '<option value="">সব বিষয়</option>' +
+
+    subjects.map(x =>
+      `<option value="${x.id}">
+        ${esc(x.name)}
+      </option>`
+    ).join("");
+}
+
+
+async function loadSources(){
+
+  const r = await sb
+    .from("question_sources")
+    .select("id,source_name")
+    .order(
+      "id",
+      {ascending:false}
+    );
+
+
+  if(r.error){
+
+    sourceSelect.innerHTML =
+      '<option value="">Source পাওয়া যায়নি</option>';
+
+    return;
+  }
+
+
+  sources = r.data || [];
+
+
+  sourceSelect.innerHTML =
+    '<option value="">Source নির্বাচন করুন</option>' +
+
+    sources.map(x =>
+      `<option value="${x.id}">
+        ${esc(x.source_name || "")}
+      </option>`
+    ).join("");
+}
+
+
+async function loadFolders(){
+
+  folderSelect.innerHTML =
+    '<option value="">ফোল্ডার নির্বাচন করুন</option>';
+
+
+  filterFolder.innerHTML =
+    '<option value="">সব ফোল্ডার</option>';
+
+
+  const r = await sb
+    .from("question_bank_folders")
+    .select("id,folder_name")
+    .eq(
+      "sub_category",
+      category
+    )
+    .order("folder_name");
+
+
+  if(r.error){
+
+    folderMsg.textContent =
+      r.error.message;
+
+    return;
+  }
+
+
+  const rows = r.data || [];
+
+
+  const opts =
+    rows.map(x =>
+      `<option value="${x.id}">
+        ${esc(x.folder_name)}
+      </option>`
+    ).join("");
+
+
+  folderSelect.innerHTML += opts;
+
+  filterFolder.innerHTML += opts;
+
+
+  await loadSets();
+
+  await loadFilterSets();
+}
+
+
+async function loadSets(){
+
+  const id =
+    Number(folderSelect.value);
+
+
+  setSelect.innerHTML =
+    '<option value="">সেট নির্বাচন করুন</option>';
+
+
+  if(!id)
+    return;
+
+
+  const r = await sb
+    .from("question_bank_sets")
+    .select("id,set_name")
+    .eq("folder_id",id)
+    .order("set_name");
+
+
+  if(r.error){
+
+    folderMsg.textContent =
+      r.error.message;
+
+    return;
+  }
+
+
+  setSelect.innerHTML +=
+    (r.data || []).map(x =>
+      `<option value="${x.id}">
+        ${esc(x.set_name)}
+      </option>`
+    ).join("");
+}
+
+
+async function loadFilterSets(){
+
+  const id =
+    Number(filterFolder.value);
+
+
+  filterSet.innerHTML =
+    '<option value="">সব সেট</option>';
+
+
+  if(!id)
+    return;
+
+
+  const r = await sb
+    .from("question_bank_sets")
+    .select("id,set_name")
+    .eq("folder_id",id)
+    .order("set_name");
+
+
+  if(r.error)
+    return;
+
+
+  filterSet.innerHTML +=
+    (r.data || []).map(x =>
+      `<option value="${x.id}">
+        ${esc(x.set_name)}
+      </option>`
+    ).join("");
+}
+
+
+async function createFolder(){
+
+  const name =
+    newFolder.value.trim();
+
+
+  if(!name){
+
+    folderMsg.textContent =
+      "ফোল্ডারের নাম দিন";
+
+    return;
+  }
+
+
+  const r = await sb
+    .from("question_bank_folders")
+    .insert({
+      sub_category:category,
+      folder_name:name
+    });
+
+
+  folderMsg.textContent =
+    r.error
+      ? r.error.message
+      : "ফোল্ডার তৈরি হয়েছে";
+
+
+  if(!r.error){
+
+    newFolder.value = "";
+
+    await loadFolders();
+  }
+}
+
+
+async function createSet(){
+
+  const folderId =
+    Number(folderSelect.value);
+
+  const name =
+    newSet.value.trim();
+
+
+  if(!folderId){
+
+    folderMsg.textContent =
+      "আগে ফোল্ডার নির্বাচন করুন";
+
+    return;
+  }
+
+
+  if(!name){
+
+    folderMsg.textContent =
+      "সেটের নাম দিন";
+
+    return;
+  }
+
+
+  const r = await sb
+    .from("question_bank_sets")
+    .insert({
+      folder_id:folderId,
+      set_name:name
+    });
+
+
+  folderMsg.textContent =
+    r.error
+      ? r.error.message
+      : "সেট তৈরি হয়েছে";
+
+
+  if(!r.error){
+
+    newSet.value = "";
+
+    await loadSets();
+  }
+}
+
+
+async function saveQuestion(){
+
+  saveMsg.textContent = "";
+
+
+  const folderId =
+    Number(folderSelect.value);
+
+  const setId =
+    Number(setSelect.value);
+
+  const subjectId =
+    Number(subjectSelect.value);
+
+  const sourceId =
+    Number(sourceSelect.value);
+
+
+  const q =
+    questionText.value.trim();
+
+  const a =
+    optionA.value.trim();
+
+  const b =
+    optionB.value.trim();
+
+  const c =
+    optionC.value.trim();
+
+  const d =
+    optionD.value.trim();
+
+  const ans =
+    correctAnswer.value;
+
+  const qn =
+    Number(questionNumber.value) || null;
+
+
+  if(!folderId || !setId){
+
+    saveMsg.textContent =
+      "ফোল্ডার ও সেট নির্বাচন করুন";
+
+    return;
+  }
+
+
+  if(!subjectId){
+
+    saveMsg.textContent =
+      "বিষয় নির্বাচন করুন";
+
+    return;
+  }
+
+
+  if(!sourceId){
+
+    saveMsg.textContent =
+      "Source নির্বাচন করুন";
+
+    return;
+  }
+
+
+  if(
+    !q ||
+    !a ||
+    !b ||
+    !c ||
+    !d ||
+    !ans
+  ){
+
+    saveMsg.textContent =
+      "প্রশ্ন, চারটি অপশন এবং সঠিক উত্তর পূরণ করুন";
+
+    return;
+  }
+
+
+  /*
+    Duplicate protection:
+    একই category + folder + set + question_text
+    থাকলে নতুন প্রশ্ন যোগ হবে না।
+  */
+
+  if(!editingId){
+
+    const dup =
+      await sb
+        .from("questions")
+        .select("id")
+        .eq(
+          "source_type",
+          category
+        )
+        .eq(
+          "folder_id",
+          folderId
+        )
+        .eq(
+          "set_id",
+          setId
+        )
+        .eq(
+          "question_text",
+          q
+        )
+        .limit(1);
+
+
+    if(dup.error){
+
+      saveMsg.textContent =
+        dup.error.message;
+
+      return;
+    }
+
+
+    if(dup.data?.length){
+
+      saveMsg.textContent =
+        "এই সেটে একই প্রশ্ন ইতিমধ্যে আছে। Duplicate প্রশ্ন যোগ করা হয়নি।";
+
+      return;
+    }
+  }
+
+
+  const source =
+    sources.find(
+      x =>
+        Number(x.id) === sourceId
+    );
+
+
+  const payload = {
+
+    question_text:q,
+
+    option_a:a,
+
+    option_b:b,
+
+    option_c:c,
+
+    option_d:d,
+
+    correct_answer:ans,
+
+    explanation:
+      explanation.value.trim() ||
+      null,
+
+    subject_id:subjectId,
+
+    source_id:sourceId,
+
+    category:
+      categoryName(category),
+
+    source_type:
+      category,
+
+    source_name:
+      source?.source_name || null,
+
+    folder_id:
+      folderId,
+
+    set_id:
+      setId,
+
+    question_number:
+      qn
+  };
+
+
+  const r =
+    editingId
+
+      ? await sb
+          .from("questions")
+          .update(payload)
+          .eq(
+            "id",
+            editingId
+          )
+
+      : await sb
+          .from("questions")
+          .insert(payload);
+
+
+  if(r.error){
+
+    saveMsg.textContent =
+      r.error.message;
+
+    return;
+  }
+
+
+  saveMsg.textContent =
+    editingId
+      ? "প্রশ্ন আপডেট হয়েছে"
+      : "প্রশ্ন যোগ হয়েছে";
+
+
+  clearForm();
+
+  await loadQuestions();
+}
+
+
+function clearForm(){
+
+  editingId = null;
+
+  saveBtn.textContent =
+    "প্রশ্ন যোগ করুন";
+
+
+  questionText.value = "";
+
+  optionA.value = "";
+
+  optionB.value = "";
+
+  optionC.value = "";
+
+  optionD.value = "";
+
+  explanation.value = "";
+
+  correctAnswer.value = "";
+
+  questionNumber.value = "";
+}
+
+
+async function editQuestion(id){
+
+  const r =
+    await sb
+      .from("questions")
+      .select("*")
+      .eq("id",id)
+      .single();
+
+
+  if(r.error){
+
+    alert(r.error.message);
+
+    return;
+  }
+
+
+  const x = r.data;
+
+
+  editingId = x.id;
+
+
+  folderSelect.value =
+    x.folder_id || "";
+
+
+  await loadSets();
+
+
+  setSelect.value =
+    x.set_id || "";
+
+
+  subjectSelect.value =
+    x.subject_id || "";
+
+
+  sourceSelect.value =
+    x.source_id || "";
+
+
+  questionNumber.value =
+    x.question_number || "";
+
+
+  questionText.value =
+    x.question_text || "";
+
+
+  optionA.value =
+    x.option_a || "";
+
+
+  optionB.value =
+    x.option_b || "";
+
+
+  optionC.value =
+    x.option_c || "";
+
+
+  optionD.value =
+    x.option_d || "";
+
+
+  correctAnswer.value =
+    x.correct_answer || "";
+
+
+  explanation.value =
+    x.explanation || "";
+
+
+  saveBtn.textContent =
+    "প্রশ্ন আপডেট করুন";
+
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+}
+
+
+async function deleteQuestion(id){
+
+  if(
+    !confirm(
+      "এই প্রশ্নটি Question Bank থেকে মুছবেন?"
+    )
+  )
+    return;
+
+
+  const r =
+    await sb
+      .from("questions")
+      .delete()
+      .eq("id",id);
+
+
+  if(r.error)
+    alert(r.error.message);
+
+  else
+    loadQuestions();
+}
+
+
+function showQuestion(id){
+
+  sb
+    .from("questions")
+    .select("*")
+    .eq("id",id)
+    .single()
+    .then(({data:x,error}) => {
+
+      if(error){
+
+        alert(error.message);
+
+        return;
+      }
+
+
+      alert(
+
+        "প্রশ্ন: " +
+        x.question_text +
+
+        "\n\nক. " +
+        x.option_a +
+
+        "\nখ. " +
+        x.option_b +
+
+        "\nগ. " +
+        x.option_c +
+
+        "\nঘ. " +
+        x.option_d +
+
+        "\n\nসঠিক উত্তর: " +
+        answerBn(
+          x.correct_answer
+        ) +
+
+        "\n\nব্যাখ্যা: " +
+        (
+          x.explanation ||
+          "নেই"
+        )
+      );
+
+    });
+}
+
+
+async function loadQuestions(){
+
+  questionList.innerHTML =
+    "লোড হচ্ছে...";
+
+
+  const folderId =
+    Number(filterFolder.value);
+
+  const setId =
+    Number(filterSet.value);
+
+  const subjectId =
+    Number(filterSubject.value);
+
+
+  let query =
+    sb
+      .from("questions")
+      .select(
+        "*,subjects(name),question_bank_folders(folder_name),question_bank_sets(set_name),question_sources(source_name)"
+      )
+      .eq(
+        "source_type",
+        category
+      )
+      .order(
+        "question_number",
+        {
+          ascending:true,
+          nullsFirst:false
+        }
+      )
+      .order(
+        "id",
+        {
+          ascending:true
+        }
+      );
+
+
+  if(folderId)
+    query =
+      query.eq(
+        "folder_id",
+        folderId
+      );
+
+
+  if(setId)
+    query =
+      query.eq(
+        "set_id",
+        setId
+      );
+
+
+  if(subjectId)
+    query =
+      query.eq(
+        "subject_id",
+        subjectId
+      );
+
+
+  const r =
+    await query;
+
+
+  if(r.error){
+
+    questionList.innerHTML =
+      "";
+
+    questionCount.textContent =
+      r.error.message;
+
+    return;
+  }
+
+
+  const rows =
+    r.data || [];
+
+
+  questionCount.textContent =
+    "মোট প্রশ্ন: " +
+    bn(rows.length);
+
+
+  questionList.innerHTML =
+    rows.map((x,i) => {
+
+      const sub =
+        x.subjects?.name || "";
+
+      const fol =
+        x.question_bank_folders
+          ?.folder_name || "";
+
+      const set =
+        x.question_bank_sets
+          ?.set_name || "";
+
+      const src =
+        x.question_sources
+          ?.source_name ||
+        x.source_name ||
+        "";
+
+
+      return `
+
+        <div class="q">
+
+          <div class="qtitle">
+            ${bn(i+1)}.
+            ${esc(x.question_text)}
+          </div>
+
+
+          <div class="option">
+            ক. ${esc(x.option_a)}
+          </div>
+
+          <div class="option">
+            খ. ${esc(x.option_b)}
+          </div>
+
+          <div class="option">
+            গ. ${esc(x.option_c)}
+          </div>
+
+          <div class="option">
+            ঘ. ${esc(x.option_d)}
+          </div>
+
+
+          <div class="meta">
+
+            <span class="badge">
+              ${esc(sub)}
+            </span>
+
+            <span class="badge">
+              ${esc(
+                categoryName(category)
+              )}
+            </span>
+
+            <br>
+
+            ফোল্ডার:
+            ${esc(fol)}
+
+            |
+
+            সেট:
+            ${esc(set)}
+
+            |
+
+            প্রশ্ন নম্বর:
+            ${bn(
+              x.question_number ||
+              "—"
+            )}
+
+            <br>
+
+            Source:
+            ${esc(src)}
+
+            |
+
+            সঠিক উত্তর:
+            ${esc(
+              answerBn(
+                x.correct_answer
+              )
+            )}
+
+          </div>
+
+
+          <div class="actions">
+
+            <button
+              onclick="editQuestion(${x.id})">
+              এডিট
+            </button>
+
+
+            <button
+              class="secondary"
+              onclick="showQuestion(${x.id})">
+              বিস্তারিত
+            </button>
+
+
+            <button
+              class="danger"
+              onclick="deleteQuestion(${x.id})">
+              মুছুন
+            </button>
+
+          </div>
+
+        </div>
+
+      `;
+
+    }).join("")
+
+    ||
+
+    "কোনো প্রশ্ন পাওয়া যায়নি";
+}
+
+
+function clearFilters(){
+
+  filterFolder.value = "";
+
+  filterSet.innerHTML =
+    '<option value="">সব সেট</option>';
+
+  filterSubject.value = "";
+
+  loadQuestions();
+}
+
+
+(async()=>{
+
+  if(!(await auth()))
+    return;
+
+
+  await loadSubjects();
+
+  await loadSources();
+
+  await loadFolders();
+
+
+  categoryMsg.textContent =
+    "বর্তমান বিভাগ: " +
+    categoryName(category);
+
+
+  await loadQuestions();
+
+})();
+
+</script>
+
+</body>
+</html>
