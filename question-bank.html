@@ -6,7 +6,7 @@
 <title>ফেইসবুক পাঠশালা — Question Bank</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <style>
 *{box-sizing:border-box}
@@ -21,9 +21,10 @@ body{
 header{
   background:#1769aa;
   color:#fff;
-  padding:13px 15px;
+  padding:14px 16px;
   display:flex;
   align-items:center;
+  gap:10px;
 }
 
 header b{
@@ -32,62 +33,38 @@ header b{
 
 header button{
   margin-left:auto;
+  width:auto;
   background:#fff;
   color:#1769aa;
   border:0;
-  border-radius:9px;
-  padding:9px 12px;
+  padding:8px 12px;
+  border-radius:8px;
   font-weight:700;
 }
 
 main{
-  max-width:1050px;
+  max-width:1000px;
   margin:auto;
-  padding:12px;
+  padding:14px;
 }
 
 .card{
   background:#fff;
   border:1px solid #e2e8f0;
   border-radius:14px;
-  padding:14px;
-  margin-bottom:12px;
+  padding:16px;
+  margin-bottom:14px;
 }
 
 h2,h3{
-  margin:4px 0 12px;
+  margin-top:0;
 }
 
 .tabs{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:7px;
-}
-
-button,input,select,textarea{
-  width:100%;
-  font:inherit;
-  border-radius:9px;
-}
-
-button{
-  border:0;
-  padding:11px;
-  background:#1769aa;
-  color:#fff;
-  font-weight:700;
-  cursor:pointer;
-}
-
-input,select,textarea{
-  border:1px solid #cbd5e1;
-  padding:10px;
-  background:#fff;
-}
-
-textarea{
-  min-height:80px;
-  resize:vertical;
+  gap:8px;
+  margin-bottom:14px;
 }
 
 .tab{
@@ -103,75 +80,121 @@ textarea{
 .grid{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:9px;
+  gap:10px;
+}
+
+input,select,textarea,button{
+  width:100%;
+  padding:11px;
+  border-radius:9px;
+  font:inherit;
+}
+
+input,select,textarea{
+  border:1px solid #cbd5e1;
+  background:#fff;
+}
+
+textarea{
+  min-height:90px;
+  resize:vertical;
+}
+
+button{
+  border:0;
+  background:#1769aa;
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+}
+
+button.secondary{
+  background:#64748b;
+}
+
+button.success{
+  background:#15803d;
+}
+
+button.danger{
+  background:#dc2626;
+}
+
+.small{
+  font-size:13px;
+  color:#64748b;
 }
 
 .row{
-  display:grid;
-  grid-template-columns:1fr auto;
-  gap:7px;
+  display:flex;
+  gap:8px;
   align-items:center;
 }
 
-.smallbtn{
+.row>*{
+  flex:1;
+}
+
+.inline{
+  display:flex;
+  gap:8px;
+}
+
+.inline input{
+  flex:1;
+}
+
+.inline button{
   width:auto;
-  padding:9px 12px;
   white-space:nowrap;
-}
-
-.muted{
-  color:#64748b;
-  font-size:13px;
-}
-
-.msg{
-  margin-top:8px;
-  padding:8px;
-  border-radius:8px;
-  background:#f1f5f9;
 }
 
 .q{
   border:1px solid #e2e8f0;
-  border-radius:11px;
-  padding:11px;
-  margin-top:9px;
+  border-radius:10px;
+  padding:12px;
+  margin-top:10px;
+  background:#fff;
 }
 
-.opts{
-  margin-top:7px;
-  line-height:1.7;
+.qtext{
+  font-weight:700;
+  margin-bottom:8px;
 }
 
-.danger{
-  background:#b91c1c;
+.option{
+  padding:4px 0;
 }
 
-.secondary{
-  background:#64748b;
+.answer{
+  margin-top:8px;
+  color:#15803d;
+  font-weight:700;
+}
+
+.empty{
+  text-align:center;
+  padding:20px;
+  color:#64748b;
+}
+
+.msg{
+  margin-top:10px;
+  padding:10px;
+  border-radius:8px;
+  background:#f1f5f9;
+}
+
+.login{
+  max-width:430px;
+  margin:60px auto;
 }
 
 .hidden{
   display:none;
 }
 
-.login{
-  max-width:430px;
-  margin:55px auto;
-  padding:15px;
-}
-
-.login .card{
-  padding:20px;
-}
-
-label{
-  display:block;
-  margin-top:8px;
-  margin-bottom:4px;
-}
-
-@media(max-width:650px){
+@media(max-width:700px){
   .grid{
     grid-template-columns:1fr;
   }
@@ -179,86 +202,65 @@ label{
   .tabs{
     grid-template-columns:1fr;
   }
+
+  .inline{
+    flex-direction:column;
+  }
+
+  .inline button{
+    width:100%;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
-<div id="loginBox" class="login hidden">
+<div id="loginBox" class="login card hidden">
+  <h2>ফেইসবুক পাঠশালা</h2>
+  <p>Question Bank লগইন</p>
 
-  <div class="card">
+  <input id="loginEmail" type="email" placeholder="Admin Email">
+  <input id="loginPassword" type="password" placeholder="Password">
 
-    <h2>ফেইসবুক পাঠশালা</h2>
+  <button onclick="login()">লগ ইন</button>
 
-    <p>Question Bank-এ প্রবেশ করতে লগ ইন করুন</p>
-
-    <input
-      id="loginEmail"
-      type="email"
-      placeholder="Admin Email"
-    >
-
-    <input
-      id="loginPassword"
-      type="password"
-      placeholder="Password"
-    >
-
-    <button id="loginBtn">
-      লগ ইন
-    </button>
-
-    <div id="loginMsg" class="msg"></div>
-
-  </div>
-
+  <div id="loginMsg" class="msg"></div>
 </div>
 
 
-<!-- APP -->
 <div id="app" class="hidden">
 
 <header>
-
   <b>Question Bank</b>
-
-  <button id="logoutBtn">
-    লগআউট
-  </button>
-
+  <button onclick="logout()">লগ আউট</button>
 </header>
-
 
 <main>
 
-
 <!-- CATEGORY -->
+
 <div class="card">
 
-  <h3>১. বিভাগ নির্বাচন</h3>
+  <h3>বিভাগ নির্বাচন</h3>
 
   <div class="tabs">
 
-    <button
-      class="tab active"
-      data-cat="recruitment"
-    >
+    <button id="tabRecruitment"
+            class="tab"
+            onclick="changeCategory('recruitment')">
       নিয়োগ পরীক্ষা
     </button>
 
-    <button
-      class="tab"
-      data-cat="verification_test"
-    >
+    <button id="tabVerification"
+            class="tab"
+            onclick="changeCategory('verification_test')">
       যাচাই পরীক্ষা
     </button>
 
-    <button
-      class="tab"
-      data-cat="recent"
-    >
+    <button id="tabRecent"
+            class="tab"
+            onclick="changeCategory('recent')">
       সাম্প্রতিক প্রশ্ন
     </button>
 
@@ -268,54 +270,39 @@ label{
 
 
 <!-- FOLDER + SET -->
+
 <div class="card">
 
-  <h3>২. ফোল্ডার ও সেট</h3>
+  <h3>ফোল্ডার ও সেট নির্বাচন</h3>
 
+  <label>ফোল্ডার</label>
 
-  <label>
-    ফোল্ডার
-  </label>
+  <div class="inline">
 
-  <div class="row">
-
-    <select id="folderSelect">
-
-      <option value="">
-        ফোল্ডার নির্বাচন করুন
-      </option>
-
+    <select id="folderSelect"
+            onchange="folderChanged()">
+      <option value="">ফোল্ডার নির্বাচন করুন</option>
     </select>
 
-    <button
-      class="smallbtn"
-      id="newFolderBtn"
-    >
-      ＋ নতুন
-    </button>
+    <button onclick="showNewFolder()">＋ নতুন ফোল্ডার</button>
 
   </div>
 
+  <div id="newFolderBox" class="hidden" style="margin-top:10px">
 
-  <!-- NEW FOLDER -->
-  <div
-    id="folderBox"
-    class="hidden"
-    style="margin-top:8px"
-  >
+    <div class="inline">
 
-    <div class="row">
+      <input id="newFolderName"
+             placeholder="নতুন ফোল্ডারের নাম">
 
-      <input
-        id="folderName"
-        placeholder="নতুন ফোল্ডারের নাম"
-      >
-
-      <button
-        class="smallbtn"
-        id="saveFolderBtn"
-      >
+      <button class="success"
+              onclick="createFolder()">
         সংরক্ষণ
+      </button>
+
+      <button class="secondary"
+              onclick="hideNewFolder()">
+        বাতিল
       </button>
 
     </div>
@@ -323,264 +310,261 @@ label{
   </div>
 
 
-  <label style="margin-top:12px">
-
-    সেট
-
-  </label>
+  <div style="height:14px"></div>
 
 
-  <div class="row">
+  <label>সেট</label>
 
-    <select id="setSelect">
+  <div class="inline">
 
-      <option value="">
-        সেট নির্বাচন করুন
-      </option>
-
+    <select id="setSelect"
+            onchange="setChanged()">
+      <option value="">সেট নির্বাচন করুন</option>
     </select>
 
-    <button
-      class="smallbtn"
-      id="newSetBtn"
-    >
-      ＋ নতুন
-    </button>
+    <button onclick="showNewSet()">＋ নতুন সেট</button>
 
   </div>
 
+  <div id="newSetBox" class="hidden" style="margin-top:10px">
 
-  <!-- NEW SET -->
-  <div
-    id="setBox"
-    class="hidden"
-    style="margin-top:8px"
-  >
+    <div class="inline">
 
-    <div class="row">
+      <input id="newSetName"
+             placeholder="নতুন সেটের নাম">
 
-      <input
-        id="setName"
-        placeholder="নতুন সেটের নাম"
-      >
-
-      <button
-        class="smallbtn"
-        id="saveSetBtn"
-      >
+      <button class="success"
+              onclick="createSet()">
         সংরক্ষণ
+      </button>
+
+      <button class="secondary"
+              onclick="hideNewSet()">
+        বাতিল
       </button>
 
     </div>
 
   </div>
 
-
-  <div
-    id="fsMsg"
-    class="msg"
-  ></div>
+  <div id="folderSetMsg" class="msg"></div>
 
 </div>
 
 
 <!-- ADD QUESTION -->
+
 <div class="card">
 
-  <h3>৩. প্রশ্ন যোগ করুন</h3>
+  <h3>প্রশ্ন যোগ করুন</h3>
 
+  <div class="small">
+    প্রথমে ফোল্ডার ও সেট নির্বাচন করুন। এরপর একই সেটে একের পর এক প্রশ্ন যোগ করতে পারবেন।
+  </div>
+
+  <br>
+
+  <div class="grid">
+
+    <div>
+      <label>বিষয়</label>
+
+      <select id="subjectSelect">
+        <option value="">বিষয় নির্বাচন করুন</option>
+      </select>
+    </div>
+
+    <div>
+      <label>প্রশ্ন নম্বর</label>
+
+      <input id="questionNumber"
+             type="number"
+             min="1"
+             placeholder="যেমন: ১">
+    </div>
+
+  </div>
+
+  <br>
+
+  <label>প্রশ্ন</label>
+
+  <textarea id="questionText"
+            placeholder="প্রশ্ন লিখুন"></textarea>
+
+  <br>
+
+  <div class="grid">
+
+    <div>
+      <input id="optionA"
+             placeholder="ক) অপশন">
+    </div>
+
+    <div>
+      <input id="optionB"
+             placeholder="খ) অপশন">
+    </div>
+
+    <div>
+      <input id="optionC"
+             placeholder="গ) অপশন">
+    </div>
+
+    <div>
+      <input id="optionD"
+             placeholder="ঘ) অপশন">
+    </div>
+
+  </div>
+
+  <br>
 
   <div class="grid">
 
     <div>
 
-      <label>
-        বিষয়
-      </label>
+      <label>সঠিক উত্তর</label>
 
-      <select id="subjectSelect">
+      <select id="correctAnswer">
 
-        <option value="">
-          বিষয় নির্বাচন করুন
-        </option>
+        <option value="">উত্তর নির্বাচন করুন</option>
+
+        <option value="ক">ক</option>
+        <option value="খ">খ</option>
+        <option value="গ">গ</option>
+        <option value="ঘ">ঘ</option>
 
       </select>
 
     </div>
 
-
     <div>
 
-      <label>
-        প্রশ্ন নম্বর
-      </label>
+      <label>ব্যাখ্যা</label>
 
-      <input
-        id="questionNumber"
-        type="number"
-        placeholder="যেমন ১"
-      >
+      <input id="explanation"
+             placeholder="ঐচ্ছিক">
 
     </div>
 
   </div>
 
-
-  <label>
-    প্রশ্ন
-  </label>
-
-  <textarea
-    id="questionText"
-    placeholder="প্রশ্ন লিখুন"
-  ></textarea>
-
+  <br>
 
   <div class="grid">
 
-    <input
-      id="a"
-      placeholder="ক. অপশন"
-    >
+    <div>
 
-    <input
-      id="b"
-      placeholder="খ. অপশন"
-    >
+      <label>উৎসের নাম</label>
 
-    <input
-      id="c"
-      placeholder="গ. অপশন"
-    >
+      <input id="sourceName"
+             placeholder="যেমন: ব্রেইন বুস্টার মডেল টেস্ট">
 
-    <input
-      id="d"
-      placeholder="ঘ. অপশন"
-    >
+    </div>
 
-  </div>
+    <div>
 
+      <label>অথবা বিদ্যমান উৎস</label>
 
-  <div class="grid">
+      <select id="sourceSelect">
 
-    <select id="correct">
+        <option value="">উৎস নির্বাচন করুন</option>
 
-      <option value="">
-        সঠিক উত্তর নির্বাচন করুন
-      </option>
+      </select>
 
-      <option value="ক">
-        ক
-      </option>
-
-      <option value="খ">
-        খ
-      </option>
-
-      <option value="গ">
-        গ
-      </option>
-
-      <option value="ঘ">
-        ঘ
-      </option>
-
-    </select>
-
-
-    <input
-      id="sourceName"
-      placeholder="উৎসের নাম"
-    >
+    </div>
 
   </div>
 
+  <br>
 
-  <label>
-    ব্যাখ্যা
-  </label>
-
-  <textarea
-    id="explanation"
-    placeholder="ব্যাখ্যা (ঐচ্ছিক)"
-  ></textarea>
-
-
-  <button
-    id="addBtn"
-    style="margin-top:9px"
-  >
-    প্রশ্ন যোগ করুন
+  <button onclick="addQuestion()">
+    প্রশ্ন সংরক্ষণ করুন
   </button>
 
-
-  <div
-    id="addMsg"
-    class="msg"
-  ></div>
+  <div id="addMsg" class="msg"></div>
 
 </div>
 
 
-<!-- EXCEL / CSV -->
+<!-- IMPORT -->
+
 <div class="card">
 
-  <h3>৪. Excel / CSV</h3>
+  <h3>Excel / CSV থেকে প্রশ্ন যোগ</h3>
 
-  <p class="muted">
-    প্রথমে ফোল্ডার ও সেট নির্বাচন করুন।
-    তারপর Excel অথবা CSV ফাইল নির্বাচন করুন।
-  </p>
+  <div class="small">
+    Excel/CSV-তে প্রশ্ন, option_a, option_b, option_c, option_d,
+    correct_answer, explanation, subject_id, question_number কলাম ব্যবহার করুন।
+  </div>
 
-  <input
-    id="fileInput"
-    type="file"
-    accept=".xlsx,.xls,.csv"
-  >
+  <br>
 
-  <button
-    id="importBtn"
-    style="margin-top:8px"
-  >
-    ফাইল থেকে প্রশ্ন যোগ করুন
+  <input id="fileInput"
+         type="file"
+         accept=".xlsx,.xls,.csv">
+
+  <br><br>
+
+  <button onclick="importFile()">
+    Excel / CSV ইমপোর্ট করুন
   </button>
 
-  <div
-    id="importMsg"
-    class="msg"
-  ></div>
+  <div id="importMsg" class="msg"></div>
+
+</div>
+
+
+<!-- FILTER -->
+
+<div class="card">
+
+  <h3>প্রশ্ন খুঁজুন</h3>
+
+  <div class="grid">
+
+    <select id="filterFolder"
+            onchange="loadFilterSets()">
+
+      <option value="">সব ফোল্ডার</option>
+
+    </select>
+
+    <select id="filterSet"
+            onchange="loadQuestions()">
+
+      <option value="">সব সেট</option>
+
+    </select>
+
+  </div>
+
+  <br>
+
+  <select id="filterSubject"
+          onchange="loadQuestions()">
+
+    <option value="">সব বিষয়</option>
+
+  </select>
 
 </div>
 
 
 <!-- QUESTION LIST -->
+
 <div class="card">
 
-  <h3>৫. প্রশ্ন তালিকা</h3>
+  <h3>প্রশ্ন তালিকা</h3>
 
-
-  <div class="grid">
-
-    <select id="filterSubject">
-
-      <option value="">
-        সব বিষয়
-      </option>
-
-    </select>
-
-
-    <button id="refreshBtn">
-      তালিকা রিফ্রেশ
-    </button>
-
+  <div id="questionList">
+    <div class="empty">
+      কোনো প্রশ্ন নেই
+    </div>
   </div>
 
-
-  <div id="questionList"></div>
-
 </div>
-
 
 </main>
 
@@ -589,10 +573,6 @@ label{
 
 <script>
 
-/* =========================
-   SUPABASE
-========================= */
-
 const SUPABASE_URL =
 "https://ydvbnalhcnfqpxkkmywr.supabase.co";
 
@@ -600,8 +580,7 @@ const SUPABASE_KEY =
 "sb_publishable_xCbSWDkASsbUPl-WmygyMw_eVrJY_9a";
 
 
-const sb =
-supabase.createClient(
+const sb = supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY,
   {
@@ -614,20 +593,13 @@ supabase.createClient(
 );
 
 
-/* =========================
-   GLOBAL
-========================= */
-
 const CATS = {
 
-  recruitment:
-    "নিয়োগ পরীক্ষা",
+  recruitment:"নিয়োগ পরীক্ষা",
 
-  verification_test:
-    "যাচাই পরীক্ষা",
+  verification_test:"যাচাই পরীক্ষা",
 
-  recent:
-    "সাম্প্রতিক প্রশ্ন"
+  recent:"সাম্প্রতিক প্রশ্ন"
 
 };
 
@@ -635,18 +607,25 @@ const CATS = {
 let currentCategory =
 "recruitment";
 
-
-let currentSession =
-null;
+let currentSession = null;
 
 
-let subjects =
-[];
+const subjects = [
 
+  {id:1,name:"বাংলা সাহিত্য"},
+  {id:2,name:"বাংলা ব্যাকরণ"},
+  {id:3,name:"গণিত"},
+  {id:4,name:"ইংরেজি সাহিত্য"},
+  {id:5,name:"ইংরেজি ব্যাকরণ"},
+  {id:6,name:"বাংলাদেশ"},
+  {id:7,name:"আন্তর্জাতিক"},
+  {id:8,name:"বিজ্ঞান"},
+  {id:9,name:"কম্পিউটার ও তথ্য প্রযুক্তি"},
+  {id:10,name:"ভূগোল"},
+  {id:11,name:"সাম্প্রতিক প্রশ্নোত্তর"}
 
-/* =========================
-   SHORTCUT
-========================= */
+];
+
 
 function $(id){
 
@@ -655,167 +634,78 @@ function $(id){
 }
 
 
-/* =========================
-   HTML ESCAPE
-========================= */
-
 function esc(value){
 
   return String(value ?? "")
-    .replace(/[&<>"']/g,function(m){
-
-      return {
-
-        "&":"&amp;",
-        "<":"&lt;",
-        ">":"&gt;",
-        '"':"&quot;",
-        "'":"&#039;"
-
-      }[m];
-
-    });
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
 
 }
 
 
-/* =========================
-   MESSAGE
-========================= */
+async function init(){
 
-function setMsg(
-  id,
-  text,
-  success=false
-){
-
-  $(id).textContent =
-    text || "";
-
-  $(id).style.background =
-    success
-      ? "#dcfce7"
-      : "#f1f5f9";
-
-}
-
-
-/* =========================
-   SESSION
-========================= */
-
-async function checkSession(){
-
-  const r =
+  const result =
     await sb.auth.getSession();
 
-  if(r.error){
-
-    console.error(r.error);
-
-    return null;
-
-  }
-
-  return r.data.session;
-
-}
-
-
-/* =========================
-   START
-========================= */
-
-async function boot(){
-
   currentSession =
-    await checkSession();
-
+    result.data.session;
 
   if(!currentSession){
 
-    $("loginBox")
-      .classList
-      .remove("hidden");
-
-    $("app")
-      .classList
-      .add("hidden");
+    $("loginBox").classList.remove("hidden");
+    $("app").classList.add("hidden");
 
     return;
 
   }
 
+  $("loginBox").classList.add("hidden");
+  $("app").classList.remove("hidden");
 
-  $("loginBox")
-    .classList
-    .add("hidden");
-
-
-  $("app")
-    .classList
-    .remove("hidden");
-
-
-  await loadSubjects();
-
-  await loadFolders();
+  loadSubjects();
+  changeCategory("recruitment");
 
 }
 
 
-/* =========================
-   LOGIN
-========================= */
-
-$("loginBtn").onclick =
-async function(){
+async function login(){
 
   const email =
-    $("loginEmail")
-      .value
-      .trim();
-
+    $("loginEmail").value.trim();
 
   const password =
-    $("loginPassword")
-      .value;
-
+    $("loginPassword").value;
 
   if(!email || !password){
 
-    setMsg(
-      "loginMsg",
-      "ইমেইল ও পাসওয়ার্ড দিন"
-    );
+    $("loginMsg").textContent =
+      "ইমেইল ও পাসওয়ার্ড দিন";
 
     return;
 
   }
 
-
-  setMsg(
-    "loginMsg",
-    "লগ ইন হচ্ছে..."
-  );
+  $("loginMsg").textContent =
+    "লগ ইন হচ্ছে...";
 
 
-  const r =
+  const result =
     await sb.auth.signInWithPassword({
 
-      email:email,
-
-      password:password
+      email,
+      password
 
     });
 
 
-  if(r.error){
+  if(result.error){
 
-    setMsg(
-      "loginMsg",
-      r.error.message
-    );
+    $("loginMsg").textContent =
+      result.error.message;
 
     return;
 
@@ -823,177 +713,92 @@ async function(){
 
 
   currentSession =
-    r.data.session;
+    result.data.session;
+
+  $("loginBox").classList.add("hidden");
+  $("app").classList.remove("hidden");
+
+  loadSubjects();
+  changeCategory("recruitment");
+
+}
 
 
-  $("loginPassword")
-    .value="";
-
-
-  $("loginBox")
-    .classList
-    .add("hidden");
-
-
-  $("app")
-    .classList
-    .remove("hidden");
-
-
-  await loadSubjects();
-
-  await loadFolders();
-
-};
-
-
-/* =========================
-   LOGOUT
-========================= */
-
-$("logoutBtn").onclick =
-async function(){
+async function logout(){
 
   await sb.auth.signOut();
 
   location.reload();
 
-};
+}
 
 
-/* =========================
-   CATEGORY
-========================= */
+function loadSubjects(){
 
-document
-.querySelectorAll(".tab")
-.forEach(function(btn){
-
-  btn.onclick =
-  async function(){
-
-    document
-      .querySelectorAll(".tab")
-      .forEach(function(x){
-
-        x.classList
-          .remove("active");
-
-      });
-
-
-    btn.classList
-      .add("active");
-
-
-    currentCategory =
-      btn.dataset.cat;
-
-
-    $("folderSelect")
-      .innerHTML =
-      '<option value="">ফোল্ডার নির্বাচন করুন</option>';
-
-
-    $("setSelect")
-      .innerHTML =
-      '<option value="">সেট নির্বাচন করুন</option>';
-
-
-    $("questionList")
-      .innerHTML="";
-
-
-    setMsg(
-      "fsMsg",
-      ""
-    );
-
-
-    await loadFolders();
-
-  };
-
-});
-
-
-/* =========================
-   SUBJECTS
-========================= */
-
-async function loadSubjects(){
-
-  const r =
-    await sb
-      .from("subjects")
-      .select("id,name")
-      .order("id");
-
-
-  if(r.error){
-
-    setMsg(
-      "addMsg",
-      r.error.message
-    );
-
-    return;
-
-  }
-
-
-  subjects =
-    r.data || [];
-
-
-  $("subjectSelect")
-    .innerHTML =
+  const html =
     '<option value="">বিষয় নির্বাচন করুন</option>' +
 
-    subjects
-      .map(function(s){
+    subjects.map(s =>
+      `<option value="${s.id}">${esc(s.name)}</option>`
+    ).join("");
 
-        return `
-          <option value="${s.id}">
-            ${esc(s.name)}
-          </option>
-        `;
+  $("subjectSelect").innerHTML =
+    html;
 
-      })
-      .join("");
-
-
-  $("filterSubject")
-    .innerHTML =
+  $("filterSubject").innerHTML =
     '<option value="">সব বিষয়</option>' +
 
-    subjects
-      .map(function(s){
-
-        return `
-          <option value="${s.id}">
-            ${esc(s.name)}
-          </option>
-        `;
-
-      })
-      .join("");
+    subjects.map(s =>
+      `<option value="${s.id}">${esc(s.name)}</option>`
+    ).join("");
 
 }
 
 
-/* =========================
-   LOAD FOLDERS
-========================= */
+async function changeCategory(cat){
+
+  currentCategory =
+    cat;
+
+  document.querySelectorAll(".tab")
+    .forEach(x =>
+      x.classList.remove("active")
+    );
+
+
+  if(cat === "recruitment")
+    $("tabRecruitment").classList.add("active");
+
+  if(cat === "verification_test")
+    $("tabVerification").classList.add("active");
+
+  if(cat === "recent")
+    $("tabRecent").classList.add("active");
+
+
+  $("folderSelect").innerHTML =
+    '<option value="">ফোল্ডার নির্বাচন করুন</option>';
+
+  $("setSelect").innerHTML =
+    '<option value="">সেট নির্বাচন করুন</option>';
+
+  await loadFolders();
+
+  await loadFilterFolders();
+
+  await loadSources();
+
+  await loadQuestions();
+
+}
+
 
 async function loadFolders(){
 
-  const r =
+  const result =
     await sb
       .from("question_bank_folders")
-      .select(
-        "id,sub_category,folder_name"
-      )
+      .select("id,sub_category,folder_name")
       .eq(
         "sub_category",
         CATS[currentCategory]
@@ -1001,378 +806,237 @@ async function loadFolders(){
       .order("id");
 
 
-  if(r.error){
+  if(result.error){
 
-    setMsg(
-      "fsMsg",
-      "ফোল্ডার লোড হয়নি: " +
-      r.error.message
-    );
+    $("folderSetMsg").textContent =
+      result.error.message;
 
     return;
 
   }
 
 
-  $("folderSelect")
-    .innerHTML =
+  const folders =
+    result.data || [];
+
+
+  $("folderSelect").innerHTML =
     '<option value="">ফোল্ডার নির্বাচন করুন</option>' +
 
-    (r.data || [])
-      .map(function(x){
+    folders.map(f =>
+      `<option value="${f.id}">
+        ${esc(f.folder_name)}
+      </option>`
+    ).join("");
 
-        return `
-          <option value="${x.id}">
-            ${esc(x.folder_name)}
-          </option>
-        `;
-
-      })
-      .join("");
-
-
-  $("setSelect")
-    .innerHTML =
-    '<option value="">সেট নির্বাচন করুন</option>';
 
 }
 
 
-/* =========================
-   FOLDER SELECT
-========================= */
+function showNewFolder(){
 
-$("folderSelect").onchange =
-async function(){
+  $("newFolderBox")
+    .classList.remove("hidden");
 
-  const id =
-    $("folderSelect").value;
+  $("newFolderName").focus();
 
-
-  $("setSelect")
-    .innerHTML =
-    '<option value="">সেট নির্বাচন করুন</option>';
+}
 
 
-  if(!id){
+function hideNewFolder(){
 
-    return;
+  $("newFolderBox")
+    .classList.add("hidden");
 
-  }
+  $("newFolderName").value = "";
 
-
-  const r =
-    await sb
-      .from("question_bank_sets")
-      .select("id,set_name")
-      .eq(
-        "folder_id",
-        Number(id)
-      )
-      .order("id");
+}
 
 
-  if(r.error){
-
-    setMsg(
-      "fsMsg",
-      r.error.message
-    );
-
-    return;
-
-  }
-
-
-  $("setSelect")
-    .innerHTML =
-    '<option value="">সেট নির্বাচন করুন</option>' +
-
-    (r.data || [])
-      .map(function(x){
-
-        return `
-          <option value="${x.id}">
-            ${esc(x.set_name)}
-          </option>
-        `;
-
-      })
-      .join("");
-
-
-  await loadQuestions();
-
-};
-
-
-/* =========================
-   SET SELECT
-========================= */
-
-$("setSelect").onchange =
-async function(){
-
-  await loadQuestions();
-
-};
-
-
-/* =========================
-   NEW FOLDER BOX
-========================= */
-
-$("newFolderBtn").onclick =
-function(){
-
-  $("folderBox")
-    .classList
-    .toggle("hidden");
-
-
-  $("folderName")
-    .focus();
-
-};
-
-
-/* =========================
-   SAVE FOLDER
-========================= */
-
-$("saveFolderBtn").onclick =
-async function(){
+async function createFolder(){
 
   const name =
-    $("folderName")
+    $("newFolderName")
       .value
       .trim();
 
 
   if(!name){
 
-    setMsg(
-      "fsMsg",
-      "ফোল্ডারের নাম লিখুন"
-    );
+    $("folderSetMsg").textContent =
+      "ফোল্ডারের নাম লিখুন";
 
     return;
 
   }
 
 
-  setMsg(
-    "fsMsg",
-    "ফোল্ডার তৈরি হচ্ছে..."
-  );
+  if(!currentSession){
+
+    $("folderSetMsg").textContent =
+      "লগইন সেশন পাওয়া যায়নি। আবার লগইন করুন।";
+
+    return;
+
+  }
+
+
+  $("folderSetMsg").textContent =
+    "ফোল্ডার তৈরি হচ্ছে...";
 
 
   /*
-    নিরাপত্তার জন্য INSERT policy
-    authenticated user-এর জন্য রাখা হয়েছে।
+    গুরুত্বপূর্ণ:
+    সরাসরি question_bank_folders-এ INSERT নয়।
+    Supabase-এর security definer function ব্যবহার করছি।
   */
 
-  const session =
-    await checkSession();
-
-
-  if(!session){
-
-    setMsg(
-      "fsMsg",
-      "লগইন সেশন নেই। আবার লগইন করুন।"
-    );
-
-    $("loginBox")
-      .classList
-      .remove("hidden");
-
-    $("app")
-      .classList
-      .add("hidden");
-
-    return;
-
-  }
-
-
-  /* DUPLICATE CHECK */
-
-  const dup =
-    await sb
-      .from("question_bank_folders")
-      .select("id")
-      .eq(
-        "sub_category",
-        CATS[currentCategory]
-      )
-      .eq(
-        "folder_name",
-        name
-      )
-      .maybeSingle();
-
-
-  if(dup.error){
-
-    setMsg(
-      "fsMsg",
-      "যাচাই করা যায়নি: " +
-      dup.error.message
-    );
-
-    return;
-
-  }
-
-
-  if(dup.data){
-
-    $("folderName")
-      .value="";
-
-
-    await loadFolders();
-
-
-    $("folderSelect")
-      .value =
-      dup.data.id;
-
-
-    await $("folderSelect")
-      .onchange();
-
-
-    setMsg(
-      "fsMsg",
-      "এই ফোল্ডার আগে থেকেই আছে। সেটি নির্বাচন করা হয়েছে।",
-      true
-    );
-
-    return;
-
-  }
-
-
-  /* INSERT */
-
-  const r =
-    await sb
-      .from("question_bank_folders")
-      .insert({
-
-        sub_category:
+  const result =
+    await sb.rpc(
+      "create_question_bank_folder",
+      {
+        p_sub_category:
           CATS[currentCategory],
 
-        folder_name:
+        p_folder_name:
           name
-
-      })
-      .select(
-        "id,folder_name"
-      )
-      .single();
-
-
-  if(r.error){
-
-    setMsg(
-      "fsMsg",
-      "ফোল্ডার তৈরি হয়নি: " +
-      r.error.message
+      }
     );
+
+
+  if(result.error){
+
+    $("folderSetMsg").textContent =
+      result.error.message;
 
     return;
 
   }
 
 
-  $("folderName")
-    .value="";
+  $("folderSetMsg").textContent =
+    "✅ ফোল্ডার তৈরি হয়েছে";
 
 
-  $("folderBox")
-    .classList
-    .add("hidden");
-
+  hideNewFolder();
 
   await loadFolders();
 
-
-  $("folderSelect")
-    .value =
-    r.data.id;
+  await loadFilterFolders();
 
 
-  await $("folderSelect")
-    .onchange();
+  const newFolder =
+    result.data;
 
 
-  setMsg(
-    "fsMsg",
-    "ফোল্ডার তৈরি হয়েছে। এখন সেট তৈরি করুন।",
-    true
-  );
+  if(newFolder){
 
-};
+    $("folderSelect").value =
+      newFolder.id;
+
+    await folderChanged();
+
+  }
+
+}
 
 
-/* =========================
-   NEW SET BOX
-========================= */
+async function folderChanged(){
 
-$("newSetBtn").onclick =
-function(){
+  const folderId =
+    $("folderSelect").value;
 
-  if(!$("folderSelect").value){
 
-    setMsg(
-      "fsMsg",
-      "আগে একটি ফোল্ডার নির্বাচন করুন"
-    );
+  $("setSelect").innerHTML =
+    '<option value="">সেট নির্বাচন করুন</option>';
+
+
+  if(!folderId){
 
     return;
 
   }
 
 
-  $("setBox")
-    .classList
-    .toggle("hidden");
+  const result =
+    await sb
+      .from("question_bank_sets")
+      .select("id,set_name")
+      .eq(
+        "folder_id",
+        Number(folderId)
+      )
+      .order("id");
 
 
-  $("setName")
-    .focus();
+  if(result.error){
 
-};
+    $("folderSetMsg").textContent =
+      result.error.message;
+
+    return;
+
+  }
 
 
-/* =========================
-   SAVE SET
-========================= */
+  $("setSelect").innerHTML =
+    '<option value="">সেট নির্বাচন করুন</option>' +
 
-$("saveSetBtn").onclick =
-async function(){
+    (result.data || []).map(s =>
+      `<option value="${s.id}">
+        ${esc(s.set_name)}
+      </option>`
+    ).join("");
+
+
+}
+
+
+function showNewSet(){
+
+  if(!$("folderSelect").value){
+
+    $("folderSetMsg").textContent =
+      "আগে একটি ফোল্ডার নির্বাচন করুন";
+
+    return;
+
+  }
+
+
+  $("newSetBox")
+    .classList.remove("hidden");
+
+  $("newSetName").focus();
+
+}
+
+
+function hideNewSet(){
+
+  $("newSetBox")
+    .classList.add("hidden");
+
+  $("newSetName").value = "";
+
+}
+
+
+async function createSet(){
 
   const folderId =
-    Number(
-      $("folderSelect").value
-    );
-
+    $("folderSelect").value;
 
   const name =
-    $("setName")
+    $("newSetName")
       .value
       .trim();
 
 
   if(!folderId){
 
-    setMsg(
-      "fsMsg",
-      "আগে একটি ফোল্ডার নির্বাচন করুন"
-    );
+    $("folderSetMsg").textContent =
+      "আগে ফোল্ডার নির্বাচন করুন";
 
     return;
 
@@ -1381,333 +1045,307 @@ async function(){
 
   if(!name){
 
-    setMsg(
-      "fsMsg",
-      "সেটের নাম লিখুন"
-    );
+    $("folderSetMsg").textContent =
+      "সেটের নাম লিখুন";
 
     return;
 
   }
 
 
-  setMsg(
-    "fsMsg",
-    "সেট তৈরি হচ্ছে..."
-  );
+  $("folderSetMsg").textContent =
+    "সেট তৈরি হচ্ছে...";
 
 
-  const session =
-    await checkSession();
-
-
-  if(!session){
-
-    setMsg(
-      "fsMsg",
-      "লগইন সেশন নেই। আবার লগইন করুন।"
-    );
-
-    return;
-
-  }
-
-
-  /* DUPLICATE CHECK */
-
-  const dup =
-    await sb
-      .from("question_bank_sets")
-      .select("id")
-      .eq(
-        "folder_id",
-        folderId
-      )
-      .eq(
-        "set_name",
-        name
-      )
-      .maybeSingle();
-
-
-  if(dup.error){
-
-    setMsg(
-      "fsMsg",
-      "যাচাই করা যায়নি: " +
-      dup.error.message
-    );
-
-    return;
-
-  }
-
-
-  if(dup.data){
-
-    $("setName")
-      .value="";
-
-
-    await $("folderSelect")
-      .onchange();
-
-
-    $("setSelect")
-      .value =
-      dup.data.id;
-
-
-    await loadQuestions();
-
-
-    setMsg(
-      "fsMsg",
-      "এই সেট আগে থেকেই আছে। সেটি নির্বাচন করা হয়েছে।",
-      true
-    );
-
-    return;
-
-  }
-
-
-  /* INSERT */
-
-  const r =
+  const result =
     await sb
       .from("question_bank_sets")
       .insert({
 
         folder_id:
-          folderId,
+          Number(folderId),
 
         set_name:
           name
 
       })
-      .select(
-        "id,set_name"
-      )
+      .select()
       .single();
 
 
-  if(r.error){
+  if(result.error){
 
-    setMsg(
-      "fsMsg",
-      "সেট তৈরি হয়নি: " +
-      r.error.message
-    );
+    $("folderSetMsg").textContent =
+      result.error.message;
 
     return;
 
   }
 
 
-  $("setName")
-    .value="";
+  $("folderSetMsg").textContent =
+    "✅ সেট তৈরি হয়েছে";
 
 
-  $("setBox")
-    .classList
-    .add("hidden");
+  hideNewSet();
+
+  await folderChanged();
 
 
-  await $("folderSelect")
-    .onchange();
+  if(result.data){
 
-
-  $("setSelect")
-    .value =
-    r.data.id;
-
-
-  await loadQuestions();
-
-
-  setMsg(
-    "fsMsg",
-    "সেট তৈরি হয়েছে। এখন প্রশ্ন যোগ করুন।",
-    true
-  );
-
-};
-
-
-/* =========================
-   CHECK FOLDER / SET
-========================= */
-
-function selectedReady(){
-
-  if(!$("folderSelect").value){
-
-    setMsg(
-      "addMsg",
-      "আগে ফোল্ডার নির্বাচন করুন"
-    );
-
-    return false;
+    $("setSelect").value =
+      result.data.id;
 
   }
 
-
-  if(!$("setSelect").value){
-
-    setMsg(
-      "addMsg",
-      "আগে সেট নির্বাচন করুন"
-    );
-
-    return false;
-
-  }
+}
 
 
-  return true;
+function setChanged(){
+
+  loadQuestions();
 
 }
 
 
-/* =========================
-   FORM DATA
-========================= */
+async function loadSources(){
 
-function formData(){
-
-  return {
-
-    question_text:
-      $("questionText")
-      .value
-      .trim(),
-
-    option_a:
-      $("a")
-      .value
-      .trim(),
-
-    option_b:
-      $("b")
-      .value
-      .trim(),
-
-    option_c:
-      $("c")
-      .value
-      .trim(),
-
-    option_d:
-      $("d")
-      .value
-      .trim(),
-
-    correct_answer:
-      $("correct")
-      .value,
-
-    explanation:
-      $("explanation")
-      .value
-      .trim(),
-
-    subject_id:
-      Number(
-        $("subjectSelect")
-        .value
-      ),
-
-    source_name:
-      $("sourceName")
-      .value
-      .trim() || null,
-
-    question_number:
-      $("questionNumber").value
-        ? Number(
-            $("questionNumber")
-            .value
-          )
-        : null
-
-  };
-
-}
+  const result =
+    await sb
+      .from("question_sources")
+      .select("id,source_name,source_category")
+      .eq(
+        "source_category",
+        currentCategory
+      )
+      .order("id");
 
 
-/* =========================
-   CLEAR FORM
-========================= */
+  if(result.error){
 
-function clearQuestionForm(){
-
-  $("questionText").value="";
-
-  $("a").value="";
-
-  $("b").value="";
-
-  $("c").value="";
-
-  $("d").value="";
-
-  $("correct").value="";
-
-  $("explanation").value="";
-
-  $("questionNumber").value="";
-
-}
-
-
-/* =========================
-   ADD QUESTION
-========================= */
-
-$("addBtn").onclick =
-async function(){
-
-  if(!selectedReady()){
+    $("sourceSelect").innerHTML =
+      '<option value="">উৎস পাওয়া যায়নি</option>';
 
     return;
 
   }
 
 
-  const d =
-    formData();
+  $("sourceSelect").innerHTML =
+    '<option value="">উৎস নির্বাচন করুন</option>' +
+
+    (result.data || []).map(s =>
+      `<option value="${s.id}">
+        ${esc(s.source_name)}
+      </option>`
+    ).join("");
+
+}
 
 
-  if(
-    !d.question_text ||
-    !d.option_a ||
-    !d.option_b ||
-    !d.option_c ||
-    !d.option_d ||
-    !d.correct_answer ||
-    !d.subject_id
-  ){
+async function getOrCreateSource(){
 
-    setMsg(
-      "addMsg",
-      "প্রশ্ন, চারটি অপশন, সঠিক উত্তর ও বিষয় পূরণ করুন"
-    );
+  const typedName =
+    $("sourceName")
+      .value
+      .trim();
+
+  const selectedId =
+    $("sourceSelect").value;
+
+
+  if(selectedId){
+
+    return Number(selectedId);
+
+  }
+
+
+  if(!typedName){
+
+    return null;
+
+  }
+
+
+  const existing =
+    await sb
+      .from("question_sources")
+      .select("id")
+      .eq(
+        "source_category",
+        currentCategory
+      )
+      .eq(
+        "source_name",
+        typedName
+      )
+      .maybeSingle();
+
+
+  if(existing.error){
+
+    throw existing.error;
+
+  }
+
+
+  if(existing.data){
+
+    return existing.data.id;
+
+  }
+
+
+  const created =
+    await sb
+      .from("question_sources")
+      .insert({
+
+        source_category:
+          currentCategory,
+
+        source_name:
+          typedName
+
+      })
+      .select("id")
+      .single();
+
+
+  if(created.error){
+
+    throw created.error;
+
+  }
+
+
+  return created.data.id;
+
+}
+
+
+async function addQuestion(){
+
+  const folderId =
+    $("folderSelect").value;
+
+  const setId =
+    $("setSelect").value;
+
+  const subjectId =
+    $("subjectSelect").value;
+
+  const questionText =
+    $("questionText")
+      .value
+      .trim();
+
+  const optionA =
+    $("optionA")
+      .value
+      .trim();
+
+  const optionB =
+    $("optionB")
+      .value
+      .trim();
+
+  const optionC =
+    $("optionC")
+      .value
+      .trim();
+
+  const optionD =
+    $("optionD")
+      .value
+      .trim();
+
+  const correctAnswer =
+    $("correctAnswer").value;
+
+  const explanation =
+    $("explanation")
+      .value
+      .trim();
+
+  const questionNumber =
+    $("questionNumber").value;
+
+
+  if(!folderId){
+
+    $("addMsg").textContent =
+      "ফোল্ডার নির্বাচন করুন";
 
     return;
 
   }
 
 
-  setMsg(
-    "addMsg",
-    "প্রশ্ন যোগ হচ্ছে..."
-  );
+  if(!setId){
+
+    $("addMsg").textContent =
+      "সেট নির্বাচন করুন";
+
+    return;
+
+  }
 
 
-  /* DUPLICATE */
+  if(!subjectId){
 
-  const dup =
+    $("addMsg").textContent =
+      "বিষয় নির্বাচন করুন";
+
+    return;
+
+  }
+
+
+  if(!questionText){
+
+    $("addMsg").textContent =
+      "প্রশ্ন লিখুন";
+
+    return;
+
+  }
+
+
+  if(!optionA ||
+     !optionB ||
+     !optionC ||
+     !optionD){
+
+    $("addMsg").textContent =
+      "চারটি অপশন পূরণ করুন";
+
+    return;
+
+  }
+
+
+  if(!correctAnswer){
+
+    $("addMsg").textContent =
+      "সঠিক উত্তর নির্বাচন করুন";
+
+    return;
+
+  }
+
+
+  $("addMsg").textContent =
+    "সংরক্ষণ হচ্ছে...";
+
+
+  /*
+    একই সেটে একই প্রশ্ন আগে আছে কি না
+  */
+
+  const duplicate =
     await sb
       .from("questions")
       .select("id")
@@ -1717,324 +1355,322 @@ async function(){
       )
       .eq(
         "folder_id",
-        Number(
-          $("folderSelect").value
-        )
+        Number(folderId)
       )
       .eq(
         "set_id",
-        Number(
-          $("setSelect").value
-        )
+        Number(setId)
       )
       .eq(
         "question_text",
-        d.question_text
+        questionText
       )
-      .maybeSingle();
+      .limit(1);
 
 
-  if(dup.error){
+  if(duplicate.error){
 
-    setMsg(
-      "addMsg",
-      "ডুপ্লিকেট যাচাই করা যায়নি: " +
-      dup.error.message
-    );
+    $("addMsg").textContent =
+      duplicate.error.message;
 
     return;
 
   }
 
 
-  if(dup.data){
+  if(duplicate.data &&
+     duplicate.data.length){
 
-    setMsg(
-      "addMsg",
-      "এই প্রশ্নটি এই সেটে আগে থেকেই আছে"
-    );
+    $("addMsg").textContent =
+      "⚠️ একই প্রশ্ন এই সেটে আগে থেকেই আছে";
 
     return;
 
   }
 
 
-  /* SOURCE */
-
-  let sourceId =
-    null;
+  let sourceId;
 
 
-  if(d.source_name){
+  try{
 
-    const src =
-      await sb
-        .from("question_sources")
-        .select("id")
-        .eq(
-          "source_category",
-          currentCategory
-        )
-        .eq(
-          "source_name",
-          d.source_name
-        )
-        .maybeSingle();
+    sourceId =
+      await getOrCreateSource();
 
+  }catch(error){
 
-    if(src.error){
+    $("addMsg").textContent =
+      error.message;
 
-      setMsg(
-        "addMsg",
-        "উৎস যাচাই করা যায়নি: " +
-        src.error.message
-      );
-
-      return;
-
-    }
-
-
-    if(src.data){
-
-      sourceId =
-        src.data.id;
-
-    }else{
-
-      const ins =
-        await sb
-          .from("question_sources")
-          .insert({
-
-            source_category:
-              currentCategory,
-
-            source_name:
-              d.source_name
-
-          })
-          .select("id")
-          .single();
-
-
-      if(ins.error){
-
-        setMsg(
-          "addMsg",
-          "উৎস তৈরি হয়নি: " +
-          ins.error.message
-        );
-
-        return;
-
-      }
-
-
-      sourceId =
-        ins.data.id;
-
-    }
-
-  }
-
-
-  /* EXISTING SOURCE */
-
-  if(!sourceId){
-
-    const anySrc =
-      await sb
-        .from("question_sources")
-        .select("id")
-        .eq(
-          "source_category",
-          currentCategory
-        )
-        .order("id")
-        .limit(1)
-        .maybeSingle();
-
-
-    if(anySrc.data){
-
-      sourceId =
-        anySrc.data.id;
-
-    }
+    return;
 
   }
 
 
   if(!sourceId){
 
-    setMsg(
-      "addMsg",
-      "এই বিভাগের জন্য উৎসের নাম দিন"
-    );
+    $("addMsg").textContent =
+      "একটি উৎস নির্বাচন করুন অথবা নতুন উৎসের নাম লিখুন";
 
     return;
 
   }
 
 
-  /* QUESTION INSERT */
-
-  const payload={
-
-    question_text:
-      d.question_text,
-
-    option_a:
-      d.option_a,
-
-    option_b:
-      d.option_b,
-
-    option_c:
-      d.option_c,
-
-    option_d:
-      d.option_d,
-
-    correct_answer:
-      d.correct_answer,
-
-    explanation:
-      d.explanation || null,
-
-    subject_id:
-      d.subject_id,
-
-    source_id:
-      sourceId,
-
-    source_type:
-      currentCategory,
-
-    source_name:
-      d.source_name,
-
-    folder_id:
-      Number(
-        $("folderSelect").value
-      ),
-
-    set_id:
-      Number(
-        $("setSelect").value
-      ),
-
-    question_number:
-      d.question_number
-
-  };
-
-
-  const r =
+  const result =
     await sb
       .from("questions")
-      .insert(payload);
+      .insert({
+
+        question_text:
+          questionText,
+
+        option_a:
+          optionA,
+
+        option_b:
+          optionB,
+
+        option_c:
+          optionC,
+
+        option_d:
+          optionD,
+
+        correct_answer:
+          correctAnswer,
+
+        explanation:
+          explanation || null,
+
+        subject_id:
+          Number(subjectId),
+
+        source_id:
+          Number(sourceId),
+
+        category:
+          currentCategory,
+
+        source_type:
+          currentCategory,
+
+        source_name:
+          $("sourceName").value.trim() || null,
+
+        folder_id:
+          Number(folderId),
+
+        set_id:
+          Number(setId),
+
+        question_number:
+          questionNumber
+            ? Number(questionNumber)
+            : null
+
+      });
 
 
-  if(r.error){
+  if(result.error){
 
-    setMsg(
-      "addMsg",
-      "প্রশ্ন যোগ হয়নি: " +
-      r.error.message
-    );
+    $("addMsg").textContent =
+      result.error.message;
 
     return;
 
   }
 
 
-  clearQuestionForm();
+  $("addMsg").textContent =
+    "✅ প্রশ্ন সংরক্ষণ হয়েছে";
 
 
-  setMsg(
-    "addMsg",
-    "প্রশ্ন সফলভাবে যোগ হয়েছে।",
-    true
-  );
+  /*
+    প্রশ্ন নম্বর বাড়িয়ে দেওয়া
+  */
+
+  if(questionNumber){
+
+    $("questionNumber").value =
+      Number(questionNumber) + 1;
+
+  }
+
+
+  $("questionText").value = "";
+  $("optionA").value = "";
+  $("optionB").value = "";
+  $("optionC").value = "";
+  $("optionD").value = "";
+  $("correctAnswer").value = "";
+  $("explanation").value = "";
 
 
   await loadQuestions();
 
-};
+}
 
 
-/* =========================
-   LOAD QUESTIONS
-========================= */
+async function loadFilterFolders(){
 
-async function loadQuestions(){
+  const result =
+    await sb
+      .from("question_bank_folders")
+      .select("id,folder_name")
+      .eq(
+        "sub_category",
+        CATS[currentCategory]
+      )
+      .order("id");
 
-  const setId =
-    Number(
-      $("setSelect").value
-    );
+
+  $("filterFolder").innerHTML =
+    '<option value="">সব ফোল্ডার</option>' +
+
+    (result.data || []).map(f =>
+      `<option value="${f.id}">
+        ${esc(f.folder_name)}
+      </option>`
+    ).join("");
 
 
-  if(!setId){
+  $("filterSet").innerHTML =
+    '<option value="">সব সেট</option>';
 
-    $("questionList")
-      .innerHTML="";
+}
+
+
+async function loadFilterSets(){
+
+  const folderId =
+    $("filterFolder").value;
+
+
+  $("filterSet").innerHTML =
+    '<option value="">সব সেট</option>';
+
+
+  if(!folderId){
+
+    await loadQuestions();
 
     return;
 
   }
 
 
+  const result =
+    await sb
+      .from("question_bank_sets")
+      .select("id,set_name")
+      .eq(
+        "folder_id",
+        Number(folderId)
+      )
+      .order("id");
+
+
+  $("filterSet").innerHTML =
+    '<option value="">সব সেট</option>' +
+
+    (result.data || []).map(s =>
+      `<option value="${s.id}">
+        ${esc(s.set_name)}
+      </option>`
+    ).join("");
+
+
+  await loadQuestions();
+
+}
+
+
+async function loadQuestions(){
+
   let query =
     sb
       .from("questions")
-      .select(
-        "id,question_text,option_a,option_b,option_c,option_d,correct_answer,explanation,question_number,subject_id,source_name"
-      )
+      .select(`
+        id,
+        question_text,
+        option_a,
+        option_b,
+        option_c,
+        option_d,
+        correct_answer,
+        explanation,
+        question_number,
+        source_name,
+        subject_id,
+        folder_id,
+        set_id
+      `)
       .eq(
         "source_type",
         currentCategory
       )
-      .eq(
-        "set_id",
-        setId
-      )
       .order(
         "question_number",
-        {
-          ascending:true
-        }
+        {ascending:true}
+      )
+      .order(
+        "id",
+        {ascending:true}
       );
 
 
-  const subject =
+  const folderId =
+    $("filterFolder").value;
+
+  const setId =
+    $("filterSet").value;
+
+  const subjectId =
     $("filterSubject").value;
 
 
-  if(subject){
+  if(folderId){
 
     query =
       query.eq(
-        "subject_id",
-        Number(subject)
+        "folder_id",
+        Number(folderId)
       );
 
   }
 
 
-  const r =
+  if(setId){
+
+    query =
+      query.eq(
+        "set_id",
+        Number(setId)
+      );
+
+  }
+
+
+  if(subjectId){
+
+    query =
+      query.eq(
+        "subject_id",
+        Number(subjectId)
+      );
+
+  }
+
+
+  const result =
     await query;
 
 
-  if(r.error){
+  if(result.error){
 
-    $("questionList")
-      .innerHTML =
-      '<div class="msg">' +
-      esc(r.error.message) +
-      '</div>';
+    $("questionList").innerHTML =
+      `<div class="msg">${esc(result.error.message)}</div>`;
 
     return;
 
@@ -2042,66 +1678,86 @@ async function loadQuestions(){
 
 
   const rows =
-    r.data || [];
+    result.data || [];
 
 
-  $("questionList")
-    .innerHTML =
-    rows.map(function(x,i){
+  if(!rows.length){
+
+    $("questionList").innerHTML =
+      '<div class="empty">কোনো প্রশ্ন পাওয়া যায়নি</div>';
+
+    return;
+
+  }
+
+
+  $("questionList").innerHTML =
+    rows.map((q,index) => {
+
+      const subject =
+        subjects.find(
+          s => s.id === Number(q.subject_id)
+        );
+
 
       return `
 
         <div class="q">
 
-          <b>
-            ${x.question_number || i+1}.
-            ${esc(x.question_text)}
-          </b>
+          <div class="qtext">
 
-          <div class="opts">
+            ${q.question_number
+              ? esc(q.question_number) + ". "
+              : (index+1) + ". "}
 
-            ক. ${esc(x.option_a)}<br>
-
-            খ. ${esc(x.option_b)}<br>
-
-            গ. ${esc(x.option_c)}<br>
-
-            ঘ. ${esc(x.option_d)}
+            ${esc(q.question_text)}
 
           </div>
 
-          <div class="muted">
+          <div class="option">
+            ক) ${esc(q.option_a)}
+          </div>
 
-            সঠিক উত্তর:
-            ${esc(x.correct_answer)}
+          <div class="option">
+            খ) ${esc(q.option_b)}
+          </div>
 
-            ${
-              x.source_name
-              ? " | উৎস: " +
-                esc(x.source_name)
-              : ""
-            }
+          <div class="option">
+            গ) ${esc(q.option_c)}
+          </div>
 
+          <div class="option">
+            ঘ) ${esc(q.option_d)}
+          </div>
+
+          <div class="answer">
+            সঠিক উত্তর: ${esc(q.correct_answer)}
           </div>
 
           ${
-            x.explanation
-            ?
-            `
-            <div class="muted">
-              ব্যাখ্যা:
-              ${esc(x.explanation)}
-            </div>
-            `
-            :
-            ""
+            q.explanation
+            ? `<div class="small">
+                 ব্যাখ্যা: ${esc(q.explanation)}
+               </div>`
+            : ""
           }
+
+          <div class="small">
+
+            বিষয়:
+            ${esc(subject ? subject.name : q.subject_id)}
+
+            ${q.source_name
+              ? " | উৎস: " + esc(q.source_name)
+              : ""}
+
+          </div>
+
+          <br>
 
           <button
             class="danger"
-            style="margin-top:8px"
-            onclick="deleteQuestion(${x.id})"
-          >
+            onclick="deleteQuestion(${q.id})">
             প্রশ্ন মুছুন
           </button>
 
@@ -2109,72 +1765,30 @@ async function loadQuestions(){
 
       `;
 
-    }).join("")
-
-
-    ||
-
-    '<div class="msg">এই সেটে কোনো প্রশ্ন নেই</div>';
+    }).join("");
 
 }
 
-
-/* =========================
-   SUBJECT FILTER
-========================= */
-
-$("filterSubject").onchange =
-async function(){
-
-  await loadQuestions();
-
-};
-
-
-/* =========================
-   REFRESH
-========================= */
-
-$("refreshBtn").onclick =
-async function(){
-
-  await loadQuestions();
-
-};
-
-
-/* =========================
-   DELETE QUESTION
-========================= */
 
 async function deleteQuestion(id){
 
-  if(
-    !confirm(
-      "এই প্রশ্নটি মুছবেন?"
-    )
-  ){
+  if(!confirm("এই প্রশ্নটি মুছে ফেলবেন?")){
 
     return;
 
   }
 
 
-  const r =
+  const result =
     await sb
       .from("questions")
       .delete()
-      .eq(
-        "id",
-        id
-      );
+      .eq("id",id);
 
 
-  if(r.error){
+  if(result.error){
 
-    alert(
-      r.error.message
-    );
+    alert(result.error.message);
 
     return;
 
@@ -2186,467 +1800,331 @@ async function deleteQuestion(id){
 }
 
 
-/* =========================
-   EXCEL / CSV IMPORT
-========================= */
+async function importFile(){
 
-$("importBtn").onclick =
-async function(){
+  const file =
+    $("fileInput").files[0];
 
-  if(!selectedReady()){
+
+  const folderId =
+    $("folderSelect").value;
+
+  const setId =
+    $("setSelect").value;
+
+
+  if(!folderId){
+
+    $("importMsg").textContent =
+      "আগে ফোল্ডার নির্বাচন করুন";
 
     return;
 
   }
 
 
-  const file =
-    $("fileInput")
-    .files[0];
+  if(!setId){
+
+    $("importMsg").textContent =
+      "আগে সেট নির্বাচন করুন";
+
+    return;
+
+  }
 
 
   if(!file){
 
-    setMsg(
-      "importMsg",
-      "আগে Excel/CSV ফাইল নির্বাচন করুন"
-    );
+    $("importMsg").textContent =
+      "Excel বা CSV ফাইল নির্বাচন করুন";
 
     return;
 
   }
 
 
-  setMsg(
-    "importMsg",
-    "ফাইল পড়া হচ্ছে..."
-  );
+  $("importMsg").textContent =
+    "ফাইল পড়া হচ্ছে...";
+
+
+  const buffer =
+    await file.arrayBuffer();
+
+
+  let workbook;
 
 
   try{
 
-    const buffer =
-      await file.arrayBuffer();
-
-
-    const workbook =
+    workbook =
       XLSX.read(
         buffer,
-        {
-          type:"array"
-        }
+        {type:"array"}
       );
-
-
-    const sheet =
-      workbook
-        .Sheets[
-          workbook.SheetNames[0]
-        ];
-
-
-    const rows =
-      XLSX.utils.sheet_to_json(
-        sheet,
-        {
-          defval:""
-        }
-      );
-
-
-    if(!rows.length){
-
-      setMsg(
-        "importMsg",
-        "ফাইলে কোনো প্রশ্ন পাওয়া যায়নি"
-      );
-
-      return;
-
-    }
-
-
-    let added=0;
-
-    let skipped=0;
-
-    let failed=0;
-
-
-    for(
-      const row of rows
-    ){
-
-      const d={
-
-        question_text:
-          String(
-            row.question_text ||
-            row["প্রশ্ন"] ||
-            row.question ||
-            ""
-          ).trim(),
-
-        option_a:
-          String(
-            row.option_a ||
-            row["ক"] ||
-            ""
-          ).trim(),
-
-        option_b:
-          String(
-            row.option_b ||
-            row["খ"] ||
-            ""
-          ).trim(),
-
-        option_c:
-          String(
-            row.option_c ||
-            row["গ"] ||
-            ""
-          ).trim(),
-
-        option_d:
-          String(
-            row.option_d ||
-            row["ঘ"] ||
-            ""
-          ).trim(),
-
-        correct_answer:
-          String(
-            row.correct_answer ||
-            row["সঠিক উত্তর"] ||
-            ""
-          ).trim(),
-
-        explanation:
-          String(
-            row.explanation ||
-            row["ব্যাখ্যা"] ||
-            ""
-          ).trim(),
-
-        question_number:
-          row.question_number ||
-          row["প্রশ্ন নম্বর"] ||
-          null,
-
-        subject_id:
-          row.subject_id ||
-          null,
-
-        source_name:
-          String(
-            row.source_name ||
-            row["উৎস"] ||
-            ""
-          ).trim()
-
-      };
-
-
-      if(
-        !d.question_text ||
-        !d.option_a ||
-        !d.option_b ||
-        !d.option_c ||
-        !d.option_d ||
-        !d.correct_answer ||
-        !d.subject_id
-      ){
-
-        failed++;
-
-        continue;
-
-      }
-
-
-      const dup =
-        await sb
-          .from("questions")
-          .select("id")
-          .eq(
-            "source_type",
-            currentCategory
-          )
-          .eq(
-            "folder_id",
-            Number(
-              $("folderSelect").value
-            )
-          )
-          .eq(
-            "set_id",
-            Number(
-              $("setSelect").value
-            )
-          )
-          .eq(
-            "question_text",
-            d.question_text
-          )
-          .maybeSingle();
-
-
-      if(dup.data){
-
-        skipped++;
-
-        continue;
-
-      }
-
-
-      let sourceId =
-        null;
-
-
-      if(d.source_name){
-
-        const sr =
-          await sb
-            .from("question_sources")
-            .select("id")
-            .eq(
-              "source_category",
-              currentCategory
-            )
-            .eq(
-              "source_name",
-              d.source_name
-            )
-            .maybeSingle();
-
-
-        if(sr.data){
-
-          sourceId =
-            sr.data.id;
-
-        }else{
-
-          const si =
-            await sb
-              .from("question_sources")
-              .insert({
-
-                source_category:
-                  currentCategory,
-
-                source_name:
-                  d.source_name
-
-              })
-              .select("id")
-              .single();
-
-
-          if(!si.error){
-
-            sourceId =
-              si.data.id;
-
-          }
-
-        }
-
-      }
-
-
-      if(!sourceId){
-
-        const sr =
-          await sb
-            .from("question_sources")
-            .select("id")
-            .eq(
-              "source_category",
-              currentCategory
-            )
-            .order("id")
-            .limit(1)
-            .maybeSingle();
-
-
-        if(sr.data){
-
-          sourceId =
-            sr.data.id;
-
-        }
-
-      }
-
-
-      if(!sourceId){
-
-        failed++;
-
-        continue;
-
-      }
-
-
-      const ins =
-        await sb
-          .from("questions")
-          .insert({
-
-            question_text:
-              d.question_text,
-
-            option_a:
-              d.option_a,
-
-            option_b:
-              d.option_b,
-
-            option_c:
-              d.option_c,
-
-            option_d:
-              d.option_d,
-
-            correct_answer:
-              d.correct_answer,
-
-            explanation:
-              d.explanation ||
-              null,
-
-            subject_id:
-              Number(
-                d.subject_id
-              ),
-
-            source_id:
-              sourceId,
-
-            source_type:
-              currentCategory,
-
-            source_name:
-              d.source_name ||
-              null,
-
-            folder_id:
-              Number(
-                $("folderSelect").value
-              ),
-
-            set_id:
-              Number(
-                $("setSelect").value
-              ),
-
-            question_number:
-              d.question_number
-              ? Number(
-                  d.question_number
-                )
-              : null
-
-          });
-
-
-      if(ins.error){
-
-        failed++;
-
-      }else{
-
-        added++;
-
-      }
-
-    }
-
-
-    $("fileInput")
-      .value="";
-
-
-    setMsg(
-      "importMsg",
-      "শেষ হয়েছে — যোগ: " +
-      added +
-      ", আগে ছিল: " +
-      skipped +
-      ", বাদ/ব্যর্থ: " +
-      failed,
-      true
-    );
-
-
-    await loadQuestions();
-
 
   }catch(error){
 
-    setMsg(
-      "importMsg",
-      "ফাইল পড়তে সমস্যা হয়েছে: " +
-      error.message
-    );
+    $("importMsg").textContent =
+      "ফাইল পড়া যায়নি";
+
+    return;
 
   }
 
-};
+
+  const firstSheet =
+    workbook.Sheets[
+      workbook.SheetNames[0]
+    ];
 
 
-/* =========================
-   FILE SELECT
-========================= */
+  const rows =
+    XLSX.utils.sheet_to_json(
+      firstSheet,
+      {defval:""}
+    );
 
-$("fileInput")
-.addEventListener(
-  "change",
-  function(){
+
+  if(!rows.length){
+
+    $("importMsg").textContent =
+      "ফাইলে কোনো প্রশ্ন পাওয়া যায়নি";
+
+    return;
+
+  }
+
+
+  let sourceId;
+
+
+  try{
+
+    sourceId =
+      await getOrCreateSource();
+
+  }catch(error){
+
+    $("importMsg").textContent =
+      error.message;
+
+    return;
+
+  }
+
+
+  if(!sourceId){
+
+    $("importMsg").textContent =
+      "উৎস নির্বাচন করুন অথবা উৎসের নাম লিখুন";
+
+    return;
+
+  }
+
+
+  let added = 0;
+  let skipped = 0;
+  let errors = 0;
+
+
+  for(const row of rows){
+
+    const questionText =
+      String(
+        row.question ||
+        row.question_text ||
+        ""
+      ).trim();
+
+
+    if(!questionText){
+
+      skipped++;
+      continue;
+
+    }
+
+
+    const optionA =
+      String(
+        row.option_a ||
+        row.a ||
+        ""
+      ).trim();
+
+    const optionB =
+      String(
+        row.option_b ||
+        row.b ||
+        ""
+      ).trim();
+
+    const optionC =
+      String(
+        row.option_c ||
+        row.c ||
+        ""
+      ).trim();
+
+    const optionD =
+      String(
+        row.option_d ||
+        row.d ||
+        ""
+      ).trim();
+
+    const correct =
+      String(
+        row.correct_answer ||
+        row.answer ||
+        ""
+      ).trim();
+
+    const explanation =
+      String(
+        row.explanation ||
+        ""
+      ).trim();
+
+    const subjectId =
+      Number(
+        row.subject_id ||
+        0
+      );
+
+    const questionNumber =
+      Number(
+        row.question_number ||
+        0
+      );
+
 
     if(
-      $("fileInput")
-      .files[0]
+      !optionA ||
+      !optionB ||
+      !optionC ||
+      !optionD ||
+      !correct ||
+      !subjectId
     ){
 
-      setMsg(
-        "importMsg",
-        "ফাইল নির্বাচিত হয়েছে: " +
-        $("fileInput")
-        .files[0].name
-      );
+      errors++;
+      continue;
+
+    }
+
+
+    const duplicate =
+      await sb
+        .from("questions")
+        .select("id")
+        .eq(
+          "source_type",
+          currentCategory
+        )
+        .eq(
+          "folder_id",
+          Number(folderId)
+        )
+        .eq(
+          "set_id",
+          Number(setId)
+        )
+        .eq(
+          "question_text",
+          questionText
+        )
+        .limit(1);
+
+
+    if(
+      duplicate.data &&
+      duplicate.data.length
+    ){
+
+      skipped++;
+      continue;
+
+    }
+
+
+    const insertResult =
+      await sb
+        .from("questions")
+        .insert({
+
+          question_text:
+            questionText,
+
+          option_a:
+            optionA,
+
+          option_b:
+            optionB,
+
+          option_c:
+            optionC,
+
+          option_d:
+            optionD,
+
+          correct_answer:
+            correct,
+
+          explanation:
+            explanation || null,
+
+          subject_id:
+            subjectId,
+
+          source_id:
+            sourceId,
+
+          category:
+            currentCategory,
+
+          source_type:
+            currentCategory,
+
+          source_name:
+            $("sourceName").value.trim() || null,
+
+          folder_id:
+            Number(folderId),
+
+          set_id:
+            Number(setId),
+
+          question_number:
+            questionNumber || null
+
+        });
+
+
+    if(insertResult.error){
+
+      errors++;
+
+    }else{
+
+      added++;
 
     }
 
   }
-);
 
 
-/* =========================
-   AUTH CHANGE
-========================= */
-
-sb.auth.onAuthStateChange(
-  function(
-    event,
-    session
-  ){
-
-    currentSession =
-      session;
-
-  }
-);
+  $("importMsg").textContent =
+    `✅ যোগ হয়েছে: ${added} | বাদ: ${skipped} | ভুল: ${errors}`;
 
 
-/* =========================
-   START
-========================= */
+  await loadQuestions();
 
-boot();
+}
+
+
+init();
 
 </script>
 
