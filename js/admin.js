@@ -21,7 +21,7 @@ const esc = v =>
     '&': '&amp;',
     '<': '&lt;',
     '>': '&gt;',
-    '"': '&quot;',
+    '"': '&#039;',
     "'": '&#039;'
   }[m]));
 
@@ -91,6 +91,7 @@ async function init() {
   if ($('folder')) {
     $('folder').onchange = async () => {
       await loadSets();
+      updateFolderButtons();
     };
   }
 
@@ -288,6 +289,316 @@ async function loadFolders() {
   }
 
   await loadSets();
+
+  addFolderEditButtons();
+}
+
+/* =========================
+   FOLDER EDIT BUTTONS
+========================= */
+
+function addFolderEditButtons() {
+  const folderSelect = $('folder');
+
+  if (!folderSelect) return;
+
+  let box = $('folderEditBox');
+
+  if (!box) {
+    box = document.createElement('div');
+
+    box.id = 'folderEditBox';
+
+    box.style.marginTop = '6px';
+
+    folderSelect.insertAdjacentElement(
+      'afterend',
+      box
+    );
+  }
+
+  box.innerHTML = `
+    <button
+      type="button"
+      class="secondary"
+      id="editFolderBtn"
+    >
+      ✏️ Folder-এর নাম পরিবর্তন
+    </button>
+
+    <button
+      type="button"
+      class="secondary"
+      id="deleteFolderBtn"
+      style="margin-left:6px;"
+    >
+      🗑️ Folder Delete
+    </button>
+  `;
+
+  $('editFolderBtn').onclick =
+    editFolder;
+
+  $('deleteFolderBtn').onclick =
+    deleteFolder;
+
+  updateFolderButtons();
+}
+
+/* =========================
+   UPDATE FOLDER BUTTONS
+========================= */
+
+function updateFolderButtons() {
+  const selected =
+    !!$('folder')?.value;
+
+  if ($('editFolderBtn')) {
+    $('editFolderBtn').disabled =
+      !selected;
+  }
+
+  if ($('deleteFolderBtn')) {
+    $('deleteFolderBtn').disabled =
+      !selected;
+  }
+}
+
+/* =========================
+   EDIT FOLDER NAME
+========================= */
+
+async function editFolder() {
+  const folderId =
+    $('folder')?.value;
+
+  if (!folderId) {
+    return msg(
+      'folderMsg',
+      'আগে একটি Folder নির্বাচন করুন',
+      true
+    );
+  }
+
+  const current =
+    folders.find(
+      x =>
+        String(x.id) ===
+        String(folderId)
+    );
+
+  if (!current) {
+    return msg(
+      'folderMsg',
+      'Folder পাওয়া যায়নি',
+      true
+    );
+  }
+
+  const newName =
+    prompt(
+      'Folder-এর নতুন নাম দিন:',
+      current.folder_name
+    );
+
+  if (newName === null) {
+    return;
+  }
+
+  const name =
+    newName.trim();
+
+  if (!name) {
+    return msg(
+      'folderMsg',
+      'Folder-এর নাম খালি রাখা যাবে না',
+      true
+    );
+  }
+
+  if (
+    name ===
+    current.folder_name
+  ) {
+    return;
+  }
+
+  const r =
+    await db
+      .from(
+        'question_bank_folders'
+      )
+      .update({
+        folder_name: name
+      })
+      .eq(
+        'id',
+        Number(folderId)
+      );
+
+  if (r.error) {
+    return msg(
+      'folderMsg',
+      r.error.message,
+      true
+    );
+  }
+
+  await loadFolders();
+  await loadFilterFolders();
+
+  if ($('folder')) {
+    $('folder').value =
+      folderId;
+  }
+
+  await loadSets();
+
+  msg(
+    'folderMsg',
+    '✅ Folder-এর নাম পরিবর্তন হয়েছে'
+  );
+}
+
+/* =========================
+   DELETE FOLDER
+========================= */
+
+async function deleteFolder() {
+  const folderId =
+    $('folder')?.value;
+
+  if (!folderId) {
+    return msg(
+      'folderMsg',
+      'আগে একটি Folder নির্বাচন করুন',
+      true
+    );
+  }
+
+  const current =
+    folders.find(
+      x =>
+        String(x.id) ===
+        String(folderId)
+    );
+
+  if (!current) {
+    return msg(
+      'folderMsg',
+      'Folder পাওয়া যায়নি',
+      true
+    );
+  }
+
+  /* Check Sets */
+
+  const setsCheck =
+    await db
+      .from(
+        'question_bank_sets'
+      )
+      .select(
+        'id',
+        {
+          count: 'exact',
+          head: true
+        }
+      )
+      .eq(
+        'folder_id',
+        Number(folderId)
+      );
+
+  if (setsCheck.error) {
+    return msg(
+      'folderMsg',
+      setsCheck.error.message,
+      true
+    );
+  }
+
+  if (
+    (setsCheck.count || 0) > 0
+  ) {
+    return msg(
+      'folderMsg',
+      '❌ এই Folder-এর মধ্যে Set আছে। আগে Setগুলো Delete করুন।',
+      true
+    );
+  }
+
+  /* Check Questions */
+
+  const questionsCheck =
+    await db
+      .from('questions')
+      .select(
+        'id',
+        {
+          count: 'exact',
+          head: true
+        }
+      )
+      .eq(
+        'folder_id',
+        Number(folderId)
+      );
+
+  if (questionsCheck.error) {
+    return msg(
+      'folderMsg',
+      questionsCheck.error.message,
+      true
+    );
+  }
+
+  if (
+    (questionsCheck.count || 0) > 0
+  ) {
+    return msg(
+      'folderMsg',
+      '❌ এই Folder-এর মধ্যে প্রশ্ন আছে। আগে প্রশ্নগুলো সরান।',
+      true
+    );
+  }
+
+  const ok =
+    confirm(
+      `“${current.folder_name}” Folderটি Delete করতে চান?`
+    );
+
+  if (!ok) {
+    return;
+  }
+
+  const r =
+    await db
+      .from(
+        'question_bank_folders'
+      )
+      .delete()
+      .eq(
+        'id',
+        Number(folderId)
+      );
+
+  if (r.error) {
+    return msg(
+      'folderMsg',
+      'Folder delete error: ' +
+        r.error.message,
+      true
+    );
+  }
+
+  await loadFolders();
+  await loadFilterFolders();
+
+  msg(
+    'folderMsg',
+    '✅ Folder Delete হয়েছে'
+  );
 }
 
 /* =========================
@@ -331,18 +642,27 @@ async function loadFilterFolders() {
 ========================= */
 
 async function loadSets() {
-  const id = $('folder')?.value;
+  const id =
+    $('folder')?.value;
 
-  const r = id
-    ? await db
-        .from('question_bank_sets')
-        .select('id,set_name')
-        .eq('folder_id', Number(id))
-        .order('id')
-    : {
-        data: [],
-        error: null
-      };
+  const r =
+    id
+      ? await db
+          .from(
+            'question_bank_sets'
+          )
+          .select(
+            'id,set_name'
+          )
+          .eq(
+            'folder_id',
+            Number(id)
+          )
+          .order('id')
+      : {
+          data: [],
+          error: null
+        };
 
   if (r.error) {
     msg(
@@ -353,7 +673,8 @@ async function loadSets() {
     return;
   }
 
-  sets = r.data || [];
+  sets =
+    r.data || [];
 
   if ($('set')) {
     $('set').innerHTML =
@@ -367,48 +688,90 @@ async function loadSets() {
         )
         .join('');
 
-    /* =========================
-       SET EDIT BUTTON
-    ========================= */
-
     addSetEditButton();
   }
 }
 
 /* =========================
-   SET EDIT BUTTON
+   SET EDIT / DELETE BUTTONS
 ========================= */
 
 function addSetEditButton() {
-  const setSelect = $('set');
+  const setSelect =
+    $('set');
 
   if (!setSelect) return;
 
-  let btn = $('editSetBtn');
+  let box =
+    $('setEditBox');
 
-  if (!btn) {
-    btn = document.createElement('button');
+  if (!box) {
+    box =
+      document.createElement(
+        'div'
+      );
 
-    btn.id = 'editSetBtn';
-    btn.type = 'button';
-    btn.className = 'secondary';
-    btn.textContent = '✏️ Set-এর নাম পরিবর্তন';
+    box.id =
+      'setEditBox';
 
-    btn.style.marginTop = '6px';
+    box.style.marginTop =
+      '6px';
 
     setSelect.insertAdjacentElement(
       'afterend',
-      btn
+      box
     );
-
-    btn.onclick = editSet;
   }
 
-  btn.disabled = !setSelect.value;
+  box.innerHTML = `
+    <button
+      type="button"
+      class="secondary"
+      id="editSetBtn"
+    >
+      ✏️ Set-এর নাম পরিবর্তন
+    </button>
+
+    <button
+      type="button"
+      class="secondary"
+      id="deleteSetBtn"
+      style="margin-left:6px;"
+    >
+      🗑️ Set Delete
+    </button>
+  `;
+
+  $('editSetBtn').onclick =
+    editSet;
+
+  $('deleteSetBtn').onclick =
+    deleteSet;
+
+  updateSetButtons();
 
   setSelect.onchange = () => {
-    btn.disabled = !setSelect.value;
+    updateSetButtons();
   };
+}
+
+/* =========================
+   UPDATE SET BUTTONS
+========================= */
+
+function updateSetButtons() {
+  const selected =
+    !!$('set')?.value;
+
+  if ($('editSetBtn')) {
+    $('editSetBtn').disabled =
+      !selected;
+  }
+
+  if ($('deleteSetBtn')) {
+    $('deleteSetBtn').disabled =
+      !selected;
+  }
 }
 
 /* =========================
@@ -493,8 +856,12 @@ async function editSet() {
 
   await loadSets();
 
-  $('set').value =
-    setId;
+  if ($('set')) {
+    $('set').value =
+      setId;
+  }
+
+  updateSetButtons();
 
   msg(
     'folderMsg',
@@ -503,22 +870,134 @@ async function editSet() {
 }
 
 /* =========================
+   DELETE SET
+========================= */
+
+async function deleteSet() {
+  const setId =
+    $('set')?.value;
+
+  if (!setId) {
+    return msg(
+      'folderMsg',
+      'আগে একটি Set নির্বাচন করুন',
+      true
+    );
+  }
+
+  const current =
+    sets.find(
+      x =>
+        String(x.id) ===
+        String(setId)
+    );
+
+  if (!current) {
+    return msg(
+      'folderMsg',
+      'Set পাওয়া যায়নি',
+      true
+    );
+  }
+
+  /* Check Questions */
+
+  const questionsCheck =
+    await db
+      .from('questions')
+      .select(
+        'id',
+        {
+          count: 'exact',
+          head: true
+        }
+      )
+      .eq(
+        'set_id',
+        Number(setId)
+      );
+
+  if (questionsCheck.error) {
+    return msg(
+      'folderMsg',
+      questionsCheck.error.message,
+      true
+    );
+  }
+
+  if (
+    (questionsCheck.count || 0) > 0
+  ) {
+    return msg(
+      'folderMsg',
+      '❌ এই Set-এর মধ্যে প্রশ্ন আছে। আগে প্রশ্নগুলো সরাতে হবে।',
+      true
+    );
+  }
+
+  const ok =
+    confirm(
+      `“${current.set_name}” Setটি Delete করতে চান?`
+    );
+
+  if (!ok) {
+    return;
+  }
+
+  const r =
+    await db
+      .from(
+        'question_bank_sets'
+      )
+      .delete()
+      .eq(
+        'id',
+        Number(setId)
+      );
+
+  if (r.error) {
+    return msg(
+      'folderMsg',
+      'Set delete error: ' +
+        r.error.message,
+      true
+    );
+  }
+
+  await loadSets();
+
+  msg(
+    'folderMsg',
+    '✅ Set Delete হয়েছে'
+  );
+}
+
+/* =========================
    FILTER SETS
 ========================= */
 
 async function loadFilterSets() {
-  const id = $('filterFolder')?.value;
+  const id =
+    $('filterFolder')?.value;
 
-  const r = id
-    ? await db
-        .from('question_bank_sets')
-        .select('id,set_name')
-        .eq('folder_id', Number(id))
-        .order('id')
-    : {
-        data: [],
-        error: null
-      };
+  const r =
+    id
+      ? await db
+          .from(
+            'question_bank_sets'
+          )
+          .select(
+            'id,set_name'
+          )
+          .eq(
+            'folder_id',
+            Number(id)
+          )
+          .order('id')
+      : {
+          data: [],
+          error: null
+        };
 
   if (r.error) {
     msg(
@@ -548,18 +1027,27 @@ async function loadFilterSets() {
 ========================= */
 
 async function loadMapSets() {
-  const id = $('mapFolder')?.value;
+  const id =
+    $('mapFolder')?.value;
 
-  const r = id
-    ? await db
-        .from('question_bank_sets')
-        .select('id,set_name')
-        .eq('folder_id', Number(id))
-        .order('id')
-    : {
-        data: [],
-        error: null
-      };
+  const r =
+    id
+      ? await db
+          .from(
+            'question_bank_sets'
+          )
+          .select(
+            'id,set_name'
+          )
+          .eq(
+            'folder_id',
+            Number(id)
+          )
+          .order('id')
+      : {
+          data: [],
+          error: null
+        };
 
   if (r.error) {
     msg(
@@ -590,7 +1078,9 @@ async function loadMapSets() {
 
 async function createFolder() {
   const name =
-    $('newFolder').value.trim();
+    $('newFolder')
+      .value
+      .trim();
 
   if (!name) {
     return msg(
@@ -600,14 +1090,22 @@ async function createFolder() {
     );
   }
 
-  const r = await db
-    .from('question_bank_folders')
-    .insert({
-      sub_category: CATS[cat],
-      folder_name: name
-    })
-    .select('id,folder_name')
-    .single();
+  const r =
+    await db
+      .from(
+        'question_bank_folders'
+      )
+      .insert({
+        sub_category:
+          CATS[cat],
+
+        folder_name:
+          name
+      })
+      .select(
+        'id,folder_name'
+      )
+      .single();
 
   if (r.error) {
     return msg(
@@ -617,14 +1115,19 @@ async function createFolder() {
     );
   }
 
-  $('newFolder').value = '';
+  $('newFolder').value =
+    '';
 
   await loadFolders();
 
-  $('folder').value =
-    r.data.id;
+  if ($('folder')) {
+    $('folder').value =
+      r.data.id;
+  }
 
   await loadSets();
+
+  updateFolderButtons();
 
   msg(
     'folderMsg',
@@ -641,7 +1144,9 @@ async function createSet() {
     $('folder').value;
 
   const name =
-    $('newSet').value.trim();
+    $('newSet')
+      .value
+      .trim();
 
   if (!folderId) {
     return msg(
@@ -659,14 +1164,22 @@ async function createSet() {
     );
   }
 
-  const r = await db
-    .from('question_bank_sets')
-    .insert({
-      folder_id: Number(folderId),
-      set_name: name
-    })
-    .select('id,set_name')
-    .single();
+  const r =
+    await db
+      .from(
+        'question_bank_sets'
+      )
+      .insert({
+        folder_id:
+          Number(folderId),
+
+        set_name:
+          name
+      })
+      .select(
+        'id,set_name'
+      )
+      .single();
 
   if (r.error) {
     return msg(
@@ -676,14 +1189,19 @@ async function createSet() {
     );
   }
 
-  $('newSet').value = '';
+  $('newSet').value =
+    '';
 
   await loadSets();
 
-  $('set').value =
-    r.data.id;
+  if ($('set')) {
+    $('set').value =
+      r.data.id;
+  }
 
   addSetEditButton();
+
+  updateSetButtons();
 
   msg(
     'folderMsg',
@@ -748,18 +1266,32 @@ async function addManual() {
   }
 
   const payload = {
-    folder_id: Number(folderId),
-    set_id: Number(setId),
-    subject_id: Number(subjectId),
+    folder_id:
+      Number(folderId),
 
-    question_text: text,
+    set_id:
+      Number(setId),
 
-    option_a: a,
-    option_b: b,
-    option_c: c,
-    option_d: d,
+    subject_id:
+      Number(subjectId),
 
-    correct_answer: correct,
+    question_text:
+      text,
+
+    option_a:
+      a,
+
+    option_b:
+      b,
+
+    option_c:
+      c,
+
+    option_d:
+      d,
+
+    correct_answer:
+      correct,
 
     explanation:
       $('explanation').value.trim() ||
@@ -767,21 +1299,26 @@ async function addManual() {
 
     question_number:
       $('qno').value
-        ? Number($('qno').value)
+        ? Number(
+            $('qno').value
+          )
         : null,
 
-    category: CATS[cat],
+    category:
+      CATS[cat],
 
     source_name:
       $('source').value.trim() ||
       null,
 
-    source_type: cat
+    source_type:
+      cat
   };
 
-  const r = await db
-    .from('questions')
-    .insert(payload);
+  const r =
+    await db
+      .from('questions')
+      .insert(payload);
 
   if (r.error) {
     return msg(
@@ -806,7 +1343,8 @@ async function addManual() {
     }
   });
 
-  $('correct').value = '';
+  $('correct').value =
+    '';
 
   msg(
     'qmsg',
@@ -922,7 +1460,8 @@ async function previewImport() {
       }
     );
 
-  importData = rows;
+  importData =
+    rows;
 
   $('preview').innerHTML = `
     <div class="q">
@@ -963,6 +1502,7 @@ function norm(v) {
 
 async function importRows() {
   let ok = 0;
+
   const fail = [];
 
   for (
@@ -2294,11 +2834,20 @@ window.selectCategory =
 window.createFolder =
   createFolder;
 
+window.editFolder =
+  editFolder;
+
+window.deleteFolder =
+  deleteFolder;
+
 window.createSet =
   createSet;
 
 window.editSet =
   editSet;
+
+window.deleteSet =
+  deleteSet;
 
 window.addManual =
   addManual;
