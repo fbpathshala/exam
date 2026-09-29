@@ -1,3 +1,5 @@
+console.log("NEW QUESTION BANK JS LOADED - 2026-09-29");
+
 let exams = [];
 let questions = [];
 let importRows = [];
@@ -21,6 +23,7 @@ function qbCategory(value) {
   if (typeof canonicalCat === "function") {
     return canonicalCat(String(value || "").trim());
   }
+
   return String(value || "").trim();
 }
 
@@ -38,7 +41,9 @@ function qbSafe(value) {
 }
 
 function qbBn(value) {
-  if (typeof bn === "function") return bn(value);
+  if (typeof bn === "function") {
+    return bn(value);
+  }
 
   const map = {
     "0": "০",
@@ -129,10 +134,6 @@ async function init() {
 
   installQuestionBankEvents();
 
-  /*
-    Question Bank পেজের মধ্যেই
-    Excel / CSV Import Panel তৈরি হবে।
-  */
   addBulkImportPanel();
 }
 
@@ -245,9 +246,6 @@ function renderBank() {
     qb$("bankCategory")?.value || ""
   );
 
-  const examId =
-    qb$("bankExam")?.value || "";
-
   if (qb$("bankInfo")) {
     qb$("bankInfo").textContent =
       `মোট ${qbBn(filtered.length)}টি প্রশ্ন পাওয়া গেছে। ` +
@@ -301,9 +299,7 @@ function renderBank() {
 
           <div class="bankAnswer">
             <b>সঠিক উত্তর:</b>
-            ${qbSafe(
-              qbAnswerBn(q.correct_option)
-            )}
+            ${qbSafe(qbAnswerBn(q.correct_option))}
           </div>
 
           <div class="bankExplanation">
@@ -316,13 +312,11 @@ function renderBank() {
 
           <div class="bankActions">
 
-            <button
-              onclick="openEdit('${q.id}')">
+            <button onclick="openEdit('${q.id}')">
               ✏️ প্রশ্ন এডিট করুন
             </button>
 
-            <button
-              onclick="cloneQuestion('${q.id}')">
+            <button onclick="cloneQuestion('${q.id}')">
               📋 নতুন প্রশ্ন
             </button>
 
@@ -361,18 +355,10 @@ function renderBankCategories(selected = "") {
   const selectedExam =
     String(qb$("bankExam")?.value || "");
 
-  /*
-    গুরুত্বপূর্ণ:
-    Exam নির্বাচন করলে Category-এর
-    সংখ্যা শুধু সেই Exam-এর প্রশ্ন থেকে গণনা হবে।
-  */
-
   const pool = selectedExam
-
     ? questions.filter(function (q) {
         return String(q.exam_id) === selectedExam;
       })
-
     : questions;
 
   box.innerHTML = "";
@@ -381,9 +367,7 @@ function renderBankCategories(selected = "") {
     document.createElement("button");
 
   allButton.className =
-    !selectedCategory
-      ? "active"
-      : "";
+    !selectedCategory ? "active" : "";
 
   allButton.textContent =
     `সব Category (${qbBn(pool.length)})`;
@@ -417,11 +401,6 @@ function renderBankCategories(selected = "") {
     }
 
   });
-
-  /*
-    CATEGORIES-এর মূল order থাকলে
-    সেটি বজায় রাখা হবে।
-  */
 
   const ordered = [];
 
@@ -468,8 +447,7 @@ function renderBankCategories(selected = "") {
       document.createElement("button");
 
     button.className =
-      qbCategory(category) ===
-      selectedCategory
+      qbCategory(category) === selectedCategory
         ? "active"
         : "";
 
@@ -479,8 +457,7 @@ function renderBankCategories(selected = "") {
     button.onclick = function () {
 
       if (qb$("bankCategory")) {
-        qb$("bankCategory").value =
-          category;
+        qb$("bankCategory").value = category;
       }
 
       renderBankCategories(category);
@@ -500,8 +477,7 @@ window.openEdit = function (id) {
 
   const q =
     questions.find(function (item) {
-      return String(item.id) ===
-        String(id);
+      return String(item.id) === String(id);
     });
 
   if (!q) return;
@@ -509,39 +485,18 @@ window.openEdit = function (id) {
   fillExam("editExam");
   fillCategory("editCategory", false);
 
-  qb$("editId").value =
-    q.id;
+  qb$("editId").value = q.id;
+  qb$("editExam").value = q.exam_id || "";
+  qb$("editCategory").value = q.category || "";
+  qb$("editText").value = q.question_text || "";
+  qb$("editA").value = q.option_a || "";
+  qb$("editB").value = q.option_b || "";
+  qb$("editC").value = q.option_c || "";
+  qb$("editD").value = q.option_d || "";
+  qb$("editCorrect").value = q.correct_option || "";
+  qb$("editExplanation").value = q.explanation || "";
 
-  qb$("editExam").value =
-    q.exam_id || "";
-
-  qb$("editCategory").value =
-    q.category || "";
-
-  qb$("editText").value =
-    q.question_text || "";
-
-  qb$("editA").value =
-    q.option_a || "";
-
-  qb$("editB").value =
-    q.option_b || "";
-
-  qb$("editC").value =
-    q.option_c || "";
-
-  qb$("editD").value =
-    q.option_d || "";
-
-  qb$("editCorrect").value =
-    q.correct_option || "";
-
-  qb$("editExplanation").value =
-    q.explanation || "";
-
-  qb$("editModal").classList.remove(
-    "hidden"
-  );
+  qb$("editModal").classList.remove("hidden");
 };
 
 
@@ -577,10 +532,7 @@ async function updateQuestion() {
       qb$("editCorrect").value,
 
     explanation:
-      qb$("editExplanation")
-        .value
-        .trim() || null
-
+      qb$("editExplanation").value.trim() || null
   };
 
   if (
@@ -626,57 +578,37 @@ async function updateQuestion() {
    CLONE
 ========================= */
 
-window.cloneQuestion =
-  function (id) {
+window.cloneQuestion = function (id) {
 
-    const q =
-      questions.find(function (item) {
-        return String(item.id) ===
-          String(id);
-      });
+  const q =
+    questions.find(function (item) {
+      return String(item.id) === String(id);
+    });
 
-    if (!q) return;
+  if (!q) return;
 
-    localStorage.setItem(
-      "cloneQuestion",
-      JSON.stringify(q)
-    );
+  localStorage.setItem(
+    "cloneQuestion",
+    JSON.stringify(q)
+  );
 
-    location.href =
-      "questions.html";
-  };
+  location.href = "questions.html";
+};
 
 
 function cloneFromEdit() {
 
   const q = {
 
-    exam_id:
-      qb$("editExam").value,
-
-    category:
-      qb$("editCategory").value,
-
-    question_text:
-      qb$("editText").value,
-
-    option_a:
-      qb$("editA").value,
-
-    option_b:
-      qb$("editB").value,
-
-    option_c:
-      qb$("editC").value,
-
-    option_d:
-      qb$("editD").value,
-
-    correct_option:
-      qb$("editCorrect").value,
-
-    explanation:
-      qb$("editExplanation").value
+    exam_id: qb$("editExam").value,
+    category: qb$("editCategory").value,
+    question_text: qb$("editText").value,
+    option_a: qb$("editA").value,
+    option_b: qb$("editB").value,
+    option_c: qb$("editC").value,
+    option_d: qb$("editD").value,
+    correct_option: qb$("editCorrect").value,
+    explanation: qb$("editExplanation").value
 
   };
 
@@ -685,8 +617,7 @@ function cloneFromEdit() {
     JSON.stringify(q)
   );
 
-  location.href =
-    "questions.html";
+  location.href = "questions.html";
 }
 
 
@@ -694,38 +625,29 @@ function cloneFromEdit() {
    DELETE
 ========================= */
 
-window.deleteQuestion =
-  async function (id) {
+window.deleteQuestion = async function (id) {
 
-    if (
-      !confirm(
-        "এই প্রশ্নটি মুছে ফেলবেন?"
-      )
-    ) {
-      return;
-    }
+  if (!confirm("এই প্রশ্নটি মুছে ফেলবেন?")) {
+    return;
+  }
 
-    const result =
-      await db
-        .from("questions")
-        .delete()
-        .eq("id", id);
+  const result =
+    await db
+      .from("questions")
+      .delete()
+      .eq("id", id);
 
-    if (result.error) {
+  if (result.error) {
+    alert(result.error.message);
+    return;
+  }
 
-      alert(
-        result.error.message
-      );
-
-      return;
-    }
-
-    location.reload();
-  };
+  location.reload();
+};
 
 
 /* =====================================================
-   EXCEL / CSV IMPORT
+   EXCEL / CSV IMPORT PANEL
 ===================================================== */
 
 function addBulkImportPanel() {
@@ -737,10 +659,7 @@ function addBulkImportPanel() {
   const list =
     qb$("bankList");
 
-  if (
-    !list ||
-    !list.parentElement
-  ) {
+  if (!list || !list.parentElement) {
     return;
   }
 
@@ -827,14 +746,9 @@ function addBulkImportPanel() {
 
       </div>
 
-      <div
-        id="importMsg"
-        class="msg">
-      </div>
+      <div id="importMsg" class="msg"></div>
 
-      <div
-        id="importPreview">
-      </div>
+      <div id="importPreview"></div>
 
     </div>
   `;
@@ -854,16 +768,13 @@ function addBulkImportPanel() {
     false
   );
 
-  qb$("downloadTemplateBtn")
-    .onclick =
+  qb$("downloadTemplateBtn").onclick =
     downloadImportTemplate;
 
-  qb$("readImportBtn")
-    .onclick =
+  qb$("readImportBtn").onclick =
     readImportFile;
 
-  qb$("importQuestionsBtn")
-    .onclick =
+  qb$("importQuestionsBtn").onclick =
     importQuestions;
 }
 
@@ -874,72 +785,63 @@ function addBulkImportPanel() {
 
 function loadXLSX() {
 
-  return new Promise(
-    function (resolve, reject) {
+  return new Promise(function (resolve, reject) {
 
-      if (window.XLSX) {
-        resolve();
-        return;
-      }
+    if (window.XLSX) {
+      resolve();
+      return;
+    }
 
-      const oldScript =
-        document.querySelector(
-          'script[data-xlsx="1"]'
-        );
+    const oldScript =
+      document.querySelector(
+        'script[data-xlsx="1"]'
+      );
 
-      if (oldScript) {
+    if (oldScript) {
 
-        oldScript.addEventListener(
-          "load",
-          function () {
-            resolve();
-          }
-        );
+      oldScript.addEventListener(
+        "load",
+        resolve,
+        { once: true }
+      );
 
-        oldScript.addEventListener(
-          "error",
-          function () {
-            reject(
-              new Error(
-                "Excel library লোড হয়নি।"
-              )
-            );
-          }
-        );
-
-        return;
-      }
-
-      const script =
-        document.createElement(
-          "script"
-        );
-
-      script.src =
-        "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
-
-      script.dataset.xlsx =
-        "1";
-
-      script.onload =
-        function () {
-          resolve();
-        };
-
-      script.onerror =
+      oldScript.addEventListener(
+        "error",
         function () {
           reject(
             new Error(
-              "Excel library লোড হয়নি। Internet connection পরীক্ষা করুন।"
+              "Excel library লোড হয়নি।"
             )
           );
-        };
-
-      document.head.appendChild(
-        script
+        },
+        { once: true }
       );
+
+      return;
     }
-  );
+
+    const script =
+      document.createElement("script");
+
+    script.src =
+      "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
+
+    script.dataset.xlsx = "1";
+
+    script.onload = resolve;
+
+    script.onerror = function () {
+
+      reject(
+        new Error(
+          "Excel library লোড হয়নি। Internet connection পরীক্ষা করুন।"
+        )
+      );
+
+    };
+
+    document.head.appendChild(script);
+  });
 }
 
 
@@ -961,50 +863,32 @@ function csvToRows(text) {
     i++
   ) {
 
-    const ch =
-      text[i];
-
-    const next =
-      text[i + 1];
+    const ch = text[i];
+    const next = text[i + 1];
 
     if (ch === '"') {
 
-      if (
-        quoted &&
-        next === '"'
-      ) {
+      if (quoted && next === '"') {
 
         cell += '"';
         i++;
 
       } else {
 
-        quoted =
-          !quoted;
+        quoted = !quoted;
       }
 
-    }
-
-    else if (
-      ch === "," &&
-      !quoted
-    ) {
+    } else if (ch === "," && !quoted) {
 
       row.push(cell);
       cell = "";
 
-    }
-
-    else if (
-      (ch === "\n" ||
-       ch === "\r") &&
+    } else if (
+      (ch === "\n" || ch === "\r") &&
       !quoted
     ) {
 
-      if (
-        ch === "\r" &&
-        next === "\n"
-      ) {
+      if (ch === "\r" && next === "\n") {
         i++;
       }
 
@@ -1021,18 +905,13 @@ function csvToRows(text) {
       row = [];
       cell = "";
 
-    }
-
-    else {
+    } else {
 
       cell += ch;
     }
   }
 
-  if (
-    cell ||
-    row.length
-  ) {
+  if (cell || row.length) {
 
     row.push(cell);
 
@@ -1050,11 +929,9 @@ function csvToRows(text) {
   }
 
   const headers =
-    result[0].map(
-      function (v) {
-        return String(v).trim();
-      }
-    );
+    result[0].map(function (v) {
+      return String(v).trim();
+    });
 
   return result
     .slice(1)
@@ -1066,8 +943,8 @@ function csvToRows(text) {
         function (header, index) {
 
           obj[header] =
-            columns[index] ??
-            "";
+            columns[index] ?? "";
+
         }
       );
 
@@ -1085,10 +962,7 @@ function importKey(value) {
   return String(value || "")
     .trim()
     .toLowerCase()
-    .replace(
-      /[\s\-]+/g,
-      "_"
-    );
+    .replace(/[\s\-]+/g, "_");
 }
 
 
@@ -1101,23 +975,19 @@ function normalizeImportRow(raw) {
   const x = {};
 
   Object.entries(raw || {})
-    .forEach(
-      function ([key, value]) {
+    .forEach(function ([key, value]) {
 
-        x[importKey(key)] =
-          String(value ?? "")
-            .trim();
-      }
-    );
+      x[importKey(key)] =
+        String(value ?? "").trim();
+
+    });
 
   function pick() {
 
     const keys =
       Array.from(arguments);
 
-    for (
-      const key of keys
-    ) {
+    for (const key of keys) {
 
       const value =
         x[importKey(key)];
@@ -1241,65 +1111,45 @@ function normalizeImportRow(raw) {
 
 function validateImportRows(rows) {
 
-  return rows.map(
-    function (row, index) {
+  return rows.map(function (row, index) {
 
-      const errors = [];
+    const errors = [];
 
-      if (!row.question_text) {
-        errors.push(
-          "প্রশ্ন নেই"
-        );
-      }
-
-      if (!row.option_a) {
-        errors.push(
-          "ক অপশন নেই"
-        );
-      }
-
-      if (!row.option_b) {
-        errors.push(
-          "খ অপশন নেই"
-        );
-      }
-
-      if (!row.option_c) {
-        errors.push(
-          "গ অপশন নেই"
-        );
-      }
-
-      if (!row.option_d) {
-        errors.push(
-          "ঘ অপশন নেই"
-        );
-      }
-
-      if (
-        !["A", "B", "C", "D"]
-          .includes(
-            row.correct_option
-          )
-      ) {
-
-        errors.push(
-          "সঠিক উত্তর A/B/C/D নয়"
-        );
-      }
-
-      return {
-
-        ...row,
-
-        rowNumber:
-          index + 2,
-
-        errors
-
-      };
+    if (!row.question_text) {
+      errors.push("প্রশ্ন নেই");
     }
-  );
+
+    if (!row.option_a) {
+      errors.push("ক অপশন নেই");
+    }
+
+    if (!row.option_b) {
+      errors.push("খ অপশন নেই");
+    }
+
+    if (!row.option_c) {
+      errors.push("গ অপশন নেই");
+    }
+
+    if (!row.option_d) {
+      errors.push("ঘ অপশন নেই");
+    }
+
+    if (
+      !["A", "B", "C", "D"]
+        .includes(row.correct_option)
+    ) {
+      errors.push(
+        "সঠিক উত্তর A/B/C/D নয়"
+      );
+    }
+
+    return {
+      ...row,
+      rowNumber: index + 2,
+      errors
+    };
+  });
 }
 
 
@@ -1310,8 +1160,7 @@ function validateImportRows(rows) {
 async function readImportFile() {
 
   const file =
-    qb$("importFile")
-      ?.files?.[0];
+    qb$("importFile")?.files?.[0];
 
   const message =
     qb$("importMsg");
@@ -1333,17 +1182,14 @@ async function readImportFile() {
     return;
   }
 
-  importButton.disabled =
-    true;
+  importButton.disabled = true;
 
   message.textContent =
     "ফাইল পড়া হচ্ছে...";
 
-  message.className =
-    "msg";
+  message.className = "msg";
 
-  preview.innerHTML =
-    "";
+  preview.innerHTML = "";
 
   importRows = [];
 
@@ -1351,28 +1197,14 @@ async function readImportFile() {
 
     let rows = [];
 
-    /*
-      CSV
-    */
-
-    if (
-      /\.csv$/i.test(
-        file.name
-      )
-    ) {
+    if (/\.csv$/i.test(file.name)) {
 
       rows =
         csvToRows(
           await file.text()
         );
 
-    }
-
-    /*
-      Excel
-    */
-
-    else {
+    } else {
 
       await loadXLSX();
 
@@ -1387,9 +1219,7 @@ async function readImportFile() {
           }
         );
 
-      if (
-        !workbook.SheetNames.length
-      ) {
+      if (!workbook.SheetNames.length) {
 
         throw new Error(
           "Excel sheet পাওয়া যায়নি।"
@@ -1419,21 +1249,15 @@ async function readImportFile() {
 
     importRows =
       validateImportRows(
-        rows.map(
-          normalizeImportRow
-        )
+        rows.map(normalizeImportRow)
       );
 
     renderImportPreview();
 
     const valid =
-      importRows.filter(
-        function (row) {
-          return (
-            row.errors.length === 0
-          );
-        }
-      );
+      importRows.filter(function (row) {
+        return row.errors.length === 0;
+      });
 
     importButton.disabled =
       valid.length === 0;
@@ -1442,8 +1266,7 @@ async function readImportFile() {
       `মোট ${qbBn(importRows.length)}টি row | ` +
       `Valid ${qbBn(valid.length)} | ` +
       `Invalid ${qbBn(
-        importRows.length -
-        valid.length
+        importRows.length - valid.length
       )}`;
 
     message.className =
@@ -1451,9 +1274,7 @@ async function readImportFile() {
         ? "msg success"
         : "msg error";
 
-  }
-
-  catch (error) {
+  } catch (error) {
 
     console.error(error);
 
@@ -1486,9 +1307,7 @@ function renderImportPreview() {
 
   let html = `
 
-    <div style="
-      overflow:auto;
-    ">
+    <div style="overflow:auto;">
 
       <table style="
         width:100%;
@@ -1497,7 +1316,6 @@ function renderImportPreview() {
       ">
 
         <thead>
-
           <tr>
             <th>Row</th>
             <th>Category</th>
@@ -1505,7 +1323,6 @@ function renderImportPreview() {
             <th>Answer</th>
             <th>Status</th>
           </tr>
-
         </thead>
 
         <tbody>
@@ -1532,15 +1349,11 @@ function renderImportPreview() {
         </td>
 
         <td>
-          ${qbSafe(
-            row.category || "—"
-          )}
+          ${qbSafe(row.category || "—")}
         </td>
 
         <td>
-          ${qbSafe(
-            row.question_text || "—"
-          )}
+          ${qbSafe(row.question_text || "—")}
         </td>
 
         <td>
@@ -1575,9 +1388,7 @@ function renderImportPreview() {
     </div>
   `;
 
-  if (
-    importRows.length > max
-  ) {
+  if (importRows.length > max) {
 
     html += `
 
@@ -1590,8 +1401,7 @@ function renderImportPreview() {
     `;
   }
 
-  box.innerHTML =
-    html;
+  box.innerHTML = html;
 }
 
 
@@ -1608,41 +1418,44 @@ function resolveImportExam(value) {
     return null;
   }
 
-  /*
-    প্রথমে ID দিয়ে খোঁজা
-  */
-
   const byId =
-    exams.find(
-      function (exam) {
-        return (
-          String(exam.id) ===
-          text
-        );
-      }
-    );
+    exams.find(function (exam) {
+
+      return (
+        String(exam.id) === text
+      );
+
+    });
 
   if (byId) {
     return byId.id;
   }
 
-  /*
-    তারপর title/name দিয়ে
-  */
-
   const byTitle =
-    exams.find(
-      function (exam) {
+    exams.find(function (exam) {
 
-        return (
-          qbNorm(exam.title) ===
-          qbNorm(text)
-        );
+      return (
+        qbNorm(exam.title) ===
+        qbNorm(text)
+      );
 
-      }
-    );
+    });
 
-  return byTitle?.id || null;
+  if (byTitle) {
+    return byTitle.id;
+  }
+
+  const byName =
+    exams.find(function (exam) {
+
+      return (
+        qbNorm(exam.name) ===
+        qbNorm(text)
+      );
+
+    });
+
+  return byName?.id || null;
 }
 
 
@@ -1653,13 +1466,9 @@ function resolveImportExam(value) {
 async function importQuestions() {
 
   const validRows =
-    importRows.filter(
-      function (row) {
-        return (
-          row.errors.length === 0
-        );
-      }
-    );
+    importRows.filter(function (row) {
+      return row.errors.length === 0;
+    });
 
   const message =
     qb$("importMsg");
@@ -1678,24 +1487,20 @@ async function importQuestions() {
     return;
   }
 
-  button.disabled =
-    true;
+  button.disabled = true;
 
   message.textContent =
     "Database-এ প্রশ্ন যোগ হচ্ছে...";
 
-  message.className =
-    "msg";
+  message.className = "msg";
 
   try {
 
     const fallbackExam =
-      qb$("importExam")?.value ||
-      "";
+      qb$("importExam")?.value || "";
 
     const fallbackCategory =
-      qb$("importCategory")?.value ||
-      "";
+      qb$("importCategory")?.value || "";
 
     const payload = [];
 
@@ -1704,9 +1509,7 @@ async function importQuestions() {
     ) {
 
       const examId =
-        resolveImportExam(
-          row.exam
-        ) ||
+        resolveImportExam(row.exam) ||
         fallbackExam;
 
       if (!examId) {
@@ -1751,13 +1554,7 @@ async function importQuestions() {
       });
     }
 
-    let inserted =
-      0;
-
-    /*
-      একসাথে 100টি করে insert
-      করা হচ্ছে।
-    */
+    let inserted = 0;
 
     for (
       let i = 0;
@@ -1780,8 +1577,7 @@ async function importQuestions() {
         throw result.error;
       }
 
-      inserted +=
-        batch.length;
+      inserted += batch.length;
 
       message.textContent =
         `Import চলছে... ` +
@@ -1802,9 +1598,7 @@ async function importQuestions() {
       1000
     );
 
-  }
-
-  catch (error) {
+  } catch (error) {
 
     console.error(error);
 
@@ -1815,8 +1609,7 @@ async function importQuestions() {
     message.className =
       "msg error";
 
-    button.disabled =
-      false;
+    button.disabled = false;
   }
 }
 
@@ -1857,29 +1650,22 @@ function downloadImportTemplate() {
 
   const csv =
     rows
-      .map(
-        function (row) {
+      .map(function (row) {
 
-          return row
-            .map(
-              function (value) {
+        return row
+          .map(function (value) {
 
-                return (
-                  '"' +
-                  String(value)
-                    .replace(
-                      /"/g,
-                      '""'
-                    ) +
-                  '"'
-                );
+            return (
+              '"' +
+              String(value)
+                .replace(/"/g, '""') +
+              '"'
+            );
 
-              }
-            )
-            .join(",");
+          })
+          .join(",");
 
-        }
-      )
+      })
       .join("\r\n");
 
   const blob =
@@ -1894,32 +1680,23 @@ function downloadImportTemplate() {
     );
 
   const url =
-    URL.createObjectURL(
-      blob
-    );
+    URL.createObjectURL(blob);
 
   const link =
-    document.createElement(
-      "a"
-    );
+    document.createElement("a");
 
-  link.href =
-    url;
+  link.href = url;
 
   link.download =
     "question-import-template.csv";
 
-  document.body.appendChild(
-    link
-  );
+  document.body.appendChild(link);
 
   link.click();
 
   link.remove();
 
-  URL.revokeObjectURL(
-    url
-  );
+  URL.revokeObjectURL(url);
 }
 
 
