@@ -84,8 +84,68 @@ async function init() {
   $('userEmail').textContent =
     data.session.user.email || '';
 
+  /* =========================
+     EVENT HANDLERS
+  ========================= */
+
+  if ($('folder')) {
+    $('folder').onchange = async () => {
+      await loadSets();
+    };
+  }
+
+  if ($('filterFolder')) {
+    $('filterFolder').onchange = async () => {
+      await loadFilterSets();
+      await loadQuestions();
+    };
+  }
+
+  if ($('filterSet')) {
+    $('filterSet').onchange = async () => {
+      await loadQuestions();
+    };
+  }
+
+  if ($('filterSubject')) {
+    $('filterSubject').onchange = async () => {
+      await loadQuestions();
+    };
+  }
+
+  if ($('mapFolder')) {
+    $('mapFolder').onchange = async () => {
+      await loadMapSets();
+    };
+  }
+
+  if ($('mapSet')) {
+    $('mapSet').onchange = async () => {
+      if ($('mapExam')?.value) {
+        await loadPool();
+      }
+    };
+  }
+
+  if ($('examSelect')) {
+    $('examSelect').onchange = async () => {
+      await loadSettings();
+    };
+  }
+
+  if ($('mapExam')) {
+    $('mapExam').onchange = async () => {
+      await loadPool();
+    };
+  }
+
   await loadSubjects();
-  await loadBank();
+
+  await selectCategory(
+    'verification_test'
+  );
+
+  await loadQuestions();
   await loadExams();
 
   showPage('dashboard');
@@ -230,6 +290,10 @@ async function loadFolders() {
   await loadSets();
 }
 
+/* =========================
+   FILTER FOLDERS
+========================= */
+
 async function loadFilterFolders() {
   if (!$('filterFolder')) return;
 
@@ -302,8 +366,145 @@ async function loadSets() {
             </option>`
         )
         .join('');
+
+    /* =========================
+       SET EDIT BUTTON
+    ========================= */
+
+    addSetEditButton();
   }
 }
+
+/* =========================
+   SET EDIT BUTTON
+========================= */
+
+function addSetEditButton() {
+  const setSelect = $('set');
+
+  if (!setSelect) return;
+
+  let btn = $('editSetBtn');
+
+  if (!btn) {
+    btn = document.createElement('button');
+
+    btn.id = 'editSetBtn';
+    btn.type = 'button';
+    btn.className = 'secondary';
+    btn.textContent = '✏️ Set-এর নাম পরিবর্তন';
+
+    btn.style.marginTop = '6px';
+
+    setSelect.insertAdjacentElement(
+      'afterend',
+      btn
+    );
+
+    btn.onclick = editSet;
+  }
+
+  btn.disabled = !setSelect.value;
+
+  setSelect.onchange = () => {
+    btn.disabled = !setSelect.value;
+  };
+}
+
+/* =========================
+   EDIT SET NAME
+========================= */
+
+async function editSet() {
+  const setId =
+    $('set')?.value;
+
+  if (!setId) {
+    return msg(
+      'folderMsg',
+      'আগে একটি Set নির্বাচন করুন',
+      true
+    );
+  }
+
+  const current =
+    sets.find(
+      x =>
+        String(x.id) ===
+        String(setId)
+    );
+
+  if (!current) {
+    return msg(
+      'folderMsg',
+      'Set পাওয়া যায়নি',
+      true
+    );
+  }
+
+  const newName =
+    prompt(
+      'Set-এর নতুন নাম দিন:',
+      current.set_name
+    );
+
+  if (newName === null) {
+    return;
+  }
+
+  const name =
+    newName.trim();
+
+  if (!name) {
+    return msg(
+      'folderMsg',
+      'Set-এর নাম খালি রাখা যাবে না',
+      true
+    );
+  }
+
+  if (
+    name ===
+    current.set_name
+  ) {
+    return;
+  }
+
+  const r =
+    await db
+      .from(
+        'question_bank_sets'
+      )
+      .update({
+        set_name: name
+      })
+      .eq(
+        'id',
+        Number(setId)
+      );
+
+  if (r.error) {
+    return msg(
+      'folderMsg',
+      r.error.message,
+      true
+    );
+  }
+
+  await loadSets();
+
+  $('set').value =
+    setId;
+
+  msg(
+    'folderMsg',
+    '✅ Set-এর নাম পরিবর্তন হয়েছে'
+  );
+}
+
+/* =========================
+   FILTER SETS
+========================= */
 
 async function loadFilterSets() {
   const id = $('filterFolder')?.value;
@@ -341,6 +542,10 @@ async function loadFilterSets() {
         .join('');
   }
 }
+
+/* =========================
+   MAP SETS
+========================= */
 
 async function loadMapSets() {
   const id = $('mapFolder')?.value;
@@ -477,6 +682,8 @@ async function createSet() {
 
   $('set').value =
     r.data.id;
+
+  addSetEditButton();
 
   msg(
     'folderMsg',
@@ -946,7 +1153,6 @@ async function importRows() {
         sub?.id || null,
 
       category:
-
         category,
 
       source_name:
@@ -2091,6 +2297,9 @@ window.createFolder =
 window.createSet =
   createSet;
 
+window.editSet =
+  editSet;
+
 window.addManual =
   addManual;
 
@@ -2141,9 +2350,5 @@ window.saveMapping =
 ========================= */
 
 (async function start() {
-  await selectCategory(
-    'verification_test'
-  );
-
   await init();
 })();
