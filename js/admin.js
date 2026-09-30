@@ -1,8 +1,3 @@
-/* =========================================================
-   Facebook Pathshala MCQ Exam Website
-   Admin Panel
-   ========================================================= */
-
 const CATS = {
   recruitment: 'নিয়োগ পরীক্ষা',
   verification_test: 'যাচাই পরীক্ষা',
