@@ -275,6 +275,7 @@ async function editFolder() {
   }
 
   await loadFolders();
+
   msg(
     'qmsg',
     '✅ Folder-এর নাম পরিবর্তন হয়েছে'
@@ -1006,17 +1007,7 @@ async function importRows() {
     Number($('set')?.value || 0) || null;
 
   /*
-   * Excel/CSV row থেকে value নেওয়ার helper।
-   *
-   * নতুন template:
-   * question
-   * option_a
-   *
-   * আবার Preview-তে দেখা Title Case:
-   * Question
-   * Option A
-   *
-   * দুই ধরনের নামই গ্রহণ করবে।
+   * Excel / CSV row থেকে value নেওয়ার helper
    */
   const getValue = (row, ...keys) => {
     for (const key of keys) {
@@ -1040,11 +1031,9 @@ async function importRows() {
   ) {
     const r = importData[i];
 
-    /*
-     * ==============================
-     * Read Excel / CSV Fields
-     * ==============================
-     */
+    /* ==========================================
+       Read Fields
+       ========================================== */
 
     const categoryRaw =
       getValue(
@@ -1085,7 +1074,8 @@ async function importRows() {
       getValue(
         r,
         'question_number',
-        'Question Number'
+        'Question Number',
+        'QuestionNumber'
       );
 
     const question =
@@ -1099,35 +1089,40 @@ async function importRows() {
       getValue(
         r,
         'option_a',
-        'Option A'
+        'Option A',
+        'OptionA'
       );
 
     const optionB =
       getValue(
         r,
         'option_b',
-        'Option B'
+        'Option B',
+        'OptionB'
       );
 
     const optionC =
       getValue(
         r,
         'option_c',
-        'Option C'
+        'Option C',
+        'OptionC'
       );
 
     const optionD =
       getValue(
         r,
         'option_d',
-        'Option D'
+        'Option D',
+        'OptionD'
       );
 
     let correct =
       getValue(
         r,
         'correct_answer',
-        'Correct Answer'
+        'Correct Answer',
+        'CorrectAnswer'
       );
 
     const explanation =
@@ -1137,11 +1132,9 @@ async function importRows() {
         'Explanation'
       );
 
-    /*
-     * ==============================
-     * Category
-     * ==============================
-     */
+    /* ==========================================
+       Category
+       ========================================== */
 
     const category =
       Object.values(CATS).includes(
@@ -1150,18 +1143,9 @@ async function importRows() {
         ? categoryRaw
         : CATS[cat];
 
-    /*
-     * ==============================
-     * Correct Answer Normalize
-     * ==============================
-     *
-     * ক → A
-     * খ → B
-     * গ → C
-     * ঘ → D
-     *
-     * a/b/c/d-ও গ্রহণ করবে।
-     */
+    /* ==========================================
+       Correct Answer Normalize
+       ========================================== */
 
     const correctMap = {
       'ক': 'A',
@@ -1174,24 +1158,9 @@ async function importRows() {
       correctMap[correct] ||
       correct.toUpperCase();
 
-    /*
-     * ==============================
-     * ONLY REQUIRED FIELDS
-     * ==============================
-     *
-     * বাধ্যতামূলক:
-     *
-     * ১. Question
-     * ২. Option A
-     * ৩. Option B
-     * ৪. Option C
-     * ৫. Option D
-     * ৬. Correct Answer
-     *
-     * Category / Folder / Set / Subject /
-     * Source / Question Number / Explanation
-     * কোনোটি বাধ্যতামূলক নয়।
-     */
+    /* ==========================================
+       ONLY REQUIRED FIELDS
+       ========================================== */
 
     if (
       !question ||
@@ -1210,18 +1179,9 @@ async function importRows() {
       continue;
     }
 
-    /*
-     * ==============================
-     * Folder / Set Selection
-     * ==============================
-     *
-     * Excel-এ Category না থাকলে
-     * বর্তমান Admin Category ব্যবহার করবে।
-     *
-     * Excel-এ Category থাকলে এবং সেটি
-     * বর্তমান Category-এর সঙ্গে না মিললে
-     * বর্তমান Folder/Set ব্যবহার করবে না।
-     */
+    /* ==========================================
+       Category / Selected Folder / Set
+       ========================================== */
 
     const categoryProvided =
       !!categoryRaw;
@@ -1230,6 +1190,11 @@ async function importRows() {
       !categoryProvided ||
       category === CATS[cat];
 
+    /*
+     * Category Excel-এ দেওয়া থাকলে এবং
+     * বর্তমান Category-এর সঙ্গে না মিললে
+     * selected Folder/Set ব্যবহার করা যাবে না।
+     */
     let fid =
       selectedCategoryMatches
         ? selectedFolderId
@@ -1240,16 +1205,9 @@ async function importRows() {
         ? selectedSetId
         : null;
 
-    /*
-     * ==============================
-     * Folder
-     * ==============================
-     *
-     * Excel-এ Folder থাকলে:
-     *
-     * ১. খুঁজবে
-     * ২. না থাকলে তৈরি করবে
-     */
+    /* ==========================================
+       Folder
+       ========================================== */
 
     if (folderName) {
       const fr =
@@ -1279,6 +1237,9 @@ async function importRows() {
       fid =
         fr.data?.id || null;
 
+      /*
+       * Folder না থাকলে তৈরি করবে
+       */
       if (!fid) {
         const x =
           await db
@@ -1306,26 +1267,25 @@ async function importRows() {
       }
 
       /*
-       * Folder দেওয়া আছে কিন্তু Set নেই।
-       * তাই পুরোনো selected Set ব্যবহার করা যাবে না।
+       * Excel-এ Folder আছে কিন্তু Set নেই।
+       * তাই selected Set ব্যবহার করা যাবে না।
        */
       if (!setName) {
         sid = null;
       }
     }
 
-    /*
-     * ==============================
-     * Set
-     * ==============================
-     *
-     * Excel-এ Set থাকলে:
-     *
-     * Folder-এর ভিতরে Set খুঁজবে।
-     * না থাকলে তৈরি করবে।
-     */
+    /* ==========================================
+       Set
+       ========================================== */
 
     if (setName) {
+      /*
+       * Set দেওয়া আছে কিন্তু Folder নেই।
+       *
+       * যদি Admin-এ Folder selected থাকে,
+       * সেটি ব্যবহার করবে।
+       */
       if (!fid) {
         fail.push(
           `Row ${i + 2}: Set দেওয়া হয়েছে, কিন্তু Folder পাওয়া যায়নি`
@@ -1361,6 +1321,9 @@ async function importRows() {
       sid =
         sr.data?.id || null;
 
+      /*
+       * Set না থাকলে তৈরি করবে
+       */
       if (!sid) {
         const x =
           await db
@@ -1368,8 +1331,10 @@ async function importRows() {
               'question_bank_sets'
             )
             .insert({
-              folder_id: fid,
-              set_name: setName
+              folder_id:
+                fid,
+              set_name:
+                setName
             })
             .select('id')
             .single();
@@ -1386,16 +1351,9 @@ async function importRows() {
       }
     }
 
-    /*
-     * ==============================
-     * Subject
-     * ==============================
-     *
-     * Subject optional.
-     *
-     * Subject না পাওয়া গেলেও Import
-     * বন্ধ হবে না।
-     */
+    /* ==========================================
+       Subject
+       ========================================== */
 
     let sub = null;
 
@@ -1409,12 +1367,16 @@ async function importRows() {
     }
 
     /*
-     * ==============================
-     * Question Number
-     * ==============================
+     * Subject optional।
      *
-     * Optional।
+     * Excel-এ Subject দেওয়া থাকলেও
+     * Database-এ না পাওয়া গেলে
+     * Import বন্ধ হবে না।
      */
+
+    /* ==========================================
+       Question Number
+       ========================================== */
 
     let questionNumber = null;
 
@@ -1422,26 +1384,23 @@ async function importRows() {
       const n =
         Number(rawQuestionNumber);
 
-      if (!Number.isNaN(n)) {
+      if (
+        Number.isFinite(n)
+      ) {
         questionNumber = n;
       }
     }
 
-    /*
-     * ==============================
-     * Final Payload
-     * ==============================
-     *
-     * source_id পাঠানো হচ্ছে না।
-     *
-     * কারণ source এখন optional এবং
-     * source_id nullable করা হয়েছে।
-     */
+    /* ==========================================
+       Final Payload
+       ========================================== */
 
     const payload = {
-      folder_id: fid,
+      folder_id:
+        fid,
 
-      set_id: sid,
+      set_id:
+        sid,
 
       subject_id:
         sub?.id || null,
@@ -1481,9 +1440,12 @@ async function importRows() {
     };
 
     /*
-     * ==============================
-     * Database Insert
-     * ==============================
+     * IMPORTANT:
+     *
+     * source_id ইচ্ছাকৃতভাবে পাঠানো হচ্ছে না।
+     *
+     * কারণ Source optional এবং
+     * source_id database-এ nullable করা হয়েছে।
      */
 
     const x =
@@ -1500,11 +1462,9 @@ async function importRows() {
     }
   }
 
-  /*
-   * ==============================
-   * Import Result
-   * ==============================
-   */
+  /* ==========================================
+     Import Result
+     ========================================== */
 
   msg(
     'qmsg',
@@ -1516,9 +1476,9 @@ async function importRows() {
     !!fail.length
   );
 
-  /*
-   * Error details
-   */
+  /* ==========================================
+     Error Details
+     ========================================== */
 
   if (fail.length) {
     const preview =
@@ -1534,9 +1494,9 @@ async function importRows() {
     }
   }
 
-  /*
-   * Question list reload
-   */
+  /* ==========================================
+     Question List Reload
+     ========================================== */
 
   await loadQuestions();
 }
