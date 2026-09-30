@@ -1,0 +1,1020 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ফেইসবুক পাঠশালা — Exam Results</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:#f4f7fb;
+  color:#172033;
+  font-family:Arial,"Noto Sans Bengali",sans-serif
+}
+
+header{
+  background:#123a63;
+  color:#fff;
+  padding:16px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px
+}
+
+main{
+  max-width:1200px;
+  margin:20px auto;
+  padding:0 12px
+}
+
+.card{
+  background:#fff;
+  border-radius:14px;
+  padding:18px;
+  margin-bottom:16px;
+  box-shadow:0 3px 14px #00000010
+}
+
+.hidden{display:none!important}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:12px
+}
+
+input,select,button{
+  font:inherit;
+  padding:11px;
+  border:1px solid #ccd5e1;
+  border-radius:8px
+}
+
+button{
+  background:#1769aa;
+  color:#fff;
+  border:0;
+  cursor:pointer;
+  margin:4px 4px 4px 0
+}
+
+.secondary{
+  background:#53657a
+}
+
+.login{
+  max-width:420px;
+  margin:80px auto
+}
+
+.login input,
+.login button{
+  width:100%;
+  margin:6px 0
+}
+
+.msg{
+  min-height:22px
+}
+
+.error{
+  color:#b42318
+}
+
+.success{
+  color:#087443
+}
+
+.actions{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap
+}
+
+.tableWrap{
+  overflow:auto
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:1000px
+}
+
+th,td{
+  padding:10px 8px;
+  border-bottom:1px solid #e4e8ee;
+  text-align:center;
+  white-space:nowrap
+}
+
+th{
+  background:#edf3f9;
+  position:sticky;
+  top:0
+}
+
+td.name,
+td.fb{
+  text-align:left
+}
+
+.badge{
+  display:inline-block;
+  padding:4px 9px;
+  border-radius:999px;
+  font-size:13px
+}
+
+.pass{
+  background:#dff5e8;
+  color:#087443
+}
+
+.fail{
+  background:#fde4e4;
+  color:#a51d1d
+}
+
+.summary{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin:12px 0
+}
+
+.stat{
+  background:#f5f8fc;
+  padding:12px 18px;
+  border-radius:10px
+}
+
+.stat b{
+  display:block;
+  font-size:20px
+}
+
+@media(max-width:700px){
+
+  .grid{
+    grid-template-columns:1fr
+  }
+
+  header{
+    align-items:flex-start;
+    flex-direction:column
+  }
+
+  main{
+    margin-top:10px
+  }
+
+  .card{
+    padding:13px
+  }
+}
+
+@media print{
+
+  body{
+    background:#fff
+  }
+
+  header,
+  .noPrint,
+  #login{
+    display:none!important
+  }
+
+  main{
+    max-width:none;
+    margin:0;
+    padding:0
+  }
+
+  .card{
+    box-shadow:none;
+    border:0
+  }
+
+  .tableWrap{
+    overflow:visible
+  }
+
+  table{
+    min-width:0;
+    font-size:9px
+  }
+
+  th{
+    position:static
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ADMIN LOGIN -->
+<div id="login" class="card login">
+
+  <h2>ফেইসবুক পাঠশালা</h2>
+  <h3>Admin Result</h3>
+
+  <input
+    id="email"
+    type="email"
+    placeholder="Admin Email"
+  >
+
+  <input
+    id="password"
+    type="password"
+    placeholder="Password"
+  >
+
+  <button onclick="loginAdmin()">
+    Login
+  </button>
+
+  <p id="loginMsg" class="msg"></p>
+
+</div>
+
+
+<!-- RESULT APP -->
+<div id="app" class="hidden">
+
+<header>
+
+  <b>
+    ফেইসবুক পাঠশালা — Exam Result
+  </b>
+
+  <button
+    class="secondary noPrint"
+    onclick="logoutAdmin()"
+  >
+    Logout
+  </button>
+
+</header>
+
+
+<main>
+
+  <!-- EXAM SELECT -->
+  <div class="card noPrint">
+
+    <h2>
+      পরীক্ষার ফলাফল
+    </h2>
+
+    <div class="grid">
+
+      <select
+        id="examSelect"
+        onchange="loadResults()"
+      >
+
+        <option value="">
+          Exam নির্বাচন করুন
+        </option>
+
+      </select>
+
+
+      <button onclick="loadResults()">
+        Result Refresh
+      </button>
+
+    </div>
+
+    <p id="msg" class="msg"></p>
+
+  </div>
+
+
+  <!-- RESULT -->
+  <div
+    id="resultBox"
+    class="card hidden"
+  >
+
+    <div class="actions">
+
+      <div>
+
+        <h2 id="examTitle">
+          Result
+        </h2>
+
+        <div id="generated"></div>
+
+      </div>
+
+
+      <div class="noPrint">
+
+        <button onclick="window.print()">
+          🖨️ Print / PDF
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- SUMMARY -->
+    <div
+      class="summary"
+      id="summary"
+    ></div>
+
+
+    <!-- RESULT TABLE -->
+    <div class="tableWrap">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>মেধা</th>
+
+            <th>নাম</th>
+
+            <th>ফেইসবুক নাম</th>
+
+            <th>জেলা</th>
+
+            <th>মোট প্রশ্ন</th>
+
+            <th>সঠিক</th>
+
+            <th>ভুল</th>
+
+            <th>উত্তরহীন</th>
+
+            <th>নম্বর</th>
+
+            <th>শতকরা</th>
+
+            <th>ফলাফল</th>
+
+            <th>জমাদানের সময়</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody id="rows"></tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</main>
+
+</div>
+
+
+<script>
+
+/* =========================
+   SUPABASE
+========================= */
+
+const SUPABASE_URL =
+'https://ydvbnalhcnfqpxkkmywr.supabase.co';
+
+const SUPABASE_KEY =
+'sb_publishable_xCbSWDkASsbUPl-WmygyMw_eVrJY_9a';
+
+const db =
+window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+
+/* =========================
+   BANGLA NUMBERS
+========================= */
+
+const BN =
+'০১২৩৪৫৬৭৮৯';
+
+const bn =
+x =>
+String(x ?? '')
+.replace(/\d/g,d=>BN[d]);
+
+
+/* =========================
+   HTML ESCAPE
+========================= */
+
+const esc =
+x =>
+String(x ?? '')
+.replace(
+  /[&<>"']/g,
+  m => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#039;'
+  }[m])
+);
+
+
+/* =========================
+   MESSAGE
+========================= */
+
+function setMsg(text,error=false){
+
+  const e =
+    document.getElementById('msg');
+
+  e.textContent =
+    text;
+
+  e.className =
+    'msg ' +
+    (error ? 'error' : 'success');
+}
+
+
+function setLoginMsg(text,error=false){
+
+  const e =
+    document.getElementById('loginMsg');
+
+  e.textContent =
+    text;
+
+  e.className =
+    'msg ' +
+    (error ? 'error' : 'success');
+}
+
+
+/* =========================
+   LOGIN
+========================= */
+
+async function loginAdmin(){
+
+  setLoginMsg(
+    'Login হচ্ছে...'
+  );
+
+  const {
+    error
+  } =
+  await db.auth.signInWithPassword({
+
+    email:
+      document
+      .getElementById('email')
+      .value
+      .trim(),
+
+    password:
+      document
+      .getElementById('password')
+      .value
+
+  });
+
+
+  if(error){
+
+    return setLoginMsg(
+      error.message,
+      true
+    );
+
+  }
+
+
+  await init();
+
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+async function logoutAdmin(){
+
+  await db.auth.signOut();
+
+  location.reload();
+
+}
+
+
+/* =========================
+   INIT
+========================= */
+
+async function init(){
+
+  const {
+    data,
+    error
+  } =
+  await db.auth.getSession();
+
+
+  if(error){
+
+    return setLoginMsg(
+      error.message,
+      true
+    );
+
+  }
+
+
+  /* LOGIN না থাকলে */
+
+  if(!data.session){
+
+    document
+      .getElementById('login')
+      .classList
+      .remove('hidden');
+
+    document
+      .getElementById('app')
+      .classList
+      .add('hidden');
+
+    return;
+
+  }
+
+
+  /* LOGIN থাকলে */
+
+  document
+    .getElementById('login')
+    .classList
+    .add('hidden');
+
+  document
+    .getElementById('app')
+    .classList
+    .remove('hidden');
+
+
+  await loadExams();
+
+
+  /* URL থেকে Exam ID */
+
+  const id =
+    new URLSearchParams(
+      location.search
+    ).get('exam');
+
+
+  if(id){
+
+    document
+      .getElementById('examSelect')
+      .value = id;
+
+    await loadResults();
+
+  }
+
+}
+
+
+/* =========================
+   LOAD EXAMS
+========================= */
+
+async function loadExams(){
+
+  const {
+    data,
+    error
+  } =
+  await db
+    .from('exams')
+    .select('id,exam_name')
+    .order(
+      'id',
+      {ascending:false}
+    );
+
+
+  if(error){
+
+    return setMsg(
+      error.message,
+      true
+    );
+
+  }
+
+
+  const select =
+    document
+    .getElementById(
+      'examSelect'
+    );
+
+
+  select.innerHTML =
+    '<option value="">Exam নির্বাচন করুন</option>' +
+
+    (data || [])
+    .map(x =>
+
+      '<option value="' +
+      x.id +
+      '">' +
+
+      esc(x.exam_name) +
+
+      ' (#' +
+
+      bn(x.id) +
+
+      ')' +
+
+      '</option>'
+
+    )
+    .join('');
+
+}
+
+
+/* =========================
+   LOAD RESULT
+========================= */
+
+async function loadResults(){
+
+  const id =
+    document
+    .getElementById(
+      'examSelect'
+    )
+    .value;
+
+
+  if(!id){
+
+    document
+      .getElementById(
+        'resultBox'
+      )
+      .classList
+      .add('hidden');
+
+    return;
+
+  }
+
+
+  setMsg(
+    'Result লোড হচ্ছে...'
+  );
+
+
+  /* Exam Name */
+
+  const {
+    data:exam,
+    error:examError
+  } =
+  await db
+    .from('exams')
+    .select(
+      'id,exam_name'
+    )
+    .eq(
+      'id',
+      id
+    )
+    .single();
+
+
+  if(examError){
+
+    return setMsg(
+      examError.message,
+      true
+    );
+
+  }
+
+
+  /* Result RPC */
+
+  const {
+    data,
+    error
+  } =
+  await db.rpc(
+    'get_exam_results',
+    {
+      p_exam_id:
+        Number(id)
+    }
+  );
+
+
+  if(error){
+
+    return setMsg(
+      error.message,
+      true
+    );
+
+  }
+
+
+  const results =
+    data || [];
+
+
+  /* Title */
+
+  document
+    .getElementById(
+      'examTitle'
+    )
+    .textContent =
+      (exam.exam_name || 'Exam') +
+      ' — Result';
+
+
+  /* Total */
+
+  document
+    .getElementById(
+      'generated'
+    )
+    .textContent =
+      'মোট পরীক্ষার্থী: ' +
+      bn(results.length) +
+      ' জন';
+
+
+  /* Passed / Failed */
+
+  const passed =
+    results.filter(
+      x => x.passed
+    ).length;
+
+  const failed =
+    results.length -
+    passed;
+
+
+  document
+    .getElementById(
+      'summary'
+    )
+    .innerHTML =
+
+      '<div class="stat">' +
+        '<span>পরীক্ষার্থী</span>' +
+        '<b>' +
+          bn(results.length) +
+        '</b>' +
+      '</div>' +
+
+      '<div class="stat">' +
+        '<span>উত্তীর্ণ</span>' +
+        '<b>' +
+          bn(passed) +
+        '</b>' +
+      '</div>' +
+
+      '<div class="stat">' +
+        '<span>অনুত্তীর্ণ</span>' +
+        '<b>' +
+          bn(failed) +
+        '</b>' +
+      '</div>';
+
+
+  /* Table */
+
+  const tbody =
+    document
+    .getElementById(
+      'rows'
+    );
+
+
+  if(!results.length){
+
+    tbody.innerHTML =
+      '<tr>' +
+        '<td colspan="12">' +
+          'কোনো Result পাওয়া যায়নি।' +
+        '</td>' +
+      '</tr>';
+
+  }else{
+
+    tbody.innerHTML =
+      results
+      .map(x =>
+
+        '<tr>' +
+
+        /* Rank */
+
+        '<td>' +
+          bn(x.rank_no) +
+        '</td>' +
+
+
+        /* Name */
+
+        '<td class="name">' +
+          esc(x.student_name) +
+        '</td>' +
+
+
+        /* Facebook */
+
+        '<td class="fb">' +
+          esc(x.facebook_name) +
+        '</td>' +
+
+
+        /* District */
+
+        '<td>' +
+          esc(x.district) +
+        '</td>' +
+
+
+        /* Total */
+
+        '<td>' +
+          bn(x.total_questions) +
+        '</td>' +
+
+
+        /* Correct */
+
+        '<td>' +
+          bn(x.correct_count) +
+        '</td>' +
+
+
+        /* Wrong */
+
+        '<td>' +
+          bn(x.wrong_count) +
+        '</td>' +
+
+
+        /* Unanswered */
+
+        '<td>' +
+          bn(x.unanswered_count) +
+        '</td>' +
+
+
+        /* Score */
+
+        '<td>' +
+          '<b>' +
+            bn(x.score) +
+          '</b>' +
+
+          ' / ' +
+
+          bn(x.total_marks) +
+
+        '</td>' +
+
+
+        /* Percentage */
+
+        '<td>' +
+          bn(x.percentage) +
+          '%' +
+        '</td>' +
+
+
+        /* Pass / Fail */
+
+        '<td>' +
+
+          '<span class="badge ' +
+
+          (
+            x.passed
+            ? 'pass'
+            : 'fail'
+          ) +
+
+          '">' +
+
+          (
+            x.passed
+            ? 'উত্তীর্ণ'
+            : 'অনুত্তীর্ণ'
+          ) +
+
+          '</span>' +
+
+        '</td>' +
+
+
+        /* Submission Time */
+
+        '<td>' +
+          formatDate(
+            x.submitted_at
+          ) +
+        '</td>' +
+
+        '</tr>'
+
+      )
+      .join('');
+
+  }
+
+
+  document
+    .getElementById(
+      'resultBox'
+    )
+    .classList
+    .remove('hidden');
+
+
+  setMsg(
+    '✅ Result লোড হয়েছে'
+  );
+
+}
+
+
+/* =========================
+   DATE FORMAT
+========================= */
+
+function formatDate(value){
+
+  if(!value)
+    return '—';
+
+
+  return new Intl.DateTimeFormat(
+    'bn-BD',
+    {
+      dateStyle:'short',
+      timeStyle:'short'
+    }
+  ).format(
+    new Date(value)
+  );
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+init();
+
+</script>
+
+</body>
+</html>
