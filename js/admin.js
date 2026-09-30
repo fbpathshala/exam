@@ -1,3 +1,8 @@
+/* =========================================================
+   Facebook Pathshala MCQ Exam Website
+   Admin Panel
+   ========================================================= */
+
 const CATS = {
   recruitment: 'নিয়োগ পরীক্ষা',
   verification_test: 'যাচাই পরীক্ষা',
@@ -5,43 +10,60 @@ const CATS = {
 };
 
 let cat = 'verification_test';
-let folders = [];
-let sets = [];
+
 let subjects = [];
-let exams = [];
 let importData = [];
+
+/* =========================================================
+   Helpers
+   ========================================================= */
 
 const $ = id => document.getElementById(id);
 
-const bn = n =>
-  String(n ?? '').replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
-
-const esc = v =>
-  String(v ?? '').replace(/[&<>"']/g, m => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&#039;',
-    "'": '&#039;'
-  }[m]));
-
-function msg(id, t, err = false) {
-  const el = $(id);
-  if (!el) return;
-  el.textContent = t;
-  el.style.color = err ? '#b91c1c' : '#166534';
+function bn(n) {
+  return String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
 }
 
-/* =========================
-   LOGIN / APP
-========================= */
+function esc(v) {
+  return String(v ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function norm(v) {
+  return String(v ?? '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ');
+}
+
+function msg(id, text, error = false) {
+  const el = $(id);
+  if (!el) return;
+
+  el.textContent = text;
+  el.style.color = error ? '#b91c1c' : '#15803d';
+}
+
+/* =========================================================
+   Login / App
+   ========================================================= */
 
 async function login() {
-  msg('loginMsg', 'Login হচ্ছে...');
+  const email = $('email')?.value?.trim();
+  const password = $('password')?.value;
+
+  if (!email || !password) {
+    msg('loginMsg', 'Email ও Password দিন', true);
+    return;
+  }
 
   const { error } = await db.auth.signInWithPassword({
-    email: $('email').value.trim(),
-    password: $('password').value
+    email,
+    password
   });
 
   if (error) {
@@ -57,1562 +79,1089 @@ async function logout() {
   location.reload();
 }
 
-function showPage(p) {
+function showPage(page) {
   document
     .querySelectorAll('.page')
-    .forEach(x => x.classList.add('hidden'));
-
-  const page = $(p);
-  if (page) page.classList.remove('hidden');
-
-  if (p === 'bank') loadBank();
-  if (p === 'exam') loadExams();
-}
-
-async function init() {
-  const { data } = await db.auth.getSession();
-
-  if (!data.session) {
-    $('login').classList.remove('hidden');
-    $('app').classList.add('hidden');
-    return;
-  }
-
-  $('login').classList.add('hidden');
-  $('app').classList.remove('hidden');
-
-  $('userEmail').textContent =
-    data.session.user.email || '';
-
-  /* =========================
-     EVENT HANDLERS
-  ========================= */
-
-  if ($('folder')) {
-    $('folder').onchange = async () => {
-      await loadSets();
-      updateFolderButtons();
-    };
-  }
-
-  if ($('filterFolder')) {
-    $('filterFolder').onchange = async () => {
-      await loadFilterSets();
-      await loadQuestions();
-    };
-  }
-
-  if ($('filterSet')) {
-    $('filterSet').onchange = async () => {
-      await loadQuestions();
-    };
-  }
-
-  if ($('filterSubject')) {
-    $('filterSubject').onchange = async () => {
-      await loadQuestions();
-    };
-  }
-
-  if ($('mapFolder')) {
-    $('mapFolder').onchange = async () => {
-      await loadMapSets();
-    };
-  }
-
-  if ($('mapSet')) {
-    $('mapSet').onchange = async () => {
-      if ($('mapExam')?.value) {
-        await loadPool();
-      }
-    };
-  }
-
-  if ($('examSelect')) {
-    $('examSelect').onchange = async () => {
-      await loadSettings();
-    };
-  }
-
-  if ($('mapExam')) {
-    $('mapExam').onchange = async () => {
-      await loadPool();
-    };
-  }
-
-  await loadSubjects();
-
-  await selectCategory(
-    'verification_test'
-  );
-
-  await loadQuestions();
-  await loadExams();
-
-  showPage('dashboard');
-}
-
-/* =========================
-   QUESTION BANK INIT
-========================= */
-
-async function loadBank() {
-  await loadFolders();
-  await loadFilterFolders();
-  await loadQuestions();
-}
-
-/* =========================
-   SUBJECTS
-========================= */
-
-async function loadSubjects() {
-  const r = await db
-    .from('subjects')
-    .select('id,name')
-    .order('id', { ascending: true });
-
-  if (r.error) {
-    msg(
-      'qmsg',
-      'Subject load error: ' + r.error.message,
-      true
-    );
-    return;
-  }
-
-  subjects = r.data || [];
-
-  if ($('subject')) {
-    $('subject').innerHTML =
-      '<option value="">বিষয় নির্বাচন করুন</option>' +
-      subjects
-        .map(
-          x =>
-            `<option value="${x.id}">
-              ${esc(x.name)}
-            </option>`
-        )
-        .join('');
-  }
-
-  if ($('filterSubject')) {
-    $('filterSubject').innerHTML =
-      '<option value="">সব বিষয়</option>' +
-      subjects
-        .map(
-          x =>
-            `<option value="${x.id}">
-              ${esc(x.name)}
-            </option>`
-        )
-        .join('');
-  }
-}
-
-/* =========================
-   CATEGORY
-========================= */
-
-async function selectCategory(c) {
-  cat = c;
+    .forEach(el => {
+      el.style.display =
+        el.id === page ? 'block' : 'none';
+    });
 
   document
-    .querySelectorAll('.cats button')
-    .forEach(b => b.classList.remove('active'));
-
-  if ($('cat-' + c)) {
-    $('cat-' + c).classList.add('active');
-  }
-
-  if ($('currentCat')) {
-    $('currentCat').textContent =
-      'বর্তমান Category: ' + CATS[c];
-  }
-
-  await loadFolders();
-  await loadFilterFolders();
+    .querySelectorAll('[data-page]')
+    .forEach(el => {
+      el.classList.toggle(
+        'active',
+        el.dataset.page === page
+      );
+    });
 }
 
-/* =========================
-   FOLDERS
-========================= */
+/* =========================================================
+   Initialisation
+   ========================================================= */
 
-async function loadFolders() {
-  const r = await db
-    .from('question_bank_folders')
-    .select('id,folder_name')
-    .eq('sub_category', CATS[cat])
-    .order('id');
+async function init() {
+  const {
+    data: { session }
+  } = await db.auth.getSession();
 
-  if (r.error) {
-    msg(
-      'folderMsg',
-      r.error.message,
-      true
-    );
+  if (!session) {
+    if ($('loginPage')) {
+      $('loginPage').style.display = 'block';
+    }
+
+    if ($('app')) {
+      $('app').style.display = 'none';
+    }
+
     return;
   }
 
-  folders = r.data || [];
-
-  const options =
-    '<option value="">Folder নির্বাচন করুন</option>' +
-    folders
-      .map(
-        x =>
-          `<option value="${x.id}">
-            ${esc(x.folder_name)}
-          </option>`
-      )
-      .join('');
-
-  if ($('folder')) {
-    $('folder').innerHTML = options;
+  if ($('loginPage')) {
+    $('loginPage').style.display = 'none';
   }
 
-  if ($('mapFolder')) {
-    $('mapFolder').innerHTML = options;
+  if ($('app')) {
+    $('app').style.display = 'block';
   }
 
-  if ($('filterFolder')) {
-    $('filterFolder').innerHTML =
-      '<option value="">সব Folder</option>' +
-      folders
+  const emailEl = $('adminEmail');
+
+  if (emailEl) {
+    emailEl.textContent =
+      session.user.email || '';
+  }
+
+  await loadBank();
+  await loadExams();
+}
+
+/* =========================================================
+   Question Bank
+   ========================================================= */
+
+async function loadBank() {
+  await loadSubjects();
+  await loadFolders();
+  await loadSets();
+
+  showPage('bankPage');
+}
+
+async function loadSubjects() {
+  const { data, error } = await db
+    .from('subjects')
+    .select('id,name')
+    .order('name');
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  subjects = data || [];
+
+  const subjectSelect = $('subject');
+
+  if (subjectSelect) {
+    subjectSelect.innerHTML =
+      '<option value="">Subject নির্বাচন করুন</option>' +
+      subjects
         .map(
-          x =>
-            `<option value="${x.id}">
-              ${esc(x.folder_name)}
+          s =>
+            `<option value="${s.id}">
+              ${esc(s.name)}
             </option>`
         )
         .join('');
   }
+}
+
+/* =========================================================
+   Category
+   ========================================================= */
+
+function selectCategory(key) {
+  if (!CATS[key]) return;
+
+  cat = key;
+
+  document
+    .querySelectorAll('[data-category]')
+    .forEach(btn => {
+      btn.classList.toggle(
+        'active',
+        btn.dataset.category === key
+      );
+    });
+
+  const current = $('currentCategory');
+
+  if (current) {
+    current.textContent = CATS[key];
+  }
+
+  loadFolders();
+}
+
+/* =========================================================
+   Folders
+   ========================================================= */
+
+async function loadFolders() {
+  const folder = $('folder');
+
+  if (!folder) return;
+
+  folder.innerHTML =
+    '<option value="">Folder নির্বাচন করুন</option>';
+
+  const { data, error } = await db
+    .from('question_bank_folders')
+    .select('id,folder_name,sub_category')
+    .eq('sub_category', CATS[cat])
+    .order('folder_name');
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  (data || []).forEach(f => {
+    const option =
+      document.createElement('option');
+
+    option.value = f.id;
+    option.textContent = f.folder_name;
+
+    folder.appendChild(option);
+  });
 
   await loadSets();
-
-  addFolderEditButtons();
 }
-
-/* =========================
-   FOLDER EDIT BUTTONS
-========================= */
-
-function addFolderEditButtons() {
-  const folderSelect = $('folder');
-
-  if (!folderSelect) return;
-
-  let box = $('folderEditBox');
-
-  if (!box) {
-    box = document.createElement('div');
-
-    box.id = 'folderEditBox';
-
-    box.style.marginTop = '6px';
-
-    folderSelect.insertAdjacentElement(
-      'afterend',
-      box
-    );
-  }
-
-  box.innerHTML = `
-    <button
-      type="button"
-      class="secondary"
-      id="editFolderBtn"
-    >
-      ✏️ Folder-এর নাম পরিবর্তন
-    </button>
-
-    <button
-      type="button"
-      class="secondary"
-      id="deleteFolderBtn"
-      style="margin-left:6px;"
-    >
-      🗑️ Folder Delete
-    </button>
-  `;
-
-  $('editFolderBtn').onclick =
-    editFolder;
-
-  $('deleteFolderBtn').onclick =
-    deleteFolder;
-
-  updateFolderButtons();
-}
-
-/* =========================
-   UPDATE FOLDER BUTTONS
-========================= */
-
-function updateFolderButtons() {
-  const selected =
-    !!$('folder')?.value;
-
-  if ($('editFolderBtn')) {
-    $('editFolderBtn').disabled =
-      !selected;
-  }
-
-  if ($('deleteFolderBtn')) {
-    $('deleteFolderBtn').disabled =
-      !selected;
-  }
-}
-
-/* =========================
-   EDIT FOLDER NAME
-========================= */
 
 async function editFolder() {
-  const folderId =
-    $('folder')?.value;
+  const folder = $('folder');
 
-  if (!folderId) {
-    return msg(
-      'folderMsg',
-      'আগে একটি Folder নির্বাচন করুন',
-      true
-    );
-  }
-
-  const current =
-    folders.find(
-      x =>
-        String(x.id) ===
-        String(folderId)
-    );
-
-  if (!current) {
-    return msg(
-      'folderMsg',
-      'Folder পাওয়া যায়নি',
-      true
-    );
-  }
-
-  const newName =
-    prompt(
-      'Folder-এর নতুন নাম দিন:',
-      current.folder_name
-    );
-
-  if (newName === null) {
+  if (!folder?.value) {
+    alert('আগে Folder নির্বাচন করুন');
     return;
   }
 
-  const name =
-    newName.trim();
+  const oldName =
+    folder.options[folder.selectedIndex]
+      ?.textContent || '';
 
-  if (!name) {
-    return msg(
-      'folderMsg',
-      'Folder-এর নাম খালি রাখা যাবে না',
-      true
-    );
-  }
+  const newName = prompt(
+    'নতুন Folder-এর নাম দিন:',
+    oldName
+  );
 
-  if (
-    name ===
-    current.folder_name
-  ) {
+  if (!newName || !newName.trim()) {
     return;
   }
 
-  const r =
-    await db
-      .from(
-        'question_bank_folders'
-      )
-      .update({
-        folder_name: name
-      })
-      .eq(
-        'id',
-        Number(folderId)
-      );
+  const { error } = await db
+    .from('question_bank_folders')
+    .update({
+      folder_name: newName.trim()
+    })
+    .eq('id', folder.value);
 
-  if (r.error) {
-    return msg(
-      'folderMsg',
-      r.error.message,
-      true
-    );
+  if (error) {
+    alert(error.message);
+    return;
   }
 
   await loadFolders();
-  await loadFilterFolders();
-
-  if ($('folder')) {
-    $('folder').value =
-      folderId;
-  }
-
-  await loadSets();
-
   msg(
-    'folderMsg',
+    'qmsg',
     '✅ Folder-এর নাম পরিবর্তন হয়েছে'
   );
 }
 
-/* =========================
-   DELETE FOLDER
-========================= */
-
 async function deleteFolder() {
-  const folderId =
-    $('folder')?.value;
+  const folder = $('folder');
 
-  if (!folderId) {
-    return msg(
-      'folderMsg',
-      'আগে একটি Folder নির্বাচন করুন',
-      true
-    );
-  }
-
-  const current =
-    folders.find(
-      x =>
-        String(x.id) ===
-        String(folderId)
-    );
-
-  if (!current) {
-    return msg(
-      'folderMsg',
-      'Folder পাওয়া যায়নি',
-      true
-    );
-  }
-
-  /* Check Sets */
-
-  const setsCheck =
-    await db
-      .from(
-        'question_bank_sets'
-      )
-      .select(
-        'id',
-        {
-          count: 'exact',
-          head: true
-        }
-      )
-      .eq(
-        'folder_id',
-        Number(folderId)
-      );
-
-  if (setsCheck.error) {
-    return msg(
-      'folderMsg',
-      setsCheck.error.message,
-      true
-    );
-  }
-
-  if (
-    (setsCheck.count || 0) > 0
-  ) {
-    return msg(
-      'folderMsg',
-      '❌ এই Folder-এর মধ্যে Set আছে। আগে Setগুলো Delete করুন।',
-      true
-    );
-  }
-
-  /* Check Questions */
-
-  const questionsCheck =
-    await db
-      .from('questions')
-      .select(
-        'id',
-        {
-          count: 'exact',
-          head: true
-        }
-      )
-      .eq(
-        'folder_id',
-        Number(folderId)
-      );
-
-  if (questionsCheck.error) {
-    return msg(
-      'folderMsg',
-      questionsCheck.error.message,
-      true
-    );
-  }
-
-  if (
-    (questionsCheck.count || 0) > 0
-  ) {
-    return msg(
-      'folderMsg',
-      '❌ এই Folder-এর মধ্যে প্রশ্ন আছে। আগে প্রশ্নগুলো সরান।',
-      true
-    );
-  }
-
-  const ok =
-    confirm(
-      `“${current.folder_name}” Folderটি Delete করতে চান?`
-    );
-
-  if (!ok) {
+  if (!folder?.value) {
+    alert('আগে Folder নির্বাচন করুন');
     return;
   }
 
-  const r =
-    await db
-      .from(
-        'question_bank_folders'
-      )
-      .delete()
-      .eq(
-        'id',
-        Number(folderId)
-      );
+  const folderId = Number(folder.value);
 
-  if (r.error) {
-    return msg(
-      'folderMsg',
-      'Folder delete error: ' +
-        r.error.message,
-      true
+  const { count, error: countError } =
+    await db
+      .from('question_bank_sets')
+      .select('id', {
+        count: 'exact',
+        head: true
+      })
+      .eq('folder_id', folderId);
+
+  if (countError) {
+    alert(countError.message);
+    return;
+  }
+
+  if ((count || 0) > 0) {
+    alert(
+      'এই Folder-এর ভিতরে Set আছে। আগে Setগুলো Delete করুন।'
     );
+    return;
+  }
+
+  if (
+    !confirm(
+      'এই Folder Delete করতে চান?'
+    )
+  ) {
+    return;
+  }
+
+  const { error } = await db
+    .from('question_bank_folders')
+    .delete()
+    .eq('id', folderId);
+
+  if (error) {
+    alert(error.message);
+    return;
   }
 
   await loadFolders();
-  await loadFilterFolders();
 
   msg(
-    'folderMsg',
+    'qmsg',
     '✅ Folder Delete হয়েছে'
   );
 }
 
-/* =========================
-   FILTER FOLDERS
-========================= */
+/* =========================================================
+   Folder Filter
+   ========================================================= */
 
-async function loadFilterFolders() {
-  if (!$('filterFolder')) return;
+function filterFolders() {
+  const search =
+    norm($('folderSearch')?.value);
 
-  const r = await db
-    .from('question_bank_folders')
-    .select('id,folder_name')
-    .eq('sub_category', CATS[cat])
-    .order('id');
+  document
+    .querySelectorAll('#folder option')
+    .forEach(option => {
+      if (!option.value) return;
 
-  if (r.error) {
-    msg(
-      'qmsg',
-      r.error.message,
-      true
-    );
-    return;
-  }
-
-  $('filterFolder').innerHTML =
-    '<option value="">সব Folder</option>' +
-    (r.data || [])
-      .map(
-        x =>
-          `<option value="${x.id}">
-            ${esc(x.folder_name)}
-          </option>`
-      )
-      .join('');
-
-  await loadFilterSets();
+      option.hidden =
+        search &&
+        !norm(option.textContent)
+          .includes(search);
+    });
 }
 
-/* =========================
-   SETS
-========================= */
+/* =========================================================
+   Sets
+   ========================================================= */
 
 async function loadSets() {
-  const id =
-    $('folder')?.value;
+  const set = $('set');
 
-  const r =
-    id
-      ? await db
-          .from(
-            'question_bank_sets'
-          )
-          .select(
-            'id,set_name'
-          )
-          .eq(
-            'folder_id',
-            Number(id)
-          )
-          .order('id')
-      : {
-          data: [],
-          error: null
-        };
+  if (!set) return;
 
-  if (r.error) {
-    msg(
-      'folderMsg',
-      r.error.message,
-      true
-    );
+  set.innerHTML =
+    '<option value="">Set নির্বাচন করুন</option>';
+
+  const folderId =
+    Number($('folder')?.value || 0);
+
+  if (!folderId) {
     return;
   }
 
-  sets =
-    r.data || [];
+  const { data, error } = await db
+    .from('question_bank_sets')
+    .select('id,set_name,folder_id')
+    .eq('folder_id', folderId)
+    .order('set_name');
 
-  if ($('set')) {
-    $('set').innerHTML =
-      '<option value="">Set নির্বাচন করুন</option>' +
-      sets
-        .map(
-          x =>
-            `<option value="${x.id}">
-              ${esc(x.set_name)}
-            </option>`
-        )
-        .join('');
-
-    addSetEditButton();
+  if (error) {
+    console.error(error);
+    return;
   }
+
+  (data || []).forEach(s => {
+    const option =
+      document.createElement('option');
+
+    option.value = s.id;
+    option.textContent = s.set_name;
+
+    set.appendChild(option);
+  });
+
+  await loadQuestions();
 }
-
-/* =========================
-   SET EDIT / DELETE BUTTONS
-========================= */
-
-function addSetEditButton() {
-  const setSelect =
-    $('set');
-
-  if (!setSelect) return;
-
-  let box =
-    $('setEditBox');
-
-  if (!box) {
-    box =
-      document.createElement(
-        'div'
-      );
-
-    box.id =
-      'setEditBox';
-
-    box.style.marginTop =
-      '6px';
-
-    setSelect.insertAdjacentElement(
-      'afterend',
-      box
-    );
-  }
-
-  box.innerHTML = `
-    <button
-      type="button"
-      class="secondary"
-      id="editSetBtn"
-    >
-      ✏️ Set-এর নাম পরিবর্তন
-    </button>
-
-    <button
-      type="button"
-      class="secondary"
-      id="deleteSetBtn"
-      style="margin-left:6px;"
-    >
-      🗑️ Set Delete
-    </button>
-  `;
-
-  $('editSetBtn').onclick =
-    editSet;
-
-  $('deleteSetBtn').onclick =
-    deleteSet;
-
-  updateSetButtons();
-
-  setSelect.onchange = () => {
-    updateSetButtons();
-  };
-}
-
-/* =========================
-   UPDATE SET BUTTONS
-========================= */
-
-function updateSetButtons() {
-  const selected =
-    !!$('set')?.value;
-
-  if ($('editSetBtn')) {
-    $('editSetBtn').disabled =
-      !selected;
-  }
-
-  if ($('deleteSetBtn')) {
-    $('deleteSetBtn').disabled =
-      !selected;
-  }
-}
-
-/* =========================
-   EDIT SET NAME
-========================= */
 
 async function editSet() {
-  const setId =
-    $('set')?.value;
+  const set = $('set');
 
-  if (!setId) {
-    return msg(
-      'folderMsg',
-      'আগে একটি Set নির্বাচন করুন',
-      true
-    );
-  }
-
-  const current =
-    sets.find(
-      x =>
-        String(x.id) ===
-        String(setId)
-    );
-
-  if (!current) {
-    return msg(
-      'folderMsg',
-      'Set পাওয়া যায়নি',
-      true
-    );
-  }
-
-  const newName =
-    prompt(
-      'Set-এর নতুন নাম দিন:',
-      current.set_name
-    );
-
-  if (newName === null) {
+  if (!set?.value) {
+    alert('আগে Set নির্বাচন করুন');
     return;
   }
 
-  const name =
-    newName.trim();
+  const oldName =
+    set.options[set.selectedIndex]
+      ?.textContent || '';
 
-  if (!name) {
-    return msg(
-      'folderMsg',
-      'Set-এর নাম খালি রাখা যাবে না',
-      true
-    );
-  }
+  const newName = prompt(
+    'নতুন Set-এর নাম দিন:',
+    oldName
+  );
 
-  if (
-    name ===
-    current.set_name
-  ) {
+  if (!newName || !newName.trim()) {
     return;
   }
 
-  const r =
-    await db
-      .from(
-        'question_bank_sets'
-      )
-      .update({
-        set_name: name
-      })
-      .eq(
-        'id',
-        Number(setId)
-      );
+  const { error } = await db
+    .from('question_bank_sets')
+    .update({
+      set_name: newName.trim()
+    })
+    .eq('id', set.value);
 
-  if (r.error) {
-    return msg(
-      'folderMsg',
-      r.error.message,
-      true
-    );
+  if (error) {
+    alert(error.message);
+    return;
   }
 
   await loadSets();
 
-  if ($('set')) {
-    $('set').value =
-      setId;
-  }
-
-  updateSetButtons();
-
   msg(
-    'folderMsg',
+    'qmsg',
     '✅ Set-এর নাম পরিবর্তন হয়েছে'
   );
 }
 
-/* =========================
-   DELETE SET
-========================= */
-
 async function deleteSet() {
-  const setId =
-    $('set')?.value;
+  const set = $('set');
 
-  if (!setId) {
-    return msg(
-      'folderMsg',
-      'আগে একটি Set নির্বাচন করুন',
-      true
-    );
-  }
-
-  const current =
-    sets.find(
-      x =>
-        String(x.id) ===
-        String(setId)
-    );
-
-  if (!current) {
-    return msg(
-      'folderMsg',
-      'Set পাওয়া যায়নি',
-      true
-    );
-  }
-
-  /* Check Questions */
-
-  const questionsCheck =
-    await db
-      .from('questions')
-      .select(
-        'id',
-        {
-          count: 'exact',
-          head: true
-        }
-      )
-      .eq(
-        'set_id',
-        Number(setId)
-      );
-
-  if (questionsCheck.error) {
-    return msg(
-      'folderMsg',
-      questionsCheck.error.message,
-      true
-    );
-  }
-
-  if (
-    (questionsCheck.count || 0) > 0
-  ) {
-    return msg(
-      'folderMsg',
-      '❌ এই Set-এর মধ্যে প্রশ্ন আছে। আগে প্রশ্নগুলো সরাতে হবে।',
-      true
-    );
-  }
-
-  const ok =
-    confirm(
-      `“${current.set_name}” Setটি Delete করতে চান?`
-    );
-
-  if (!ok) {
+  if (!set?.value) {
+    alert('আগে Set নির্বাচন করুন');
     return;
   }
 
-  const r =
-    await db
-      .from(
-        'question_bank_sets'
-      )
-      .delete()
-      .eq(
-        'id',
-        Number(setId)
-      );
+  const setId = Number(set.value);
 
-  if (r.error) {
-    return msg(
-      'folderMsg',
-      'Set delete error: ' +
-        r.error.message,
-      true
+  const { count, error: countError } =
+    await db
+      .from('questions')
+      .select('id', {
+        count: 'exact',
+        head: true
+      })
+      .eq('set_id', setId);
+
+  if (countError) {
+    alert(countError.message);
+    return;
+  }
+
+  if ((count || 0) > 0) {
+    alert(
+      'এই Set-এর ভিতরে প্রশ্ন আছে। আগে প্রশ্নগুলো Move/Delete করুন।'
     );
+    return;
+  }
+
+  if (
+    !confirm(
+      'এই Set Delete করতে চান?'
+    )
+  ) {
+    return;
+  }
+
+  const { error } = await db
+    .from('question_bank_sets')
+    .delete()
+    .eq('id', setId);
+
+  if (error) {
+    alert(error.message);
+    return;
   }
 
   await loadSets();
 
   msg(
-    'folderMsg',
+    'qmsg',
     '✅ Set Delete হয়েছে'
   );
 }
 
-/* =========================
-   FILTER SETS
-========================= */
+/* =========================================================
+   Set Filter
+   ========================================================= */
 
-async function loadFilterSets() {
-  const id =
-    $('filterFolder')?.value;
+function filterSets() {
+  const search =
+    norm($('setSearch')?.value);
 
-  const r =
-    id
-      ? await db
-          .from(
-            'question_bank_sets'
-          )
-          .select(
-            'id,set_name'
-          )
-          .eq(
-            'folder_id',
-            Number(id)
-          )
-          .order('id')
-      : {
-          data: [],
-          error: null
-        };
+  document
+    .querySelectorAll('#set option')
+    .forEach(option => {
+      if (!option.value) return;
 
-  if (r.error) {
-    msg(
-      'qmsg',
-      r.error.message,
-      true
-    );
-    return;
-  }
-
-  if ($('filterSet')) {
-    $('filterSet').innerHTML =
-      '<option value="">সব Set</option>' +
-      (r.data || [])
-        .map(
-          x =>
-            `<option value="${x.id}">
-              ${esc(x.set_name)}
-            </option>`
-        )
-        .join('');
-  }
+      option.hidden =
+        search &&
+        !norm(option.textContent)
+          .includes(search);
+    });
 }
 
-/* =========================
-   MAP SETS
-========================= */
+/* =========================================================
+   Map Sets
+   ========================================================= */
 
-async function loadMapSets() {
-  const id =
-    $('mapFolder')?.value;
+async function mapSets() {
+  const folderId =
+    Number($('folder')?.value || 0);
 
-  const r =
-    id
-      ? await db
-          .from(
-            'question_bank_sets'
-          )
-          .select(
-            'id,set_name'
-          )
-          .eq(
-            'folder_id',
-            Number(id)
-          )
-          .order('id')
-      : {
-          data: [],
-          error: null
-        };
+  if (!folderId) return;
 
-  if (r.error) {
-    msg(
-      'mapMsg',
-      r.error.message,
-      true
-    );
-    return;
-  }
-
-  if ($('mapSet')) {
-    $('mapSet').innerHTML =
-      '<option value="">সব Set</option>' +
-      (r.data || [])
-        .map(
-          x =>
-            `<option value="${x.id}">
-              ${esc(x.set_name)}
-            </option>`
-        )
-        .join('');
-  }
+  await loadSets();
 }
 
-/* =========================
-   CREATE FOLDER
-========================= */
+/* =========================================================
+   Create Folder
+   ========================================================= */
 
 async function createFolder() {
-  const name =
-    $('newFolder')
-      .value
-      .trim();
+  const name = prompt(
+    'নতুন Folder-এর নাম দিন:'
+  );
 
-  if (!name) {
-    return msg(
-      'folderMsg',
-      'Folder-এর নাম দিন',
-      true
-    );
+  if (!name || !name.trim()) {
+    return;
   }
 
-  const r =
-    await db
-      .from(
-        'question_bank_folders'
-      )
-      .insert({
-        sub_category:
-          CATS[cat],
+  const { error } = await db
+    .from('question_bank_folders')
+    .insert({
+      sub_category: CATS[cat],
+      folder_name: name.trim()
+    });
 
-        folder_name:
-          name
-      })
-      .select(
-        'id,folder_name'
-      )
-      .single();
-
-  if (r.error) {
-    return msg(
-      'folderMsg',
-      r.error.message,
-      true
-    );
+  if (error) {
+    alert(error.message);
+    return;
   }
-
-  $('newFolder').value =
-    '';
 
   await loadFolders();
 
-  if ($('folder')) {
-    $('folder').value =
-      r.data.id;
-  }
-
-  await loadSets();
-
-  updateFolderButtons();
-
   msg(
-    'folderMsg',
+    'qmsg',
     '✅ Folder তৈরি হয়েছে'
   );
 }
 
-/* =========================
-   CREATE SET
-========================= */
+/* =========================================================
+   Create Set
+   ========================================================= */
 
 async function createSet() {
   const folderId =
-    $('folder').value;
-
-  const name =
-    $('newSet')
-      .value
-      .trim();
+    Number($('folder')?.value || 0);
 
   if (!folderId) {
-    return msg(
-      'folderMsg',
-      'আগে Folder নির্বাচন করুন',
-      true
-    );
+    alert('আগে Folder নির্বাচন করুন');
+    return;
   }
 
-  if (!name) {
-    return msg(
-      'folderMsg',
-      'Set-এর নাম দিন',
-      true
-    );
+  const name = prompt(
+    'নতুন Set-এর নাম দিন:'
+  );
+
+  if (!name || !name.trim()) {
+    return;
   }
 
-  const r =
-    await db
-      .from(
-        'question_bank_sets'
-      )
-      .insert({
-        folder_id:
-          Number(folderId),
+  const { error } = await db
+    .from('question_bank_sets')
+    .insert({
+      folder_id: folderId,
+      set_name: name.trim()
+    });
 
-        set_name:
-          name
-      })
-      .select(
-        'id,set_name'
-      )
-      .single();
-
-  if (r.error) {
-    return msg(
-      'folderMsg',
-      r.error.message,
-      true
-    );
+  if (error) {
+    alert(error.message);
+    return;
   }
-
-  $('newSet').value =
-    '';
 
   await loadSets();
 
-  if ($('set')) {
-    $('set').value =
-      r.data.id;
-  }
-
-  addSetEditButton();
-
-  updateSetButtons();
-
   msg(
-    'folderMsg',
+    'qmsg',
     '✅ Set তৈরি হয়েছে'
   );
 }
 
-/* =========================
-   MANUAL QUESTION
-========================= */
+/* =========================================================
+   Manual Question
+   ========================================================= */
 
 async function addManual() {
   const folderId =
-    $('folder').value;
+    Number($('folder')?.value || 0) || null;
 
   const setId =
-    $('set').value;
+    Number($('set')?.value || 0) || null;
 
   const subjectId =
-    $('subject').value;
+    Number($('subject')?.value || 0) || null;
 
-  const text =
-    $('qtext').value.trim();
+  const question =
+    $('manualQuestion')?.value?.trim();
 
-  const a =
-    $('a').value.trim();
+  const optionA =
+    $('manualA')?.value?.trim();
 
-  const b =
-    $('b').value.trim();
+  const optionB =
+    $('manualB')?.value?.trim();
 
-  const c =
-    $('c').value.trim();
+  const optionC =
+    $('manualC')?.value?.trim();
 
-  const d =
-    $('d').value.trim();
+  const optionD =
+    $('manualD')?.value?.trim();
 
-  const correct =
-    $('correct').value;
+  let correct =
+    $('manualCorrect')?.value?.trim()
+      ?.toUpperCase();
 
-  if (!folderId || !setId) {
-    return msg(
-      'qmsg',
-      'Category, Folder ও Set নির্বাচন করুন',
-      true
-    );
-  }
+  const explanation =
+    $('manualExplanation')?.value?.trim();
 
   if (
-    !subjectId ||
-    !text ||
-    !a ||
-    !b ||
-    !c ||
-    !d ||
-    !correct
+    !question ||
+    !optionA ||
+    !optionB ||
+    !optionC ||
+    !optionD ||
+    !['A', 'B', 'C', 'D'].includes(correct)
   ) {
-    return msg(
+    msg(
       'qmsg',
-      'বিষয়, প্রশ্ন, চার অপশন ও সঠিক উত্তর পূরণ করুন',
+      'প্রশ্ন, চারটি অপশন এবং সঠিক উত্তর পূরণ করুন',
       true
     );
+    return;
   }
 
-  const payload = {
-    folder_id:
-      Number(folderId),
+  const { error } = await db
+    .from('questions')
+    .insert({
+      folder_id: folderId,
+      set_id: setId,
+      subject_id: subjectId,
 
-    set_id:
-      Number(setId),
+      category: CATS[cat],
 
-    subject_id:
-      Number(subjectId),
+      source_name: null,
+      source_type: cat,
 
-    question_text:
-      text,
+      question_number: null,
 
-    option_a:
-      a,
+      question_text: question,
 
-    option_b:
-      b,
+      option_a: optionA,
+      option_b: optionB,
+      option_c: optionC,
+      option_d: optionD,
 
-    option_c:
-      c,
+      correct_answer: correct,
 
-    option_d:
-      d,
+      explanation:
+        explanation || null
+    });
 
-    correct_answer:
-      correct,
-
-    explanation:
-      $('explanation').value.trim() ||
-      null,
-
-    question_number:
-      $('qno').value
-        ? Number(
-            $('qno').value
-          )
-        : null,
-
-    category:
-      CATS[cat],
-
-    source_name:
-      $('source').value.trim() ||
-      null,
-
-    source_type:
-      cat
-  };
-
-  const r =
-    await db
-      .from('questions')
-      .insert(payload);
-
-  if (r.error) {
-    return msg(
+  if (error) {
+    msg(
       'qmsg',
-      r.error.message,
+      error.message,
       true
     );
+    return;
   }
-
-  [
-    'qno',
-    'source',
-    'qtext',
-    'a',
-    'b',
-    'c',
-    'd',
-    'explanation'
-  ].forEach(x => {
-    if ($(x)) {
-      $(x).value = '';
-    }
-  });
-
-  $('correct').value =
-    '';
 
   msg(
     'qmsg',
-    '✅ প্রশ্ন Question Bank-এ যোগ হয়েছে'
+    '✅ প্রশ্ন যোগ হয়েছে'
   );
 
   await loadQuestions();
 }
 
-/* =========================
-   MANUAL / IMPORT MODE
-========================= */
-
-function mode(m) {
-  $('manualBox').classList.toggle(
-    'hidden',
-    m !== 'manual'
-  );
-
-  $('importBox').classList.toggle(
-    'hidden',
-    m !== 'import'
-  );
-}
-
-/* =========================
-   EXCEL TEMPLATE
-========================= */
+/* =========================================================
+   Excel Template
+   ========================================================= */
 
 function template() {
-  const rows = [
-    [
-      'category',
-      'folder',
-      'set',
-      'subject',
-      'source',
-      'question_number',
-      'question',
-      'option_a',
-      'option_b',
-      'option_c',
-      'option_d',
-      'correct_answer',
-      'explanation'
-    ],
-    [
-      'যাচাই পরীক্ষা',
-      'বাংলাদেশ',
-      'সেট-১',
-      'বাংলাদেশ',
-      'বিসিএস',
-      1,
-      'বাংলাদেশের রাজধানী কোনটি?',
-      'ঢাকা',
-      'চট্টগ্রাম',
-      'রাজশাহী',
-      'খুলনা',
-      'A',
-      ''
-    ]
+  const headers = [
+    'category',
+    'folder',
+    'set',
+    'subject',
+    'source',
+    'question_number',
+    'question',
+    'option_a',
+    'option_b',
+    'option_c',
+    'option_d',
+    'correct_answer',
+    'explanation'
   ];
 
-  const ws =
-    XLSX.utils.aoa_to_sheet(rows);
+  const example = [
+    'যাচাই পরীক্ষা',
+    'বাংলাদেশ',
+    'সেট-১',
+    'বাংলাদেশ',
+    'বিসিএস',
+    '1',
+    'বাংলাদেশের রাজধানী কোনটি?',
+    'ঢাকা',
+    'চট্টগ্রাম',
+    'রাজশাহী',
+    'খুলনা',
+    'A',
+    ''
+  ];
 
-  const wb =
-    XLSX.utils.book_new();
+  const csv =
+    headers.join(',') +
+    '\n' +
+    example
+      .map(v =>
+        `"${String(v).replace(/"/g, '""')}"`
+      )
+      .join(',');
 
-  XLSX.utils.book_append_sheet(
-    wb,
-    ws,
-    'Questions'
-  );
+  const blob =
+    new Blob([csv], {
+      type: 'text/csv;charset=utf-8;'
+    });
 
-  XLSX.writeFile(
-    wb,
-    'question-import-template.xlsx'
-  );
+  const url =
+    URL.createObjectURL(blob);
+
+  const a =
+    document.createElement('a');
+
+  a.href = url;
+  a.download =
+    'mcq_question_template.csv';
+
+  a.click();
+
+  URL.revokeObjectURL(url);
 }
 
-/* =========================
-   IMPORT PREVIEW
-========================= */
+/* =========================================================
+   Excel / CSV Preview
+   ========================================================= */
 
 async function previewImport() {
-  const f =
-    $('file').files[0];
+  const file =
+    $('excelFile')?.files?.[0];
 
-  if (!f) {
-    return msg(
+  if (!file) {
+    alert(
+      'আগে Excel/CSV ফাইল নির্বাচন করুন'
+    );
+    return;
+  }
+
+  try {
+    const ext =
+      file.name
+        .split('.')
+        .pop()
+        .toLowerCase();
+
+    let rows = [];
+
+    if (
+      ext === 'xlsx' ||
+      ext === 'xls'
+    ) {
+      const buffer =
+        await file.arrayBuffer();
+
+      const workbook =
+        XLSX.read(buffer, {
+          type: 'array'
+        });
+
+      const sheet =
+        workbook.Sheets[
+          workbook.SheetNames[0]
+        ];
+
+      rows =
+        XLSX.utils.sheet_to_json(
+          sheet,
+          {
+            defval: ''
+          }
+        );
+    } else {
+      const text =
+        await file.text();
+
+      const workbook =
+        XLSX.read(text, {
+          type: 'string'
+        });
+
+      const sheet =
+        workbook.Sheets[
+          workbook.SheetNames[0]
+        ];
+
+      rows =
+        XLSX.utils.sheet_to_json(
+          sheet,
+          {
+            defval: ''
+          }
+        );
+    }
+
+    /*
+     * Excel header → internal key
+     */
+    const aliases = {
+      category: [
+        'category',
+        'Category'
+      ],
+
+      folder: [
+        'folder',
+        'Folder'
+      ],
+
+      set: [
+        'set',
+        'Set'
+      ],
+
+      subject: [
+        'subject',
+        'Subject'
+      ],
+
+      source: [
+        'source',
+        'Source'
+      ],
+
+      question_number: [
+        'question_number',
+        'Question Number',
+        'QuestionNumber'
+      ],
+
+      question: [
+        'question',
+        'Question'
+      ],
+
+      option_a: [
+        'option_a',
+        'Option A',
+        'OptionA'
+      ],
+
+      option_b: [
+        'option_b',
+        'Option B',
+        'OptionB'
+      ],
+
+      option_c: [
+        'option_c',
+        'Option C',
+        'OptionC'
+      ],
+
+      option_d: [
+        'option_d',
+        'Option D',
+        'OptionD'
+      ],
+
+      correct_answer: [
+        'correct_answer',
+        'Correct Answer',
+        'CorrectAnswer'
+      ],
+
+      explanation: [
+        'explanation',
+        'Explanation'
+      ]
+    };
+
+    importData =
+      rows.map(row => {
+        const obj = {};
+
+        Object.keys(aliases)
+          .forEach(key => {
+            obj[key] = '';
+
+            for (
+              const alias of aliases[key]
+            ) {
+              if (
+                row[alias] !== undefined &&
+                row[alias] !== null
+              ) {
+                obj[key] =
+                  String(row[alias]).trim();
+                break;
+              }
+            }
+          });
+
+        return obj;
+      });
+
+    const preview =
+      $('preview');
+
+    if (preview) {
+      preview.innerHTML =
+        `<strong>৩৫ টি row পাওয়া গেছে</strong>`;
+
+      if (importData.length !== 35) {
+        preview.innerHTML =
+          `<strong>${bn(importData.length)} টি row পাওয়া গেছে</strong>`;
+      }
+
+      const pre =
+        document.createElement('pre');
+
+      pre.textContent =
+        JSON.stringify(
+          importData.slice(0, 5),
+          null,
+          2
+        );
+
+      preview.appendChild(pre);
+    }
+
+    msg(
       'qmsg',
-      'CSV/Excel file নির্বাচন করুন',
+      `✅ ${bn(importData.length)}টি row প্রস্তুত`
+    );
+
+  } catch (error) {
+    console.error(error);
+
+    msg(
+      'qmsg',
+      `❌ ফাইল পড়তে সমস্যা: ${error.message}`,
       true
     );
   }
-
-  const data =
-    XLSX.read(
-      await f.arrayBuffer(),
-      {
-        type: 'array'
-      }
-    );
-
-  const rows =
-    XLSX.utils.sheet_to_json(
-      data.Sheets[
-        data.SheetNames[0]
-      ],
-      {
-        defval: ''
-      }
-    );
-
-  importData =
-    rows;
-
-  $('preview').innerHTML = `
-    <div class="q">
-      <b>
-        ${bn(rows.length)}
-        টি row পাওয়া গেছে
-      </b>
-
-      <pre>${esc(
-        JSON.stringify(
-          rows.slice(0, 5),
-          null,
-          2
-        )
-      )}</pre>
-    </div>
-  `;
-
-  $('importBtn')
-    .classList
-    .remove('hidden');
-
-  msg(
-    'qmsg',
-    'Preview প্রস্তুত হয়েছে'
-  );
 }
 
-function norm(v) {
-  return String(v ?? '')
-    .trim()
-    .toLowerCase();
-}
-
-/* =========================
-   IMPORT QUESTIONS
-========================= */
+/* =========================================================
+   IMPORT
+   ========================================================= */
 
 async function importRows() {
-  let ok = 0;
+  if (!importData.length) {
+    alert(
+      'আগে Excel/CSV ফাইল Preview করুন'
+    );
+    return;
+  }
 
+  let ok = 0;
   const fail = [];
 
   /*
-    Admin-এ বর্তমানে নির্বাচিত Folder / Set।
-    Excel-এ এগুলো না থাকলে এগুলো ব্যবহার করা হবে।
-  */
-
+   * বর্তমানে Admin panel-এ নির্বাচিত Folder / Set
+   */
   const selectedFolderId =
-    Number(
-      $('folder')?.value || 0
-    ) || null;
+    Number($('folder')?.value || 0) || null;
 
   const selectedSetId =
-    Number(
-      $('set')?.value || 0
-    ) || null;
+    Number($('set')?.value || 0) || null;
+
+  /*
+   * Excel/CSV row থেকে value নেওয়ার helper।
+   *
+   * নতুন template:
+   * question
+   * option_a
+   *
+   * আবার Preview-তে দেখা Title Case:
+   * Question
+   * Option A
+   *
+   * দুই ধরনের নামই গ্রহণ করবে।
+   */
+  const getValue = (row, ...keys) => {
+    for (const key of keys) {
+      if (
+        row &&
+        row[key] !== undefined &&
+        row[key] !== null &&
+        String(row[key]).trim() !== ''
+      ) {
+        return String(row[key]).trim();
+      }
+    }
+
+    return '';
+  };
 
   for (
     let i = 0;
     i < importData.length;
     i++
   ) {
-    const r =
-      importData[i];
-
-    /* =========================
-       CATEGORY
-    ========================= */
-
-    const categoryRaw =
-      String(
-        r.category || ''
-      ).trim();
-
-    const categoryProvided =
-      !!categoryRaw;
+    const r = importData[i];
 
     /*
-      Excel-এর Category সঠিক হলে সেটি ব্যবহার হবে।
-      Category খালি/ভুল হলে বর্তমান Category ব্যবহার হবে।
-    */
+     * ==============================
+     * Read Excel / CSV Fields
+     * ==============================
+     */
+
+    const categoryRaw =
+      getValue(
+        r,
+        'category',
+        'Category'
+      );
+
+    const folderName =
+      getValue(
+        r,
+        'folder',
+        'Folder'
+      );
+
+    const setName =
+      getValue(
+        r,
+        'set',
+        'Set'
+      );
+
+    const subjectName =
+      getValue(
+        r,
+        'subject',
+        'Subject'
+      );
+
+    const sourceName =
+      getValue(
+        r,
+        'source',
+        'Source'
+      );
+
+    const rawQuestionNumber =
+      getValue(
+        r,
+        'question_number',
+        'Question Number'
+      );
+
+    const question =
+      getValue(
+        r,
+        'question',
+        'Question'
+      );
+
+    const optionA =
+      getValue(
+        r,
+        'option_a',
+        'Option A'
+      );
+
+    const optionB =
+      getValue(
+        r,
+        'option_b',
+        'Option B'
+      );
+
+    const optionC =
+      getValue(
+        r,
+        'option_c',
+        'Option C'
+      );
+
+    const optionD =
+      getValue(
+        r,
+        'option_d',
+        'Option D'
+      );
+
+    let correct =
+      getValue(
+        r,
+        'correct_answer',
+        'Correct Answer'
+      );
+
+    const explanation =
+      getValue(
+        r,
+        'explanation',
+        'Explanation'
+      );
+
+    /*
+     * ==============================
+     * Category
+     * ==============================
+     */
 
     const category =
-      Object.values(CATS)
-        .includes(categoryRaw)
+      Object.values(CATS).includes(
+        categoryRaw
+      )
         ? categoryRaw
         : CATS[cat];
 
-    /* =========================
-       OPTIONAL FOLDER / SET
-    ========================= */
-
-    const folderName =
-      String(
-        r.folder || ''
-      ).trim();
-
-    const setName =
-      String(
-        r.set || ''
-      ).trim();
-
-    /* =========================
-       REQUIRED FIELDS
-       শুধু এই ৬টি বিষয় বাধ্যতামূলক
-    ========================= */
-
-    const question =
-      String(
-        r.question || ''
-      ).trim();
-
-    const optionA =
-      String(
-        r.option_a || ''
-      ).trim();
-
-    const optionB =
-      String(
-        r.option_b || ''
-      ).trim();
-
-    const optionC =
-      String(
-        r.option_c || ''
-      ).trim();
-
-    const optionD =
-      String(
-        r.option_d || ''
-      ).trim();
-
-    /* =========================
-       CORRECT ANSWER
-    ========================= */
-
-    let correct =
-      String(
-        r.correct_answer || ''
-      )
-        .trim()
-        .toUpperCase();
-
     /*
-      বাংলা সঠিক উত্তরকেও গ্রহণ করা হবে।
-      ক = A
-      খ = B
-      গ = C
-      ঘ = D
-    */
+     * ==============================
+     * Correct Answer Normalize
+     * ==============================
+     *
+     * ক → A
+     * খ → B
+     * গ → C
+     * ঘ → D
+     *
+     * a/b/c/d-ও গ্রহণ করবে।
+     */
 
     const correctMap = {
       'ক': 'A',
@@ -1623,11 +1172,26 @@ async function importRows() {
 
     correct =
       correctMap[correct] ||
-      correct;
+      correct.toUpperCase();
 
-    /* =========================
-       REQUIRED VALIDATION
-    ========================= */
+    /*
+     * ==============================
+     * ONLY REQUIRED FIELDS
+     * ==============================
+     *
+     * বাধ্যতামূলক:
+     *
+     * ১. Question
+     * ২. Option A
+     * ৩. Option B
+     * ৪. Option C
+     * ৫. Option D
+     * ৬. Correct Answer
+     *
+     * Category / Folder / Set / Subject /
+     * Source / Question Number / Explanation
+     * কোনোটি বাধ্যতামূলক নয়।
+     */
 
     if (
       !question ||
@@ -1635,7 +1199,9 @@ async function importRows() {
       !optionB ||
       !optionC ||
       !optionD ||
-      !['A', 'B', 'C', 'D'].includes(correct)
+      !['A', 'B', 'C', 'D'].includes(
+        correct
+      )
     ) {
       fail.push(
         `Row ${i + 2}: প্রশ্ন, চারটি অপশন এবং সঠিক উত্তর পূরণ করতে হবে`
@@ -1644,38 +1210,48 @@ async function importRows() {
       continue;
     }
 
-    /* =========================
-       FOLDER / SET ID
-    ========================= */
-
     /*
-      Excel-এ Category দেওয়া হয়েছে এবং
-      সেটি বর্তমান Category থেকে আলাদা হলে
-      বর্তমান Admin Folder/Set ব্যবহার করা হবে না।
-    */
+     * ==============================
+     * Folder / Set Selection
+     * ==============================
+     *
+     * Excel-এ Category না থাকলে
+     * বর্তমান Admin Category ব্যবহার করবে।
+     *
+     * Excel-এ Category থাকলে এবং সেটি
+     * বর্তমান Category-এর সঙ্গে না মিললে
+     * বর্তমান Folder/Set ব্যবহার করবে না।
+     */
+
+    const categoryProvided =
+      !!categoryRaw;
+
+    const selectedCategoryMatches =
+      !categoryProvided ||
+      category === CATS[cat];
 
     let fid =
-      (
-        categoryProvided &&
-        categoryRaw !== CATS[cat]
-      )
-        ? null
-        : selectedFolderId;
+      selectedCategoryMatches
+        ? selectedFolderId
+        : null;
 
     let sid =
-      (
-        categoryProvided &&
-        categoryRaw !== CATS[cat]
-      )
-        ? null
-        : selectedSetId;
+      selectedCategoryMatches
+        ? selectedSetId
+        : null;
 
-    /* =========================
-       FOLDER
-    ========================= */
+    /*
+     * ==============================
+     * Folder
+     * ==============================
+     *
+     * Excel-এ Folder থাকলে:
+     *
+     * ১. খুঁজবে
+     * ২. না থাকলে তৈরি করবে
+     */
 
     if (folderName) {
-
       const fr =
         await db
           .from(
@@ -1703,12 +1279,7 @@ async function importRows() {
       fid =
         fr.data?.id || null;
 
-      /*
-        Folder না থাকলে তৈরি হবে।
-      */
-
       if (!fid) {
-
         const x =
           await db
             .from(
@@ -1717,7 +1288,6 @@ async function importRows() {
             .insert({
               sub_category:
                 category,
-
               folder_name:
                 folderName
             })
@@ -1732,32 +1302,30 @@ async function importRows() {
           continue;
         }
 
-        fid =
-          x.data.id;
+        fid = x.data.id;
       }
 
       /*
-        Folder দেওয়া হয়েছে কিন্তু Set দেওয়া হয়নি।
-        তাই আগের selected Set ব্যবহার করা যাবে না।
-      */
-
+       * Folder দেওয়া আছে কিন্তু Set নেই।
+       * তাই পুরোনো selected Set ব্যবহার করা যাবে না।
+       */
       if (!setName) {
         sid = null;
       }
     }
 
-    /* =========================
-       SET
-    ========================= */
+    /*
+     * ==============================
+     * Set
+     * ==============================
+     *
+     * Excel-এ Set থাকলে:
+     *
+     * Folder-এর ভিতরে Set খুঁজবে।
+     * না থাকলে তৈরি করবে।
+     */
 
     if (setName) {
-
-      /*
-        Set দেওয়া আছে কিন্তু Folder নেই।
-        তখন Admin-এর selected Folder থাকলে
-        সেটি ব্যবহার করা হবে।
-      */
-
       if (!fid) {
         fail.push(
           `Row ${i + 2}: Set দেওয়া হয়েছে, কিন্তু Folder পাওয়া যায়নি`
@@ -1793,23 +1361,15 @@ async function importRows() {
       sid =
         sr.data?.id || null;
 
-      /*
-        Set না থাকলে তৈরি হবে।
-      */
-
       if (!sid) {
-
         const x =
           await db
             .from(
               'question_bank_sets'
             )
             .insert({
-              folder_id:
-                fid,
-
-              set_name:
-                setName
+              folder_id: fid,
+              set_name: setName
             })
             .select('id')
             .single();
@@ -1822,51 +1382,66 @@ async function importRows() {
           continue;
         }
 
-        sid =
-          x.data.id;
+        sid = x.data.id;
       }
     }
 
-    /* =========================
-       SUBJECT
-       Optional
-    ========================= */
+    /*
+     * ==============================
+     * Subject
+     * ==============================
+     *
+     * Subject optional.
+     *
+     * Subject না পাওয়া গেলেও Import
+     * বন্ধ হবে না।
+     */
 
-    let sub =
-      null;
-
-    const subjectName =
-      String(
-        r.subject || ''
-      ).trim();
+    let sub = null;
 
     if (subjectName) {
-
       sub =
         subjects.find(
           x =>
             norm(x.name) ===
             norm(subjectName)
         ) || null;
-
-      /*
-        Subject পাওয়া না গেলেও
-        Row বাদ যাবে না।
-        subject_id = null থাকবে।
-      */
     }
 
-    /* =========================
-       QUESTION PAYLOAD
-    ========================= */
+    /*
+     * ==============================
+     * Question Number
+     * ==============================
+     *
+     * Optional।
+     */
 
-    const p = {
+    let questionNumber = null;
 
-      folder_id:
-        fid,
+    if (rawQuestionNumber !== '') {
+      const n =
+        Number(rawQuestionNumber);
 
-      set_id:
-        sid,
+      if (!Number.isNaN(n)) {
+        questionNumber = n;
+      }
+    }
+
+    /*
+     * ==============================
+     * Final Payload
+     * ==============================
+     *
+     * source_id পাঠানো হচ্ছে না।
+     *
+     * কারণ source এখন optional এবং
+     * source_id nullable করা হয়েছে।
+     */
+
+    const payload = {
+      folder_id: fid,
+
+      set_id: sid,
 
       subject_id:
         sub?.id || null,
@@ -1874,28 +1449,14 @@ async function importRows() {
       category:
         category,
 
-      /*
-        Source শুধু text হিসেবে সংরক্ষিত হবে।
-        source_id পাঠানো হচ্ছে না।
-      */
-
       source_name:
-        String(
-          r.source || ''
-        ).trim() ||
-        null,
+        sourceName || null,
 
       source_type:
         cat,
 
       question_number:
-        r.question_number !== '' &&
-        r.question_number !== null &&
-        r.question_number !== undefined
-          ? Number(
-              r.question_number
-            )
-          : null,
+        questionNumber,
 
       question_text:
         question,
@@ -1916,920 +1477,438 @@ async function importRows() {
         correct,
 
       explanation:
-        String(
-          r.explanation || ''
-        ).trim() ||
-        null
+        explanation || null
     };
 
-    /* =========================
-       INSERT
-    ========================= */
+    /*
+     * ==============================
+     * Database Insert
+     * ==============================
+     */
 
     const x =
       await db
         .from('questions')
-        .insert(p);
+        .insert(payload);
 
     if (x.error) {
-
       fail.push(
         `Row ${i + 2}: ${x.error.message}`
       );
-
     } else {
-
       ok++;
     }
   }
 
-  /* =========================
-     RESULT
-  ========================= */
+  /*
+   * ==============================
+   * Import Result
+   * ==============================
+   */
 
   msg(
     'qmsg',
     `✅ ${bn(ok)}টি Import হয়েছে${
       fail.length
-        ? ` | ❌ ${bn(
-            fail.length
-          )}টি ব্যর্থ`
+        ? ` | ❌ ${bn(fail.length)}টি ব্যর্থ`
         : ''
     }`,
     !!fail.length
   );
 
-  if (fail.length) {
+  /*
+   * Error details
+   */
 
-    $('preview').innerHTML +=
-      '<div class="q">' +
-      fail
-        .map(esc)
-        .join('<br>') +
-      '</div>';
+  if (fail.length) {
+    const preview =
+      $('preview');
+
+    if (preview) {
+      preview.innerHTML +=
+        '<div class="q">' +
+        fail
+          .map(esc)
+          .join('<br>') +
+        '</div>';
+    }
   }
 
+  /*
+   * Question list reload
+   */
+
   await loadQuestions();
 }
 
-/* =========================
-   QUESTION FILTER
-========================= */
-
-async function loadFilter() {
-  await loadFilterSets();
-  await loadQuestions();
-}
-
-/* =========================
-   QUESTION BANK LIST
-   + QUESTION MOVE
-========================= */
+/* =========================================================
+   Question List
+   ========================================================= */
 
 async function loadQuestions() {
+  const list =
+    $('questionList');
 
-  let q =
+  if (!list) return;
+
+  const folderId =
+    Number($('folder')?.value || 0);
+
+  const setId =
+    Number($('set')?.value || 0);
+
+  let query =
     db
       .from('questions')
       .select(
-        'id,question_text,option_a,option_b,option_c,option_d,correct_answer,question_number,category,folder_id,set_id,subject_id,subjects(name)'
+        `
+        id,
+        question_number,
+        question_text,
+        option_a,
+        option_b,
+        option_c,
+        option_d,
+        correct_answer,
+        explanation,
+        category,
+        source_name,
+        folder_id,
+        set_id
+        `
       )
       .order(
-        'id',
+        'question_number',
         {
-          ascending: false
+          ascending: true,
+          nullsFirst: false
         }
-      )
-      .limit(200);
-
-  if (
-    $('filterFolder')?.value
-  ) {
-    q =
-      q.eq(
-        'folder_id',
-        Number(
-          $('filterFolder').value
-        )
       );
-  }
 
-  if (
-    $('filterSet')?.value
-  ) {
-    q =
-      q.eq(
-        'set_id',
-        Number(
-          $('filterSet').value
-        )
-      );
-  }
-
-  if (
-    $('filterSubject')?.value
-  ) {
-    q =
-      q.eq(
-        'subject_id',
-        Number(
-          $('filterSubject').value
-        )
-      );
-  }
-
-  const term =
-    $('search')?.value.trim() ||
-    '';
-
-  if (term) {
-    q =
-      q.ilike(
-        'question_text',
-        '%' +
-          term +
-          '%'
-      );
-  }
-
-  const r =
-    await q;
-
-  if (r.error) {
-    return msg(
-      'qmsg',
-      r.error.message,
-      true
-    );
-  }
-
-  const data =
-    r.data || [];
-
-  /*
-    Current question list-এর Folder নাম
-    বের করার জন্য local folders ব্যবহার করা হচ্ছে।
-  */
-
-  const folderMap =
-    new Map(
-      (folders || []).map(
-        x => [
-          Number(x.id),
-          x.folder_name
-        ]
-      )
-    );
-
-  /*
-    বর্তমানে দেখানো প্রশ্নগুলোর Set ID সংগ্রহ
-  */
-
-  const setIds =
-    [
-      ...new Set(
-        data
-          .map(
-            x =>
-              Number(
-                x.set_id
-              )
-          )
-          .filter(Boolean)
-      )
-    ];
-
-  let setMap =
-    new Map();
-
-  if (setIds.length) {
-
-    const sr =
-      await db
-        .from(
-          'question_bank_sets'
-        )
-        .select(
-          'id,set_name,folder_id'
-        )
-        .in(
-          'id',
-          setIds
-        );
-
-    if (!sr.error) {
-
-      setMap =
-        new Map(
-          (sr.data || [])
-            .map(
-              x => [
-                Number(x.id),
-                x
-              ]
-            )
-        );
-    }
-  }
-
-  /*
-    Move UI আগে তৈরি করা হবে।
-  */
-
-  setupQuestionMoveUI();
-
-  /*
-    Question list
-  */
-
-  $('questions').innerHTML =
-    data
-      .map(
-        x => {
-
-          const currentSet =
-            setMap.get(
-              Number(
-                x.set_id
-              )
-            );
-
-          const currentFolderName =
-            folderMap.get(
-              Number(
-                x.folder_id
-              )
-            ) ||
-            '—';
-
-          const currentSetName =
-            currentSet?.set_name ||
-            '—';
-
-          return `
-            <div class="q">
-
-              <label
-                style="
-                  display:block;
-                  margin-bottom:8px;
-                "
-              >
-
-                <input
-                  type="checkbox"
-                  class="bankQuestionCheck"
-                  value="${x.id}"
-                >
-
-                <b>
-                  ${bn(
-                    x.question_number ||
-                      ''
-                  )}.
-                  ${esc(
-                    x.question_text
-                  )}
-                </b>
-
-              </label>
-
-              <div>
-                ক.
-                ${esc(
-                  x.option_a
-                )}
-                <br>
-
-                খ.
-                ${esc(
-                  x.option_b
-                )}
-                <br>
-
-                গ.
-                ${esc(
-                  x.option_c
-                )}
-                <br>
-
-                ঘ.
-                ${esc(
-                  x.option_d
-                )}
-              </div>
-
-              <div class="small">
-
-                ${esc(
-                  x.category
-                )}
-
-                ·
-
-                ${esc(
-                  x.subjects?.name ||
-                    ''
-                )}
-
-                ·
-
-                Folder:
-                ${esc(
-                  currentFolderName
-                )}
-
-                ·
-
-                Set:
-                ${esc(
-                  currentSetName
-                )}
-
-                ·
-
-                সঠিক:
-                ${esc(
-                  ({
-                    A: 'ক',
-                    B: 'খ',
-                    C: 'গ',
-                    D: 'ঘ'
-                  })[
-                    x.correct_answer
-                  ] ||
-                    x.correct_answer
-                )}
-
-              </div>
-
-            </div>
-          `;
-        }
-      )
-      .join('') ||
-    'কোনো প্রশ্ন নেই';
-
-  /*
-    Question list বসানোর পর Move UI আবার নিশ্চিত করা।
-  */
-
-  setupQuestionMoveUI();
-}
-
-/* =========================
-   QUESTION MOVE HELPERS
-========================= */
-
-function moveEsc(v) {
-  return esc(v);
-}
-
-function moveBn(v) {
-  return bn(v);
-}
-
-/* =========================
-   LOAD DESTINATION SETS
-========================= */
-
-async function loadMoveSets() {
-
-  const folderId =
-    Number(
-      $('moveFolder')?.value ||
-      0
-    );
-
-  const setEl =
-    $('moveSet');
-
-  if (!setEl) return;
-
-  if (!folderId) {
-
-    setEl.innerHTML =
-      '<option value="">আগে Destination Folder নির্বাচন করুন</option>';
-
-    return;
-  }
-
-  setEl.innerHTML =
-    '<option value="">Set লোড হচ্ছে...</option>';
-
-  const r =
-    await db
-      .from(
-        'question_bank_sets'
-      )
-      .select(
-        'id,set_name,folder_id'
-      )
-      .eq(
+  if (folderId) {
+    query =
+      query.eq(
         'folder_id',
         folderId
-      )
-      .order(
-        'id',
-        {
-          ascending: true
-        }
       );
+  }
 
-  if (r.error) {
+  if (setId) {
+    query =
+      query.eq(
+        'set_id',
+        setId
+      );
+  }
 
-    setEl.innerHTML =
-      '<option value="">Set লোড হয়নি</option>';
+  const {
+    data,
+    error
+  } = await query;
 
-    const moveMsg =
-      $('moveMsg');
+  if (error) {
+    console.error(error);
 
-    if (moveMsg) {
-      moveMsg.textContent =
-        r.error.message;
-
-      moveMsg.style.color =
-        '#b91c1c';
-    }
+    list.innerHTML =
+      `<div class="q">
+        ${esc(error.message)}
+      </div>`;
 
     return;
   }
 
-  setEl.innerHTML =
-    '<option value="">Destination Set নির্বাচন করুন</option>' +
+  if (!data?.length) {
+    list.innerHTML =
+      '<div class="q">কোনো প্রশ্ন নেই</div>';
 
-    (r.data || [])
-      .map(
-        x =>
-          `<option value="${x.id}">
-            ${moveEsc(
-              x.set_name
-            )}
-          </option>`
-      )
-      .join('');
-}
-
-/* =========================
-   QUESTION MOVE UI
-========================= */
-
-function setupQuestionMoveUI() {
-
-  const questions =
-    $('questions');
-
-  if (!questions) return;
-
-  /*
-    Move box Question list-এর উপরে থাকবে।
-  */
-
-  let box =
-    $('questionMoveBox');
-
-  if (!box) {
-
-    box =
-      document.createElement(
-        'div'
-      );
-
-    box.id =
-      'questionMoveBox';
-
-    box.className =
-      'card';
-
-    box.style.marginBottom =
-      '12px';
-
-    questions.parentElement.insertBefore(
-      box,
-      questions
-    );
+    return;
   }
 
-  /*
-    Current category-এর folders-ই
-    Destination Folder হিসেবে দেখানো হবে।
-  */
-
-  const folderOptions =
-    '<option value="">Destination Folder নির্বাচন করুন</option>' +
-
-    (folders || [])
+  list.innerHTML =
+    data
       .map(
-        x =>
-          `<option value="${x.id}">
-            ${moveEsc(
-              x.folder_name
-            )}
-          </option>`
+        (q, index) => `
+          <div class="q">
+            <label>
+              <input
+                type="checkbox"
+                class="bankQuestionCheck"
+                value="${q.id}"
+              >
+
+              <strong>
+                ${bn(index + 1)}.
+              </strong>
+
+              ${esc(q.question_text)}
+            </label>
+
+            <div>
+              ক) ${esc(q.option_a)}
+            </div>
+
+            <div>
+              খ) ${esc(q.option_b)}
+            </div>
+
+            <div>
+              গ) ${esc(q.option_c)}
+            </div>
+
+            <div>
+              ঘ) ${esc(q.option_d)}
+            </div>
+
+            <div>
+              <strong>
+                উত্তর:
+              </strong>
+              ${esc(q.correct_answer)}
+            </div>
+
+            ${
+              q.explanation
+                ? `
+                  <div>
+                    <strong>
+                      ব্যাখ্যা:
+                    </strong>
+                    ${esc(q.explanation)}
+                  </div>
+                `
+                : ''
+            }
+          </div>
+        `
       )
       .join('');
-
-  box.innerHTML = `
-
-    <h3
-      style="margin-top:0;"
-    >
-      📦 নির্বাচিত প্রশ্ন অন্য Folder / Set-এ নিন
-    </h3>
-
-    <div class="grid">
-
-      <select id="moveFolder">
-        ${folderOptions}
-      </select>
-
-      <select id="moveSet">
-
-        <option value="">
-          আগে Destination Folder নির্বাচন করুন
-        </option>
-
-      </select>
-
-    </div>
-
-    <button
-      type="button"
-      id="moveSelectedBtn"
-    >
-      ➡️ নির্বাচিত প্রশ্ন Move করুন
-    </button>
-
-    <button
-      type="button"
-      class="secondary"
-      id="selectAllQuestionsBtn"
-      style="margin-left:6px;"
-    >
-      ☑️ সব প্রশ্ন নির্বাচন
-    </button>
-
-    <button
-      type="button"
-      class="secondary"
-      id="clearAllQuestionsBtn"
-      style="margin-left:6px;"
-    >
-      ☐ নির্বাচন বাতিল
-    </button>
-
-    <p
-      id="moveMsg"
-      class="msg"
-    ></p>
-
-  `;
-
-  $('moveFolder').onchange =
-    loadMoveSets;
-
-  $('selectAllQuestionsBtn').onclick =
-    function () {
-
-      document
-        .querySelectorAll(
-          '.bankQuestionCheck'
-        )
-        .forEach(
-          x => {
-            x.checked = true;
-          }
-        );
-
-      if ($('moveMsg')) {
-        $('moveMsg').textContent =
-          'সব দেখানো প্রশ্ন নির্বাচন করা হয়েছে';
-
-        $('moveMsg').style.color =
-          '#166534';
-      }
-    };
-
-  $('clearAllQuestionsBtn').onclick =
-    function () {
-
-      document
-        .querySelectorAll(
-          '.bankQuestionCheck'
-        )
-        .forEach(
-          x => {
-            x.checked = false;
-          }
-        );
-
-      if ($('moveMsg')) {
-        $('moveMsg').textContent =
-          'নির্বাচন বাতিল করা হয়েছে';
-
-        $('moveMsg').style.color =
-          '#166534';
-      }
-    };
-
-  $('moveSelectedBtn').onclick =
-    moveSelectedQuestions;
 }
 
-/* =========================
-   MOVE SELECTED QUESTIONS
-========================= */
+/* =========================================================
+   Select / Clear All Questions
+   ========================================================= */
+
+function selectAllQuestions() {
+  document
+    .querySelectorAll(
+      '.bankQuestionCheck'
+    )
+    .forEach(cb => {
+      cb.checked = true;
+    });
+}
+
+function clearAllQuestions() {
+  document
+    .querySelectorAll(
+      '.bankQuestionCheck'
+    )
+    .forEach(cb => {
+      cb.checked = false;
+    });
+}
+
+/* =========================================================
+   Move Questions
+   ========================================================= */
+
+async function loadMoveSets() {
+  const moveFolder =
+    Number(
+      $('moveFolder')?.value || 0
+    );
+
+  const moveSet =
+    $('moveSet');
+
+  if (!moveSet) return;
+
+  moveSet.innerHTML =
+    '<option value="">Set নির্বাচন করুন</option>';
+
+  if (!moveFolder) {
+    return;
+  }
+
+  const {
+    data,
+    error
+  } = await db
+    .from('question_bank_sets')
+    .select('id,set_name')
+    .eq(
+      'folder_id',
+      moveFolder
+    )
+    .order('set_name');
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  (data || []).forEach(s => {
+    const option =
+      document.createElement(
+        'option'
+      );
+
+    option.value = s.id;
+    option.textContent =
+      s.set_name;
+
+    moveSet.appendChild(
+      option
+    );
+  });
+}
 
 async function moveSelectedQuestions() {
-
-  const selected =
+  const ids =
     Array.from(
       document.querySelectorAll(
         '.bankQuestionCheck:checked'
       )
+    ).map(
+      el => Number(el.value)
     )
-      .map(
-        x =>
-          Number(
-            x.value
-          )
-      )
-      .filter(Boolean);
+    .filter(Boolean);
+
+  if (!ids.length) {
+    alert(
+      'কমপক্ষে একটি প্রশ্ন নির্বাচন করুন'
+    );
+    return;
+  }
 
   const folderId =
     Number(
-      $('moveFolder')?.value ||
-      0
+      $('moveFolder')?.value || 0
     );
 
   const setId =
     Number(
-      $('moveSet')?.value ||
-      0
+      $('moveSet')?.value || 0
     );
-
-  if (!selected.length) {
-
-    alert(
-      'আগে অন্তত একটি প্রশ্ন নির্বাচন করুন।'
-    );
-
-    return;
-  }
 
   if (!folderId || !setId) {
-
     alert(
-      'Destination Folder এবং Destination Set দুটোই নির্বাচন করুন।'
+      'Move করার জন্য Folder ও Set নির্বাচন করুন'
     );
-
-    return;
-  }
-
-  /*
-    গুরুত্বপূর্ণ নিরাপত্তা যাচাই:
-    নির্বাচিত Set সত্যিই নির্বাচিত Folder-এর
-    অন্তর্ভুক্ত কি না।
-  */
-
-  const check =
-    await db
-      .from(
-        'question_bank_sets'
-      )
-      .select(
-        'id,folder_id,set_name'
-      )
-      .eq(
-        'id',
-        setId
-      )
-      .maybeSingle();
-
-  if (check.error) {
-
-    alert(
-      check.error.message
-    );
-
     return;
   }
 
   if (
-    !check.data ||
-    Number(
-      check.data.folder_id
-    ) !== folderId
+    !confirm(
+      `${bn(ids.length)}টি প্রশ্ন Move করতে চান?`
+    )
   ) {
-
-    alert(
-      'নির্বাচিত Set এই Folder-এর অন্তর্ভুক্ত নয়।'
-    );
-
     return;
   }
 
-  /*
-    নিশ্চিতকরণ
-  */
-
-  const confirmed =
-    confirm(
-      `${moveBn(
-        selected.length
-      )}টি প্রশ্ন Move করা হবে।\n\n` +
-
-      'প্রশ্নের লেখা, অপশন, সঠিক উত্তর, বিষয়, নম্বর ও অন্যান্য তথ্য পরিবর্তন হবে না।\n\n' +
-
-      'শুধু Folder এবং Set পরিবর্তন হবে।\n\n' +
-
-      'আপনি কি নিশ্চিত?'
+  const {
+    error
+  } = await db
+    .from('questions')
+    .update({
+      folder_id:
+        folderId,
+      set_id:
+        setId
+    })
+    .in(
+      'id',
+      ids
     );
 
-  if (!confirmed) {
+  if (error) {
+    alert(error.message);
     return;
   }
 
-  const button =
-    $('moveSelectedBtn');
-
-  if (button) {
-    button.disabled = true;
-    button.textContent =
-      '⏳ Move হচ্ছে...';
-  }
-
-  /*
-    শুধু folder_id এবং set_id update হবে।
-  */
-
-  const r =
-    await db
-      .from('questions')
-      .update({
-        folder_id:
-          folderId,
-
-        set_id:
-          setId
-      })
-      .in(
-        'id',
-        selected
-      );
-
-  if (button) {
-    button.disabled = false;
-    button.textContent =
-      '➡️ নির্বাচিত প্রশ্ন Move করুন';
-  }
-
-  if (r.error) {
-
-    alert(
-      'Move হয়নি:\n' +
-      r.error.message
-    );
-
-    return;
-  }
-
-  alert(
-    `${moveBn(
-      selected.length
-    )}টি প্রশ্ন সফলভাবে Move হয়েছে।`
+  msg(
+    'qmsg',
+    `✅ ${bn(ids.length)}টি প্রশ্ন Move হয়েছে`
   );
-
-  /*
-    Destination selection পরিষ্কার
-  */
-
-  if ($('moveFolder')) {
-    $('moveFolder').value =
-      '';
-  }
-
-  if ($('moveSet')) {
-    $('moveSet').innerHTML =
-      '<option value="">আগে Destination Folder নির্বাচন করুন</option>';
-  }
-
-  /*
-    Question Bank refresh
-  */
 
   await loadQuestions();
 }
 
-/* =========================
-   CREATE EXAM
-========================= */
+/* =========================================================
+   Exam Management
+   ========================================================= */
+
+async function loadExams() {
+  const list =
+    $('examList');
+
+  if (!list) return;
+
+  const {
+    data,
+    error
+  } = await db
+    .from('exam_settings')
+    .select('*')
+    .order(
+      'id',
+      {
+        ascending: false
+      }
+    );
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  list.innerHTML =
+    (data || [])
+      .map(
+        exam => `
+          <div class="q">
+            <strong>
+              ${esc(
+                exam.exam_name ||
+                exam.name ||
+                ''
+              )}
+            </strong>
+          </div>
+        `
+      )
+      .join('') ||
+    '<div class="q">কোনো Exam নেই</div>';
+}
+
+/* =========================================================
+   Exam Create
+   ========================================================= */
 
 async function createExam() {
   const name =
-    $('examName')
-      .value
-      .trim();
+    $('examName')?.value?.trim();
 
   if (!name) {
-    return msg(
-      'examMsg',
-      'পরীক্ষার নাম দিন',
-      true
+    alert(
+      'Exam-এর নাম দিন'
     );
+    return;
   }
 
-  const r =
-    await db
-      .from('exams')
-      .insert({
-        exam_name:
-          name,
+  const {
+    error
+  } = await db
+    .from('exam_settings')
+    .insert({
+      exam_name:
+        name
+    });
 
-        status:
-          $('examStatus')
-            .value,
-
-        total_questions:
-          0,
-
-        marks_per_question:
-          1,
-
-        negative_mark:
-          0,
-
-        pass_mark:
-          0
-      })
-      .select('id')
-      .single();
-
-  if (r.error) {
-    return msg(
-      'examMsg',
-      r.error.message,
-      true
-    );
+  if (error) {
+    alert(error.message);
+    return;
   }
-
-  const s =
-    await db
-      .from('exam_settings')
-      .upsert(
-        {
-          exam_id:
-            r.data.id,
-
-          total_questions:
-            0,
-
-          total_marks:
-            0,
-
-          pass_mark:
-            0,
-
-          duration_minutes:
-            20,
-
-          marks_per_question:
-            1,
-
-          negative_mark:
-            0,
-
-          show_answers:
-            false,
-
-          multiple_attempts:
-            false,
-
-          device_attempt_protection:
-            true,
-
-          random_questions:
-            false,
-
-          random_options:
-            false
-        },
-        {
-          onConflict:
-            'exam_id'
-        }
-      );
-
-  if (s.error) {
-    return msg(
-      'examMsg',
-      s.error.message,
-      true
-    );
-  }
-
-  $('examName').value =
-    '';
 
   msg(
     'examMsg',
@@ -2837,843 +1916,398 @@ async function createExam() {
   );
 
   await loadExams();
-
-  $('examSelect').value =
-    r.data.id;
-
-  await loadSettings();
 }
 
-/* =========================
-   EXAM LIST
-========================= */
+/* =========================================================
+   Exam Link
+   ========================================================= */
 
-async function loadExams() {
-  const r =
-    await db
-      .from('exams')
-      .select(
-        'id,exam_name,status,total_questions,marks_per_question,negative_mark,pass_mark'
-      )
-      .order(
-        'id',
-        {
-          ascending: false
-        }
-      );
-
-  if (r.error) {
-    msg(
-      'examMsg',
-      r.error.message,
-      true
+async function linkQuestionsToExam() {
+  const examId =
+    Number(
+      $('examSelect')?.value || 0
     );
 
+  if (!examId) {
+    alert(
+      'Exam নির্বাচন করুন'
+    );
     return;
   }
 
-  exams =
-    r.data || [];
-
-  if ($('sExams')) {
-    $('sExams')
-      .textContent =
-      bn(
-        exams.length
-      );
-  }
-
-  if ($('sActive')) {
-    $('sActive')
-      .textContent =
-      bn(
-        exams.filter(
-          x =>
-            x.status ===
-            'active'
-        ).length
-      );
-  }
-
-  const examOptions =
-    '<option value="">Exam নির্বাচন করুন</option>' +
-    exams
+  const ids =
+    Array.from(
+      document.querySelectorAll(
+        '.bankQuestionCheck:checked'
+      )
+    )
       .map(
-        x =>
-          `<option value="${x.id}">
-            ${esc(
-              x.exam_name
-            )}
-            (#${x.id})
-          </option>`
+        el => Number(el.value)
       )
-      .join('');
+      .filter(Boolean);
 
-  if ($('examSelect')) {
-    $('examSelect')
-      .innerHTML =
-      examOptions;
-  }
-
-  if ($('mapExam')) {
-    $('mapExam')
-      .innerHTML =
-      examOptions;
-  }
-
-  if ($('exams')) {
-    $('exams').innerHTML =
-      exams
-        .map(
-          x => `
-            <div class="examrow">
-
-              <b>
-                ${esc(
-                  x.exam_name
-                )}
-              </b>
-
-              ·
-              ${esc(
-                x.status
-              )}
-
-              ·
-              ${bn(
-                x.total_questions ||
-                  0
-              )}
-              প্রশ্ন
-
-              <br>
-
-              <span class="link">
-                ${
-                  location.origin
-                }${
-                  location.pathname.replace(
-                    /\/[^/]*$/,
-                    '/../'
-                  )
-                }?exam=${x.id}
-              </span>
-
-              <br>
-
-              <button
-                onclick="copyLink(${x.id})"
-              >
-                🔗 Exam Link কপি
-              </button>
-
-              <button
-                class="secondary"
-                onclick="activate(
-                  ${x.id},
-                  '${
-                    x.status ===
-                    'active'
-                      ? 'inactive'
-                      : 'active'
-                  }'
-                )"
-              >
-                ${
-                  x.status ===
-                  'active'
-                    ? 'Inactive'
-                    : 'Active'
-                }
-              </button>
-
-            </div>
-          `
-        )
-        .join('');
-  }
-
-  const countR =
-    await db
-      .from('questions')
-      .select(
-        'id',
-        {
-          count:
-            'exact',
-          head:
-            true
-        }
-      );
-
-  if ($('sQuestions')) {
-    $('sQuestions')
-      .textContent =
-      bn(
-        countR.count ||
-          0
-      );
-  }
-}
-
-/* =========================
-   EXAM LINK
-========================= */
-
-async function copyLink(id) {
-  const base =
-    new URL(
-      '../index.html',
-      location.href
-    ).href +
-    '?exam=' +
-    id;
-
-  try {
-    await navigator.clipboard
-      .writeText(base);
-
+  if (!ids.length) {
     alert(
-      'Exam Link copied'
+      'প্রশ্ন নির্বাচন করুন'
     );
-  } catch (_) {
-    prompt(
-      'Exam Link',
-      base
-    );
+    return;
   }
-}
 
-/* =========================
-   ACTIVATE / INACTIVE
-========================= */
-
-async function activate(
-  id,
-  status
-) {
-  const r =
-    await db
-      .from('exams')
-      .update({
-        status
+  const rows =
+    ids.map(
+      questionId => ({
+        exam_id:
+          examId,
+        question_id:
+          questionId
       })
-      .eq(
-        'id',
-        id
-      );
-
-  if (r.error) {
-    return msg(
-      'examMsg',
-      r.error.message,
-      true
     );
-  }
 
-  await loadExams();
-}
+  const {
+    error
+  } = await db
+    .from('exam_questions')
+    .insert(rows);
 
-/* =========================
-   LOAD EXAM SETTINGS
-========================= */
-
-async function loadSettings() {
-  const id =
-    $('examSelect')
-      ?.value;
-
-  if (!id) return;
-
-  const r =
-    await db
-      .from('exam_settings')
-      .select('*')
-      .eq(
-        'exam_id',
-        id
-      )
-      .maybeSingle();
-
-  if (r.error) {
-    return msg(
-      'settingsMsg',
-      r.error.message,
-      true
-    );
-  }
-
-  const s =
-    r.data || {};
-
-  $('totalQ').value =
-    s.total_questions ??
-    0;
-
-  $('totalMarks').value =
-    s.total_marks ??
-    0;
-
-  $('pass').value =
-    s.pass_mark ??
-    0;
-
-  $('duration').value =
-    s.duration_minutes ??
-    20;
-
-  $('marks').value =
-    s.marks_per_question ??
-    1;
-
-  $('negative').value =
-    s.negative_mark ??
-    0;
-
-  $('examiner').value =
-    s.examiner_name ??
-    '';
-
-  $('syllabus').value =
-    s.syllabus ??
-    '';
-
-  $('showAnswers').checked =
-    !!s.show_answers;
-
-  $('multiple').checked =
-    !!s.multiple_attempts;
-
-  $('device').checked =
-    s.device_attempt_protection !==
-    false;
-
-  $('randomQ').checked =
-    !!s.random_questions;
-
-  $('randomO').checked =
-    !!s.random_options;
-
-  $('startDate').value =
-    s.exam_date ||
-    '';
-
-  $('startTime').value =
-    s.start_time ||
-    '';
-
-  $('endDate').value =
-    s.end_date ||
-    '';
-
-  $('endTime').value =
-    s.end_time ||
-    '';
-}
-
-/* =========================
-   SAVE EXAM SETTINGS
-========================= */
-
-async function saveSettings() {
-  const id =
-    $('examSelect')
-      ?.value;
-
-  if (!id) {
-    return msg(
-      'settingsMsg',
-      'Exam নির্বাচন করুন',
-      true
-    );
-  }
-
-  const payload = {
-    exam_id:
-      id,
-
-    total_questions:
-      Number(
-        $('totalQ').value
-      ) || 0,
-
-    total_marks:
-      Number(
-        $('totalMarks').value
-      ) || 0,
-
-    pass_mark:
-      Number(
-        $('pass').value
-      ) || 0,
-
-    duration_minutes:
-      Number(
-        $('duration').value
-      ) || 20,
-
-    marks_per_question:
-      Number(
-        $('marks').value
-      ) || 1,
-
-    negative_mark:
-      Number(
-        $('negative').value
-      ) || 0,
-
-    examiner_name:
-      $('examiner')
-        .value
-        .trim() ||
-      null,
-
-    syllabus:
-      $('syllabus')
-        .value
-        .trim() ||
-      null,
-
-    show_answers:
-      $('showAnswers')
-        .checked,
-
-    multiple_attempts:
-      $('multiple')
-        .checked,
-
-    device_attempt_protection:
-      $('device')
-        .checked,
-
-    random_questions:
-      $('randomQ')
-        .checked,
-
-    random_options:
-      $('randomO')
-        .checked,
-
-    exam_date:
-      $('startDate')
-        .value ||
-      null,
-
-    start_time:
-      $('startTime')
-        .value ||
-      null,
-
-    end_date:
-      $('endDate')
-        .value ||
-      null,
-
-    end_time:
-      $('endTime')
-        .value ||
-      null
-  };
-
-  /* Save Exam Settings */
-
-  const r =
-    await db
-      .from('exam_settings')
-      .upsert(
-        payload,
-        {
-          onConflict:
-            'exam_id'
-        }
-      );
-
-  if (r.error) {
-    return msg(
-      'settingsMsg',
-      r.error.message,
-      true
-    );
-  }
-
-  /* Update main Exam table */
-
-  const e =
-    await db
-      .from('exams')
-      .update({
-        total_questions:
-          payload.total_questions,
-
-        marks_per_question:
-          payload.marks_per_question,
-
-        negative_mark:
-          payload.negative_mark,
-
-        pass_mark:
-          payload.pass_mark
-      })
-      .eq(
-        'id',
-        id
-      );
-
-  if (e.error) {
-    return msg(
-      'settingsMsg',
-      e.error.message,
-      true
-    );
+  if (error) {
+    alert(error.message);
+    return;
   }
 
   msg(
-    'settingsMsg',
-    '✅ Exam Settings সংরক্ষিত হয়েছে'
+    'examMsg',
+    `✅ ${bn(ids.length)}টি প্রশ্ন Exam-এ যুক্ত হয়েছে`
   );
-
-  await loadExams();
 }
 
-/* =========================
-   QUESTION MAPPING
-========================= */
+/* =========================================================
+   Activate Exam
+   ========================================================= */
 
-async function loadPool() {
+async function activateExam() {
   const examId =
-    $('mapExam')
-      ?.value;
+    Number(
+      $('examSelect')?.value || 0
+    );
 
   if (!examId) {
-    return msg(
-      'mapMsg',
-      'Exam নির্বাচন করুন',
-      true
+    alert(
+      'Exam নির্বাচন করুন'
     );
+    return;
   }
 
-  let q =
-    db
-      .from('questions')
-      .select(
-        'id,question_text,category,folder_id,set_id,question_number'
-      )
-      .limit(200);
-
-  if (
-    $('mapFolder')?.value
-  ) {
-    q =
-      q.eq(
-        'folder_id',
-        Number(
-          $('mapFolder')
-            .value
-        )
-      );
-  }
-
-  if (
-    $('mapSet')?.value
-  ) {
-    q =
-      q.eq(
-        'set_id',
-        Number(
-          $('mapSet')
-            .value
-        )
-      );
-  }
-
-  const r =
-    await q;
-
-  if (r.error) {
-    return msg(
-      'mapMsg',
-      r.error.message,
-      true
-    );
-  }
-
-  const existing =
-    await db
-      .from(
-        'exam_questions'
-      )
-      .select(
-        'question_id'
-      )
-      .eq(
-        'exam_id',
-        examId
-      );
-
-  if (existing.error) {
-    return msg(
-      'mapMsg',
-      existing.error.message,
-      true
-    );
-  }
-
-  const ids =
-    new Set(
-      (
-        existing.data ||
-        []
-      ).map(
-        x =>
-          String(
-            x.question_id
-          )
-      )
-    );
-
-  $('pool').innerHTML =
-    (r.data || [])
-      .map(
-        x => `
-          <label class="q">
-
-            <input
-              type="checkbox"
-              class="poolq"
-              value="${x.id}"
-              ${
-                ids.has(
-                  String(
-                    x.id
-                  )
-                )
-                  ? 'checked'
-                  : ''
-              }
-            >
-
-            ${esc(
-              x.question_text
-            )}
-
-            <span class="small">
-              (
-              ${esc(
-                x.category ||
-                  ''
-              )}
-              )
-            </span>
-
-          </label>
-        `
-      )
-      .join('') +
-
-    `
-      <button
-        onclick="saveMapping(${examId})"
-      >
-        Exam-এ নির্বাচিত প্রশ্ন Save করুন
-      </button>
-    `;
-}
-
-/* =========================
-   SAVE QUESTION MAPPING
-========================= */
-
-async function saveMapping(
-  examId
-) {
-  const ids =
-    [
-      ...document.querySelectorAll(
-        '.poolq:checked'
-      )
-    ].map(
-      x =>
-        Number(
-          x.value
-        )
-    );
-
-  const old =
-    await db
-      .from(
-        'exam_questions'
-      )
-      .delete()
-      .eq(
-        'exam_id',
-        examId
-      );
-
-  if (old.error) {
-    return msg(
-      'mapMsg',
-      old.error.message,
-      true
-    );
-  }
-
-  if (ids.length) {
-    const rows =
-      ids.map(
-        (
-          id,
-          i
-        ) => ({
-          exam_id:
-            examId,
-
-          question_id:
-            id,
-
-          question_order:
-            i + 1
-        })
-      );
-
-    const r =
-      await db
-        .from(
-          'exam_questions'
-        )
-        .insert(
-          rows
-        );
-
-    if (r.error) {
-      return msg(
-        'mapMsg',
-        r.error.message,
-        true
-      );
-    }
-  }
-
-  await db
-    .from('exams')
+  const {
+    error
+  } = await db
+    .from('exam_settings')
     .update({
-      total_questions:
-        ids.length
+      active: true
     })
     .eq(
       'id',
       examId
     );
 
-  await db
-    .from('exam_settings')
-    .update({
-      total_questions:
-        ids.length
-    })
-    .eq(
-      'exam_id',
-      examId
-    );
+  if (error) {
+    alert(error.message);
+    return;
+  }
 
   msg(
-    'mapMsg',
-    `✅ ${bn(
-      ids.length
-    )}টি প্রশ্ন Exam-এ যুক্ত হয়েছে`
+    'examMsg',
+    '✅ Exam Activate হয়েছে'
   );
 
   await loadExams();
 }
 
-/* =========================
-   GLOBAL FUNCTIONS
-========================= */
+/* =========================================================
+   Exam Settings
+   ========================================================= */
 
-window.login =
-  login;
+async function saveExamSettings() {
+  const examId =
+    Number(
+      $('examSelect')?.value || 0
+    );
 
-window.logout =
-  logout;
+  if (!examId) {
+    alert(
+      'Exam নির্বাচন করুন'
+    );
+    return;
+  }
 
-window.showPage =
-  showPage;
+  const payload = {};
 
-window.selectCategory =
-  selectCategory;
+  const duration =
+    Number(
+      $('examDuration')?.value || 0
+    );
 
-window.createFolder =
-  createFolder;
+  if (duration) {
+    payload.duration_minutes =
+      duration;
+  }
 
-window.editFolder =
-  editFolder;
+  if (
+    $('examTitle')?.value !==
+    undefined
+  ) {
+    payload.exam_name =
+      $('examTitle').value.trim();
+  }
 
-window.deleteFolder =
-  deleteFolder;
+  const {
+    error
+  } = await db
+    .from('exam_settings')
+    .update(payload)
+    .eq(
+      'id',
+      examId
+    );
 
-window.createSet =
-  createSet;
+  if (error) {
+    alert(error.message);
+    return;
+  }
 
-window.editSet =
-  editSet;
+  msg(
+    'examMsg',
+    '✅ Exam Settings Save হয়েছে'
+  );
 
-window.deleteSet =
-  deleteSet;
+  await loadExams();
+}
 
-window.addManual =
-  addManual;
+/* =========================================================
+   Global Event Handlers
+   ========================================================= */
 
-window.mode =
-  mode;
+document.addEventListener(
+  'DOMContentLoaded',
+  () => {
 
-window.template =
-  template;
+    /*
+     * Login
+     */
 
-window.previewImport =
-  previewImport;
+    $('loginBtn')?.addEventListener(
+      'click',
+      login
+    );
 
-window.importRows =
-  importRows;
+    $('logoutBtn')?.addEventListener(
+      'click',
+      logout
+    );
 
-window.loadFilter =
-  loadFilter;
+    /*
+     * Category
+     */
 
-window.loadQuestions =
-  loadQuestions;
+    document
+      .querySelectorAll(
+        '[data-category]'
+      )
+      .forEach(btn => {
+        btn.addEventListener(
+          'click',
+          () =>
+            selectCategory(
+              btn.dataset.category
+            )
+        );
+      });
 
-window.createExam =
-  createExam;
+    /*
+     * Folder
+     */
 
-window.loadExams =
-  loadExams;
+    $('folder')?.addEventListener(
+      'change',
+      async () => {
+        await loadSets();
+      }
+    );
 
-window.copyLink =
-  copyLink;
+    $('folderSearch')?.addEventListener(
+      'input',
+      filterFolders
+    );
 
-window.activate =
-  activate;
+    /*
+     * Set
+     */
 
-window.loadSettings =
-  loadSettings;
+    $('set')?.addEventListener(
+      'change',
+      async () => {
+        await loadQuestions();
+      }
+    );
 
-window.saveSettings =
-  saveSettings;
+    $('setSearch')?.addEventListener(
+      'input',
+      filterSets
+    );
 
-window.loadPool =
-  loadPool;
+    /*
+     * Buttons
+     */
 
-window.saveMapping =
-  saveMapping;
+    $('editFolderBtn')
+      ?.addEventListener(
+        'click',
+        editFolder
+      );
 
-window.loadMoveSets =
-  loadMoveSets;
+    $('deleteFolderBtn')
+      ?.addEventListener(
+        'click',
+        deleteFolder
+      );
 
-window.moveSelectedQuestions =
-  moveSelectedQuestions;
+    $('editSetBtn')
+      ?.addEventListener(
+        'click',
+        editSet
+      );
 
-/* =========================
-   START
-========================= */
+    $('deleteSetBtn')
+      ?.addEventListener(
+        'click',
+        deleteSet
+      );
 
-(async function start() {
-  await init();
-})();
+    $('createFolderBtn')
+      ?.addEventListener(
+        'click',
+        createFolder
+      );
+
+    $('createSetBtn')
+      ?.addEventListener(
+        'click',
+        createSet
+      );
+
+    /*
+     * Manual Question
+     */
+
+    $('addManualBtn')
+      ?.addEventListener(
+        'click',
+        addManual
+      );
+
+    /*
+     * Import
+     */
+
+    $('templateBtn')
+      ?.addEventListener(
+        'click',
+        template
+      );
+
+    $('previewBtn')
+      ?.addEventListener(
+        'click',
+        previewImport
+      );
+
+    $('importBtn')
+      ?.addEventListener(
+        'click',
+        importRows
+      );
+
+    /*
+     * Question Selection
+     */
+
+    $('selectAllQuestionsBtn')
+      ?.addEventListener(
+        'click',
+        selectAllQuestions
+      );
+
+    $('clearAllQuestionsBtn')
+      ?.addEventListener(
+        'click',
+        clearAllQuestions
+      );
+
+    /*
+     * Move
+     */
+
+    $('moveFolder')
+      ?.addEventListener(
+        'change',
+        loadMoveSets
+      );
+
+    $('moveSelectedBtn')
+      ?.addEventListener(
+        'click',
+        moveSelectedQuestions
+      );
+
+    /*
+     * Exam
+     */
+
+    $('createExamBtn')
+      ?.addEventListener(
+        'click',
+        createExam
+      );
+
+    $('linkQuestionsBtn')
+      ?.addEventListener(
+        'click',
+        linkQuestionsToExam
+      );
+
+    $('activateExamBtn')
+      ?.addEventListener(
+        'click',
+        activateExam
+      );
+
+    $('saveExamSettingsBtn')
+      ?.addEventListener(
+        'click',
+        saveExamSettings
+      );
+
+    /*
+     * Page navigation
+     */
+
+    document
+      .querySelectorAll(
+        '[data-page]'
+      )
+      .forEach(el => {
+        el.addEventListener(
+          'click',
+          () =>
+            showPage(
+              el.dataset.page
+            )
+        );
+      });
+
+    /*
+     * Start
+     */
+
+    init();
+  }
+);
