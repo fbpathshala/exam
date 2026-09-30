@@ -1800,14 +1800,16 @@ async function loadFilter() {
 
 /* =========================
    QUESTION BANK LIST
+   + QUESTION MOVE
 ========================= */
 
 async function loadQuestions() {
+
   let q =
     db
       .from('questions')
       .select(
-        'id,question_text,option_a,option_b,option_c,option_d,correct_answer,question_number,category,folder_id,set_id,subjects(name)'
+        'id,question_text,option_a,option_b,option_c,option_d,correct_answer,question_number,category,folder_id,set_id,subject_id,subjects(name)'
       )
       .order(
         'id',
@@ -1878,77 +1880,662 @@ async function loadQuestions() {
     );
   }
 
+  const data =
+    r.data || [];
+
+  /*
+    Current question list-এর Folder নাম
+    বের করার জন্য local folders ব্যবহার করা হচ্ছে।
+  */
+
+  const folderMap =
+    new Map(
+      (folders || []).map(
+        x => [
+          Number(x.id),
+          x.folder_name
+        ]
+      )
+    );
+
+  /*
+    বর্তমানে দেখানো প্রশ্নগুলোর Set ID সংগ্রহ
+  */
+
+  const setIds =
+    [
+      ...new Set(
+        data
+          .map(
+            x =>
+              Number(
+                x.set_id
+              )
+          )
+          .filter(Boolean)
+      )
+    ];
+
+  let setMap =
+    new Map();
+
+  if (setIds.length) {
+
+    const sr =
+      await db
+        .from(
+          'question_bank_sets'
+        )
+        .select(
+          'id,set_name,folder_id'
+        )
+        .in(
+          'id',
+          setIds
+        );
+
+    if (!sr.error) {
+
+      setMap =
+        new Map(
+          (sr.data || [])
+            .map(
+              x => [
+                Number(x.id),
+                x
+              ]
+            )
+        );
+    }
+  }
+
+  /*
+    Move UI আগে তৈরি করা হবে।
+  */
+
+  setupQuestionMoveUI();
+
+  /*
+    Question list
+  */
+
   $('questions').innerHTML =
-    (r.data || [])
+    data
       .map(
-        x => `
-          <div class="q">
+        x => {
 
-            <b>
-              ${bn(
-                x.question_number ||
-                  ''
-              )}.
-              ${esc(
-                x.question_text
-              )}
-            </b>
+          const currentSet =
+            setMap.get(
+              Number(
+                x.set_id
+              )
+            );
 
-            <div>
-              ক.
-              ${esc(
-                x.option_a
-              )}
-              <br>
+          const currentFolderName =
+            folderMap.get(
+              Number(
+                x.folder_id
+              )
+            ) ||
+            '—';
 
-              খ.
-              ${esc(
-                x.option_b
-              )}
-              <br>
+          const currentSetName =
+            currentSet?.set_name ||
+            '—';
 
-              গ.
-              ${esc(
-                x.option_c
-              )}
-              <br>
+          return `
+            <div class="q">
 
-              ঘ.
-              ${esc(
-                x.option_d
-              )}
+              <label
+                style="
+                  display:block;
+                  margin-bottom:8px;
+                "
+              >
+
+                <input
+                  type="checkbox"
+                  class="bankQuestionCheck"
+                  value="${x.id}"
+                >
+
+                <b>
+                  ${bn(
+                    x.question_number ||
+                      ''
+                  )}.
+                  ${esc(
+                    x.question_text
+                  )}
+                </b>
+
+              </label>
+
+              <div>
+                ক.
+                ${esc(
+                  x.option_a
+                )}
+                <br>
+
+                খ.
+                ${esc(
+                  x.option_b
+                )}
+                <br>
+
+                গ.
+                ${esc(
+                  x.option_c
+                )}
+                <br>
+
+                ঘ.
+                ${esc(
+                  x.option_d
+                )}
+              </div>
+
+              <div class="small">
+
+                ${esc(
+                  x.category
+                )}
+
+                ·
+
+                ${esc(
+                  x.subjects?.name ||
+                    ''
+                )}
+
+                ·
+
+                Folder:
+                ${esc(
+                  currentFolderName
+                )}
+
+                ·
+
+                Set:
+                ${esc(
+                  currentSetName
+                )}
+
+                ·
+
+                সঠিক:
+                ${esc(
+                  ({
+                    A: 'ক',
+                    B: 'খ',
+                    C: 'গ',
+                    D: 'ঘ'
+                  })[
+                    x.correct_answer
+                  ] ||
+                    x.correct_answer
+                )}
+
+              </div>
+
             </div>
-
-            <div class="small">
-              ${esc(
-                x.category
-              )}
-              ·
-              ${esc(
-                x.subjects?.name ||
-                  ''
-              )}
-              ·
-
-              সঠিক:
-              ${esc(
-                ({
-                  A: 'ক',
-                  B: 'খ',
-                  C: 'গ',
-                  D: 'ঘ'
-                })[
-                  x.correct_answer
-                ] ||
-                  x.correct_answer
-              )}
-            </div>
-
-          </div>
-        `
+          `;
+        }
       )
       .join('') ||
     'কোনো প্রশ্ন নেই';
+
+  /*
+    Question list বসানোর পর Move UI আবার নিশ্চিত করা।
+  */
+
+  setupQuestionMoveUI();
+}
+
+/* =========================
+   QUESTION MOVE HELPERS
+========================= */
+
+function moveEsc(v) {
+  return esc(v);
+}
+
+function moveBn(v) {
+  return bn(v);
+}
+
+/* =========================
+   LOAD DESTINATION SETS
+========================= */
+
+async function loadMoveSets() {
+
+  const folderId =
+    Number(
+      $('moveFolder')?.value ||
+      0
+    );
+
+  const setEl =
+    $('moveSet');
+
+  if (!setEl) return;
+
+  if (!folderId) {
+
+    setEl.innerHTML =
+      '<option value="">আগে Destination Folder নির্বাচন করুন</option>';
+
+    return;
+  }
+
+  setEl.innerHTML =
+    '<option value="">Set লোড হচ্ছে...</option>';
+
+  const r =
+    await db
+      .from(
+        'question_bank_sets'
+      )
+      .select(
+        'id,set_name,folder_id'
+      )
+      .eq(
+        'folder_id',
+        folderId
+      )
+      .order(
+        'id',
+        {
+          ascending: true
+        }
+      );
+
+  if (r.error) {
+
+    setEl.innerHTML =
+      '<option value="">Set লোড হয়নি</option>';
+
+    const moveMsg =
+      $('moveMsg');
+
+    if (moveMsg) {
+      moveMsg.textContent =
+        r.error.message;
+
+      moveMsg.style.color =
+        '#b91c1c';
+    }
+
+    return;
+  }
+
+  setEl.innerHTML =
+    '<option value="">Destination Set নির্বাচন করুন</option>' +
+
+    (r.data || [])
+      .map(
+        x =>
+          `<option value="${x.id}">
+            ${moveEsc(
+              x.set_name
+            )}
+          </option>`
+      )
+      .join('');
+}
+
+/* =========================
+   QUESTION MOVE UI
+========================= */
+
+function setupQuestionMoveUI() {
+
+  const questions =
+    $('questions');
+
+  if (!questions) return;
+
+  /*
+    Move box Question list-এর উপরে থাকবে।
+  */
+
+  let box =
+    $('questionMoveBox');
+
+  if (!box) {
+
+    box =
+      document.createElement(
+        'div'
+      );
+
+    box.id =
+      'questionMoveBox';
+
+    box.className =
+      'card';
+
+    box.style.marginBottom =
+      '12px';
+
+    questions.parentElement.insertBefore(
+      box,
+      questions
+    );
+  }
+
+  /*
+    Current category-এর folders-ই
+    Destination Folder হিসেবে দেখানো হবে।
+  */
+
+  const folderOptions =
+    '<option value="">Destination Folder নির্বাচন করুন</option>' +
+
+    (folders || [])
+      .map(
+        x =>
+          `<option value="${x.id}">
+            ${moveEsc(
+              x.folder_name
+            )}
+          </option>`
+      )
+      .join('');
+
+  box.innerHTML = `
+
+    <h3
+      style="margin-top:0;"
+    >
+      📦 নির্বাচিত প্রশ্ন অন্য Folder / Set-এ নিন
+    </h3>
+
+    <div class="grid">
+
+      <select id="moveFolder">
+        ${folderOptions}
+      </select>
+
+      <select id="moveSet">
+
+        <option value="">
+          আগে Destination Folder নির্বাচন করুন
+        </option>
+
+      </select>
+
+    </div>
+
+    <button
+      type="button"
+      id="moveSelectedBtn"
+    >
+      ➡️ নির্বাচিত প্রশ্ন Move করুন
+    </button>
+
+    <button
+      type="button"
+      class="secondary"
+      id="selectAllQuestionsBtn"
+      style="margin-left:6px;"
+    >
+      ☑️ সব প্রশ্ন নির্বাচন
+    </button>
+
+    <button
+      type="button"
+      class="secondary"
+      id="clearAllQuestionsBtn"
+      style="margin-left:6px;"
+    >
+      ☐ নির্বাচন বাতিল
+    </button>
+
+    <p
+      id="moveMsg"
+      class="msg"
+    ></p>
+
+  `;
+
+  $('moveFolder').onchange =
+    loadMoveSets;
+
+  $('selectAllQuestionsBtn').onclick =
+    function () {
+
+      document
+        .querySelectorAll(
+          '.bankQuestionCheck'
+        )
+        .forEach(
+          x => {
+            x.checked = true;
+          }
+        );
+
+      if ($('moveMsg')) {
+        $('moveMsg').textContent =
+          'সব দেখানো প্রশ্ন নির্বাচন করা হয়েছে';
+
+        $('moveMsg').style.color =
+          '#166534';
+      }
+    };
+
+  $('clearAllQuestionsBtn').onclick =
+    function () {
+
+      document
+        .querySelectorAll(
+          '.bankQuestionCheck'
+        )
+        .forEach(
+          x => {
+            x.checked = false;
+          }
+        );
+
+      if ($('moveMsg')) {
+        $('moveMsg').textContent =
+          'নির্বাচন বাতিল করা হয়েছে';
+
+        $('moveMsg').style.color =
+          '#166534';
+      }
+    };
+
+  $('moveSelectedBtn').onclick =
+    moveSelectedQuestions;
+}
+
+/* =========================
+   MOVE SELECTED QUESTIONS
+========================= */
+
+async function moveSelectedQuestions() {
+
+  const selected =
+    Array.from(
+      document.querySelectorAll(
+        '.bankQuestionCheck:checked'
+      )
+    )
+      .map(
+        x =>
+          Number(
+            x.value
+          )
+      )
+      .filter(Boolean);
+
+  const folderId =
+    Number(
+      $('moveFolder')?.value ||
+      0
+    );
+
+  const setId =
+    Number(
+      $('moveSet')?.value ||
+      0
+    );
+
+  if (!selected.length) {
+
+    alert(
+      'আগে অন্তত একটি প্রশ্ন নির্বাচন করুন।'
+    );
+
+    return;
+  }
+
+  if (!folderId || !setId) {
+
+    alert(
+      'Destination Folder এবং Destination Set দুটোই নির্বাচন করুন।'
+    );
+
+    return;
+  }
+
+  /*
+    গুরুত্বপূর্ণ নিরাপত্তা যাচাই:
+    নির্বাচিত Set সত্যিই নির্বাচিত Folder-এর
+    অন্তর্ভুক্ত কি না।
+  */
+
+  const check =
+    await db
+      .from(
+        'question_bank_sets'
+      )
+      .select(
+        'id,folder_id,set_name'
+      )
+      .eq(
+        'id',
+        setId
+      )
+      .maybeSingle();
+
+  if (check.error) {
+
+    alert(
+      check.error.message
+    );
+
+    return;
+  }
+
+  if (
+    !check.data ||
+    Number(
+      check.data.folder_id
+    ) !== folderId
+  ) {
+
+    alert(
+      'নির্বাচিত Set এই Folder-এর অন্তর্ভুক্ত নয়।'
+    );
+
+    return;
+  }
+
+  /*
+    নিশ্চিতকরণ
+  */
+
+  const confirmed =
+    confirm(
+      `${moveBn(
+        selected.length
+      )}টি প্রশ্ন Move করা হবে।\n\n` +
+
+      'প্রশ্নের লেখা, অপশন, সঠিক উত্তর, বিষয়, নম্বর ও অন্যান্য তথ্য পরিবর্তন হবে না।\n\n' +
+
+      'শুধু Folder এবং Set পরিবর্তন হবে।\n\n' +
+
+      'আপনি কি নিশ্চিত?'
+    );
+
+  if (!confirmed) {
+    return;
+  }
+
+  const button =
+    $('moveSelectedBtn');
+
+  if (button) {
+    button.disabled = true;
+    button.textContent =
+      '⏳ Move হচ্ছে...';
+  }
+
+  /*
+    শুধু folder_id এবং set_id update হবে।
+  */
+
+  const r =
+    await db
+      .from('questions')
+      .update({
+        folder_id:
+          folderId,
+
+        set_id:
+          setId
+      })
+      .in(
+        'id',
+        selected
+      );
+
+  if (button) {
+    button.disabled = false;
+    button.textContent =
+      '➡️ নির্বাচিত প্রশ্ন Move করুন';
+  }
+
+  if (r.error) {
+
+    alert(
+      'Move হয়নি:\n' +
+      r.error.message
+    );
+
+    return;
+  }
+
+  alert(
+    `${moveBn(
+      selected.length
+    )}টি প্রশ্ন সফলভাবে Move হয়েছে।`
+  );
+
+  /*
+    Destination selection পরিষ্কার
+  */
+
+  if ($('moveFolder')) {
+    $('moveFolder').value =
+      '';
+  }
+
+  if ($('moveSet')) {
+    $('moveSet').innerHTML =
+      '<option value="">আগে Destination Folder নির্বাচন করুন</option>';
+  }
+
+  /*
+    Question Bank refresh
+  */
+
+  await loadQuestions();
 }
 
 /* =========================
@@ -2893,6 +3480,12 @@ window.loadPool =
 
 window.saveMapping =
   saveMapping;
+
+window.loadMoveSets =
+  loadMoveSets;
+
+window.moveSelectedQuestions =
+  moveSelectedQuestions;
 
 /* =========================
    START
