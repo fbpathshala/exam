@@ -1505,6 +1505,21 @@ async function importRows() {
 
   const fail = [];
 
+  /*
+    Admin-এ বর্তমানে নির্বাচিত Folder / Set।
+    Excel-এ এগুলো না থাকলে এগুলো ব্যবহার করা হবে।
+  */
+
+  const selectedFolderId =
+    Number(
+      $('folder')?.value || 0
+    ) || null;
+
+  const selectedSetId =
+    Number(
+      $('set')?.value || 0
+    ) || null;
+
   for (
     let i = 0;
     i < importData.length;
@@ -1513,17 +1528,32 @@ async function importRows() {
     const r =
       importData[i];
 
+    /* =========================
+       CATEGORY
+    ========================= */
+
+    const categoryRaw =
+      String(
+        r.category || ''
+      ).trim();
+
+    const categoryProvided =
+      !!categoryRaw;
+
+    /*
+      Excel-এর Category সঠিক হলে সেটি ব্যবহার হবে।
+      Category খালি/ভুল হলে বর্তমান Category ব্যবহার হবে।
+    */
+
     const category =
       Object.values(CATS)
-        .includes(
-          String(
-            r.category
-          ).trim()
-        )
-        ? String(
-            r.category
-          ).trim()
+        .includes(categoryRaw)
+        ? categoryRaw
         : CATS[cat];
+
+    /* =========================
+       OPTIONAL FOLDER / SET
+    ========================= */
 
     const folderName =
       String(
@@ -1535,154 +1565,303 @@ async function importRows() {
         r.set || ''
       ).trim();
 
+    /* =========================
+       REQUIRED FIELDS
+       শুধু এই ৬টি বিষয় বাধ্যতামূলক
+    ========================= */
+
+    const question =
+      String(
+        r.question || ''
+      ).trim();
+
+    const optionA =
+      String(
+        r.option_a || ''
+      ).trim();
+
+    const optionB =
+      String(
+        r.option_b || ''
+      ).trim();
+
+    const optionC =
+      String(
+        r.option_c || ''
+      ).trim();
+
+    const optionD =
+      String(
+        r.option_d || ''
+      ).trim();
+
+    /* =========================
+       CORRECT ANSWER
+    ========================= */
+
+    let correct =
+      String(
+        r.correct_answer || ''
+      )
+        .trim()
+        .toUpperCase();
+
+    /*
+      বাংলা সঠিক উত্তরকেও গ্রহণ করা হবে।
+      ক = A
+      খ = B
+      গ = C
+      ঘ = D
+    */
+
+    const correctMap = {
+      'ক': 'A',
+      'খ': 'B',
+      'গ': 'C',
+      'ঘ': 'D'
+    };
+
+    correct =
+      correctMap[correct] ||
+      correct;
+
+    /* =========================
+       REQUIRED VALIDATION
+    ========================= */
+
     if (
-      !folderName ||
-      !setName ||
-      !r.question ||
-      !r.option_a ||
-      !r.option_b ||
-      !r.option_c ||
-      !r.option_d ||
-      !r.correct_answer
+      !question ||
+      !optionA ||
+      !optionB ||
+      !optionC ||
+      !optionD ||
+      !['A', 'B', 'C', 'D'].includes(correct)
     ) {
       fail.push(
-        `Row ${i + 2}: required field missing`
+        `Row ${i + 2}: প্রশ্ন, চারটি অপশন এবং সঠিক উত্তর পূরণ করতে হবে`
       );
 
       continue;
     }
 
-    let fr =
-      await db
-        .from(
-          'question_bank_folders'
-        )
-        .select('id')
-        .eq(
-          'sub_category',
-          category
-        )
-        .eq(
-          'folder_name',
-          folderName
-        )
-        .maybeSingle();
+    /* =========================
+       FOLDER / SET ID
+    ========================= */
 
-    if (fr.error) {
-      fail.push(
-        `Row ${i + 2}: ${fr.error.message}`
-      );
-
-      continue;
-    }
+    /*
+      Excel-এ Category দেওয়া হয়েছে এবং
+      সেটি বর্তমান Category থেকে আলাদা হলে
+      বর্তমান Admin Folder/Set ব্যবহার করা হবে না।
+    */
 
     let fid =
-      fr.data?.id;
+      (
+        categoryProvided &&
+        categoryRaw !== CATS[cat]
+      )
+        ? null
+        : selectedFolderId;
 
-    if (!fid) {
-      const x =
+    let sid =
+      (
+        categoryProvided &&
+        categoryRaw !== CATS[cat]
+      )
+        ? null
+        : selectedSetId;
+
+    /* =========================
+       FOLDER
+    ========================= */
+
+    if (folderName) {
+
+      const fr =
         await db
           .from(
             'question_bank_folders'
           )
-          .insert({
-            sub_category:
-              category,
-
-            folder_name:
-              folderName
-          })
           .select('id')
-          .single();
+          .eq(
+            'sub_category',
+            category
+          )
+          .eq(
+            'folder_name',
+            folderName
+          )
+          .maybeSingle();
 
-      if (x.error) {
+      if (fr.error) {
         fail.push(
-          `Row ${i + 2}: ${x.error.message}`
+          `Row ${i + 2}: ${fr.error.message}`
         );
 
         continue;
       }
 
       fid =
-        x.data.id;
+        fr.data?.id || null;
+
+      /*
+        Folder না থাকলে তৈরি হবে।
+      */
+
+      if (!fid) {
+
+        const x =
+          await db
+            .from(
+              'question_bank_folders'
+            )
+            .insert({
+              sub_category:
+                category,
+
+              folder_name:
+                folderName
+            })
+            .select('id')
+            .single();
+
+        if (x.error) {
+          fail.push(
+            `Row ${i + 2}: ${x.error.message}`
+          );
+
+          continue;
+        }
+
+        fid =
+          x.data.id;
+      }
+
+      /*
+        Folder দেওয়া হয়েছে কিন্তু Set দেওয়া হয়নি।
+        তাই আগের selected Set ব্যবহার করা যাবে না।
+      */
+
+      if (!setName) {
+        sid = null;
+      }
     }
 
-    let sr =
-      await db
-        .from(
-          'question_bank_sets'
-        )
-        .select('id')
-        .eq(
-          'folder_id',
-          fid
-        )
-        .eq(
-          'set_name',
-          setName
-        )
-        .maybeSingle();
+    /* =========================
+       SET
+    ========================= */
 
-    if (sr.error) {
-      fail.push(
-        `Row ${i + 2}: ${sr.error.message}`
-      );
+    if (setName) {
 
-      continue;
-    }
+      /*
+        Set দেওয়া আছে কিন্তু Folder নেই।
+        তখন Admin-এর selected Folder থাকলে
+        সেটি ব্যবহার করা হবে।
+      */
 
-    let sid =
-      sr.data?.id;
+      if (!fid) {
+        fail.push(
+          `Row ${i + 2}: Set দেওয়া হয়েছে, কিন্তু Folder পাওয়া যায়নি`
+        );
 
-    if (!sid) {
-      const x =
+        continue;
+      }
+
+      const sr =
         await db
           .from(
             'question_bank_sets'
           )
-          .insert({
-            folder_id:
-              fid,
-
-            set_name:
-              setName
-          })
           .select('id')
-          .single();
+          .eq(
+            'folder_id',
+            fid
+          )
+          .eq(
+            'set_name',
+            setName
+          )
+          .maybeSingle();
 
-      if (x.error) {
+      if (sr.error) {
         fail.push(
-          `Row ${i + 2}: ${x.error.message}`
+          `Row ${i + 2}: ${sr.error.message}`
         );
 
         continue;
       }
 
       sid =
-        x.data.id;
+        sr.data?.id || null;
+
+      /*
+        Set না থাকলে তৈরি হবে।
+      */
+
+      if (!sid) {
+
+        const x =
+          await db
+            .from(
+              'question_bank_sets'
+            )
+            .insert({
+              folder_id:
+                fid,
+
+              set_name:
+                setName
+            })
+            .select('id')
+            .single();
+
+        if (x.error) {
+          fail.push(
+            `Row ${i + 2}: ${x.error.message}`
+          );
+
+          continue;
+        }
+
+        sid =
+          x.data.id;
+      }
     }
+
+    /* =========================
+       SUBJECT
+       Optional
+    ========================= */
 
     let sub =
       null;
 
-    if (r.subject) {
+    const subjectName =
+      String(
+        r.subject || ''
+      ).trim();
+
+    if (subjectName) {
+
       sub =
         subjects.find(
           x =>
             norm(x.name) ===
-            norm(r.subject)
-        );
+            norm(subjectName)
+        ) || null;
 
-      if (!sub) {
-        fail.push(
-          `Row ${i + 2}: Subject পাওয়া যায়নি: ${r.subject}`
-        );
-
-        continue;
-      }
+      /*
+        Subject পাওয়া না গেলেও
+        Row বাদ যাবে না।
+        subject_id = null থাকবে।
+      */
     }
 
+    /* =========================
+       QUESTION PAYLOAD
+    ========================= */
+
     const p = {
+
       folder_id:
         fid,
 
@@ -1695,6 +1874,11 @@ async function importRows() {
       category:
         category,
 
+      /*
+        Source শুধু text হিসেবে সংরক্ষিত হবে।
+        source_id পাঠানো হচ্ছে না।
+      */
+
       source_name:
         String(
           r.source || ''
@@ -1705,51 +1889,42 @@ async function importRows() {
         cat,
 
       question_number:
-        r.question_number
+        r.question_number !== '' &&
+        r.question_number !== null &&
+        r.question_number !== undefined
           ? Number(
               r.question_number
             )
           : null,
 
       question_text:
-        String(
-          r.question
-        ).trim(),
+        question,
 
       option_a:
-        String(
-          r.option_a
-        ).trim(),
+        optionA,
 
       option_b:
-        String(
-          r.option_b
-        ).trim(),
+        optionB,
 
       option_c:
-        String(
-          r.option_c
-        ).trim(),
+        optionC,
 
       option_d:
-        String(
-          r.option_d
-        ).trim(),
+        optionD,
 
       correct_answer:
-        String(
-          r.correct_answer
-        )
-          .trim()
-          .toUpperCase(),
+        correct,
 
       explanation:
         String(
-          r.explanation ||
-            ''
+          r.explanation || ''
         ).trim() ||
         null
     };
+
+    /* =========================
+       INSERT
+    ========================= */
 
     const x =
       await db
@@ -1757,13 +1932,20 @@ async function importRows() {
         .insert(p);
 
     if (x.error) {
+
       fail.push(
         `Row ${i + 2}: ${x.error.message}`
       );
+
     } else {
+
       ok++;
     }
   }
+
+  /* =========================
+     RESULT
+  ========================= */
 
   msg(
     'qmsg',
@@ -1778,6 +1960,7 @@ async function importRows() {
   );
 
   if (fail.length) {
+
     $('preview').innerHTML +=
       '<div class="q">' +
       fail
