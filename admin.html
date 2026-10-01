@@ -34,11 +34,6 @@
   margin:0
 }
 
-
-/* =========================
-   SMART DASHBOARD
-========================= */
-
 .dashboard-top{
   display:flex;
   align-items:center;
@@ -58,11 +53,6 @@
   color:#64748b;
   font-size:13px
 }
-
-
-/* =========================
-   THREE LINE MENU
-========================= */
 
 .admin-menu{
   position:relative
@@ -107,11 +97,6 @@
 .admin-menu-panel .logout{
   background:#dc2626
 }
-
-
-/* =========================
-   SMART DATE CARD
-========================= */
 
 .smart-date{
   position:relative;
@@ -176,11 +161,6 @@
   margin-top:2px
 }
 
-
-/* =========================
-   DASHBOARD STAT CARDS
-========================= */
-
 .dashboard-cards{
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
@@ -220,19 +200,11 @@
   margin-top:6px
 }
 
-
-/* =========================
-   RESPONSIVE
-========================= */
-
 @media(max-width:800px){
-
   .dashboard-cards{
     grid-template-columns:repeat(2,minmax(0,1fr))
   }
-
 }
-
 
 @media(max-width:480px){
 
@@ -270,9 +242,7 @@
 </style>
 </head>
 
-
 <body>
-
 
 <!-- =========================
      LOGIN
@@ -290,15 +260,22 @@
       id="email"
       type="email"
       placeholder="Admin Email"
+      autocomplete="username"
     >
 
     <input
       id="password"
       type="password"
       placeholder="Password"
+      autocomplete="current-password"
     >
 
-    <button onclick="login()">Login</button>
+    <button
+      type="button"
+      onclick="login()"
+    >
+      Login
+    </button>
 
     <p id="loginMsg" class="msg"></p>
 
@@ -307,16 +284,13 @@
 </div>
 
 
-
 <!-- =========================
      ADMIN APP
 ========================= -->
 
 <div id="app" class="hidden">
 
-
 <header class="dashboard-top">
-
 
   <div class="dashboard-brand">
 
@@ -325,12 +299,6 @@
     <p>Admin Dashboard</p>
 
   </div>
-
-
-
-  <!-- =========================
-       THREE LINE MENU
-  ========================= -->
 
   <div class="admin-menu">
 
@@ -341,12 +309,10 @@
       aria-label="মেনু"
     >☰</button>
 
-
     <div
       class="admin-menu-panel hidden"
       id="adminMenuPanel"
     >
-
 
       <button
         type="button"
@@ -355,7 +321,6 @@
         🏠 ড্যাশবোর্ড
       </button>
 
-
       <button
         type="button"
         onclick="showPage('bank');closeAdminMenu()"
@@ -363,14 +328,12 @@
         🗂️ প্রশ্ন ব্যাংক
       </button>
 
-
       <button
         type="button"
         onclick="showPage('exam');closeAdminMenu()"
       >
         📋 পরীক্ষা পরিচালনা
       </button>
-
 
       <button
         type="button"
@@ -380,7 +343,6 @@
         🚪 লগ আউট
       </button>
 
-
     </div>
 
   </div>
@@ -388,9 +350,7 @@
 </header>
 
 
-
 <main>
-
 
 <!-- =========================
      DASHBOARD
@@ -401,16 +361,11 @@
   class="page"
 >
 
-
-  <!-- SMART DATE & TIME -->
-
   <div class="smart-date">
-
 
     <div class="label">
       আজকের দিন • বাংলাদেশ সময়
     </div>
-
 
     <div
       class="today"
@@ -419,9 +374,7 @@
       লোড হচ্ছে...
     </div>
 
-
     <div class="smart-lines">
-
 
       <span
         class="smart-pill"
@@ -430,7 +383,6 @@
         🌾 বাংলা: লোড হচ্ছে...
       </span>
 
-
       <span
         class="smart-pill"
         id="smartHijri"
@@ -438,9 +390,7 @@
         🌙 হিজরি: লোড হচ্ছে...
       </span>
 
-
     </div>
-
 
     <div
       class="smart-clock"
@@ -449,20 +399,14 @@
       --:--:--
     </div>
 
-
     <div class="smart-zone">
       Asia/Dhaka • UTC+6
     </div>
 
-
   </div>
 
 
-
-  <!-- FOUR STAT CARDS -->
-
   <div class="dashboard-cards">
-
 
     <div class="dashboard-stat">
 
@@ -519,12 +463,9 @@
 
     </div>
 
-
   </div>
 
-
 </section>
-
 
 
 <!-- =========================
@@ -536,17 +477,13 @@
   class="page hidden"
 >
 
-
   <div class="card">
-
 
     <h2>
       ১. Category → Folder → Set
     </h2>
 
-
     <div class="cats">
-
 
       <button
         id="cat-recruitment"
@@ -555,14 +492,12 @@
         নিয়োগ পরীক্ষা
       </button>
 
-
       <button
         id="cat-verification_test"
         onclick="selectCategory('verification_test')"
       >
         যাচাই পরীক্ষা
       </button>
-
 
       <button
         id="cat-recent"
@@ -571,35 +506,27 @@
         সাম্প্রতিক প্রশ্ন
       </button>
 
-
     </div>
-
 
     <div
       id="currentCat"
       class="notice"
     ></div>
 
-
     <div class="grid">
 
-
       <div>
-
 
         <label>
           Folder
         </label>
 
-
         <select id="folder"></select>
-
 
         <div
           id="folderActions"
           class="bank-actions"
         >
-
 
           <button
             class="secondary"
@@ -609,7 +536,6 @@
             ✏️ Folder Rename
           </button>
 
-
           <button
             class="secondary"
             type="button"
@@ -618,30 +544,23 @@
             🗑️ Folder Delete
           </button>
 
-
         </div>
-
 
       </div>
 
 
-
       <div>
-
 
         <label>
           Set
         </label>
 
-
         <select id="set"></select>
-
 
         <div
           id="setActions"
           class="bank-actions"
         >
-
 
           <button
             class="secondary"
@@ -651,7 +570,6 @@
             ✏️ Set Rename
           </button>
 
-
           <button
             class="secondary"
             type="button"
@@ -660,19 +578,14 @@
             🗑️ Set Delete
           </button>
 
-
         </div>
 
-
       </div>
-
 
     </div>
 
 
-
     <div class="grid">
-
 
       <div>
 
@@ -683,18 +596,14 @@
 
       </div>
 
-
       <button onclick="createFolder()">
         ＋ Folder তৈরি
       </button>
 
-
     </div>
 
 
-
     <div class="grid">
-
 
       <div>
 
@@ -705,90 +614,70 @@
 
       </div>
 
-
       <button onclick="createSet()">
         ＋ Set তৈরি
       </button>
 
-
     </div>
-
 
     <p
       id="folderMsg"
       class="msg"
     ></p>
 
-
   </div>
-
 
 
   <!-- QUESTION UPLOAD -->
 
   <div class="card">
 
-
     <h2>
       ২. প্রশ্ন আপলোড
     </h2>
 
-
     <div class="tabs">
-
 
       <button onclick="mode('manual')">
         Manual
       </button>
 
-
       <button onclick="mode('import')">
         CSV / Excel
       </button>
-
 
     </div>
 
 
     <div id="manualBox">
 
-
       <div class="grid">
 
-
         <div>
-
 
           <label>
             বিষয়
           </label>
 
-
           <select id="subject"></select>
-
 
         </div>
 
 
         <div>
 
-
           <label>
             প্রশ্ন নম্বর
           </label>
-
 
           <input
             id="qno"
             type="number"
           >
 
-
         </div>
 
-
       </div>
-
 
 
       <input
@@ -803,68 +692,54 @@
       ></textarea>
 
 
-
       <div class="grid">
-
 
         <input
           id="a"
           placeholder="ক. অপশন"
         >
 
-
         <input
           id="b"
           placeholder="খ. অপশন"
         >
-
 
         <input
           id="c"
           placeholder="গ. অপশন"
         >
 
-
         <input
           id="d"
           placeholder="ঘ. অপশন"
         >
 
-
       </div>
-
 
 
       <div class="grid">
 
-
         <select id="correct">
-
 
           <option value="">
             সঠিক উত্তর
           </option>
 
-
           <option value="A">
             ক
           </option>
-
 
           <option value="B">
             খ
           </option>
 
-
           <option value="C">
             গ
           </option>
 
-
           <option value="D">
             ঘ
           </option>
-
 
         </select>
 
@@ -874,18 +749,14 @@
           placeholder="ব্যাখ্যা (ঐচ্ছিক)"
         >
 
-
       </div>
-
 
 
       <button onclick="addManual()">
         প্রশ্ন Question Bank-এ যোগ করুন
       </button>
 
-
     </div>
-
 
 
     <!-- IMPORT -->
@@ -894,7 +765,6 @@
       id="importBox"
       class="hidden"
     >
-
 
       <p class="muted">
 
@@ -906,7 +776,6 @@
 
       </p>
 
-
       <button
         class="secondary"
         onclick="template()"
@@ -914,21 +783,17 @@
         Template ডাউনলোড
       </button>
 
-
       <input
         id="file"
         type="file"
         accept=".csv,.xlsx,.xls"
       >
 
-
       <button onclick="previewImport()">
         Preview
       </button>
 
-
       <div id="preview"></div>
-
 
       <button
         id="importBtn"
@@ -938,70 +803,52 @@
         Database-এ Import করুন
       </button>
 
-
     </div>
-
 
     <p
       id="qmsg"
       class="msg"
     ></p>
 
-
   </div>
-
 
 
   <!-- QUESTION BANK LIST -->
 
   <div class="card">
 
-
     <h2>
       ৩. Question Bank
     </h2>
 
-
     <div class="grid">
-
 
       <select id="filterFolder"></select>
 
-
       <select id="filterSet"></select>
-
 
     </div>
 
-
     <div class="grid">
 
-
       <select id="filterSubject"></select>
-
 
       <input
         id="search"
         placeholder="প্রশ্ন খুঁজুন"
       >
 
-
     </div>
-
 
     <button onclick="loadQuestions()">
       Refresh
     </button>
 
-
     <div id="questions"></div>
-
 
   </div>
 
-
 </section>
-
 
 
 <!-- =========================
@@ -1013,69 +860,52 @@
   class="page hidden"
 >
 
-
-  <!-- CREATE EXAM -->
-
   <div class="card">
-
 
     <h2>
       Exam Management
     </h2>
 
-
     <div class="grid">
-
 
       <input
         id="examName"
         placeholder="পরীক্ষার নাম"
       >
 
-
       <select id="examStatus">
-
 
         <option value="active">
           Active
         </option>
 
-
         <option value="inactive">
           Inactive
         </option>
 
-
       </select>
 
-
     </div>
-
 
     <button onclick="createExam()">
       ＋ নতুন Exam তৈরি
     </button>
-
 
     <p
       id="examMsg"
       class="msg"
     ></p>
 
-
   </div>
-
 
 
   <!-- EXAM SETTINGS -->
 
   <div class="card">
 
-
     <h2>
       Exam Settings
     </h2>
-
 
     <select
       id="examSelect"
@@ -1085,13 +915,11 @@
 
     <div class="grid">
 
-
       <input
         id="totalQ"
         type="number"
         placeholder="Total Questions"
       >
-
 
       <input
         id="totalMarks"
@@ -1099,12 +927,10 @@
         placeholder="Total Marks"
       >
 
-
     </div>
 
 
     <div class="grid">
-
 
       <input
         id="pass"
@@ -1112,19 +938,16 @@
         placeholder="Pass Mark"
       >
 
-
       <input
         id="duration"
         type="number"
         placeholder="Duration (minutes)"
       >
 
-
     </div>
 
 
     <div class="grid">
-
 
       <input
         id="marks"
@@ -1133,14 +956,12 @@
         placeholder="Marks / Question"
       >
 
-
       <input
         id="negative"
         type="number"
         step="0.01"
         placeholder="Negative Mark"
       >
-
 
     </div>
 
@@ -1157,9 +978,7 @@
     ></textarea>
 
 
-
     <div class="checks">
-
 
       <label>
 
@@ -1221,43 +1040,35 @@
 
       </label>
 
-
     </div>
 
 
-
     <div class="grid">
-
 
       <input
         id="startDate"
         type="date"
       >
 
-
       <input
         id="startTime"
         type="time"
       >
-
 
     </div>
 
 
     <div class="grid">
 
-
       <input
         id="endDate"
         type="date"
       >
 
-
       <input
         id="endTime"
         type="time"
       >
-
 
     </div>
 
@@ -1272,63 +1083,48 @@
       class="msg"
     ></p>
 
-
   </div>
-
 
 
   <!-- QUESTION MAPPING -->
 
   <div class="card">
 
-
     <h2>
       Exam-এ Question Bank থেকে প্রশ্ন নিন
     </h2>
 
-
     <select id="mapExam"></select>
-
 
     <div class="grid">
 
-
       <select id="mapFolder"></select>
-
 
       <select id="mapSet"></select>
 
-
     </div>
-
 
     <button onclick="loadPool()">
       প্রশ্ন দেখুন
     </button>
 
-
     <div id="pool"></div>
-
 
     <p
       id="mapMsg"
       class="msg"
     ></p>
 
-
   </div>
-
 
 
   <!-- EXAM LIST -->
 
   <div class="card">
 
-
     <h2>
       Exam List / Link
     </h2>
-
 
     <a
       href="results.html"
@@ -1338,31 +1134,395 @@
       📊 Result দেখুন
     </a>
 
-
     <div id="exams"></div>
-
 
   </div>
 
-
 </section>
-
 
 </main>
 
 </div>
 
 
-
-<!-- SUPABASE -->
+<!-- =========================
+     SUPABASE
+========================= -->
 
 <script src="js/supabase.js"></script>
 
 
-<!-- EXISTING ADMIN LOGIC -->
+<!-- =========================
+     EXISTING ADMIN LOGIC
+========================= -->
 
 <script src="js/admin.js"></script>
 
+
+<!-- =========================
+     ADMIN AUTH
+========================= -->
+
+<script>
+
+(function(){
+
+  function showAdminApp(){
+
+    const loginBox =
+      document.getElementById("login");
+
+    const appBox =
+      document.getElementById("app");
+
+
+    if(loginBox){
+      loginBox.classList.add("hidden");
+    }
+
+
+    if(appBox){
+      appBox.classList.remove("hidden");
+    }
+
+  }
+
+
+  function showLogin(){
+
+    const loginBox =
+      document.getElementById("login");
+
+    const appBox =
+      document.getElementById("app");
+
+
+    if(loginBox){
+      loginBox.classList.remove("hidden");
+    }
+
+
+    if(appBox){
+      appBox.classList.add("hidden");
+    }
+
+  }
+
+
+  /* =========================
+     LOGIN
+  ========================= */
+
+  window.login = async function(){
+
+    const emailInput =
+      document.getElementById("email");
+
+    const passwordInput =
+      document.getElementById("password");
+
+    const msg =
+      document.getElementById("loginMsg");
+
+    const button =
+      document.querySelector("#login button");
+
+
+    const email =
+      emailInput
+        ? emailInput.value.trim()
+        : "";
+
+
+    const password =
+      passwordInput
+        ? passwordInput.value
+        : "";
+
+
+    if(!email || !password){
+
+      if(msg){
+        msg.textContent =
+          "❌ Email ও Password দিন";
+      }
+
+      return;
+    }
+
+
+    if(button){
+
+      button.disabled = true;
+
+      button.textContent =
+        "Login হচ্ছে...";
+
+    }
+
+
+    if(msg){
+
+      msg.textContent =
+        "Login হচ্ছে...";
+
+    }
+
+
+    try{
+
+      const { data, error } =
+        await db.auth.signInWithPassword({
+
+          email: email,
+
+          password: password
+
+        });
+
+
+      if(error){
+
+        throw error;
+
+      }
+
+
+      if(!data || !data.session){
+
+        throw new Error(
+          "Login session পাওয়া যায়নি"
+        );
+
+      }
+
+
+      if(msg){
+
+        msg.textContent =
+          "✅ Login সফল হয়েছে";
+
+      }
+
+
+      showAdminApp();
+
+
+    }catch(error){
+
+      console.error(
+        "Admin Login Error:",
+        error
+      );
+
+
+      if(msg){
+
+        msg.textContent =
+          "❌ " +
+          (
+            error?.message ||
+            "Login ব্যর্থ হয়েছে"
+          );
+
+      }
+
+
+      showLogin();
+
+
+    }finally{
+
+      if(button){
+
+        button.disabled = false;
+
+        button.textContent =
+          "Login";
+
+      }
+
+    }
+
+  };
+
+
+  /* =========================
+     LOGOUT
+  ========================= */
+
+  window.logout = async function(){
+
+    try{
+
+      const { error } =
+        await db.auth.signOut();
+
+
+      if(error){
+
+        throw error;
+
+      }
+
+
+    }catch(error){
+
+      console.error(
+        "Logout Error:",
+        error
+      );
+
+    }
+
+
+    showLogin();
+
+
+    const msg =
+      document.getElementById(
+        "loginMsg"
+      );
+
+
+    if(msg){
+
+      msg.textContent =
+        "আপনি Logout করেছেন";
+
+    }
+
+  };
+
+
+  /* =========================
+     SESSION CHECK
+  ========================= */
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    async function(){
+
+      try{
+
+        const { data, error } =
+          await db.auth.getSession();
+
+
+        if(error){
+
+          throw error;
+
+        }
+
+
+        if(data && data.session){
+
+          showAdminApp();
+
+        }else{
+
+          showLogin();
+
+        }
+
+
+      }catch(error){
+
+        console.error(
+          "Session Check Error:",
+          error
+        );
+
+        showLogin();
+
+      }
+
+
+      /* =========================
+         AUTH STATE CHANGE
+      ========================= */
+
+      db.auth.onAuthStateChange(
+        function(event, session){
+
+          console.log(
+            "Auth Event:",
+            event
+          );
+
+
+          if(session){
+
+            showAdminApp();
+
+          }else{
+
+            showLogin();
+
+          }
+
+        }
+      );
+
+
+      /* =========================
+         ENTER KEY LOGIN
+      ========================= */
+
+      const emailInput =
+        document.getElementById(
+          "email"
+        );
+
+
+      const passwordInput =
+        document.getElementById(
+          "password"
+        );
+
+
+      if(emailInput){
+
+        emailInput.addEventListener(
+          "keydown",
+          function(e){
+
+            if(e.key === "Enter"){
+
+              window.login();
+
+            }
+
+          }
+        );
+
+      }
+
+
+      if(passwordInput){
+
+        passwordInput.addEventListener(
+          "keydown",
+          function(e){
+
+            if(e.key === "Enter"){
+
+              window.login();
+
+            }
+
+          }
+        );
+
+      }
+
+    }
+  );
+
+})();
+
+</script>
 
 
 <!-- =========================
@@ -1373,11 +1533,6 @@
 
 (function(){
 
-
-  /* =========================
-     BANGLA NUMERAL
-  ========================= */
-
   const bn = n =>
     String(n ?? '')
       .replace(
@@ -1385,11 +1540,6 @@
         d => '০১২৩৪৫৬৭৮৯'[d]
       );
 
-
-
-  /* =========================
-     BANGLA MONTHS
-  ========================= */
 
   const bdMonths = [
 
@@ -1409,11 +1559,6 @@
   ];
 
 
-
-  /* =========================
-     BANGLA WEEK
-  ========================= */
-
   const bdWeek = [
 
     'রবিবার',
@@ -1427,43 +1572,44 @@
   ];
 
 
-
-  /* =========================
-     BANGLA DATE
-  ========================= */
-
   function banglaDate(d){
 
-    const y = d.getFullYear();
+    const y =
+      d.getFullYear();
 
 
-    let start = new Date(
-      y,
-      3,
-      14
-    );
+    let start =
+      new Date(
+        y,
+        3,
+        14
+      );
 
 
-    let by = y - 593;
+    let by =
+      y - 593;
 
 
     if(d < start){
 
-      by = y - 594;
+      by =
+        y - 594;
 
 
-      start = new Date(
-        y - 1,
-        3,
-        14
-      );
+      start =
+        new Date(
+          y - 1,
+          3,
+          14
+        );
 
     }
 
 
     let dayIndex =
       Math.floor(
-        (d - start) / 86400000
+        (d - start) /
+        86400000
       );
 
 
@@ -1493,7 +1639,8 @@
       dayIndex >= lens[m]
     ){
 
-      dayIndex -= lens[m];
+      dayIndex -=
+        lens[m];
 
       m++;
 
@@ -1512,11 +1659,6 @@
 
   }
 
-
-
-  /* =========================
-     HIJRI DATE AUTO UPDATE
-  ========================= */
 
   function hijriDate(d){
 
@@ -1560,11 +1702,6 @@
   }
 
 
-
-  /* =========================
-     BANGLA HIJRI NUMERAL
-  ========================= */
-
   function hijriBangla(d){
 
     return hijriDate(d)
@@ -1576,14 +1713,10 @@
   }
 
 
-
-  /* =========================
-     BANGLADESH CLOCK
-  ========================= */
-
   function updateClock(){
 
-    const now = new Date();
+    const now =
+      new Date();
 
 
     const dateStr =
@@ -1608,7 +1741,6 @@
       ).format(now);
 
 
-
     const parts =
       new Intl.DateTimeFormat(
 
@@ -1631,12 +1763,10 @@
       ).formatToParts(now);
 
 
-
     const hh =
       parts.find(
         x => x.type === 'hour'
       )?.value || '--';
-
 
 
     const mm =
@@ -1645,12 +1775,10 @@
       )?.value || '--';
 
 
-
     const ss =
       parts.find(
         x => x.type === 'second'
       )?.value || '--';
-
 
 
     const ap =
@@ -1659,20 +1787,15 @@
       )?.value || '';
 
 
-
     const dh =
       new Date(
         now.toLocaleString(
-
           'en-US',
-
           {
             timeZone:'Asia/Dhaka'
           }
-
         )
       );
-
 
 
     const today =
@@ -1699,7 +1822,6 @@
       );
 
 
-
     if(today){
 
       today.textContent =
@@ -1708,7 +1830,6 @@
         + bdWeek[dh.getDay()];
 
     }
-
 
 
     if(clock){
@@ -1725,7 +1846,6 @@
     }
 
 
-
     if(bangla){
 
       bangla.textContent =
@@ -1734,11 +1854,6 @@
 
     }
 
-
-
-    /* =========================
-       HIJRI AUTO UPDATE
-    ========================= */
 
     if(hijri){
 
@@ -1750,11 +1865,6 @@
 
   }
 
-
-
-  /* =========================
-     DASHBOARD DATABASE STATS
-  ========================= */
 
   async function dashboardStats(){
 
@@ -1773,50 +1883,37 @@
       s
     ] = await Promise.all([
 
-
       db
         .from('questions')
         .select(
-
           'id',
-
           {
             count:'exact',
             head:true
           }
-
         ),
-
 
       db
         .from('exams')
         .select(
-
           'id',
-
           {
             count:'exact',
             head:true
           }
-
         ),
-
 
       db
         .from('students')
         .select(
-
           'id',
-
           {
             count:'exact',
             head:true
           }
-
         )
 
     ]);
-
 
 
     function setStat(
@@ -1838,7 +1935,6 @@
     }
 
 
-
     if(!q.error){
 
       setStat(
@@ -1849,7 +1945,6 @@
     }
 
 
-
     if(!e.error){
 
       setStat(
@@ -1858,7 +1953,6 @@
       );
 
     }
-
 
 
     if(!s.error){
@@ -1873,10 +1967,11 @@
   }
 
 
+  /* Make available to other scripts */
 
-  /* =========================
-     THREE LINE MENU
-  ========================= */
+  window.dashboardStats =
+    dashboardStats;
+
 
   window.closeAdminMenu =
     function(){
@@ -1891,11 +1986,8 @@
     };
 
 
-
   document.addEventListener(
-
     'click',
-
     function(e){
 
       const panel =
@@ -1911,12 +2003,10 @@
 
 
       if(
-
         panel &&
         button &&
         !panel.contains(e.target) &&
         e.target !== button
-
       ){
 
         panel.classList.add(
@@ -1926,17 +2016,12 @@
       }
 
     }
-
   );
 
 
-
   document.addEventListener(
-
     'DOMContentLoaded',
-
     function(){
-
 
       const button =
         document.getElementById(
@@ -1950,14 +2035,12 @@
         );
 
 
-
       if(button && panel){
 
         button.onclick =
           function(e){
 
             e.stopPropagation();
-
 
             panel.classList.toggle(
               'hidden'
@@ -1966,7 +2049,6 @@
           };
 
       }
-
 
 
       updateClock();
@@ -1980,16 +2062,12 @@
 
       dashboardStats();
 
-
     }
-
   );
-
 
 })();
 
 </script>
-
 
 
 <!-- =========================
@@ -1999,7 +2077,6 @@
 <script>
 
 (function(){
-
 
   async function renameSelectedFolder(){
 
@@ -2112,7 +2189,6 @@
   }
 
 
-
   async function deleteSelectedFolder(){
 
     const id =
@@ -2140,25 +2216,20 @@
         || 'এই Folder';
 
 
-
     const check =
       await db
         .from('question_bank_sets')
         .select(
-
           'id',
-
           {
             count:'exact',
             head:true
           }
-
         )
         .eq(
           'folder_id',
           Number(id)
         );
-
 
 
     if(check.error){
@@ -2172,10 +2243,8 @@
     }
 
 
-
     const count =
       check.count || 0;
-
 
 
     const text =
@@ -2190,7 +2259,6 @@
           '" Folder Delete করবেন?';
 
 
-
     if(!confirm(text)){
 
       return;
@@ -2198,12 +2266,10 @@
     }
 
 
-
     msg(
       'folderMsg',
       'Folder Delete হচ্ছে...'
     );
-
 
 
     const r =
@@ -2214,7 +2280,6 @@
           'id',
           Number(id)
         );
-
 
 
     if(r.error){
@@ -2228,9 +2293,7 @@
     }
 
 
-
     await loadFolders();
-
 
 
     document.getElementById(
@@ -2239,14 +2302,12 @@
       '<option value="">Set নির্বাচন করুন</option>';
 
 
-
     msg(
       'folderMsg',
       '✅ Folder Delete হয়েছে'
     );
 
   }
-
 
 
   async function renameSelectedSet(){
@@ -2268,13 +2329,11 @@
     }
 
 
-
     const old =
       document
         .getElementById('set')
         .selectedOptions[0]
         ?.textContent || '';
-
 
 
     const name =
@@ -2284,7 +2343,6 @@
       );
 
 
-
     if(name === null){
 
       return;
@@ -2292,10 +2350,8 @@
     }
 
 
-
     const value =
       name.trim();
-
 
 
     if(!value){
@@ -2309,7 +2365,6 @@
     }
 
 
-
     if(value === old){
 
       return;
@@ -2317,12 +2372,10 @@
     }
 
 
-
     msg(
       'folderMsg',
       'Set Rename হচ্ছে...'
     );
-
 
 
     const r =
@@ -2337,7 +2390,6 @@
         );
 
 
-
     if(r.error){
 
       return msg(
@@ -2349,9 +2401,7 @@
     }
 
 
-
     await loadSets();
-
 
 
     document.getElementById(
@@ -2360,14 +2410,12 @@
       String(id);
 
 
-
     msg(
       'folderMsg',
       '✅ Set-এর নাম পরিবর্তন হয়েছে'
     );
 
   }
-
 
 
   async function deleteSelectedSet(){
@@ -2389,7 +2437,6 @@
     }
 
 
-
     const name =
       document
         .getElementById('set')
@@ -2398,25 +2445,20 @@
         || 'এই Set';
 
 
-
     const check =
       await db
         .from('questions')
         .select(
-
           'id',
-
           {
             count:'exact',
             head:true
           }
-
         )
         .eq(
           'set_id',
           Number(id)
         );
-
 
 
     if(check.error){
@@ -2430,10 +2472,8 @@
     }
 
 
-
     const count =
       check.count || 0;
-
 
 
     const text =
@@ -2448,7 +2488,6 @@
           '" Set Delete করবেন?';
 
 
-
     if(!confirm(text)){
 
       return;
@@ -2456,12 +2495,10 @@
     }
 
 
-
     msg(
       'folderMsg',
       'Set Delete হচ্ছে...'
     );
-
 
 
     const r =
@@ -2472,7 +2509,6 @@
           'id',
           Number(id)
         );
-
 
 
     if(r.error){
@@ -2486,9 +2522,7 @@
     }
 
 
-
     await loadSets();
-
 
 
     msg(
@@ -2497,7 +2531,6 @@
     );
 
   }
-
 
 
   window.renameSelectedFolder =
@@ -2519,7 +2552,6 @@
 })();
 
 </script>
-
 
 </body>
 </html>
