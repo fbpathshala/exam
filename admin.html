@@ -11,6 +11,7 @@
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 
 <style>
+
 .result-link{
   display:inline-block;
   text-decoration:none;
@@ -32,6 +33,7 @@
 .bank-actions button{
   margin:0
 }
+
 
 /* =========================
    SMART DASHBOARD
@@ -57,6 +59,11 @@
   font-size:13px
 }
 
+
+/* =========================
+   THREE LINE MENU
+========================= */
+
 .admin-menu{
   position:relative
 }
@@ -65,13 +72,16 @@
   width:46px!important;
   height:46px!important;
   padding:0!important;
-  font-size:28px!important;
+  font-size:27px!important;
   line-height:1;
   background:#111827!important;
   color:#fff!important;
   border:0!important;
   border-radius:12px!important;
-  cursor:pointer
+  cursor:pointer;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important
 }
 
 .admin-menu-panel{
@@ -98,7 +108,10 @@
   background:#dc2626
 }
 
-/* Smart date card */
+
+/* =========================
+   SMART DATE CARD
+========================= */
 
 .smart-date{
   position:relative;
@@ -163,7 +176,10 @@
   margin-top:2px
 }
 
-/* Dashboard stat cards */
+
+/* =========================
+   DASHBOARD STAT CARDS
+========================= */
 
 .dashboard-cards{
   display:grid;
@@ -204,11 +220,19 @@
   margin-top:6px
 }
 
+
+/* =========================
+   RESPONSIVE
+========================= */
+
 @media(max-width:800px){
+
   .dashboard-cards{
     grid-template-columns:repeat(2,minmax(0,1fr))
   }
+
 }
+
 
 @media(max-width:480px){
 
@@ -246,7 +270,9 @@
 </style>
 </head>
 
+
 <body>
+
 
 <!-- =========================
      LOGIN
@@ -257,6 +283,7 @@
   <div class="card login">
 
     <h1>ফেইসবুক পাঠশালা</h1>
+
     <h2>Admin Panel</h2>
 
     <input
@@ -280,6 +307,7 @@
 </div>
 
 
+
 <!-- =========================
      ADMIN APP
 ========================= -->
@@ -288,6 +316,7 @@
 
 
 <header class="dashboard-top">
+
 
   <div class="dashboard-brand">
 
@@ -298,7 +327,10 @@
   </div>
 
 
-  <!-- THREE DOT MENU -->
+
+  <!-- =========================
+       THREE LINE MENU
+  ========================= -->
 
   <div class="admin-menu">
 
@@ -307,13 +339,14 @@
       class="admin-menu-btn"
       id="adminMenuBtn"
       aria-label="মেনু"
-    >⋮</button>
+    >☰</button>
 
 
     <div
       class="admin-menu-panel hidden"
       id="adminMenuPanel"
     >
+
 
       <button
         type="button"
@@ -322,6 +355,7 @@
         🏠 ড্যাশবোর্ড
       </button>
 
+
       <button
         type="button"
         onclick="showPage('bank');closeAdminMenu()"
@@ -329,12 +363,14 @@
         🗂️ প্রশ্ন ব্যাংক
       </button>
 
+
       <button
         type="button"
         onclick="showPage('exam');closeAdminMenu()"
       >
         📋 পরীক্ষা পরিচালনা
       </button>
+
 
       <button
         type="button"
@@ -344,11 +380,13 @@
         🚪 লগ আউট
       </button>
 
+
     </div>
 
   </div>
 
 </header>
+
 
 
 <main>
@@ -368,6 +406,7 @@
 
   <div class="smart-date">
 
+
     <div class="label">
       আজকের দিন • বাংলাদেশ সময়
     </div>
@@ -383,6 +422,7 @@
 
     <div class="smart-lines">
 
+
       <span
         class="smart-pill"
         id="smartBangla"
@@ -395,8 +435,9 @@
         class="smart-pill"
         id="smartHijri"
       >
-        🌙 হিজরি: বাংলাদেশে চাঁদ দেখা অনুযায়ী
+        🌙 হিজরি: লোড হচ্ছে...
       </span>
+
 
     </div>
 
@@ -413,7 +454,9 @@
       Asia/Dhaka • UTC+6
     </div>
 
+
   </div>
+
 
 
   <!-- FOUR STAT CARDS -->
@@ -483,6 +526,7 @@
 </section>
 
 
+
 <!-- =========================
      QUESTION BANK
 ========================= -->
@@ -495,12 +539,14 @@
 
   <div class="card">
 
+
     <h2>
       ১. Category → Folder → Set
     </h2>
 
 
     <div class="cats">
+
 
       <button
         id="cat-recruitment"
@@ -509,6 +555,7 @@
         নিয়োগ পরীক্ষা
       </button>
 
+
       <button
         id="cat-verification_test"
         onclick="selectCategory('verification_test')"
@@ -516,12 +563,14 @@
         যাচাই পরীক্ষা
       </button>
 
+
       <button
         id="cat-recent"
         onclick="selectCategory('recent')"
       >
         সাম্প্রতিক প্রশ্ন
       </button>
+
 
     </div>
 
@@ -537,9 +586,11 @@
 
       <div>
 
+
         <label>
           Folder
         </label>
+
 
         <select id="folder"></select>
 
@@ -549,6 +600,7 @@
           class="bank-actions"
         >
 
+
           <button
             class="secondary"
             type="button"
@@ -556,6 +608,7 @@
           >
             ✏️ Folder Rename
           </button>
+
 
           <button
             class="secondary"
@@ -565,16 +618,21 @@
             🗑️ Folder Delete
           </button>
 
+
         </div>
+
 
       </div>
 
 
+
       <div>
+
 
         <label>
           Set
         </label>
+
 
         <select id="set"></select>
 
@@ -584,6 +642,7 @@
           class="bank-actions"
         >
 
+
           <button
             class="secondary"
             type="button"
@@ -591,6 +650,7 @@
           >
             ✏️ Set Rename
           </button>
+
 
           <button
             class="secondary"
@@ -600,7 +660,9 @@
             🗑️ Set Delete
           </button>
 
+
         </div>
+
 
       </div>
 
@@ -608,7 +670,9 @@
     </div>
 
 
+
     <div class="grid">
+
 
       <div>
 
@@ -619,14 +683,18 @@
 
       </div>
 
+
       <button onclick="createFolder()">
         ＋ Folder তৈরি
       </button>
 
+
     </div>
 
 
+
     <div class="grid">
+
 
       <div>
 
@@ -637,9 +705,11 @@
 
       </div>
 
+
       <button onclick="createSet()">
         ＋ Set তৈরি
       </button>
+
 
     </div>
 
@@ -649,12 +719,15 @@
       class="msg"
     ></p>
 
+
   </div>
+
 
 
   <!-- QUESTION UPLOAD -->
 
   <div class="card">
+
 
     <h2>
       ২. প্রশ্ন আপলোড
@@ -663,13 +736,16 @@
 
     <div class="tabs">
 
+
       <button onclick="mode('manual')">
         Manual
       </button>
 
+
       <button onclick="mode('import')">
         CSV / Excel
       </button>
+
 
     </div>
 
@@ -679,31 +755,40 @@
 
       <div class="grid">
 
+
         <div>
+
 
           <label>
             বিষয়
           </label>
 
+
           <select id="subject"></select>
+
 
         </div>
 
 
         <div>
 
+
           <label>
             প্রশ্ন নম্বর
           </label>
+
 
           <input
             id="qno"
             type="number"
           >
 
+
         </div>
 
+
       </div>
+
 
 
       <input
@@ -718,54 +803,68 @@
       ></textarea>
 
 
+
       <div class="grid">
+
 
         <input
           id="a"
           placeholder="ক. অপশন"
         >
 
+
         <input
           id="b"
           placeholder="খ. অপশন"
         >
+
 
         <input
           id="c"
           placeholder="গ. অপশন"
         >
 
+
         <input
           id="d"
           placeholder="ঘ. অপশন"
         >
 
+
       </div>
+
 
 
       <div class="grid">
 
+
         <select id="correct">
+
 
           <option value="">
             সঠিক উত্তর
           </option>
 
+
           <option value="A">
             ক
           </option>
+
 
           <option value="B">
             খ
           </option>
 
+
           <option value="C">
             গ
           </option>
 
+
           <option value="D">
             ঘ
           </option>
+
 
         </select>
 
@@ -775,14 +874,18 @@
           placeholder="ব্যাখ্যা (ঐচ্ছিক)"
         >
 
+
       </div>
+
 
 
       <button onclick="addManual()">
         প্রশ্ন Question Bank-এ যোগ করুন
       </button>
 
+
     </div>
+
 
 
     <!-- IMPORT -->
@@ -792,12 +895,15 @@
       class="hidden"
     >
 
+
       <p class="muted">
+
         Excel/CSV columns:
         category, folder, set, subject, source,
         question_number, question, option_a,
         option_b, option_c, option_d,
         correct_answer, explanation
+
       </p>
 
 
@@ -832,6 +938,7 @@
         Database-এ Import করুন
       </button>
 
+
     </div>
 
 
@@ -840,12 +947,15 @@
       class="msg"
     ></p>
 
+
   </div>
+
 
 
   <!-- QUESTION BANK LIST -->
 
   <div class="card">
+
 
     <h2>
       ৩. Question Bank
@@ -854,21 +964,27 @@
 
     <div class="grid">
 
+
       <select id="filterFolder"></select>
 
+
       <select id="filterSet"></select>
+
 
     </div>
 
 
     <div class="grid">
 
+
       <select id="filterSubject"></select>
+
 
       <input
         id="search"
         placeholder="প্রশ্ন খুঁজুন"
       >
+
 
     </div>
 
@@ -880,10 +996,12 @@
 
     <div id="questions"></div>
 
+
   </div>
 
 
 </section>
+
 
 
 <!-- =========================
@@ -900,12 +1018,14 @@
 
   <div class="card">
 
+
     <h2>
       Exam Management
     </h2>
 
 
     <div class="grid">
+
 
       <input
         id="examName"
@@ -915,15 +1035,19 @@
 
       <select id="examStatus">
 
+
         <option value="active">
           Active
         </option>
+
 
         <option value="inactive">
           Inactive
         </option>
 
+
       </select>
+
 
     </div>
 
@@ -938,12 +1062,15 @@
       class="msg"
     ></p>
 
+
   </div>
+
 
 
   <!-- EXAM SETTINGS -->
 
   <div class="card">
+
 
     <h2>
       Exam Settings
@@ -958,11 +1085,13 @@
 
     <div class="grid">
 
+
       <input
         id="totalQ"
         type="number"
         placeholder="Total Questions"
       >
+
 
       <input
         id="totalMarks"
@@ -970,10 +1099,12 @@
         placeholder="Total Marks"
       >
 
+
     </div>
 
 
     <div class="grid">
+
 
       <input
         id="pass"
@@ -981,16 +1112,19 @@
         placeholder="Pass Mark"
       >
 
+
       <input
         id="duration"
         type="number"
         placeholder="Duration (minutes)"
       >
 
+
     </div>
 
 
     <div class="grid">
+
 
       <input
         id="marks"
@@ -999,12 +1133,14 @@
         placeholder="Marks / Question"
       >
 
+
       <input
         id="negative"
         type="number"
         step="0.01"
         placeholder="Negative Mark"
       >
+
 
     </div>
 
@@ -1021,82 +1157,107 @@
     ></textarea>
 
 
+
     <div class="checks">
 
+
       <label>
+
         <input
           id="showAnswers"
           type="checkbox"
         >
+
         উত্তর দেখাবে
+
       </label>
 
 
       <label>
+
         <input
           id="multiple"
           type="checkbox"
         >
+
         Multiple Attempt
+
       </label>
 
 
       <label>
+
         <input
           id="device"
           type="checkbox"
           checked
         >
+
         Device Protection
+
       </label>
 
 
       <label>
+
         <input
           id="randomQ"
           type="checkbox"
         >
+
         Random Questions
+
       </label>
 
 
       <label>
+
         <input
           id="randomO"
           type="checkbox"
         >
+
         Random Options
+
       </label>
+
 
     </div>
 
 
+
     <div class="grid">
+
 
       <input
         id="startDate"
         type="date"
       >
 
+
       <input
         id="startTime"
         type="time"
       >
+
 
     </div>
 
 
     <div class="grid">
 
+
       <input
         id="endDate"
         type="date"
       >
 
+
       <input
         id="endTime"
         type="time"
       >
+
 
     </div>
 
@@ -1111,12 +1272,15 @@
       class="msg"
     ></p>
 
+
   </div>
+
 
 
   <!-- QUESTION MAPPING -->
 
   <div class="card">
+
 
     <h2>
       Exam-এ Question Bank থেকে প্রশ্ন নিন
@@ -1128,9 +1292,12 @@
 
     <div class="grid">
 
+
       <select id="mapFolder"></select>
 
+
       <select id="mapSet"></select>
+
 
     </div>
 
@@ -1148,12 +1315,15 @@
       class="msg"
     ></p>
 
+
   </div>
+
 
 
   <!-- EXAM LIST -->
 
   <div class="card">
+
 
     <h2>
       Exam List / Link
@@ -1171,6 +1341,7 @@
 
     <div id="exams"></div>
 
+
   </div>
 
 
@@ -1182,13 +1353,16 @@
 </div>
 
 
+
 <!-- SUPABASE -->
 
 <script src="js/supabase.js"></script>
 
+
 <!-- EXISTING ADMIN LOGIC -->
 
 <script src="js/admin.js"></script>
+
 
 
 <!-- =========================
@@ -1199,6 +1373,11 @@
 
 (function(){
 
+
+  /* =========================
+     BANGLA NUMERAL
+  ========================= */
+
   const bn = n =>
     String(n ?? '')
       .replace(
@@ -1207,7 +1386,13 @@
       );
 
 
+
+  /* =========================
+     BANGLA MONTHS
+  ========================= */
+
   const bdMonths = [
+
     'বৈশাখ',
     'জ্যৈষ্ঠ',
     'আষাঢ়',
@@ -1220,10 +1405,17 @@
     'মাঘ',
     'ফাল্গুন',
     'চৈত্র'
+
   ];
 
 
+
+  /* =========================
+     BANGLA WEEK
+  ========================= */
+
   const bdWeek = [
+
     'রবিবার',
     'সোমবার',
     'মঙ্গলবার',
@@ -1231,20 +1423,19 @@
     'বৃহস্পতিবার',
     'শুক্রবার',
     'শনিবার'
+
   ];
 
 
-  /*
-   * বাংলা তারিখ
-   *
-   * এটি Dashboard-এর
-   * আনুমানিক বাংলা ক্যালেন্ডার
-   * প্রদর্শনের জন্য।
-   */
+
+  /* =========================
+     BANGLA DATE
+  ========================= */
 
   function banglaDate(d){
 
     const y = d.getFullYear();
+
 
     let start = new Date(
       y,
@@ -1252,12 +1443,14 @@
       14
     );
 
+
     let by = y - 593;
 
 
     if(d < start){
 
       by = y - 594;
+
 
       start = new Date(
         y - 1,
@@ -1275,6 +1468,7 @@
 
 
     const lens = [
+
       31,
       31,
       31,
@@ -1287,6 +1481,7 @@
       30,
       30,
       30
+
     ];
 
 
@@ -1306,19 +1501,85 @@
 
 
     return (
+
       bn(dayIndex + 1)
       + ' '
       + bdMonths[m]
       + ' '
       + bn(by)
+
     );
 
   }
 
 
-  /*
-   * Bangladesh time
-   */
+
+  /* =========================
+     HIJRI DATE AUTO UPDATE
+  ========================= */
+
+  function hijriDate(d){
+
+    try{
+
+      const formatter =
+        new Intl.DateTimeFormat(
+
+          'en-US-u-ca-islamic-umalqura',
+
+          {
+
+            timeZone:'Asia/Dhaka',
+
+            day:'numeric',
+
+            month:'long',
+
+            year:'numeric'
+
+          }
+
+        );
+
+
+      return formatter.format(d);
+
+
+    }catch(error){
+
+      console.error(
+        'Hijri date error:',
+        error
+      );
+
+
+      return 'হিজরি তারিখ পাওয়া যাচ্ছে না';
+
+    }
+
+  }
+
+
+
+  /* =========================
+     BANGLA HIJRI NUMERAL
+  ========================= */
+
+  function hijriBangla(d){
+
+    return hijriDate(d)
+      .replace(
+        /\d/g,
+        n => '০১২৩৪৫৬৭৮৯'[n]
+      );
+
+  }
+
+
+
+  /* =========================
+     BANGLADESH CLOCK
+  ========================= */
 
   function updateClock(){
 
@@ -1327,28 +1588,48 @@
 
     const dateStr =
       new Intl.DateTimeFormat(
+
         'en-US',
+
         {
+
           timeZone:'Asia/Dhaka',
+
           weekday:'long',
+
           month:'long',
+
           day:'numeric',
+
           year:'numeric'
+
         }
+
       ).format(now);
+
 
 
     const parts =
       new Intl.DateTimeFormat(
+
         'en-US',
+
         {
+
           timeZone:'Asia/Dhaka',
+
           hour:'2-digit',
+
           minute:'2-digit',
+
           second:'2-digit',
+
           hour12:true
+
         }
+
       ).formatToParts(now);
+
 
 
     const hh =
@@ -1357,10 +1638,12 @@
       )?.value || '--';
 
 
+
     const mm =
       parts.find(
         x => x.type === 'minute'
       )?.value || '--';
+
 
 
     const ss =
@@ -1369,21 +1652,27 @@
       )?.value || '--';
 
 
+
     const ap =
       parts.find(
         x => x.type === 'dayPeriod'
       )?.value || '';
 
 
+
     const dh =
       new Date(
         now.toLocaleString(
+
           'en-US',
+
           {
             timeZone:'Asia/Dhaka'
           }
+
         )
       );
+
 
 
     const today =
@@ -1404,6 +1693,13 @@
       );
 
 
+    const hijri =
+      document.getElementById(
+        'smartHijri'
+      );
+
+
+
     if(today){
 
       today.textContent =
@@ -1412,6 +1708,7 @@
         + bdWeek[dh.getDay()];
 
     }
+
 
 
     if(clock){
@@ -1428,6 +1725,7 @@
     }
 
 
+
     if(bangla){
 
       bangla.textContent =
@@ -1436,12 +1734,27 @@
 
     }
 
+
+
+    /* =========================
+       HIJRI AUTO UPDATE
+    ========================= */
+
+    if(hijri){
+
+      hijri.textContent =
+        '🌙 হিজরি: '
+        + hijriBangla(now);
+
+    }
+
   }
 
 
-  /*
-   * Dashboard database statistics
-   */
+
+  /* =========================
+     DASHBOARD DATABASE STATS
+  ========================= */
 
   async function dashboardStats(){
 
@@ -1460,37 +1773,50 @@
       s
     ] = await Promise.all([
 
+
       db
         .from('questions')
         .select(
+
           'id',
+
           {
             count:'exact',
             head:true
           }
+
         ),
+
 
       db
         .from('exams')
         .select(
+
           'id',
+
           {
             count:'exact',
             head:true
           }
+
         ),
+
 
       db
         .from('students')
         .select(
+
           'id',
+
           {
             count:'exact',
             head:true
           }
+
         )
 
     ]);
+
 
 
     function setStat(
@@ -1512,6 +1838,7 @@
     }
 
 
+
     if(!q.error){
 
       setStat(
@@ -1522,6 +1849,7 @@
     }
 
 
+
     if(!e.error){
 
       setStat(
@@ -1530,6 +1858,7 @@
       );
 
     }
+
 
 
     if(!s.error){
@@ -1544,9 +1873,10 @@
   }
 
 
-  /*
-   * Three-dot menu
-   */
+
+  /* =========================
+     THREE LINE MENU
+  ========================= */
 
   window.closeAdminMenu =
     function(){
@@ -1561,14 +1891,18 @@
     };
 
 
+
   document.addEventListener(
+
     'click',
+
     function(e){
 
       const panel =
         document.getElementById(
           'adminMenuPanel'
         );
+
 
       const button =
         document.getElementById(
@@ -1577,10 +1911,12 @@
 
 
       if(
+
         panel &&
         button &&
         !panel.contains(e.target) &&
         e.target !== button
+
       ){
 
         panel.classList.add(
@@ -1590,22 +1926,29 @@
       }
 
     }
+
   );
 
 
+
   document.addEventListener(
+
     'DOMContentLoaded',
+
     function(){
+
 
       const button =
         document.getElementById(
           'adminMenuBtn'
         );
 
+
       const panel =
         document.getElementById(
           'adminMenuPanel'
         );
+
 
 
       if(button && panel){
@@ -1614,6 +1957,7 @@
           function(e){
 
             e.stopPropagation();
+
 
             panel.classList.toggle(
               'hidden'
@@ -1624,7 +1968,9 @@
       }
 
 
+
       updateClock();
+
 
       setInterval(
         updateClock,
@@ -1634,13 +1980,16 @@
 
       dashboardStats();
 
+
     }
+
   );
 
 
 })();
 
 </script>
+
 
 
 <!-- =========================
@@ -1763,6 +2112,7 @@
   }
 
 
+
   async function deleteSelectedFolder(){
 
     const id =
@@ -1790,20 +2140,25 @@
         || 'এই Folder';
 
 
+
     const check =
       await db
         .from('question_bank_sets')
         .select(
+
           'id',
+
           {
             count:'exact',
             head:true
           }
+
         )
         .eq(
           'folder_id',
           Number(id)
         );
+
 
 
     if(check.error){
@@ -1817,18 +2172,23 @@
     }
 
 
+
     const count =
       check.count || 0;
 
 
+
     const text =
       count
+
         ? '"' + name +
           '" Folder-এর ভিতরে ' +
           count +
           'টি Set আছে। Delete করলে Set-গুলোও মুছে যাবে। নিশ্চিত?'
+
         : '"' + name +
           '" Folder Delete করবেন?';
+
 
 
     if(!confirm(text)){
@@ -1838,10 +2198,12 @@
     }
 
 
+
     msg(
       'folderMsg',
       'Folder Delete হচ্ছে...'
     );
+
 
 
     const r =
@@ -1852,6 +2214,7 @@
           'id',
           Number(id)
         );
+
 
 
     if(r.error){
@@ -1865,7 +2228,9 @@
     }
 
 
+
     await loadFolders();
+
 
 
     document.getElementById(
@@ -1874,12 +2239,14 @@
       '<option value="">Set নির্বাচন করুন</option>';
 
 
+
     msg(
       'folderMsg',
       '✅ Folder Delete হয়েছে'
     );
 
   }
+
 
 
   async function renameSelectedSet(){
@@ -1901,11 +2268,13 @@
     }
 
 
+
     const old =
       document
         .getElementById('set')
         .selectedOptions[0]
         ?.textContent || '';
+
 
 
     const name =
@@ -1915,6 +2284,7 @@
       );
 
 
+
     if(name === null){
 
       return;
@@ -1922,8 +2292,10 @@
     }
 
 
+
     const value =
       name.trim();
+
 
 
     if(!value){
@@ -1937,6 +2309,7 @@
     }
 
 
+
     if(value === old){
 
       return;
@@ -1944,10 +2317,12 @@
     }
 
 
+
     msg(
       'folderMsg',
       'Set Rename হচ্ছে...'
     );
+
 
 
     const r =
@@ -1962,6 +2337,7 @@
         );
 
 
+
     if(r.error){
 
       return msg(
@@ -1973,7 +2349,9 @@
     }
 
 
+
     await loadSets();
+
 
 
     document.getElementById(
@@ -1982,12 +2360,14 @@
       String(id);
 
 
+
     msg(
       'folderMsg',
       '✅ Set-এর নাম পরিবর্তন হয়েছে'
     );
 
   }
+
 
 
   async function deleteSelectedSet(){
@@ -2009,6 +2389,7 @@
     }
 
 
+
     const name =
       document
         .getElementById('set')
@@ -2017,20 +2398,25 @@
         || 'এই Set';
 
 
+
     const check =
       await db
         .from('questions')
         .select(
+
           'id',
+
           {
             count:'exact',
             head:true
           }
+
         )
         .eq(
           'set_id',
           Number(id)
         );
+
 
 
     if(check.error){
@@ -2044,18 +2430,23 @@
     }
 
 
+
     const count =
       check.count || 0;
 
 
+
     const text =
       count
+
         ? '"' + name +
           '" Set-এর মধ্যে ' +
           count +
           'টি প্রশ্ন আছে। Delete করলে প্রশ্নগুলোও মুছে যাবে। নিশ্চিত?'
+
         : '"' + name +
           '" Set Delete করবেন?';
+
 
 
     if(!confirm(text)){
@@ -2065,10 +2456,12 @@
     }
 
 
+
     msg(
       'folderMsg',
       'Set Delete হচ্ছে...'
     );
+
 
 
     const r =
@@ -2079,6 +2472,7 @@
           'id',
           Number(id)
         );
+
 
 
     if(r.error){
@@ -2092,7 +2486,9 @@
     }
 
 
+
     await loadSets();
+
 
 
     msg(
@@ -2103,14 +2499,18 @@
   }
 
 
+
   window.renameSelectedFolder =
     renameSelectedFolder;
+
 
   window.deleteSelectedFolder =
     deleteSelectedFolder;
 
+
   window.renameSelectedSet =
     renameSelectedSet;
+
 
   window.deleteSelectedSet =
     deleteSelectedSet;
@@ -2119,6 +2519,7 @@
 })();
 
 </script>
+
 
 </body>
 </html>
