@@ -1,3880 +1,2122 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="bn">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ফেইসবুক পাঠশালা — Admin Panel</title>
 
-<title>ফেইসবুক পাঠশালা</title>
+<link rel="stylesheet" href="css/admin.css">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
-<script>
-window.FACEBOOK_PATHSHALA_CONFIG={
- SUPABASE_URL:"https://ydvbnalhcnfqpxkkmywr.supabase.co",
- SUPABASE_KEY:"sb_publishable_xCbSWDkASsbUPl-WmygyMw_eVrJY_9a",
- FACEBOOK_PAGE_URL:"https://www.facebook.com/facebook.pathshala",
- FACEBOOK_GROUP_URL:"https://www.facebook.com/groups/facebookpathshala",
- FACEBOOK_PROFILE_URL:"https://www.facebook.com/mdbayzidmostofa"
-};
-</script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 
 <style>
-*{box-sizing:border-box}
-body{
- margin:0;
- font-family:"Noto Sans Bengali",Arial,sans-serif;
- background:#f4f7fb;
- color:#172033
-}
-.top{
- background:linear-gradient(135deg,#0f3d91,#2563eb);
- color:#fff;
- padding:22px 16px;
- text-align:center
-}
-.top h1{margin:0;font-size:28px}
-.top p{margin:6px 0 0}
-
-.wrap{
- max-width:1050px;
- margin:22px auto;
- padding:0 14px
+.result-link{
+  display:inline-block;
+  text-decoration:none;
+  margin-bottom:12px;
+  padding:10px 16px;
+  border-radius:8px;
+  background:#0b7a4b;
+  color:#fff;
+  font-weight:700
 }
 
-.card{
- background:#fff;
- border:1px solid #e2e8f0;
- border-radius:18px;
- padding:20px;
- box-shadow:0 8px 28px rgba(15,23,42,.07);
- margin-bottom:18px
+.bank-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:8px
 }
 
-.grid{
- display:grid;
- grid-template-columns:repeat(2,minmax(0,1fr));
- gap:14px
+.bank-actions button{
+  margin:0
 }
 
-.grid3{
- display:grid;
- grid-template-columns:repeat(3,minmax(0,1fr));
- gap:12px
+/* =========================
+   SMART DASHBOARD
+========================= */
+
+.dashboard-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:16px
 }
 
-.field{
- display:block;
- font-weight:700;
- margin:10px 0 6px
+.dashboard-brand h1{
+  margin:0;
+  font-size:24px;
+  font-weight:800
 }
 
-input,select,textarea{
- width:100%;
- padding:11px 12px;
- border:1px solid #cbd5e1;
- border-radius:10px;
- font-size:15px;
- background:#fff
+.dashboard-brand p{
+  margin:4px 0 0;
+  color:#64748b;
+  font-size:13px
 }
 
-textarea{
- min-height:90px;
- resize:vertical
+.admin-menu{
+  position:relative
 }
 
-.btn{
- border:0;
- border-radius:10px;
- padding:11px 15px;
- font-size:15px;
- cursor:pointer
+.admin-menu-btn{
+  width:46px!important;
+  height:46px!important;
+  padding:0!important;
+  font-size:28px!important;
+  line-height:1;
+  background:#111827!important;
+  color:#fff!important;
+  border:0!important;
+  border-radius:12px!important;
+  cursor:pointer
 }
 
-.primary{background:#2563eb;color:#fff}
-.secondary{background:#e2e8f0;color:#172033}
-.danger{background:#dc2626;color:#fff}
-.success{background:#16a34a;color:#fff}
-
-.tabs{
- display:flex;
- gap:8px;
- flex-wrap:wrap;
- margin-bottom:16px
+.admin-menu-panel{
+  position:absolute;
+  right:0;
+  top:54px;
+  width:230px;
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  box-shadow:0 16px 40px rgba(15,23,42,.18);
+  padding:8px;
+  z-index:10000
 }
 
-.tab{
- background:#e8eef9;
- color:#17356f
+.admin-menu-panel button{
+  display:block;
+  width:100%;
+  margin:3px 0;
+  text-align:left
 }
 
-.tab.active{
- background:#2563eb;
- color:#fff
+.admin-menu-panel .logout{
+  background:#dc2626
 }
 
-.hidden{display:none!important}
-.muted{color:#64748b}
+/* Smart date card */
 
-.status{
- padding:11px 13px;
- border-radius:10px;
- margin-top:12px;
- background:#eff6ff;
- color:#1d4ed8
+.smart-date{
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(135deg,#0f172a,#1e3a5f);
+  color:#fff;
+  border-radius:20px;
+  padding:22px;
+  margin-bottom:16px;
+  box-shadow:0 14px 35px rgba(15,23,42,.18)
 }
 
-.status.error{
- background:#fef2f2;
- color:#b91c1c
+.smart-date:after{
+  content:"";
+  position:absolute;
+  width:170px;
+  height:170px;
+  border-radius:50%;
+  right:-65px;
+  top:-75px;
+  background:rgba(255,255,255,.08)
 }
 
-.status.success{
- background:#f0fdf4;
- color:#15803d
+.smart-date .label{
+  font-size:12px;
+  opacity:.72;
+  letter-spacing:.06em
 }
 
-.exam-item,.q-item{
- border:1px solid #e2e8f0;
- border-radius:12px;
- padding:14px;
- margin:9px 0
+.smart-date .today{
+  font-size:25px;
+  font-weight:800;
+  margin:5px 0 12px
 }
 
-.exam-item{
- display:flex;
- justify-content:space-between;
- gap:12px;
- align-items:center
+.smart-lines{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px
 }
 
-.question-row{
- display:grid;
- grid-template-columns:1fr 120px 120px 110px;
- gap:8px;
- align-items:start
+.smart-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:999px;
+  padding:7px 11px;
+  font-size:13px
 }
 
-.small{font-size:13px}
-
-.pill{
- display:inline-block;
- padding:4px 8px;
- border-radius:999px;
- background:#eef2ff;
- color:#3730a3;
- font-size:12px
+.smart-clock{
+  font-size:30px;
+  font-weight:800;
+  margin-top:15px
 }
 
-.exam-info{
- background:#f8fbff;
- border:1px solid #dbeafe;
- border-radius:14px;
- padding:15px
+.smart-zone{
+  font-size:12px;
+  opacity:.7;
+  margin-top:2px
 }
 
-.question{
- font-size:21px;
- font-weight:800;
- line-height:1.55;
- margin:20px 0
+/* Dashboard stat cards */
+
+.dashboard-cards{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:14px
 }
 
-.option{
- display:flex;
- gap:9px;
- align-items:flex-start;
- padding:13px;
- border:1px solid #e2e8f0;
- border-radius:10px;
- margin:9px 0;
- background:#f8fafc
+.dashboard-stat{
+  position:relative;
+  overflow:hidden;
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:18px;
+  padding:18px;
+  box-shadow:0 8px 22px rgba(15,23,42,.06)
 }
 
-.option input{
- width:auto;
- margin-top:4px
+.dashboard-stat .icon{
+  font-size:25px
 }
 
-.nav{
- display:flex;
- gap:10px;
- margin-top:18px
+.dashboard-stat b{
+  display:block;
+  font-size:30px;
+  margin:10px 0 3px
 }
 
-.nav .btn{flex:1}
-
-.result{text-align:center}
-
-.score{
- font-size:42px;
- font-weight:900;
- color:#2563eb
+.dashboard-stat span{
+  color:#64748b;
+  font-size:13px;
+  font-weight:700
 }
 
-.resultgrid{
- display:grid;
- grid-template-columns:repeat(2,1fr);
- gap:10px
+.dashboard-stat small{
+  display:block;
+  color:#94a3b8;
+  font-size:11px;
+  margin-top:6px
 }
 
-.resultbox{
- background:#f8fafc;
- border-radius:10px;
- padding:13px
+@media(max-width:800px){
+  .dashboard-cards{
+    grid-template-columns:repeat(2,minmax(0,1fr))
+  }
 }
 
-.resultbox strong{
- display:block;
- font-size:22px
+@media(max-width:480px){
+
+  .dashboard-brand h1{
+    font-size:20px
+  }
+
+  .smart-date{
+    padding:18px
+  }
+
+  .smart-date .today{
+    font-size:21px
+  }
+
+  .smart-clock{
+    font-size:26px
+  }
+
+  .dashboard-cards{
+    gap:10px
+  }
+
+  .dashboard-stat{
+    padding:14px;
+    border-radius:15px
+  }
+
+  .dashboard-stat b{
+    font-size:25px
+  }
+
 }
 
-.center{text-align:center}
-
-.csv-note{
- background:#fffbeb;
- border:1px solid #fde68a;
- border-radius:10px;
- padding:11px;
- margin-top:10px
-}
-
-.right{
- display:flex;
- justify-content:flex-end;
- gap:8px
-}
-
-.adminHeader{
- background:linear-gradient(135deg,#0f3d91,#2563eb);
- color:#fff;
- padding:14px 18px;
- display:flex;
- align-items:center;
- justify-content:space-between;
- position:sticky;
- top:0;
- z-index:20
-}
-
-.brand{
- font-size:21px;
- font-weight:900
-}
-
-.brandSub{
- font-size:12px;
- font-weight:500;
- opacity:.9;
- margin-top:3px
-}
-
-.menuBtn{
- border:0;
- background:rgba(255,255,255,.16);
- color:#fff;
- font-size:27px;
- width:46px;
- height:42px;
- border-radius:10px;
- cursor:pointer
-}
-
-.sideMenu{
- position:absolute;
- left:14px;
- top:68px;
- width:235px;
- background:#fff;
- border:1px solid #dbe3ef;
- border-radius:14px;
- box-shadow:0 14px 35px rgba(15,23,42,.18);
- z-index:30;
- padding:8px
-}
-
-.sideMenu button{
- display:block;
- width:100%;
- text-align:left;
- border:0;
- background:#fff;
- padding:12px 13px;
- border-radius:9px;
- font-size:15px;
- cursor:pointer
-}
-
-.sideMenu button:hover{
- background:#eff6ff
-}
-
-.menuGrid{
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:7px
-}
-
-.menuGrid button{
- font-size:14px;
- text-align:center;
- padding:12px 6px
-}
-
-.logoutMenu{
- margin-top:7px;
- border-top:1px solid #e2e8f0!important;
- padding-top:12px!important
-}
-
-.adminWelcome{
- max-width:1050px;
- margin:18px auto 0;
- padding:0 14px;
- display:flex;
- align-items:center;
- justify-content:space-between
-}
-
-.adminWelcome h2{margin:0}
-
-.statsGrid{
- max-width:1050px;
- margin:18px auto;
- padding:0 14px;
- display:grid;
- grid-template-columns:repeat(2,1fr);
- gap:14px
-}
-
-.statCard{
- background:#fff;
- border:1px solid #e2e8f0;
- border-radius:16px;
- padding:17px;
- display:flex;
- align-items:center;
- gap:13px;
- box-shadow:0 6px 20px rgba(15,23,42,.06)
-}
-
-.statIcon{
- font-size:28px;
- background:#eff6ff;
- width:50px;
- height:50px;
- border-radius:13px;
- display:grid;
- place-items:center
-}
-
-.statLabel{
- font-size:12px;
- color:#64748b;
- margin-bottom:4px
-}
-
-.statCard strong{
- font-size:27px
-}
-
-.sectionHead{
- display:flex;
- align-items:center;
- justify-content:space-between;
- gap:10px
-}
-
-.sectionHead h3{
- margin:0 0 3px
-}
-
-.sectionHead p{
- margin:0
-}
-
-.modal{
- position:fixed;
- inset:0;
- background:rgba(15,23,42,.45);
- display:flex;
- align-items:center;
- justify-content:center;
- padding:15px;
- z-index:50
-}
-
-.empty{
- color:#64748b;
- text-align:center;
- padding:20px
-}
-
-@media(max-width:700px){
- .grid,.grid3,.question-row{
-  grid-template-columns:1fr
- }
-
- .statsGrid{
-  grid-template-columns:repeat(2,1fr)
- }
-
- .exam-item{
-  display:block
- }
-
- .top h1{
-  font-size:22px
- }
-}
 </style>
-
-<meta name="version" content="facebook-pathshala-admin-4-question-bank-edit-exam-system">
 </head>
 
 <body>
 
-<section id="loginCard" class="card" style="max-width:520px;margin:35px auto">
+<!-- =========================
+     LOGIN
+========================= -->
 
-<h2>🔐 প্রশাসক প্রবেশ</h2>
+<div id="login" class="center">
 
-<p class="muted">
-Exam Management পরিচালনার জন্য Supabase Auth-এর প্রশাসক অ্যাকাউন্ট দিয়ে প্রবেশ করুন।
-</p>
+  <div class="card login">
 
-<label class="field">ইমেইল</label>
-<input id="loginEmail" type="email" autocomplete="email">
+    <h1>ফেইসবুক পাঠশালা</h1>
+    <h2>Admin Panel</h2>
 
-<label class="field">পাসওয়ার্ড</label>
-<input id="loginPassword" type="password" autocomplete="current-password">
+    <input
+      id="email"
+      type="email"
+      placeholder="Admin Email"
+    >
 
-<div class="right" style="margin-top:14px">
-<button class="btn primary" onclick="doAdminLogin()">প্রবেশ করুন</button>
+    <input
+      id="password"
+      type="password"
+      placeholder="Password"
+    >
+
+    <button onclick="login()">Login</button>
+
+    <p id="loginMsg" class="msg"></p>
+
+  </div>
+
 </div>
 
-<div id="loginStatus"></div>
 
-</section>
+<!-- =========================
+     ADMIN APP
+========================= -->
 
-<section id="adminApp" class="hidden">
+<div id="app" class="hidden">
 
-<header class="adminHeader">
 
-<div class="brand">
-📚 ফেইসবুক পাঠশালা
-<div class="brandSub">
-তোমার জ্ঞানের আলোয় আলোকিত হোক চারপাশ
-</div>
-</div>
+<header class="dashboard-top">
 
-<button class="menuBtn" onclick="toggleMenu()" aria-label="মেনু">
-☰
-</button>
+  <div class="dashboard-brand">
+
+    <h1>ফেইসবুক পাঠশালা</h1>
+
+    <p>Admin Dashboard</p>
+
+  </div>
+
+
+  <!-- THREE DOT MENU -->
+
+  <div class="admin-menu">
+
+    <button
+      type="button"
+      class="admin-menu-btn"
+      id="adminMenuBtn"
+      aria-label="মেনু"
+    >⋮</button>
+
+
+    <div
+      class="admin-menu-panel hidden"
+      id="adminMenuPanel"
+    >
+
+      <button
+        type="button"
+        onclick="showPage('dashboard');closeAdminMenu()"
+      >
+        🏠 ড্যাশবোর্ড
+      </button>
+
+      <button
+        type="button"
+        onclick="showPage('bank');closeAdminMenu()"
+      >
+        🗂️ প্রশ্ন ব্যাংক
+      </button>
+
+      <button
+        type="button"
+        onclick="showPage('exam');closeAdminMenu()"
+      >
+        📋 পরীক্ষা পরিচালনা
+      </button>
+
+      <button
+        type="button"
+        class="logout"
+        onclick="logout()"
+      >
+        🚪 লগ আউট
+      </button>
+
+    </div>
+
+  </div>
 
 </header>
 
-<div id="sideMenu" class="sideMenu hidden">
 
-<div class="menuGrid">
+<main>
 
-<button onclick="showAdminTab('dashboard')">
-🏠 ড্যাশবোর্ড
-</button>
 
-<button onclick="showAdminTab('bank')">
-🗂️ প্রশ্ন ব্যাংক
-</button>
+<!-- =========================
+     DASHBOARD
+========================= -->
 
-<button onclick="showAdminTab('exam')">
-📋 এক্সাম সিস্টেম
-</button>
-
-<button onclick="showAdminTab('results')">
-📊 রেজাল্ট
-</button>
-
-</div>
-
-<button class="logoutMenu" onclick="logout()">
-🚪 লগআউট
-</button>
-
-</div>
-
-<div class="adminWelcome">
-
-<div>
-<h2 id="pageTitle">ড্যাশবোর্ড</h2>
-<p id="pageSubtitle" class="muted">
-ফেইসবুক পাঠশালার পরীক্ষা ব্যবস্থাপনা
-</p>
-</div>
-
-<span id="adminUser" class="muted"></span>
-
-</div>
-
-<div id="dashboardTab">
-
-<div class="statsGrid">
-
-<div class="statCard">
-<div class="statIcon">📝</div>
-<div>
-<div class="statLabel">এযাবৎ অনুষ্ঠিত পরীক্ষা</div>
-<strong id="statExams">০</strong>
-</div>
-</div>
-
-<div class="statCard">
-<div class="statIcon">👨‍🎓</div>
-<div>
-<div class="statLabel">মোট পরীক্ষার্থী</div>
-<strong id="statStudents">০</strong>
-</div>
-</div>
-
-<div class="statCard">
-<div class="statIcon">📚</div>
-<div>
-<div class="statLabel">প্রশ্ন ব্যাংকের প্রশ্ন</div>
-<strong id="statQuestions">০</strong>
-</div>
-</div>
-
-<div class="statCard">
-<div class="statIcon">🏆</div>
-<div>
-<div class="statLabel">মোট পরীক্ষা অংশগ্রহণ</div>
-<strong id="statAttempts">০</strong>
-</div>
-</div>
-
-</div>
-
-<div class="card">
-
-<div class="sectionHead">
-
-<div>
-<h3>সাম্প্রতিক পরীক্ষা</h3>
-<p class="muted">
-সর্বশেষ তৈরি পরীক্ষাগুলোর সংক্ষিপ্ত তথ্য
-</p>
-</div>
-
-<button class="btn secondary" onclick="loadDashboard()">
-🔄 রিফ্রেশ
-</button>
-
-</div>
-
-<div id="recentExams">
-লোড হচ্ছে...
-</div>
-
-</div>
-
-</div>
-
-<div id="examTab" class="hidden">
-
-<div class="card">
-
-<h3>নতুন পরীক্ষা</h3>
-
-<div class="grid">
-
-<div>
-<label class="field">পরীক্ষার নাম</label>
-<input id="examName" placeholder="যেমন: ফেইসবুক পাঠশালা রিভিশন টেস্ট">
-</div>
-
-<div>
-<label class="field">পরীক্ষকের নাম</label>
-<input id="examinerName" placeholder="পরীক্ষকের নাম">
-</div>
-
-<div style="grid-column:1/-1">
-
-<label class="field">📚 পরীক্ষার সিলেবাস</label>
-
-<textarea id="syllabus"
-placeholder="কোন কোন টপিক/অধ্যায় থেকে পরীক্ষা নেওয়া হবে লিখুন"></textarea>
-
-</div>
-
-<div>
-<label class="field">মোট নম্বর</label>
-<input id="totalMarks" type="number" value="1" min="0">
-</div>
-
-<div>
-<label class="field">প্রতি প্রশ্নের নম্বর</label>
-<input id="marksPerQuestion" type="number" value="1" min="0" step="0.01">
-</div>
-
-<div>
-<label class="field">Negative Mark</label>
-<input id="negativeMark" type="number" value="0" min="0" step="0.01">
-</div>
-
-<div>
-<label class="field">Pass Mark</label>
-<input id="passMark" type="number" value="0" min="0" step="0.01">
-</div>
-
-<div>
-<label class="field">সময় (মিনিট)</label>
-<input id="duration" type="number" value="20" min="1">
-</div>
-
-<div>
-<label class="field">পরীক্ষা শুরুর তারিখ</label>
-<input id="startDate" type="date">
-</div>
-
-<div>
-<label class="field">শুরুর সময়</label>
-<input id="startTime" type="time">
-</div>
-
-<div>
-<label class="field">পরীক্ষা শেষের তারিখ</label>
-<input id="endDate" type="date">
-</div>
-
-<div>
-<label class="field">শেষ সময়</label>
-<input id="endTime" type="time">
-</div>
-
-<div>
-<label class="field">প্রশ্ন ব্যাংক ক্যাটাগরি</label>
-
-<select id="sourceType">
-
-<option value="verification_test">
-যাচাই পরীক্ষা
-</option>
-
-<option value="job_solution">
-জব সলিউশন
-</option>
-
-</select>
-
-</div>
-
-</div>
-
-<div style="margin-top:14px">
-
-<label>
-<input id="showAnswers" type="checkbox">
-ফলাফলে উত্তর দেখাবে
-</label>
-
-&nbsp;
-
-<label>
-<input id="multipleAttempts" type="checkbox">
-একাধিকবার পরীক্ষা
-</label>
-
-</div>
-
-</div>
-
-<div class="card">
-
-<h3>প্রশ্ন আপলোড</h3>
-
-<p class="muted">
-প্রতিটি প্রশ্ন এই পরীক্ষার প্রশ্নপত্র হবে এবং Question Bank-এ একই ক্যাটাগরি ও বিষয়সহ জমা হবে। বিষয় ঐচ্ছিক; পরে Question Bank-এ ফিল্টার করা যাবে।
-</p>
-
-<div class="grid">
-
-<div>
-
-<label class="field">ম্যানুয়াল প্রশ্ন</label>
-
-<textarea id="manualQuestion"
-placeholder="প্রশ্ন লিখুন"></textarea>
-
-</div>
-
-<div>
-
-<label class="field">সঠিক উত্তর</label>
-
-<select id="manualCorrect">
-
-<option value="A">ক</option>
-<option value="B">খ</option>
-<option value="C">গ</option>
-<option value="D">ঘ</option>
-
-</select>
-
-<label class="field">বিষয় (ঐচ্ছিক)</label>
-
-<select id="manualSubject">
-
-<option value="">বিষয় নির্বাচন করুন</option>
-<option value="1">বাংলা সাহিত্য</option>
-<option value="2">বাংলা ব্যাকরণ</option>
-<option value="3">গণিত</option>
-<option value="4">ইংরেজি সাহিত্য</option>
-<option value="5">ইংরেজি ব্যাকরণ</option>
-<option value="6">বাংলাদেশ</option>
-<option value="7">আন্তর্জাতিক</option>
-<option value="8">বিজ্ঞান</option>
-<option value="9">কম্পিউটার ও তথ্য প্রযুক্তি</option>
-<option value="10">ভূগোল</option>
-<option value="11">সাম্প্রতিক প্রশ্নোত্তর</option>
-
-</select>
-
-</div>
-
-</div>
-
-<div class="grid3">
-
-<input id="manualA" placeholder="ক — অপশন A">
-<input id="manualB" placeholder="খ — অপশন B">
-<input id="manualC" placeholder="গ — অপশন C">
-<input id="manualD" placeholder="ঘ — অপশন D">
-
-</div>
-
-<div class="right" style="margin-top:12px">
-
-<button class="btn secondary" onclick="addManualQuestion()">
-+ প্রশ্ন যোগ করুন
-</button>
-
-</div>
-
-<div class="csv-note">
-
-<b>📄 CSV / 📊 Excel ফাইল আপলোড</b>
-
-<br>
-
-<span class="muted">
-Excel (.xlsx) বা CSV-তে আপনার বর্তমান হেডিংই রাখুন:
-<code>ক্রম, Category, Question, ক, খ, গ, ঘ, Correct, ব্যাখ্যা</code>
-</span>
-
-<br>
-
-<input
-id="questionFile"
-type="file"
-accept=".xlsx,.xls,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
-style="margin-top:10px"
+<section
+  id="dashboard"
+  class="page"
 >
 
-<button
-class="btn secondary"
-onclick="importQuestionFile()"
-style="margin-top:8px"
->
-📥 ফাইল থেকে প্রশ্ন যোগ করুন
-</button>
 
-</div>
+  <!-- SMART DATE & TIME -->
 
-<div id="draftStatus"></div>
-<div id="draftList"></div>
+  <div class="smart-date">
 
-<div class="right" style="margin-top:14px">
+    <div class="label">
+      আজকের দিন • বাংলাদেশ সময়
+    </div>
 
-<button class="btn success" onclick="createExamAndSave()">
-💾 পরীক্ষা তৈরি ও প্রশ্ন সংরক্ষণ
-</button>
 
-</div>
-
-<div id="saveStatus"></div>
-
-</div>
-
-<div class="card">
-
-<h3>তৈরি করা পরীক্ষা</h3>
-
-<div id="examList">
-লোড হচ্ছে...
-</div>
-
-</div>
-
-<div class="card">
-
-<div class="sectionHead">
-
-<div>
-
-<h3>📊 পরীক্ষার্থী ও রেজাল্ট</h3>
-
-<p class="muted">
-পরীক্ষার অংশগ্রহণ ও ফলাফল দেখুন।
-</p>
-
-</div>
-
-<button class="btn primary" onclick="showAdminTab('results')">
-রেজাল্ট খুলুন
-</button>
-
-</div>
-
-</div>
-
-</div>
-<section id="bankTab" class="hidden">
-
-<div class="card">
-
-<h3>📚 প্রশ্ন ব্যাংক</h3>
-
-<div class="grid3">
-
-<select id="filterSource" onchange="loadBank()">
-<option value="">সব ক্যাটাগরি</option>
-<option value="verification_test">যাচাই পরীক্ষা</option>
-<option value="job_solution">জব সলিউশন</option>
-</select>
-
-<select id="filterSubject" onchange="loadBank()">
-<option value="">সব বিষয়</option>
-<option value="1">বাংলা সাহিত্য</option>
-<option value="2">বাংলা ব্যাকরণ</option>
-<option value="3">গণিত</option>
-<option value="4">ইংরেজি সাহিত্য</option>
-<option value="5">ইংরেজি ব্যাকরণ</option>
-<option value="6">বাংলাদেশ</option>
-<option value="7">আন্তর্জাতিক</option>
-<option value="8">বিজ্ঞান</option>
-<option value="9">কম্পিউটার ও তথ্য প্রযুক্তি</option>
-<option value="10">ভূগোল</option>
-<option value="11">সাম্প্রতিক প্রশ্নোত্তর</option>
-</select>
-
-<input id="filterSourceName"
-placeholder="সেট/পরীক্ষার নাম"
-oninput="loadBank()">
-
-</div>
-
-<div id="bankList" style="margin-top:12px">
-লোড হচ্ছে...
-</div>
-
-</div>
-
-
-<div id="editQuestionModal" class="modal hidden">
-
-<div class="card" style="max-width:720px;width:100%;max-height:90vh;overflow:auto">
-
-<div class="sectionHead">
-
-<h3>✏️ প্রশ্ন এডিট করুন</h3>
-
-<button class="btn secondary" onclick="closeEditQuestion()">
-বন্ধ
-</button>
-
-</div>
-
-<input type="hidden" id="editQuestionId">
-
-<label class="field">প্রশ্ন</label>
-<textarea id="editQuestionText"></textarea>
-
-<div class="grid">
-
-<div>
-<label class="field">ক</label>
-<input id="editA">
-</div>
-
-<div>
-<label class="field">খ</label>
-<input id="editB">
-</div>
-
-<div>
-<label class="field">গ</label>
-<input id="editC">
-</div>
-
-<div>
-<label class="field">ঘ</label>
-<input id="editD">
-</div>
-
-</div>
-
-<div class="grid3">
-
-<div>
-
-<label class="field">সঠিক উত্তর</label>
-
-<select id="editCorrect">
-<option value="A">ক</option>
-<option value="B">খ</option>
-<option value="C">গ</option>
-<option value="D">ঘ</option>
-</select>
-
-</div>
-
-<div>
-
-<label class="field">বিষয়</label>
-
-<select id="editSubject">
-
-<option value="">বিষয় নির্বাচন করুন</option>
-<option value="1">বাংলা সাহিত্য</option>
-<option value="2">বাংলা ব্যাকরণ</option>
-<option value="3">গণিত</option>
-<option value="4">ইংরেজি সাহিত্য</option>
-<option value="5">ইংরেজি ব্যাকরণ</option>
-<option value="6">বাংলাদেশ</option>
-<option value="7">আন্তর্জাতিক</option>
-<option value="8">বিজ্ঞান</option>
-<option value="9">কম্পিউটার ও তথ্য প্রযুক্তি</option>
-<option value="10">ভূগোল</option>
-<option value="11">সাম্প্রতিক প্রশ্নোত্তর</option>
-
-</select>
-
-</div>
-
-</div>
-
-<label class="field">ব্যাখ্যা</label>
-<textarea id="editExplanation"></textarea>
-
-<div id="editQuestionStatus"></div>
-
-<button class="btn success" onclick="saveEditedQuestion()">
-💾 পরিবর্তন সংরক্ষণ
-</button>
-
-</div>
-</div>
-
-</section>
-
-
-<div id="examSettingsModal" class="modal hidden">
-
-<div class="card" style="max-width:720px;width:100%;max-height:90vh;overflow:auto">
-
-<div class="sectionHead">
-
-<h3>⚙️ Exam Settings</h3>
-
-<button class="btn secondary" onclick="closeExamSettings()">
-বন্ধ
-</button>
-
-</div>
-
-<input type="hidden" id="editExamId">
-
-<div class="grid">
-
-<div>
-<label class="field">পরীক্ষার নাম</label>
-<input id="editExamName">
-</div>
-
-<div>
-<label class="field">পরীক্ষকের নাম</label>
-<input id="editExaminer">
-</div>
-
-<div style="grid-column:1/-1">
-<label class="field">সিলেবাস</label>
-<textarea id="editSyllabus"></textarea>
-</div>
-
-<div>
-<label class="field">মোট নম্বর</label>
-<input id="editTotalMarks" type="number">
-</div>
-
-<div>
-<label class="field">প্রতি প্রশ্নের নম্বর</label>
-<input id="editMarksPer" type="number" step="0.01">
-</div>
-
-<div>
-<label class="field">Negative Mark</label>
-<input id="editNegative" type="number" step="0.01">
-</div>
-
-<div>
-<label class="field">Pass Mark</label>
-<input id="editPass" type="number" step="0.01">
-</div>
-
-<div>
-<label class="field">সময় (মিনিট)</label>
-<input id="editDuration" type="number">
-</div>
-
-<div>
-<label class="field">শুরুর তারিখ</label>
-<input id="editStartDate" type="date">
-</div>
-
-<div>
-<label class="field">শুরুর সময়</label>
-<input id="editStartTime" type="time">
-</div>
-
-<div>
-<label class="field">শেষের তারিখ</label>
-<input id="editEndDate" type="date">
-</div>
-
-<div>
-<label class="field">শেষ সময়</label>
-<input id="editEndTime" type="time">
-</div>
-
-</div>
-
-<div style="margin-top:12px">
-
-<label>
-<input id="editShowAnswers" type="checkbox">
-ফলাফলে উত্তর দেখাবে
-</label>
-
-&nbsp;
-
-<label>
-<input id="editMultiple" type="checkbox">
-একাধিকবার পরীক্ষা
-</label>
-
-</div>
-
-<div id="editExamStatus"></div>
-
-<div class="right" style="margin-top:12px">
-
-<button class="btn success" onclick="saveExamSettings()">
-💾 সেটিংস সংরক্ষণ
-</button>
-
-</div>
-
-</div>
-</div>
-
-
-<section id="resultsTab" class="hidden">
-
-<div class="card">
-
-<div class="sectionHead">
-
-<div>
-
-<h3>👨‍🎓 পরীক্ষার্থী ও রেজাল্ট</h3>
-
-<p class="muted">
-প্রতিটি পরীক্ষার ফলাফল আলাদাভাবে দেখুন ও ডাউনলোড করুন।
-মোবাইল নম্বর ফলাফলে প্রকাশ করা হবে না।
-</p>
-
-</div>
-
-</div>
-
-<div class="grid3" style="margin-top:14px">
-
-<div>
-
-<label class="field">
-পরীক্ষা নির্বাচন
-</label>
-
-<select id="resultExamSelect" onchange="loadResults()">
-
-<option value="">
-পরীক্ষা নির্বাচন করুন
-</option>
-
-</select>
-
-</div>
-
-<div style="display:flex;align-items:end;gap:8px">
-
-<button class="btn secondary" onclick="loadResultExams()">
-🔄 পরীক্ষা তালিকা
-</button>
-
-<button class="btn primary" onclick="downloadResultSheet()">
-📥 রেজাল্ট ডাউনলোড
-</button>
-
-</div>
-
-</div>
-
-<div id="resultSummary"
-class="status"
-style="margin-top:14px">
-একটি পরীক্ষা নির্বাচন করুন।
-</div>
-
-<div id="resultsList"
-style="margin-top:12px">
-</div>
-
-</div>
-
-</section>
-
-
-<script>
-
-const CFG=window.FACEBOOK_PATHSHALA_CONFIG;
-
-const client=supabase.createClient(
- CFG.SUPABASE_URL,
- CFG.SUPABASE_KEY
-);
-
-const BN="০১২৩৪৫৬৭৮৯";
-
-const LETTER={
- A:"ক",
- B:"খ",
- C:"গ",
- D:"ঘ"
-};
-
-let draft=[],
-studentQuestions=[],
-studentAnswers={},
-studentIndex=0,
-studentTimer=null,
-studentTime=0,
-currentExam=null;
-
-const SUBJECTS={
- 1:"বাংলা সাহিত্য",
- 2:"বাংলা ব্যাকরণ",
- 3:"গণিত",
- 4:"ইংরেজি সাহিত্য",
- 5:"ইংরেজি ব্যাকরণ",
- 6:"বাংলাদেশ",
- 7:"আন্তর্জাতিক",
- 8:"বিজ্ঞান",
- 9:"কম্পিউটার ও তথ্য প্রযুক্তি",
- 10:"ভূগোল",
- 11:"সাম্প্রতিক প্রশ্নোত্তর"
-};
-
-function bn(x){
- return String(x).replace(
-  /\d/g,
-  d=>BN[d]
- );
-}
-
-function esc(s){
- return String(s??"").replace(
-  /[&<>"']/g,
-  m=>({
-   "&":"&amp;",
-   "<":"&lt;",
-   ">":"&gt;",
-   '"':"&quot;",
-   "'":"&#39;"
-  }[m])
- );
-}
-
-function sourceLabel(v){
-
- return {
-  verification_test:"যাচাই পরীক্ষা",
-  job_solution:"জব সলিউশন",
-  current_affairs:"সাম্প্রতিক প্রশ্নোত্তর"
- }[v]||v;
-
-}
-
-window.getNextIdSafe=async function(table){
-
- const {data,error}=await client
-  .from(table)
-  .select("id")
-  .order("id",{ascending:false})
-  .limit(1);
-
- if(error) throw error;
-
- const last=
-  Array.isArray(data)&&data.length
-   ?Number(data[0].id)
-   :0;
-
- return last+1;
-
-};
-
-function getExamId(){
-
- const m=
-  location.search.match(/[?&]exam=(\d+)/);
-
- return m?Number(m[1]):null;
-
-}
-
-async function doAdminLogin(){
-
- const emailEl=
-  document.getElementById("loginEmail");
-
- const passwordEl=
-  document.getElementById("loginPassword");
-
- const statusEl=
-  document.getElementById("loginStatus");
-
- try{
-
-  const email=
-   emailEl.value.trim();
-
-  const password=
-   passwordEl.value;
-
-  statusEl.className="status";
-
-  statusEl.textContent=
-   "প্রবেশ করা হচ্ছে...";
-
-  if(!email||!password){
-
-   statusEl.className=
-    "status error";
-
-   statusEl.textContent=
-    "❌ ইমেইল ও পাসওয়ার্ড দিন।";
-
-   return;
-
-  }
-
-  if(!window.supabase)
-   throw new Error(
-    "Supabase লাইব্রেরি লোড হয়নি। পেজটি আবার খুলুন।"
-   );
-
-  const {data,error}=
-   await client.auth.signInWithPassword({
-    email,
-    password
-   });
-
-  if(error) throw error;
-
-  if(!data?.session)
-   throw new Error(
-    "লগইন সেশন পাওয়া যায়নি।"
-   );
-
-  statusEl.className=
-   "status success";
-
-  statusEl.textContent=
-   "সফলভাবে লগইন হয়েছে।";
-
-  await init();
-
- }catch(e){
-
-  statusEl.className=
-   "status error";
-
-  statusEl.textContent=
-   "❌ "+(e?.message||String(e));
-
-  console.error(
-   "Admin login error:",
-   e
-  );
-
- }
-
-}
-
-window.doAdminLogin=
- doAdminLogin;
-
-async function logout(){
-
- await client.auth.signOut();
-
- location.reload();
-
-}
-  async function init(){
-
- const {data:{session}}=
-  await client.auth.getSession();
-
- if(session){
-
-  loginCard.classList.add("hidden");
-
-  adminApp.classList.remove("hidden");
-
-  adminUser.textContent=
-   session.user.email||"";
-
-  ensureBangladeshDateCard();
-
-  updateSmartDate();
-
-  await showAdminTab("dashboard");
-
- }else{
-
-  loginCard.classList.remove("hidden");
-
-  adminApp.classList.add("hidden");
-
- }
-
-}
-
-
-/* =========================
-   বাংলাদেশ সময় + হিজরি তারিখ
-========================= */
-
-const HIJRI_MONTHS=[
- "মুহররম",
- "সফর",
- "রবিউল আউয়াল",
- "রবিউস সানি",
- "জমাদিউল আউয়াল",
- "জমাদিউস সানি",
- "রজব",
- "শাবান",
- "রমজান",
- "শাওয়াল",
- "জিলকদ",
- "জিলহজ"
-];
-
-function hijriBangladesh(d){
-
- const parts=
-  new Intl.DateTimeFormat(
-   "en-US-u-ca-islamic-umalqura",
-   {
-    timeZone:"Asia/Dhaka",
-    day:"numeric",
-    month:"numeric",
-    year:"numeric"
-   }
-  ).formatToParts(d);
-
- const day=
-  parts.find(x=>x.type==="day")?.value||"";
-
- const month=
-  Number(
-   parts.find(x=>x.type==="month")?.value||0
-  );
-
- const year=
-  parts.find(x=>x.type==="year")?.value||"";
-
- return `${bn(day)} ${
-  HIJRI_MONTHS[month-1]||""
- } ${bn(year)} হিজরি`;
-
-}
-
-
-function ensureBangladeshDateCard(){
-
- if(document.getElementById("smartDateCard"))
-  return;
-
- const welcome=
-  document.querySelector(".adminWelcome");
-
- if(!welcome)
-  return;
-
- const card=
-  document.createElement("div");
-
- card.id="smartDateCard";
-
- card.className="card";
-
- card.style.maxWidth="1050px";
- card.style.margin="14px auto";
- card.style.padding="14px";
-
- card.innerHTML=`
-
- <div style="
-  display:flex;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap;
-  align-items:center
- ">
-
-  <div>
-
-   <b>📅 বাংলাদেশ সময়</b>
-
-   <div
-    id="smartToday"
-    class="muted"
-    style="margin-top:4px"
-   >
-    তারিখ লোড হচ্ছে...
-   </div>
-
-   <div
-    id="smartHijri"
-    class="muted"
-    style="margin-top:3px"
-   >
-    হিজরি তারিখ লোড হচ্ছে...
-   </div>
-
-  </div>
-
-  <div
-   id="smartClock"
-   style="
-    font-weight:800;
-    font-size:20px
-   "
-  >
-   --:--:--
-  </div>
-
- </div>
-
- `;
-
- welcome.after(card);
-
-}
-
-
-function updateSmartDate(){
-
- const d=new Date();
-
- const g=
-  new Intl.DateTimeFormat(
-   "bn-BD",
-   {
-    timeZone:"Asia/Dhaka",
-    year:"numeric",
-    month:"long",
-    day:"numeric",
-    weekday:"long"
-   }
-  ).format(d);
-
- const t=
-  new Intl.DateTimeFormat(
-   "bn-BD",
-   {
-    timeZone:"Asia/Dhaka",
-    hour:"2-digit",
-    minute:"2-digit",
-    second:"2-digit",
-    hour12:true
-   }
-  ).format(d);
-
- const today=
-  document.getElementById("smartToday");
-
- const hijri=
-  document.getElementById("smartHijri");
-
- const clock=
-  document.getElementById("smartClock");
-
- if(today)
-  today.textContent=g;
-
- if(hijri)
-  hijri.textContent=hijriBangladesh(d);
-
- if(clock)
-  clock.textContent=t;
-
-}
-
-
-setInterval(
- updateSmartDate,
- 1000
-);
-
-
-/* =========================
-   Error
-========================= */
-
-function friendlyError(e){
-
- const m=
-  e?.message||String(e||"");
-
- if(/invalid api key|api key/i.test(m))
-  return "সার্ভারের সংযোগ বর্তমানে পাওয়া যাচ্ছে না। পরে আবার চেষ্টা করুন।";
-
- if(/row-level security|permission denied|JWT/i.test(m))
-  return "অ্যাডমিন অনুমতি প্রয়োজন।";
-
- return m;
-
-}
-
-
-/* =========================
-   Manual Question
-========================= */
-
-function addManualQuestion(){
-
- const q=
-  manualQuestion.value.trim();
-
- if(
-  !q||
-  !manualA.value.trim()||
-  !manualB.value.trim()||
-  !manualC.value.trim()||
-  !manualD.value.trim()
- ){
-
-  draftStatus.className=
-   "status error";
-
-  draftStatus.textContent=
-   "প্রশ্ন ও চারটি অপশন পূরণ করুন।";
-
-  return;
-
- }
-
- draft.push({
-
-  question_text:q,
-
-  option_a:
-   manualA.value.trim(),
-
-  option_b:
-   manualB.value.trim(),
-
-  option_c:
-   manualC.value.trim(),
-
-  option_d:
-   manualD.value.trim(),
-
-  correct_answer:
-   manualCorrect.value,
-
-  subject_id:
-   manualSubject.value
-    ?Number(manualSubject.value)
-    :null
-
- });
-
- manualQuestion.value="";
- manualA.value="";
- manualB.value="";
- manualC.value="";
- manualD.value="";
-
- renderDraft();
-
- draftStatus.className=
-  "status success";
-
- draftStatus.textContent=
-  "প্রশ্ন যোগ হয়েছে।";
-
-}
-
-
-function renderDraft(){
-
- draftList.innerHTML=
-
-  draft.map((q,i)=>`
-
-   <div class="q-item">
-
-    <b>${bn(i+1)}.</b>
-    ${esc(q.question_text)}
-
-    <span class="pill">
-     ${sourceLabel(sourceType.value)}
-    </span>
-
-    ${
-     q.subject_id
-      ?`<span class="pill">
-        ${SUBJECTS[q.subject_id]}
-       </span>`
-      :""
-    }
-
-    <button
-     class="btn danger"
-     style="float:right;padding:5px 8px"
-     onclick="draft.splice(${i},1);renderDraft()"
+    <div
+      class="today"
+      id="smartToday"
     >
-     বাদ
-    </button>
+      লোড হচ্ছে...
+    </div>
 
-   </div>
 
-  `).join("")
+    <div class="smart-lines">
 
-  ||
-
-  '<p class="muted">এখনও কোনো প্রশ্ন যোগ হয়নি।</p>';
-
-}
-
-
-/* =========================
-   CSV
-========================= */
-
-function parseCSV(text){
-
- const rows=[];
- let row=[];
- let cell="";
- let quote=false;
-
- for(
-  let i=0;
-  i<text.length;
-  i++
- ){
-
-  const c=text[i];
-  const n=text[i+1];
-
-  if(c==='"'){
-
-   if(
-    quote &&
-    n==='"'
-   ){
-
-    cell+='"';
-    i++;
-
-   }else{
-
-    quote=!quote;
-
-   }
-
-  }else if(
-   c==="," &&
-   !quote
-  ){
-
-   row.push(cell);
-   cell="";
-
-  }else if(
-   (c==="\n"||c==="\r") &&
-   !quote
-  ){
-
-   if(
-    c==="\r" &&
-    n==="\n"
-   )
-    i++;
-
-   row.push(cell);
-
-   if(
-    row.some(
-     x=>x.trim()!==""
-    )
-   )
-    rows.push(row);
-
-   row=[];
-   cell="";
-
-  }else{
-
-   cell+=c;
-
-  }
-
- }
-
- row.push(cell);
-
- if(
-  row.some(
-   x=>x.trim()!==""
-  )
- )
-  rows.push(row);
-
- return rows;
-
-}
-
-
-function normalizeHeader(v){
-
- return String(v??"")
-  .trim()
-  .toLowerCase()
-  .replace(/\s+/g,"_");
-
-}
-
-
-const SUBJECT_BY_NAME={
-
- "বাংলা সাহিত্য":1,
- "বাংলা ব্যাকরণ":2,
- "গণিত":3,
- "ইংরেজি সাহিত্য":4,
- "ইংরেজি ব্যাকরণ":5,
- "বাংলাদেশ":6,
- "আন্তর্জাতিক":7,
- "বিজ্ঞান":8,
- "কম্পিউটার ও তথ্য প্রযুক্তি":9,
- "ভূগোল":10,
- "সাম্প্রতিক প্রশ্নোত্তর":11
-
-};
-
-
-function headerIndex(head,names){
-
- for(
-  const n of names
- ){
-
-  const i=
-   head.indexOf(
-    normalizeHeader(n)
-   );
-
-  if(i>=0)
-   return i;
-
- }
-
- return -1;
-
-}
-
-
-function correctToCode(v){
-
- const x=
-  String(v??"")
-   .trim()
-   .toUpperCase();
-
- return({
-
-  "ক":"A",
-  "খ":"B",
-  "গ":"C",
-  "ঘ":"D",
-
-  "A":"A",
-  "B":"B",
-  "C":"C",
-  "D":"D"
-
- })[x]||"";
-
-}
-
-
-function addImportedRows(rows){
-
- if(!rows.length)
-  return 0;
-
- const head=
-  rows[0].map(
-   normalizeHeader
-  );
-
- const iq=
-  headerIndex(
-   head,
-   ["Question","প্রশ্ন"]
-  );
-
- const ia=
-  headerIndex(
-   head,
-   ["ক","option_a"]
-  );
-
- const ib=
-  headerIndex(
-   head,
-   ["খ","option_b"]
-  );
-
- const ic=
-  headerIndex(
-   head,
-   ["গ","option_c"]
-  );
-
- const id=
-  headerIndex(
-   head,
-   ["ঘ","option_d"]
-  );
-
- const ir=
-  headerIndex(
-   head,
-   ["Correct","সঠিক উত্তর"]
-  );
-
- const ie=
-  headerIndex(
-   head,
-   ["ব্যাখ্যা","explanation"]
-  );
-
- const isub=
-  headerIndex(
-   head,
-   ["Category","বিষয়","subject"]
-  );
-
- if(
-  [iq,ia,ib,ic,id,ir]
-   .some(i=>i<0)
- ){
-
-  throw new Error(
-   "ফাইলে প্রয়োজনীয় হেডিং পাওয়া যায়নি। আপনার ফাইলের হেডিং রাখুন: ক্রম, Category, Question, ক, খ, গ, ঘ, Correct, ব্যাখ্যা"
-  );
-
- }
-
- let added=0;
-
- for(
-  const r of rows.slice(1)
- ){
-
-  const q=
-   String(r[iq]??"").trim();
-
-  if(!q)
-   continue;
-
-  const ca=
-   correctToCode(r[ir]);
-
-  if(!ca){
-
-   throw new Error(
-    "Correct ঘরে ক, খ, গ, ঘ অথবা A, B, C, D থাকতে হবে।"
-   );
-
-  }
-
-  const cat=
-   isub>=0
-    ?String(r[isub]??"").trim()
-    :"";
-
-  const sid=
-   SUBJECT_BY_NAME[cat]||null;
-
-  draft.push({
-
-   question_text:q,
-
-   option_a:
-    String(r[ia]??"").trim(),
-
-   option_b:
-    String(r[ib]??"").trim(),
-
-   option_c:
-    String(r[ic]??"").trim(),
-
-   option_d:
-    String(r[id]??"").trim(),
-
-   correct_answer:ca,
-
-   subject_id:sid,
-
-   category:cat,
-
-   explanation:
-    ie>=0
-     ?String(r[ie]??"").trim()
-     :""
-
-  });
-
-  added++;
-
- }
-
- return added;
-
-}
-
-
-async function importQuestionFile(){
-
- const f=
-  document
-   .getElementById("questionFile")
-   .files[0];
-
- if(!f){
-
-  draftStatus.className=
-   "status error";
-
-  draftStatus.textContent=
-   "Excel বা CSV ফাইল নির্বাচন করুন।";
-
-  return;
-
- }
-
- try{
-
-  let rows;
-
-  if(
-   /\.csv$/i.test(f.name)
-  ){
-
-   rows=
-    parseCSV(
-     await f.text()
-    );
-
-  }else{
-
-   const buf=
-    await f.arrayBuffer();
-
-   const wb=
-    XLSX.read(
-     buf,
-     {type:"array"}
-    );
-
-   const ws=
-    wb.Sheets[
-     wb.SheetNames[0]
-    ];
-
-   rows=
-    XLSX.utils.sheet_to_json(
-     ws,
-     {
-      header:1,
-      defval:""
-     }
-    );
-
-  }
-
-  const added=
-   addImportedRows(rows);
-
-  renderDraft();
-
-  draftStatus.className=
-   "status success";
-
-  draftStatus.textContent=
-   bn(added)+
-   "টি প্রশ্ন ফাইল থেকে যোগ হয়েছে। এখন নিচের ‘পরীক্ষা তৈরি ও প্রশ্ন সংরক্ষণ’ চাপুন।";
-
- }catch(e){
-
-  draftStatus.className=
-   "status error";
-
-  draftStatus.textContent=
-   "❌ "+e.message;
-
- }
-
-}
-
-
-/* =========================
-   Source
-========================= */
-
-async function getOrCreateSourceId(
- type,
- name
-){
-
- const {data,error}=
-  await client
-   .from("question_sources")
-   .select("id")
-   .eq("source_category",type)
-   .limit(1)
-   .maybeSingle();
-
- if(error)
-  throw error;
-
- if(data?.id)
-  return data.id;
-
- const {
-  data:n,
-  error:ne
- }=
-  await client
-   .from("question_sources")
-   .insert({
-    source_category:type,
-    source_name:name
-   })
-   .select("id")
-   .single();
-
- if(ne)
-  throw ne;
-
- return n.id;
-
-}
-
-
-/* =========================
-   Create Exam
-========================= */
-
-async function createExamAndSave(){
-
- const name=
-  examName.value.trim();
-
- if(!name){
-
-  saveStatus.className=
-   "status error";
-
-  saveStatus.textContent=
-   "পরীক্ষার নাম দিন।";
-
-  return;
-
- }
-
- if(!draft.length){
-
-  saveStatus.className=
-   "status error";
-
-  saveStatus.textContent=
-   "কমপক্ষে একটি প্রশ্ন যোগ করুন।";
-
-  return;
-
- }
-
- if(
-  draft.some(q=>
-   !q.question_text||
-   !q.option_a||
-   !q.option_b||
-   !q.option_c||
-   !q.option_d||
-   !["A","B","C","D"]
-    .includes(q.correct_answer)
-  )
- ){
-
-  saveStatus.className=
-   "status error";
-
-  saveStatus.textContent=
-   "প্রতিটি প্রশ্নে চার অপশন ও সঠিক উত্তর ঠিক আছে কি না দেখুন।";
-
-  return;
-
- }
-
- saveStatus.className=
-  "status";
-
- saveStatus.textContent=
-  "সংরক্ষণ হচ্ছে...";
-
- try{
-
-  const {
-   data:{user}
-  }=
-   await client.auth.getUser();
-
-  if(!user)
-   throw new Error(
-    "প্রশাসক লগইন নেই।"
-   );
-
-  const examId=
-   await getNextIdSafe("exams");
-
-  const token=
-   crypto.randomUUID();
-
-  const {
-   error:e1
-  }=
-   await client
-    .from("exams")
-    .insert({
-
-     id:examId,
-
-     exam_name:name,
-
-     examiner_id:user.id,
-
-     total_questions:
-      draft.length,
-
-     marks_per_question:
-      Number(
-       marksPerQuestion.value
-      ),
-
-     negative_mark:
-      Number(
-       negativeMark.value
-      ),
-
-     pass_mark:
-      Number(
-       passMark.value
-      ),
-
-     start_at:
-      (
-       startDate.value &&
-       startTime.value
-      )
-       ?new Date(
-        `${startDate.value}T${startTime.value}:00+06:00`
-       ).toISOString()
-       :new Date().toISOString(),
-
-     end_at:
-      (
-       endDate.value &&
-       endTime.value
-      )
-       ?new Date(
-        `${endDate.value}T${endTime.value}:59+06:00`
-       ).toISOString()
-       :new Date(
-        Date.now()+
-        365*24*3600*1000
-       ).toISOString(),
-
-     exam_token:token,
-
-     status:"active"
-
-    });
-
-  if(e1)
-   throw e1;
-
-
-  const {
-   error:e2
-  }=
-   await client
-    .from("exam_settings")
-    .upsert({
-
-     exam_id:examId,
-
-     total_questions:
-      draft.length,
-
-     total_marks:
-      Number(totalMarks.value),
-
-     pass_mark:
-      Number(passMark.value),
-
-     duration_minutes:
-      Number(duration.value),
-
-     marks_per_question:
-      Number(
-       marksPerQuestion.value
-      ),
-
-     negative_mark:
-      Number(
-       negativeMark.value
-      ),
-
-     examiner_name:
-      examinerName.value.trim(),
-
-     syllabus:
-      syllabus.value.trim(),
-
-     exam_date:
-      startDate.value||null,
-
-     start_time:
-      startTime.value||null,
-
-     end_date:
-      endDate.value||null,
-
-     end_time:
-      endTime.value||null,
-
-     show_answers:
-      showAnswers.checked,
-
-     multiple_attempts:
-      multipleAttempts.checked,
-
-     device_attempt_protection:true
-
-    },{
-     onConflict:"exam_id"
-    });
-
-  if(e2)
-   throw e2;
-
-
-  const sourceId=
-   await getOrCreateSourceId(
-    sourceType.value,
-    sourceType.options[
-     sourceType.selectedIndex
-    ].textContent
-   );
-
-
-  const startQ=
-   await getNextIdSafe(
-    "questions"
-   );
-
-
-  const qs=
-   draft.map((q,i)=>({
-
-    id:startQ+i,
-
-    question_text:
-     q.question_text,
-
-    option_a:
-     q.option_a,
-
-    option_b:
-     q.option_b,
-
-    option_c:
-     q.option_c,
-
-    option_d:
-     q.option_d,
-
-    correct_answer:
-     q.correct_answer,
-
-    explanation:
-     q.explanation||null,
-
-    subject_id:
-     q.subject_id,
-
-    source_id:
-     sourceId,
-
-    source_type:
-     sourceType.value,
-
-    source_name:
-     name
-
-   }));
-
-
-  const {
-   error:e3
-  }=
-   await client
-    .from("questions")
-    .insert(qs);
-
-  if(e3)
-   throw e3;
-
-
-  const links=
-   qs.map((q,i)=>({
-
-    exam_id:examId,
-
-    question_id:q.id,
-
-    question_order:i+1
-
-   }));
-
-
-  const {
-   error:e4
-  }=
-   await client
-    .from("exam_questions")
-    .insert(links);
-
-  if(e4)
-   throw e4;
-
-
-  saveStatus.className=
-   "status success";
-
-  saveStatus.innerHTML=
-   `পরীক্ষা তৈরি হয়েছে।
-   শিক্ষার্থীর লিংক:
-   <b>?exam=${examId}</b>`;
-
-
-  draft=[];
-
-  renderDraft();
-
-  await loadExams();
-
-  await loadDashboard();
-
-
- }catch(e){
-
-  saveStatus.className=
-   "status error";
-
-  saveStatus.textContent=
-   "❌ "+friendlyError(e);
-
- }
-
-}
-
-
-/* =========================
-   Results
-========================= */
-
-let currentResultRows=[];
-
-
-async function loadResultExams(){
-
- const sel=
-  document.getElementById(
-   "resultExamSelect"
-  );
-
- const keep=sel.value;
-
- const {
-  data,
-  error
- }=
-  await client
-   .from("exams")
-   .select(
-    "id,exam_name,total_questions"
-   )
-   .order(
-    "id",
-    {ascending:false}
-   );
-
- if(error){
-
-  const box=
-   document.getElementById(
-    "resultSummary"
-   );
-
-  box.className=
-   "status error";
-
-  box.textContent=
-   friendlyError(error);
-
-  return;
-
- }
-
- sel.innerHTML=
-  '<option value="">পরীক্ষা নির্বাচন করুন</option>'+
-  (data||[])
-   .map(e=>
-    `<option value="${e.id}">
-     ${esc(e.exam_name)}
-    </option>`
-   )
-   .join("");
-
- if(
-  keep &&
-  (data||[]).some(
-   e=>String(e.id)===String(keep)
-  )
- )
-  sel.value=keep;
-
-}
-
-
-async function loadResults(){
-
- const sel=
-  document.getElementById(
-   "resultExamSelect"
-  );
-
- if(!sel.value)
-  await loadResultExams();
-
- const examId=sel.value;
-
- const box=
-  document.getElementById(
-   "resultsList"
-  );
-
- const summary=
-  document.getElementById(
-   "resultSummary"
-  );
-
- if(!examId){
-
-  currentResultRows=[];
-
-  summary.className=
-   "status";
-
-  summary.textContent=
-   "একটি পরীক্ষা নির্বাচন করুন।";
-
-  box.innerHTML="";
-
-  return;
-
- }
-
- try{
-
-  const {
-   data:rows,
-   error
-  }=
-   await client
-    .from("exam_attempts")
-    .select(
-     "id,exam_id,score,total_questions,submitted_at,students(name,facebook_name,district)"
-    )
-    .eq(
-     "exam_id",
-     Number(examId)
-    )
-    .order(
-     "score",
-     {ascending:false}
-    )
-    .order(
-     "submitted_at",
-     {ascending:true}
-    )
-    .order(
-     "id",
-     {ascending:true}
-    );
-
-  if(error)
-   throw error;
-
-  currentResultRows=
-   (rows||[])
-    .map((x,i)=>({
-     ...x,
-     rank:i+1
-    }));
-
-  const examName=
-   sel.options[
-    sel.selectedIndex
-   ]?.textContent||"";
-
-  summary.className=
-   "status success";
-
-  summary.textContent=
-   `${examName} — মোট ${
-    bn(currentResultRows.length)
-   } জন পরীক্ষার্থী`;
-
-  box.innerHTML=
-   currentResultRows.length
-
-   ?
-
-   `<div class="exam-item"
-     style="font-weight:800;background:#f8fafc">
-
-     <div style="
-      display:grid;
-      grid-template-columns:
-       70px 1.4fr 1fr 100px;
-      gap:10px;
-      width:100%
-     ">
-
-      <span>অবস্থান</span>
-      <span>নাম</span>
-      <span>জেলা</span>
-      <span>নম্বর</span>
-
-     </div>
-
-    </div>`+
-
-   currentResultRows
-    .map(x=>`
-
-     <div class="exam-item">
-
-      <div style="
-       display:grid;
-       grid-template-columns:
-        70px 1.4fr 1fr 100px;
-       gap:10px;
-       width:100%;
-       align-items:center
-      ">
-
-       <b>${bn(x.rank)}</b>
-
-       <span>
-
-        <b>
-         ${esc(
-          x.students?.name||""
-         )}
-        </b>
-
-        <br>
-
-        <span class="small muted">
-         ${esc(
-          x.students?.facebook_name||""
-         )}
-        </span>
-
-       </span>
-
-       <span>
-        ${esc(
-         x.students?.district||""
-        )}
-       </span>
-
-       <span>
-        <b>
-         ${bn(x.score??0)}
-        </b>
-        /
-        ${bn(x.total_questions??0)}
-       </span>
-
-      </div>
-
-     </div>
-
-    `)
-    .join("")
-
-   :
-
-   '<p class="empty">এই পরীক্ষায় এখনও কোনো ফলাফল নেই।</p>';
-
- }catch(e){
-
-  currentResultRows=[];
-
-  summary.className=
-   "status error";
-
-  summary.textContent=
-   friendlyError(e);
-
-  box.innerHTML="";
-
- }
-
-}
-
-
-function downloadResultSheet(){
-
- if(!currentResultRows.length){
-
-  alert(
-   "আগে একটি পরীক্ষা নির্বাচন করুন এবং ফলাফল লোড করুন।"
-  );
-
-  return;
-
- }
-
- const sel=
-  document.getElementById(
-   "resultExamSelect"
-  );
-
- const examName=
-  sel.options[
-   sel.selectedIndex
-  ]?.textContent||"রেজাল্ট";
-
- const data=
-  currentResultRows.map(x=>({
-
-   "অবস্থান":
-    x.rank,
-
-   "পরীক্ষার্থীর নাম":
-    x.students?.name||"",
-
-   "ফেইসবুক আইডির নাম":
-    x.students?.facebook_name||"",
-
-   "জেলা":
-    x.students?.district||"",
-
-   "প্রাপ্ত নম্বর":
-    Number(x.score||0),
-
-   "মোট নম্বর":
-    Number(x.total_questions||0),
-
-   "জমাদানের সময়":
-    x.submitted_at
-     ?new Date(
-      x.submitted_at
-     ).toLocaleString("bn-BD")
-     :""
-
-  }));
-
- const ws=
-  XLSX.utils.json_to_sheet(data);
-
- const wb=
-  XLSX.utils.book_new();
-
- XLSX.utils.book_append_sheet(
-  wb,
-  ws,
-  "রেজাল্ট"
- );
-
- XLSX.writeFile(
-  wb,
-  `${examName.replace(
-   /[\\/:*?"<>|]/g,
-   "_"
-  )}_রেজাল্ট.xlsx`
- );
-
-}
-
-
-/* =========================
-   Exam Settings
-========================= */
-
-async function editExamSettings(id){
-
- const e=
-  await client
-   .from("exams")
-   .select("*")
-   .eq("id",Number(id))
-   .maybeSingle();
-
- if(
-  e.error||
-  !e.data
- ){
-
-  alert(
-   friendlyError(
-    e.error||
-    new Error(
-     "পরীক্ষা পাওয়া যায়নি।"
-    )
-   )
-  );
-
-  return;
-
- }
-
- const s=
-  await client
-   .from("exam_settings")
-   .select("*")
-   .eq("exam_id",Number(id))
-   .maybeSingle();
-
- if(s.error){
-
-  alert(
-   friendlyError(s.error)
-  );
-
-  return;
-
- }
-
- const x=e.data;
- const st=s.data||{};
-
- document.getElementById(
-  "editExamId"
- ).value=id;
-
- document.getElementById(
-  "editExamName"
- ).value=x.exam_name||"";
-
- document.getElementById(
-  "editExaminer"
- ).value=st.examiner_name||"";
-
- document.getElementById(
-  "editSyllabus"
- ).value=st.syllabus||"";
-
- document.getElementById(
-  "editTotalMarks"
- ).value=st.total_marks||0;
-
- document.getElementById(
-  "editMarksPer"
- ).value=
-  st.marks_per_question||
-  x.marks_per_question||
-  1;
-
- document.getElementById(
-  "editNegative"
- ).value=
-  st.negative_mark||
-  x.negative_mark||
-  0;
-
- document.getElementById(
-  "editPass"
- ).value=
-  st.pass_mark||
-  x.pass_mark||
-  0;
-
- document.getElementById(
-  "editDuration"
- ).value=
-  st.duration_minutes||
-  20;
-
- document.getElementById(
-  "editStartDate"
- ).value=
-  st.exam_date||"";
-
- document.getElementById(
-  "editStartTime"
- ).value=
-  (st.start_time||"").slice(0,5);
-
- document.getElementById(
-  "editEndDate"
- ).value=
-  st.end_date||"";
-
- document.getElementById(
-  "editEndTime"
- ).value=
-  (st.end_time||"").slice(0,5);
-
- document.getElementById(
-  "editShowAnswers"
- ).checked=
-  !!st.show_answers;
-
- document.getElementById(
-  "editMultiple"
- ).checked=
-  !!st.multiple_attempts;
-
- document.getElementById(
-  "examSettingsModal"
- ).classList.remove("hidden");
-
-}
-
-
-function closeExamSettings(){
-
- document.getElementById(
-  "examSettingsModal"
- ).classList.add("hidden");
-
-}
-
-
-async function saveExamSettings(){
-
- const id=
-  Number(
-   document.getElementById(
-    "editExamId"
-   ).value
-  );
-
- const status=
-  document.getElementById(
-   "editExamStatus"
-  );
-
- status.className=
-  "status";
-
- status.textContent=
-  "সংরক্ষণ হচ্ছে...";
-
- const start=
-  (
-   document.getElementById(
-    "editStartDate"
-   ).value &&
-   document.getElementById(
-    "editStartTime"
-   ).value
-  )
-
-   ?
-
-   new Date(
-    `${document.getElementById(
-     "editStartDate"
-    ).value}T${
-     document.getElementById(
-      "editStartTime"
-     ).value
-    }:00+06:00`
-   ).toISOString()
-
-   :
-
-   new Date().toISOString();
-
- const end=
-  (
-   document.getElementById(
-    "editEndDate"
-   ).value &&
-   document.getElementById(
-    "editEndTime"
-   ).value
-  )
-
-   ?
-
-   new Date(
-    `${document.getElementById(
-     "editEndDate"
-    ).value}T${
-     document.getElementById(
-      "editEndTime"
-     ).value
-    }:59+06:00`
-   ).toISOString()
-
-   :
-
-   null;
-
-
- const e1=
-  await client
-   .from("exams")
-   .update({
-
-    exam_name:
-     document.getElementById(
-      "editExamName"
-     ).value.trim(),
-
-    marks_per_question:
-     Number(
-      document.getElementById(
-       "editMarksPer"
-      ).value
-     ),
-
-    negative_mark:
-     Number(
-      document.getElementById(
-       "editNegative"
-      ).value
-     ),
-
-    pass_mark:
-     Number(
-      document.getElementById(
-       "editPass"
-      ).value
-     ),
-
-    start_at:start,
-
-    end_at:end
-
-   })
-   .eq("id",id);
-
- if(e1.error){
-
-  status.className=
-   "status error";
-
-  status.textContent=
-   "❌ "+friendlyError(e1.error);
-
-  return;
-
- }
-
-
- const e2=
-  await client
-   .from("exam_settings")
-   .upsert({
-
-    exam_id:id,
-
-    total_marks:
-     Number(
-      document.getElementById(
-       "editTotalMarks"
-      ).value
-     ),
-
-    pass_mark:
-     Number(
-      document.getElementById(
-       "editPass"
-      ).value
-     ),
-
-    duration_minutes:
-     Number(
-      document.getElementById(
-       "editDuration"
-      ).value
-     ),
-
-    marks_per_question:
-     Number(
-      document.getElementById(
-       "editMarksPer"
-      ).value
-     ),
-
-    negative_mark:
-     Number(
-      document.getElementById(
-       "editNegative"
-      ).value
-     ),
-
-    examiner_name:
-     document.getElementById(
-      "editExaminer"
-     ).value.trim(),
-
-    syllabus:
-     document.getElementById(
-      "editSyllabus"
-     ).value.trim(),
-
-    exam_date:
-     document.getElementById(
-      "editStartDate"
-     ).value||null,
-
-    start_time:
-     document.getElementById(
-      "editStartTime"
-     ).value||null,
-
-    end_date:
-     document.getElementById(
-      "editEndDate"
-     ).value||null,
-
-    end_time:
-     document.getElementById(
-      "editEndTime"
-     ).value||null,
-
-    show_answers:
-     document.getElementById(
-      "editShowAnswers"
-     ).checked,
-
-    multiple_attempts:
-     document.getElementById(
-      "editMultiple"
-     ).checked,
-
-    updated_at:
-     new Date().toISOString()
-
-   },{
-    onConflict:"exam_id"
-   });
-
- if(e2.error){
-
-  status.className=
-   "status error";
-
-  status.textContent=
-   "❌ "+friendlyError(e2.error);
-
-  return;
-
- }
-
- status.className=
-  "status success";
-
- status.textContent=
-  "সেটিংস সংরক্ষিত হয়েছে। Exam Link একই থাকবে।";
-
- await loadExams();
-
- setTimeout(
-  closeExamSettings,
-  700
- );
-
-}
-
-
-/* =========================
-   Exam List
-========================= */
-
-async function loadExams(){
-
- const box=
-  document.getElementById(
-   "examList"
-  );
-
- const {
-  data,
-  error
- }=
-  await client
-   .from("exams")
-   .select(
-    "id,exam_name,status,created_at,total_questions"
-   )
-   .order(
-    "id",
-    {ascending:false}
-   );
-
- if(error){
-
-  box.textContent=
-   "❌ "+friendlyError(error);
-
-  return;
-
- }
-
- box.innerHTML=
-  (data||[])
-   .map(e=>`
-
-    <div class="exam-item">
-
-     <div>
-
-      <b>
-       ${esc(e.exam_name)}
-      </b>
-
-      <div class="small muted">
-       ID: ${bn(e.id)}
-       · ${e.status}
-      </div>
-
-     </div>
-
-     <div style="
-      display:flex;
-      gap:6px;
-      flex-wrap:wrap
-     ">
-
-      <a
-       class="btn secondary"
-       href="?exam=${e.id}"
-       target="_blank"
+      <span
+        class="smart-pill"
+        id="smartBangla"
       >
-       পরীক্ষার লিংক
-      </a>
+        🌾 বাংলা: লোড হচ্ছে...
+      </span>
 
-      <button
-       class="btn primary"
-       onclick="editExamSettings(${e.id})"
+
+      <span
+        class="smart-pill"
+        id="smartHijri"
       >
-       ⚙️ সেটিংস
-      </button>
-
-     </div>
+        🌙 হিজরি: বাংলাদেশে চাঁদ দেখা অনুযায়ী
+      </span>
 
     </div>
 
-   `)
-   .join("")
 
-   ||
+    <div
+      class="smart-clock"
+      id="smartClock"
+    >
+      --:--:--
+    </div>
 
-   '<p class="muted">কোনো পরীক্ষা নেই।</p>';
 
-}
+    <div class="smart-zone">
+      Asia/Dhaka • UTC+6
+    </div>
+
+  </div>
 
 
-/* =========================
-   Question Bank
-========================= */
+  <!-- FOUR STAT CARDS -->
 
-async function loadBank(){
+  <div class="dashboard-cards">
 
- const box=
-  document.getElementById(
-   "bankList"
-  );
 
- let q=
-  client
-   .from("questions")
-   .select(
-    "id,question_text,option_a,option_b,option_c,option_d,correct_answer,explanation,source_type,source_name,subject_id,created_at"
-   )
-   .order(
-    "id",
-    {ascending:false}
-   )
-   .limit(100);
+    <div class="dashboard-stat">
 
- if(filterSource.value)
-  q=q.eq(
-   "source_type",
-   filterSource.value
-  );
+      <div class="icon">📝</div>
 
- if(filterSubject.value)
-  q=q.eq(
-   "subject_id",
-   Number(filterSubject.value)
-  );
+      <b id="sQuestions">০</b>
 
- if(
-  filterSourceName.value.trim()
- )
-  q=q.ilike(
-   "source_name",
-   `%${filterSourceName.value.trim()}%`
-  );
-
- const {
-  data,
-  error
- }=
-  await q;
-
- if(error){
-
-  box.textContent=
-   "❌ "+friendlyError(error);
-
-  return;
-
- }
-
- box.innerHTML=
-  (data||[])
-   .map((x,i)=>`
-
-    <div class="q-item">
-
-     <b>${bn(i+1)}.</b>
-     ${esc(x.question_text)}
-
-     <div class="small muted">
-
-      ${sourceLabel(x.source_type)}
-      ·
-      ${esc(x.source_name||"")}
-
-      ${
-       x.subject_id
-        ?" · "+SUBJECTS[x.subject_id]
-        :""
-      }
-
-     </div>
-
-     <div
-      class="small"
-      style="margin-top:6px"
-     >
-
-      ক) ${esc(x.option_a)}
-      · খ) ${esc(x.option_b)}
-      · গ) ${esc(x.option_c)}
-      · ঘ) ${esc(x.option_d)}
-
-      <br>
-
-      সঠিক উত্তর:
-      <b>
-       ${LETTER[x.correct_answer]||
-         esc(x.correct_answer||"")}
-      </b>
-
-      ${
-       x.explanation
-        ?` · ব্যাখ্যা:
-          ${esc(x.explanation)}`
-        :""
-      }
-
-     </div>
-
-     <div
-      class="right"
-      style="margin-top:8px"
-     >
-
-      <button
-       class="btn primary"
-       onclick="openEditQuestion(${x.id})"
-      >
-       ✏️ এডিট
-      </button>
-
-     </div>
+      <span>
+        মোট প্রশ্ন
+      </span>
 
     </div>
 
-   `)
-   .join("")
 
-   ||
+    <div class="dashboard-stat">
 
-   '<p class="muted">কোনো প্রশ্ন পাওয়া যায়নি।</p>';
+      <div class="icon">📋</div>
 
-}
+      <b id="sExams">০</b>
 
+      <span>
+        মোট পরীক্ষা
+      </span>
 
-/* =========================
-   Edit Question
-========================= */
+    </div>
 
-async function openEditQuestion(id){
 
- const q=
-  await client
-   .from("questions")
-   .select(
-    "id,question_text,option_a,option_b,option_c,option_d,correct_answer,explanation,subject_id"
-   )
-   .eq("id",Number(id))
-   .maybeSingle();
+    <div class="dashboard-stat">
 
- if(q.error){
+      <div class="icon">👨‍🎓</div>
 
-  alert(
-   friendlyError(q.error)
-  );
+      <b id="sStudents">০</b>
 
-  return;
+      <span>
+        মোট পরীক্ষার্থী
+      </span>
 
- }
+    </div>
 
- if(!q.data){
 
-  alert(
-   "প্রশ্নটি পাওয়া যায়নি।"
-  );
+    <div class="dashboard-stat">
 
-  return;
+      <div class="icon">👁️</div>
 
- }
+      <b id="sVisitors">—</b>
 
- const x=q.data;
+      <span>
+        মোট ভিজিটর
+      </span>
 
- document.getElementById(
-  "editQuestionId"
- ).value=x.id;
+      <small>
+        Visitor tracking এখনো যুক্ত করা হয়নি
+      </small>
 
- document.getElementById(
-  "editQuestionText"
- ).value=x.question_text||"";
+    </div>
 
- document.getElementById(
-  "editA"
- ).value=x.option_a||"";
 
- document.getElementById(
-  "editB"
- ).value=x.option_b||"";
+  </div>
 
- document.getElementById(
-  "editC"
- ).value=x.option_c||"";
 
- document.getElementById(
-  "editD"
- ).value=x.option_d||"";
+</section>
 
- document.getElementById(
-  "editCorrect"
- ).value=
-  x.correct_answer||"A";
 
- document.getElementById(
-  "editSubject"
- ).value=
-  x.subject_id
-   ?String(x.subject_id)
-   :"";
+<!-- =========================
+     QUESTION BANK
+========================= -->
 
- document.getElementById(
-  "editExplanation"
- ).value=
-  x.explanation||"";
+<section
+  id="bank"
+  class="page hidden"
+>
 
- document.getElementById(
-  "editQuestionStatus"
- ).textContent="";
 
- document.getElementById(
-  "editQuestionModal"
- ).classList.remove("hidden");
+  <div class="card">
 
-}
+    <h2>
+      ১. Category → Folder → Set
+    </h2>
 
 
-function closeEditQuestion(){
+    <div class="cats">
 
- document.getElementById(
-  "editQuestionModal"
- ).classList.add("hidden");
-
-}
-
-
-async function saveEditedQuestion(){
-
- const id=
-  Number(
-   document.getElementById(
-    "editQuestionId"
-   ).value
-  );
-
- const payload={
-
-  question_text:
-   document.getElementById(
-    "editQuestionText"
-   ).value.trim(),
-
-  option_a:
-   document.getElementById(
-    "editA"
-   ).value.trim(),
-
-  option_b:
-   document.getElementById(
-    "editB"
-   ).value.trim(),
-
-  option_c:
-   document.getElementById(
-    "editC"
-   ).value.trim(),
-
-  option_d:
-   document.getElementById(
-    "editD"
-   ).value.trim(),
+      <button
+        id="cat-recruitment"
+        onclick="selectCategory('recruitment')"
+      >
+        নিয়োগ পরীক্ষা
+      </button>
 
-  correct_answer:
-   document.getElementById(
-    "editCorrect"
-   ).value,
+      <button
+        id="cat-verification_test"
+        onclick="selectCategory('verification_test')"
+      >
+        যাচাই পরীক্ষা
+      </button>
 
-  explanation:
-   document.getElementById(
-    "editExplanation"
-   ).value.trim()||null,
+      <button
+        id="cat-recent"
+        onclick="selectCategory('recent')"
+      >
+        সাম্প্রতিক প্রশ্ন
+      </button>
 
-  subject_id:
-   document.getElementById(
-    "editSubject"
-   ).value
-    ?Number(
-     document.getElementById(
-      "editSubject"
-     ).value
-    )
-    :null
+    </div>
 
- };
 
- if(
-  !id||
-  !payload.question_text||
-  !payload.option_a||
-  !payload.option_b||
-  !payload.option_c||
-  !payload.option_d||
-  !["A","B","C","D"]
-   .includes(
-    payload.correct_answer
-   )
- ){
+    <div
+      id="currentCat"
+      class="notice"
+    ></div>
 
-  const st=
-   document.getElementById(
-    "editQuestionStatus"
-   );
 
-  st.className=
-   "status error";
+    <div class="grid">
 
-  st.textContent=
-   "প্রশ্ন, চারটি অপশন ও সঠিক উত্তর ঠিকভাবে দিন।";
-
-  return;
-
- }
-
- const st=
-  document.getElementById(
-   "editQuestionStatus"
-  );
-
- st.className=
-  "status";
-
- st.textContent=
-  "সংরক্ষণ হচ্ছে...";
-
- const {
-  error
- }=
-  await client
-   .from("questions")
-   .update(payload)
-   .eq("id",id);
-
- if(error){
-
-  st.className=
-   "status error";
-
-  st.textContent=
-   "❌ "+friendlyError(error);
-
-  return;
-
- }
-
- st.className=
-  "status success";
-
- st.textContent=
-  "প্রশ্নের পরিবর্তন সংরক্ষণ করা হয়েছে।";
-
- await loadBank();
-
- setTimeout(
-  closeEditQuestion,
-  500
- );
-
-}
-
-
-/* =========================
-   Menu / Page
-========================= */
-
-function toggleMenu(){
-
- document.getElementById(
-  "sideMenu"
- ).classList.toggle(
-  "hidden"
- );
-
-}
-
-
-function setPageMeta(tab){
-
- const t={
-
-  dashboard:[
-   "ড্যাশবোর্ড",
-   "ফেইসবুক পাঠশালার পরীক্ষা ব্যবস্থাপনা"
-  ],
-
-  exam:[
-   "এক্সাম ম্যানেজমেন্ট",
-   "পরীক্ষা তৈরি, প্রশ্ন যোগ ও পরীক্ষার লিংক"
-  ],
-
-  bank:[
-   "প্রশ্ন ব্যাংক",
-   "সংরক্ষিত প্রশ্ন খুঁজুন ও বিষয়ভিত্তিক দেখুন"
-  ],
-
-  results:[
-   "পরীক্ষার্থী ও রেজাল্ট",
-   "পরীক্ষার্থীদের অংশগ্রহণ ও ফলাফল দেখুন"
-  ]
-
- }[tab]||
- [
-  "ড্যাশবোর্ড",
-  ""
- ];
-
- document.getElementById(
-  "pageTitle"
- ).textContent=t[0];
-
- document.getElementById(
-  "pageSubtitle"
- ).textContent=t[1];
-
-}
-
-
-async function showAdminTab(tab){
-
- [
-  "dashboard",
-  "exam",
-  "bank",
-  "results"
- ].forEach(x=>{
-
-  const el=
-   document.getElementById(
-    x+"Tab"
-   );
-
-  if(el)
-   el.classList.toggle(
-    "hidden",
-    x!==tab
-   );
-
- });
-
- setPageMeta(tab);
-
- document.getElementById(
-  "sideMenu"
- ).classList.add("hidden");
-
- if(tab==="dashboard")
-  await loadDashboard();
-
- if(tab==="exam")
-  await loadExams();
-
- if(tab==="bank")
-  await loadBank();
-
- if(tab==="results"){
-
-  await loadResultExams();
-
-  await loadResults();
-
- }
-
-}
-
-
-/* =========================
-   Dashboard
-========================= */
-
-async function loadDashboard(){
-
- try{
-
-  const [
-   e,
-   s,
-   q,
-   a
-  ]=
-   await Promise.all([
-
-    client
-     .from("exams")
-     .select(
-      "id",
-      {count:"exact",head:true}
-     ),
-
-    client
-     .from("students")
-     .select(
-      "id",
-      {count:"exact",head:true}
-     ),
-
-    client
-     .from("questions")
-     .select(
-      "id",
-      {count:"exact",head:true}
-     ),
-
-    client
-     .from("exam_attempts")
-     .select(
-      "id",
-      {count:"exact",head:true}
-     )
-
-   ]);
-
-
-  document.getElementById(
-   "statExams"
-  ).textContent=
-   bn(e.count||0);
-
-  document.getElementById(
-   "statStudents"
-  ).textContent=
-   bn(s.count||0);
-
-  document.getElementById(
-   "statQuestions"
-  ).textContent=
-   bn(q.count||0);
-
-  document.getElementById(
-   "statAttempts"
-  ).textContent=
-   bn(a.count||0);
-
-
-  const {
-   data,
-   error
-  }=
-   await client
-    .from("exams")
-    .select(
-     "id,exam_name,status,created_at,total_questions"
-    )
-    .order(
-     "id",
-     {ascending:false}
-    )
-    .limit(5);
-
-  if(error)
-   throw error;
-
-
-  document.getElementById(
-   "recentExams"
-  ).innerHTML=
-
-   (data||[])
-    .map(x=>`
-
-     <div class="exam-item">
 
       <div>
 
-       <b>
-        ${esc(x.exam_name)}
-       </b>
+        <label>
+          Folder
+        </label>
 
-       <div class="small muted">
+        <select id="folder"></select>
 
-        ${bn(
-         x.total_questions||0
-        )}টি প্রশ্ন
 
-        ·
+        <div
+          id="folderActions"
+          class="bank-actions"
+        >
 
-        ${
-         x.status==="active"
-          ?"সক্রিয়"
-          :"নিষ্ক্রিয়"
-        }
+          <button
+            class="secondary"
+            type="button"
+            onclick="renameSelectedFolder()"
+          >
+            ✏️ Folder Rename
+          </button>
 
-       </div>
+          <button
+            class="secondary"
+            type="button"
+            onclick="deleteSelectedFolder()"
+          >
+            🗑️ Folder Delete
+          </button>
+
+        </div>
 
       </div>
 
-      <a
-       class="btn secondary"
-       href="?exam=${x.id}"
-       target="_blank"
+
+      <div>
+
+        <label>
+          Set
+        </label>
+
+        <select id="set"></select>
+
+
+        <div
+          id="setActions"
+          class="bank-actions"
+        >
+
+          <button
+            class="secondary"
+            type="button"
+            onclick="renameSelectedSet()"
+          >
+            ✏️ Set Rename
+          </button>
+
+          <button
+            class="secondary"
+            type="button"
+            onclick="deleteSelectedSet()"
+          >
+            🗑️ Set Delete
+          </button>
+
+        </div>
+
+      </div>
+
+
+    </div>
+
+
+    <div class="grid">
+
+      <div>
+
+        <input
+          id="newFolder"
+          placeholder="নতুন Folder-এর নাম"
+        >
+
+      </div>
+
+      <button onclick="createFolder()">
+        ＋ Folder তৈরি
+      </button>
+
+    </div>
+
+
+    <div class="grid">
+
+      <div>
+
+        <input
+          id="newSet"
+          placeholder="নতুন Set-এর নাম"
+        >
+
+      </div>
+
+      <button onclick="createSet()">
+        ＋ Set তৈরি
+      </button>
+
+    </div>
+
+
+    <p
+      id="folderMsg"
+      class="msg"
+    ></p>
+
+  </div>
+
+
+  <!-- QUESTION UPLOAD -->
+
+  <div class="card">
+
+    <h2>
+      ২. প্রশ্ন আপলোড
+    </h2>
+
+
+    <div class="tabs">
+
+      <button onclick="mode('manual')">
+        Manual
+      </button>
+
+      <button onclick="mode('import')">
+        CSV / Excel
+      </button>
+
+    </div>
+
+
+    <div id="manualBox">
+
+
+      <div class="grid">
+
+        <div>
+
+          <label>
+            বিষয়
+          </label>
+
+          <select id="subject"></select>
+
+        </div>
+
+
+        <div>
+
+          <label>
+            প্রশ্ন নম্বর
+          </label>
+
+          <input
+            id="qno"
+            type="number"
+          >
+
+        </div>
+
+      </div>
+
+
+      <input
+        id="source"
+        placeholder="Source / পরীক্ষার নাম (ঐচ্ছিক)"
       >
-       লিংক
-      </a>
-
-     </div>
-
-    `)
-    .join("")
-
-   ||
-
-   '<p class="muted">এখনও কোনো পরীক্ষা তৈরি হয়নি।</p>';
 
 
- }catch(e){
-
-  document.getElementById(
-   "recentExams"
-  ).innerHTML=
-   '<div class="status error">'+
-   friendlyError(e)+
-   '</div>';
-
- }
-
-}
+      <textarea
+        id="qtext"
+        placeholder="প্রশ্ন"
+      ></textarea>
 
 
-/* =========================
-   Start
-========================= */
+      <div class="grid">
 
-window.addEventListener(
- "DOMContentLoaded",
- ()=>{
-  init();
-  updateSmartDate();
- }
-);
+        <input
+          id="a"
+          placeholder="ক. অপশন"
+        >
+
+        <input
+          id="b"
+          placeholder="খ. অপশন"
+        >
+
+        <input
+          id="c"
+          placeholder="গ. অপশন"
+        >
+
+        <input
+          id="d"
+          placeholder="ঘ. অপশন"
+        >
+
+      </div>
+
+
+      <div class="grid">
+
+        <select id="correct">
+
+          <option value="">
+            সঠিক উত্তর
+          </option>
+
+          <option value="A">
+            ক
+          </option>
+
+          <option value="B">
+            খ
+          </option>
+
+          <option value="C">
+            গ
+          </option>
+
+          <option value="D">
+            ঘ
+          </option>
+
+        </select>
+
+
+        <input
+          id="explanation"
+          placeholder="ব্যাখ্যা (ঐচ্ছিক)"
+        >
+
+      </div>
+
+
+      <button onclick="addManual()">
+        প্রশ্ন Question Bank-এ যোগ করুন
+      </button>
+
+    </div>
+
+
+    <!-- IMPORT -->
+
+    <div
+      id="importBox"
+      class="hidden"
+    >
+
+      <p class="muted">
+        Excel/CSV columns:
+        category, folder, set, subject, source,
+        question_number, question, option_a,
+        option_b, option_c, option_d,
+        correct_answer, explanation
+      </p>
+
+
+      <button
+        class="secondary"
+        onclick="template()"
+      >
+        Template ডাউনলোড
+      </button>
+
+
+      <input
+        id="file"
+        type="file"
+        accept=".csv,.xlsx,.xls"
+      >
+
+
+      <button onclick="previewImport()">
+        Preview
+      </button>
+
+
+      <div id="preview"></div>
+
+
+      <button
+        id="importBtn"
+        class="hidden"
+        onclick="importRows()"
+      >
+        Database-এ Import করুন
+      </button>
+
+    </div>
+
+
+    <p
+      id="qmsg"
+      class="msg"
+    ></p>
+
+  </div>
+
+
+  <!-- QUESTION BANK LIST -->
+
+  <div class="card">
+
+    <h2>
+      ৩. Question Bank
+    </h2>
+
+
+    <div class="grid">
+
+      <select id="filterFolder"></select>
+
+      <select id="filterSet"></select>
+
+    </div>
+
+
+    <div class="grid">
+
+      <select id="filterSubject"></select>
+
+      <input
+        id="search"
+        placeholder="প্রশ্ন খুঁজুন"
+      >
+
+    </div>
+
+
+    <button onclick="loadQuestions()">
+      Refresh
+    </button>
+
+
+    <div id="questions"></div>
+
+  </div>
+
+
+</section>
+
+
+<!-- =========================
+     EXAM MANAGEMENT
+========================= -->
+
+<section
+  id="exam"
+  class="page hidden"
+>
+
+
+  <!-- CREATE EXAM -->
+
+  <div class="card">
+
+    <h2>
+      Exam Management
+    </h2>
+
+
+    <div class="grid">
+
+      <input
+        id="examName"
+        placeholder="পরীক্ষার নাম"
+      >
+
+
+      <select id="examStatus">
+
+        <option value="active">
+          Active
+        </option>
+
+        <option value="inactive">
+          Inactive
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <button onclick="createExam()">
+      ＋ নতুন Exam তৈরি
+    </button>
+
+
+    <p
+      id="examMsg"
+      class="msg"
+    ></p>
+
+  </div>
+
+
+  <!-- EXAM SETTINGS -->
+
+  <div class="card">
+
+    <h2>
+      Exam Settings
+    </h2>
+
+
+    <select
+      id="examSelect"
+      onchange="loadSettings()"
+    ></select>
+
+
+    <div class="grid">
+
+      <input
+        id="totalQ"
+        type="number"
+        placeholder="Total Questions"
+      >
+
+      <input
+        id="totalMarks"
+        type="number"
+        placeholder="Total Marks"
+      >
+
+    </div>
+
+
+    <div class="grid">
+
+      <input
+        id="pass"
+        type="number"
+        placeholder="Pass Mark"
+      >
+
+      <input
+        id="duration"
+        type="number"
+        placeholder="Duration (minutes)"
+      >
+
+    </div>
+
+
+    <div class="grid">
+
+      <input
+        id="marks"
+        type="number"
+        step="0.01"
+        placeholder="Marks / Question"
+      >
+
+      <input
+        id="negative"
+        type="number"
+        step="0.01"
+        placeholder="Negative Mark"
+      >
+
+    </div>
+
+
+    <input
+      id="examiner"
+      placeholder="পরীক্ষকের নাম"
+    >
+
+
+    <textarea
+      id="syllabus"
+      placeholder="সিলেবাস"
+    ></textarea>
+
+
+    <div class="checks">
+
+      <label>
+        <input
+          id="showAnswers"
+          type="checkbox"
+        >
+        উত্তর দেখাবে
+      </label>
+
+
+      <label>
+        <input
+          id="multiple"
+          type="checkbox"
+        >
+        Multiple Attempt
+      </label>
+
+
+      <label>
+        <input
+          id="device"
+          type="checkbox"
+          checked
+        >
+        Device Protection
+      </label>
+
+
+      <label>
+        <input
+          id="randomQ"
+          type="checkbox"
+        >
+        Random Questions
+      </label>
+
+
+      <label>
+        <input
+          id="randomO"
+          type="checkbox"
+        >
+        Random Options
+      </label>
+
+    </div>
+
+
+    <div class="grid">
+
+      <input
+        id="startDate"
+        type="date"
+      >
+
+      <input
+        id="startTime"
+        type="time"
+      >
+
+    </div>
+
+
+    <div class="grid">
+
+      <input
+        id="endDate"
+        type="date"
+      >
+
+      <input
+        id="endTime"
+        type="time"
+      >
+
+    </div>
+
+
+    <button onclick="saveSettings()">
+      Settings Save
+    </button>
+
+
+    <p
+      id="settingsMsg"
+      class="msg"
+    ></p>
+
+  </div>
+
+
+  <!-- QUESTION MAPPING -->
+
+  <div class="card">
+
+    <h2>
+      Exam-এ Question Bank থেকে প্রশ্ন নিন
+    </h2>
+
+
+    <select id="mapExam"></select>
+
+
+    <div class="grid">
+
+      <select id="mapFolder"></select>
+
+      <select id="mapSet"></select>
+
+    </div>
+
+
+    <button onclick="loadPool()">
+      প্রশ্ন দেখুন
+    </button>
+
+
+    <div id="pool"></div>
+
+
+    <p
+      id="mapMsg"
+      class="msg"
+    ></p>
+
+  </div>
+
+
+  <!-- EXAM LIST -->
+
+  <div class="card">
+
+    <h2>
+      Exam List / Link
+    </h2>
+
+
+    <a
+      href="results.html"
+      target="_blank"
+      class="result-link"
+    >
+      📊 Result দেখুন
+    </a>
+
+
+    <div id="exams"></div>
+
+  </div>
+
+
+</section>
+
+
+</main>
+
+</div>
+
+
+<!-- SUPABASE -->
+
+<script src="js/supabase.js"></script>
+
+<!-- EXISTING ADMIN LOGIC -->
+
+<script src="js/admin.js"></script>
+
+
+<!-- =========================
+     DASHBOARD SCRIPT
+========================= -->
+
+<script>
+
+(function(){
+
+  const bn = n =>
+    String(n ?? '')
+      .replace(
+        /\d/g,
+        d => '০১২৩৪৫৬৭৮৯'[d]
+      );
+
+
+  const bdMonths = [
+    'বৈশাখ',
+    'জ্যৈষ্ঠ',
+    'আষাঢ়',
+    'শ্রাবণ',
+    'ভাদ্র',
+    'আশ্বিন',
+    'কার্তিক',
+    'অগ্রহায়ণ',
+    'পৌষ',
+    'মাঘ',
+    'ফাল্গুন',
+    'চৈত্র'
+  ];
+
+
+  const bdWeek = [
+    'রবিবার',
+    'সোমবার',
+    'মঙ্গলবার',
+    'বুধবার',
+    'বৃহস্পতিবার',
+    'শুক্রবার',
+    'শনিবার'
+  ];
+
+
+  /*
+   * বাংলা তারিখ
+   *
+   * এটি Dashboard-এর
+   * আনুমানিক বাংলা ক্যালেন্ডার
+   * প্রদর্শনের জন্য।
+   */
+
+  function banglaDate(d){
+
+    const y = d.getFullYear();
+
+    let start = new Date(
+      y,
+      3,
+      14
+    );
+
+    let by = y - 593;
+
+
+    if(d < start){
+
+      by = y - 594;
+
+      start = new Date(
+        y - 1,
+        3,
+        14
+      );
+
+    }
+
+
+    let dayIndex =
+      Math.floor(
+        (d - start) / 86400000
+      );
+
+
+    const lens = [
+      31,
+      31,
+      31,
+      31,
+      31,
+      30,
+      30,
+      30,
+      30,
+      30,
+      30,
+      30
+    ];
+
+
+    let m = 0;
+
+
+    while(
+      m < 11 &&
+      dayIndex >= lens[m]
+    ){
+
+      dayIndex -= lens[m];
+
+      m++;
+
+    }
+
+
+    return (
+      bn(dayIndex + 1)
+      + ' '
+      + bdMonths[m]
+      + ' '
+      + bn(by)
+    );
+
+  }
+
+
+  /*
+   * Bangladesh time
+   */
+
+  function updateClock(){
+
+    const now = new Date();
+
+
+    const dateStr =
+      new Intl.DateTimeFormat(
+        'en-US',
+        {
+          timeZone:'Asia/Dhaka',
+          weekday:'long',
+          month:'long',
+          day:'numeric',
+          year:'numeric'
+        }
+      ).format(now);
+
+
+    const parts =
+      new Intl.DateTimeFormat(
+        'en-US',
+        {
+          timeZone:'Asia/Dhaka',
+          hour:'2-digit',
+          minute:'2-digit',
+          second:'2-digit',
+          hour12:true
+        }
+      ).formatToParts(now);
+
+
+    const hh =
+      parts.find(
+        x => x.type === 'hour'
+      )?.value || '--';
+
+
+    const mm =
+      parts.find(
+        x => x.type === 'minute'
+      )?.value || '--';
+
+
+    const ss =
+      parts.find(
+        x => x.type === 'second'
+      )?.value || '--';
+
+
+    const ap =
+      parts.find(
+        x => x.type === 'dayPeriod'
+      )?.value || '';
+
+
+    const dh =
+      new Date(
+        now.toLocaleString(
+          'en-US',
+          {
+            timeZone:'Asia/Dhaka'
+          }
+        )
+      );
+
+
+    const today =
+      document.getElementById(
+        'smartToday'
+      );
+
+
+    const clock =
+      document.getElementById(
+        'smartClock'
+      );
+
+
+    const bangla =
+      document.getElementById(
+        'smartBangla'
+      );
+
+
+    if(today){
+
+      today.textContent =
+        dateStr
+        + ' • '
+        + bdWeek[dh.getDay()];
+
+    }
+
+
+    if(clock){
+
+      clock.textContent =
+        hh
+        + ':'
+        + mm
+        + ':'
+        + ss
+        + ' '
+        + ap;
+
+    }
+
+
+    if(bangla){
+
+      bangla.textContent =
+        '🌾 বাংলা: '
+        + banglaDate(dh);
+
+    }
+
+  }
+
+
+  /*
+   * Dashboard database statistics
+   */
+
+  async function dashboardStats(){
+
+    if(
+      typeof db === 'undefined'
+    ){
+
+      return;
+
+    }
+
+
+    const [
+      q,
+      e,
+      s
+    ] = await Promise.all([
+
+      db
+        .from('questions')
+        .select(
+          'id',
+          {
+            count:'exact',
+            head:true
+          }
+        ),
+
+      db
+        .from('exams')
+        .select(
+          'id',
+          {
+            count:'exact',
+            head:true
+          }
+        ),
+
+      db
+        .from('students')
+        .select(
+          'id',
+          {
+            count:'exact',
+            head:true
+          }
+        )
+
+    ]);
+
+
+    function setStat(
+      id,
+      value
+    ){
+
+      const el =
+        document.getElementById(id);
+
+
+      if(el){
+
+        el.textContent =
+          bn(value ?? 0);
+
+      }
+
+    }
+
+
+    if(!q.error){
+
+      setStat(
+        'sQuestions',
+        q.count
+      );
+
+    }
+
+
+    if(!e.error){
+
+      setStat(
+        'sExams',
+        e.count
+      );
+
+    }
+
+
+    if(!s.error){
+
+      setStat(
+        'sStudents',
+        s.count
+      );
+
+    }
+
+  }
+
+
+  /*
+   * Three-dot menu
+   */
+
+  window.closeAdminMenu =
+    function(){
+
+      document
+        .getElementById(
+          'adminMenuPanel'
+        )
+        ?.classList
+        .add('hidden');
+
+    };
+
+
+  document.addEventListener(
+    'click',
+    function(e){
+
+      const panel =
+        document.getElementById(
+          'adminMenuPanel'
+        );
+
+      const button =
+        document.getElementById(
+          'adminMenuBtn'
+        );
+
+
+      if(
+        panel &&
+        button &&
+        !panel.contains(e.target) &&
+        e.target !== button
+      ){
+
+        panel.classList.add(
+          'hidden'
+        );
+
+      }
+
+    }
+  );
+
+
+  document.addEventListener(
+    'DOMContentLoaded',
+    function(){
+
+      const button =
+        document.getElementById(
+          'adminMenuBtn'
+        );
+
+      const panel =
+        document.getElementById(
+          'adminMenuPanel'
+        );
+
+
+      if(button && panel){
+
+        button.onclick =
+          function(e){
+
+            e.stopPropagation();
+
+            panel.classList.toggle(
+              'hidden'
+            );
+
+          };
+
+      }
+
+
+      updateClock();
+
+      setInterval(
+        updateClock,
+        1000
+      );
+
+
+      dashboardStats();
+
+    }
+  );
+
+
+})();
+
+</script>
+
+
+<!-- =========================
+     FOLDER / SET RENAME DELETE
+========================= -->
+
+<script>
+
+(function(){
+
+
+  async function renameSelectedFolder(){
+
+    const id =
+      document.getElementById(
+        'folder'
+      )?.value;
+
+
+    if(!id){
+
+      return msg(
+        'folderMsg',
+        'আগে Folder নির্বাচন করুন',
+        true
+      );
+
+    }
+
+
+    const old =
+      document
+        .getElementById('folder')
+        .selectedOptions[0]
+        ?.textContent || '';
+
+
+    const name =
+      prompt(
+        'নতুন Folder-এর নাম লিখুন:',
+        old
+      );
+
+
+    if(name === null){
+
+      return;
+
+    }
+
+
+    const value =
+      name.trim();
+
+
+    if(!value){
+
+      return msg(
+        'folderMsg',
+        'Folder-এর নাম খালি রাখা যাবে না',
+        true
+      );
+
+    }
+
+
+    if(value === old){
+
+      return;
+
+    }
+
+
+    msg(
+      'folderMsg',
+      'Folder Rename হচ্ছে...'
+    );
+
+
+    const r =
+      await db
+        .from('question_bank_folders')
+        .update({
+          folder_name:value
+        })
+        .eq(
+          'id',
+          Number(id)
+        );
+
+
+    if(r.error){
+
+      return msg(
+        'folderMsg',
+        r.error.message,
+        true
+      );
+
+    }
+
+
+    await loadFolders();
+
+
+    document.getElementById(
+      'folder'
+    ).value =
+      String(id);
+
+
+    await loadSets();
+
+
+    msg(
+      'folderMsg',
+      '✅ Folder-এর নাম পরিবর্তন হয়েছে'
+    );
+
+  }
+
+
+  async function deleteSelectedFolder(){
+
+    const id =
+      document.getElementById(
+        'folder'
+      )?.value;
+
+
+    if(!id){
+
+      return msg(
+        'folderMsg',
+        'আগে Folder নির্বাচন করুন',
+        true
+      );
+
+    }
+
+
+    const name =
+      document
+        .getElementById('folder')
+        .selectedOptions[0]
+        ?.textContent
+        || 'এই Folder';
+
+
+    const check =
+      await db
+        .from('question_bank_sets')
+        .select(
+          'id',
+          {
+            count:'exact',
+            head:true
+          }
+        )
+        .eq(
+          'folder_id',
+          Number(id)
+        );
+
+
+    if(check.error){
+
+      return msg(
+        'folderMsg',
+        check.error.message,
+        true
+      );
+
+    }
+
+
+    const count =
+      check.count || 0;
+
+
+    const text =
+      count
+        ? '"' + name +
+          '" Folder-এর ভিতরে ' +
+          count +
+          'টি Set আছে। Delete করলে Set-গুলোও মুছে যাবে। নিশ্চিত?'
+        : '"' + name +
+          '" Folder Delete করবেন?';
+
+
+    if(!confirm(text)){
+
+      return;
+
+    }
+
+
+    msg(
+      'folderMsg',
+      'Folder Delete হচ্ছে...'
+    );
+
+
+    const r =
+      await db
+        .from('question_bank_folders')
+        .delete()
+        .eq(
+          'id',
+          Number(id)
+        );
+
+
+    if(r.error){
+
+      return msg(
+        'folderMsg',
+        r.error.message,
+        true
+      );
+
+    }
+
+
+    await loadFolders();
+
+
+    document.getElementById(
+      'set'
+    ).innerHTML =
+      '<option value="">Set নির্বাচন করুন</option>';
+
+
+    msg(
+      'folderMsg',
+      '✅ Folder Delete হয়েছে'
+    );
+
+  }
+
+
+  async function renameSelectedSet(){
+
+    const id =
+      document.getElementById(
+        'set'
+      )?.value;
+
+
+    if(!id){
+
+      return msg(
+        'folderMsg',
+        'আগে Set নির্বাচন করুন',
+        true
+      );
+
+    }
+
+
+    const old =
+      document
+        .getElementById('set')
+        .selectedOptions[0]
+        ?.textContent || '';
+
+
+    const name =
+      prompt(
+        'নতুন Set-এর নাম লিখুন:',
+        old
+      );
+
+
+    if(name === null){
+
+      return;
+
+    }
+
+
+    const value =
+      name.trim();
+
+
+    if(!value){
+
+      return msg(
+        'folderMsg',
+        'Set-এর নাম খালি রাখা যাবে না',
+        true
+      );
+
+    }
+
+
+    if(value === old){
+
+      return;
+
+    }
+
+
+    msg(
+      'folderMsg',
+      'Set Rename হচ্ছে...'
+    );
+
+
+    const r =
+      await db
+        .from('question_bank_sets')
+        .update({
+          set_name:value
+        })
+        .eq(
+          'id',
+          Number(id)
+        );
+
+
+    if(r.error){
+
+      return msg(
+        'folderMsg',
+        r.error.message,
+        true
+      );
+
+    }
+
+
+    await loadSets();
+
+
+    document.getElementById(
+      'set'
+    ).value =
+      String(id);
+
+
+    msg(
+      'folderMsg',
+      '✅ Set-এর নাম পরিবর্তন হয়েছে'
+    );
+
+  }
+
+
+  async function deleteSelectedSet(){
+
+    const id =
+      document.getElementById(
+        'set'
+      )?.value;
+
+
+    if(!id){
+
+      return msg(
+        'folderMsg',
+        'আগে Set নির্বাচন করুন',
+        true
+      );
+
+    }
+
+
+    const name =
+      document
+        .getElementById('set')
+        .selectedOptions[0]
+        ?.textContent
+        || 'এই Set';
+
+
+    const check =
+      await db
+        .from('questions')
+        .select(
+          'id',
+          {
+            count:'exact',
+            head:true
+          }
+        )
+        .eq(
+          'set_id',
+          Number(id)
+        );
+
+
+    if(check.error){
+
+      return msg(
+        'folderMsg',
+        check.error.message,
+        true
+      );
+
+    }
+
+
+    const count =
+      check.count || 0;
+
+
+    const text =
+      count
+        ? '"' + name +
+          '" Set-এর মধ্যে ' +
+          count +
+          'টি প্রশ্ন আছে। Delete করলে প্রশ্নগুলোও মুছে যাবে। নিশ্চিত?'
+        : '"' + name +
+          '" Set Delete করবেন?';
+
+
+    if(!confirm(text)){
+
+      return;
+
+    }
+
+
+    msg(
+      'folderMsg',
+      'Set Delete হচ্ছে...'
+    );
+
+
+    const r =
+      await db
+        .from('question_bank_sets')
+        .delete()
+        .eq(
+          'id',
+          Number(id)
+        );
+
+
+    if(r.error){
+
+      return msg(
+        'folderMsg',
+        r.error.message,
+        true
+      );
+
+    }
+
+
+    await loadSets();
+
+
+    msg(
+      'folderMsg',
+      '✅ Set Delete হয়েছে'
+    );
+
+  }
+
+
+  window.renameSelectedFolder =
+    renameSelectedFolder;
+
+  window.deleteSelectedFolder =
+    deleteSelectedFolder;
+
+  window.renameSelectedSet =
+    renameSelectedSet;
+
+  window.deleteSelectedSet =
+    deleteSelectedSet;
+
+
+})();
 
 </script>
 
