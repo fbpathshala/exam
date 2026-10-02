@@ -4,7 +4,12 @@ const CATS={
   recent:'সাম্প্রতিক প্রশ্ন'
 };
 
-let cat='verification_test',folders=[],sets=[],subjects=[],exams=[],importData=[];
+let cat='verification_test',
+    folders=[],
+    sets=[],
+    subjects=[],
+    exams=[],
+    importData=[];
 
 const $=id=>document.getElementById(id);
 
@@ -39,9 +44,7 @@ function msg(id,t,err=false){
 async function login(){
   msg('loginMsg','Login হচ্ছে...');
 
-  const{
-    error
-  }=await db.auth.signInWithPassword({
+  const{error}=await db.auth.signInWithPassword({
     email:$('email').value.trim(),
     password:$('password').value
   });
@@ -51,6 +54,7 @@ async function login(){
 
   await init();
 }
+
 
 async function logout(){
   await db.auth.signOut();
@@ -63,7 +67,6 @@ async function logout(){
 ========================= */
 
 function showPage(p){
-
   document
     .querySelectorAll('.page')
     .forEach(x=>x.classList.add('hidden'));
@@ -84,19 +87,14 @@ function showPage(p){
 
 async function init(){
 
-  const{
-    data,
-    error
-  }=await db.auth.getSession();
+  const{data,error}=await db.auth.getSession();
 
   if(error)
     return msg('loginMsg',error.message,true);
 
   if(!data.session){
-
     $('login').classList.remove('hidden');
     $('app').classList.add('hidden');
-
     return;
   }
 
@@ -122,18 +120,18 @@ async function init(){
 
 async function loadSubjects(){
 
-  const s=$('subject');
-  const f=$('filterSubject');
+  const s=$('subject'),
+        f=$('filterSubject');
 
   if(!s||!f)return;
 
-  s.innerHTML='<option value="">বিষয় নির্বাচন করুন</option>';
-  f.innerHTML='<option value="">সব বিষয়</option>';
+  s.innerHTML=
+    '<option value="">বিষয় নির্বাচন করুন</option>';
 
-  const{
-    data,
-    error
-  }=await db
+  f.innerHTML=
+    '<option value="">সব বিষয়</option>';
+
+  const{data,error}=await db
     .from('subjects')
     .select('id,name')
     .order('id');
@@ -142,8 +140,11 @@ async function loadSubjects(){
 
     console.error(error);
 
-    s.innerHTML='<option value="">বিষয় লোড হয়নি</option>';
-    f.innerHTML='<option value="">বিষয় লোড হয়নি</option>';
+    s.innerHTML=
+      '<option value="">বিষয় লোড হয়নি</option>';
+
+    f.innerHTML=
+      '<option value="">বিষয় লোড হয়নি</option>';
 
     return msg(
       'qmsg',
@@ -157,13 +158,17 @@ async function loadSubjects(){
   s.innerHTML=
     '<option value="">বিষয় নির্বাচন করুন</option>'+
     subjects.map(x=>
-      `<option value="${x.id}">${esc(x.name)}</option>`
+      `<option value="${x.id}">
+        ${esc(x.name)}
+      </option>`
     ).join('');
 
   f.innerHTML=
     '<option value="">সব বিষয়</option>'+
     subjects.map(x=>
-      `<option value="${x.id}">${esc(x.name)}</option>`
+      `<option value="${x.id}">
+        ${esc(x.name)}
+      </option>`
     ).join('');
 }
 
@@ -177,6 +182,7 @@ async function loadBank(){
   await loadFilterFolders();
   await loadQuestions();
 }
+
 
 async function selectCategory(c){
 
@@ -202,10 +208,7 @@ async function selectCategory(c){
 
 async function loadFolders(){
 
-  const{
-    data,
-    error
-  }=await db
+  const{data,error}=await db
     .from('question_bank_folders')
     .select('id,folder_name')
     .eq('sub_category',CATS[cat])
@@ -219,30 +222,34 @@ async function loadFolders(){
   $('folder').innerHTML=
     '<option value="">Folder নির্বাচন করুন</option>'+
     folders.map(x=>
-      `<option value="${x.id}">${esc(x.folder_name)}</option>`
+      `<option value="${x.id}">
+        ${esc(x.folder_name)}
+      </option>`
     ).join('');
 
   $('mapFolder').innerHTML=
     '<option value="">Folder নির্বাচন করুন</option>'+
     folders.map(x=>
-      `<option value="${x.id}">${esc(x.folder_name)}</option>`
+      `<option value="${x.id}">
+        ${esc(x.folder_name)}
+      </option>`
     ).join('');
 
   $('filterFolder').innerHTML=
     '<option value="">সব Folder</option>'+
     folders.map(x=>
-      `<option value="${x.id}">${esc(x.folder_name)}</option>`
+      `<option value="${x.id}">
+        ${esc(x.folder_name)}
+      </option>`
     ).join('');
 
   await loadSets();
 }
 
+
 async function loadFilterFolders(){
 
-  const{
-    data,
-    error
-  }=await db
+  const{data,error}=await db
     .from('question_bank_folders')
     .select('id,folder_name')
     .eq('sub_category',CATS[cat])
@@ -253,7 +260,9 @@ async function loadFilterFolders(){
   $('filterFolder').innerHTML=
     '<option value="">সব Folder</option>'+
     (data||[]).map(x=>
-      `<option value="${x.id}">${esc(x.folder_name)}</option>`
+      `<option value="${x.id}">
+        ${esc(x.folder_name)}
+      </option>`
     ).join('');
 }
 
@@ -276,10 +285,7 @@ async function loadSets(){
     return;
   }
 
-  const{
-    data,
-    error
-  }=await db
+  const{data,error}=await db
     .from('question_bank_sets')
     .select('id,set_name')
     .eq('folder_id',Number(id))
@@ -293,9 +299,12 @@ async function loadSets(){
   $('set').innerHTML=
     '<option value="">Set নির্বাচন করুন</option>'+
     sets.map(x=>
-      `<option value="${x.id}">${esc(x.set_name)}</option>`
+      `<option value="${x.id}">
+        ${esc(x.set_name)}
+      </option>`
     ).join('');
 }
+
 
 async function loadFilterSets(){
 
@@ -309,10 +318,7 @@ async function loadFilterSets(){
     return;
   }
 
-  const{
-    data,
-    error
-  }=await db
+  const{data,error}=await db
     .from('question_bank_sets')
     .select('id,set_name')
     .eq('folder_id',Number(id))
@@ -324,9 +330,12 @@ async function loadFilterSets(){
   $('filterSet').innerHTML=
     '<option value="">সব Set</option>'+
     (data||[]).map(x=>
-      `<option value="${x.id}">${esc(x.set_name)}</option>`
+      `<option value="${x.id}">
+        ${esc(x.set_name)}
+      </option>`
     ).join('');
 }
+
 
 async function loadMapSets(){
 
@@ -340,10 +349,7 @@ async function loadMapSets(){
     return;
   }
 
-  const{
-    data,
-    error
-  }=await db
+  const{data,error}=await db
     .from('question_bank_sets')
     .select('id,set_name')
     .eq('folder_id',Number(id))
@@ -355,13 +361,15 @@ async function loadMapSets(){
   $('mapSet').innerHTML=
     '<option value="">সব Set</option>'+
     (data||[]).map(x=>
-      `<option value="${x.id}">${esc(x.set_name)}</option>`
+      `<option value="${x.id}">
+        ${esc(x.set_name)}
+      </option>`
     ).join('');
 }
 
 
 /* =========================
-   CREATE FOLDER
+   CREATE FOLDER / SET
 ========================= */
 
 async function createFolder(){
@@ -375,10 +383,7 @@ async function createFolder(){
       true
     );
 
-  const{
-    data,
-    error
-  }=await db
+  const{data,error}=await db
     .from('question_bank_folders')
     .insert({
       sub_category:CATS[cat],
@@ -398,18 +403,17 @@ async function createFolder(){
 
   await loadSets();
 
-  msg('folderMsg','✅ Folder তৈরি হয়েছে');
+  msg(
+    'folderMsg',
+    '✅ Folder তৈরি হয়েছে'
+  );
 }
 
 
-/* =========================
-   CREATE SET
-========================= */
-
 async function createSet(){
 
-  const folderId=$('folder').value;
-  const name=$('newSet').value.trim();
+  const folderId=$('folder').value,
+        name=$('newSet').value.trim();
 
   if(!folderId)
     return msg(
@@ -425,10 +429,7 @@ async function createSet(){
       true
     );
 
-  const{
-    data,
-    error
-  }=await db
+  const{data,error}=await db
     .from('question_bank_sets')
     .insert({
       folder_id:Number(folderId),
@@ -446,7 +447,10 @@ async function createSet(){
 
   $('set').value=data.id;
 
-  msg('folderMsg','✅ Set তৈরি হয়েছে');
+  msg(
+    'folderMsg',
+    '✅ Set তৈরি হয়েছে'
+  );
 }
 
 
@@ -456,18 +460,15 @@ async function createSet(){
 
 async function addManual(){
 
-  const folderId=$('folder').value;
-  const setId=$('set').value;
-  const subjectId=$('subject').value;
-
-  const text=$('qtext').value.trim();
-
-  const a=$('a').value.trim();
-  const b=$('b').value.trim();
-  const c=$('c').value.trim();
-  const d=$('d').value.trim();
-
-  const correct=$('correct').value;
+  const folderId=$('folder').value,
+        setId=$('set').value,
+        subjectId=$('subject').value,
+        text=$('qtext').value.trim(),
+        a=$('a').value.trim(),
+        b=$('b').value.trim(),
+        c=$('c').value.trim(),
+        d=$('d').value.trim(),
+        correct=$('correct').value;
 
   if(!folderId||!setId)
     return msg(
@@ -492,35 +493,24 @@ async function addManual(){
     );
 
   const p={
-
     folder_id:Number(folderId),
-
     set_id:Number(setId),
-
     subject_id:Number(subjectId),
-
     question_text:text,
-
     option_a:a,
     option_b:b,
     option_c:c,
     option_d:d,
-
     correct_answer:correct,
-
     explanation:
       $('explanation').value.trim()||null,
-
     question_number:
       $('qno').value
-        ?Number($('qno').value)
-        :null,
-
+        ? Number($('qno').value)
+        : null,
     category:CATS[cat],
-
     source_name:
       $('source').value.trim()||null,
-
     source_type:cat
   };
 
@@ -529,7 +519,11 @@ async function addManual(){
     .insert(p);
 
   if(error)
-    return msg('qmsg',error.message,true);
+    return msg(
+      'qmsg',
+      error.message,
+      true
+    );
 
   [
     'qno',
@@ -554,7 +548,7 @@ async function addManual(){
 
 
 /* =========================
-   MANUAL / IMPORT MODE
+   IMPORT
 ========================= */
 
 function mode(m){
@@ -569,51 +563,29 @@ function mode(m){
 }
 
 
-/* =========================
-   EXCEL TEMPLATE
-========================= */
-
 function template(){
 
   const rows=[
-
     [
       'question',
       'option_a',
       'option_b',
       'option_c',
       'option_d',
-      'correct_answer',
-      'subject_id',
-      'category',
-      'folder',
-      'set',
-      'question_number',
-      'source',
-      'explanation'
+      'correct_answer'
     ],
-
     [
       'বাংলাদেশের রাজধানী কোনটি?',
       'ঢাকা',
       'চট্টগ্রাম',
       'রাজশাহী',
       'খুলনা',
-      'A',
-      '6',
-      'বাংলাদেশ',
-      '',
-      '',
-      '1',
-      '',
-      ''
+      'A'
     ]
-
   ];
 
-  const ws=XLSX.utils.aoa_to_sheet(rows);
-
-  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet(rows),
+        wb=XLSX.utils.book_new();
 
   XLSX.utils.book_append_sheet(
     wb,
@@ -628,10 +600,6 @@ function template(){
 }
 
 
-/* =========================
-   PREVIEW IMPORT
-========================= */
-
 async function previewImport(){
 
   const f=$('file').files[0];
@@ -643,350 +611,175 @@ async function previewImport(){
       true
     );
 
-  try{
+  const data=XLSX.read(
+    await f.arrayBuffer(),
+    {type:'array'}
+  );
 
-    const data=XLSX.read(
-      await f.arrayBuffer(),
-      {
-        type:'array'
-      }
+  const rows=
+    XLSX.utils.sheet_to_json(
+      data.Sheets[data.SheetNames[0]],
+      {defval:''}
     );
 
-    const sheet=
-      data.Sheets[data.SheetNames[0]];
+  importData=rows;
 
-    const rows=
-      XLSX.utils.sheet_to_json(
-        sheet,
-        {
-          defval:''
-        }
-      );
+  $('preview').innerHTML=`
+    <div class="q">
+      <b>${bn(rows.length)}টি row পাওয়া গেছে</b>
+      <pre>${esc(
+        JSON.stringify(
+          rows.slice(0,5),
+          null,
+          2
+        )
+      )}</pre>
+    </div>
+  `;
 
-    importData=rows;
+  $('importBtn')
+    .classList
+    .remove('hidden');
 
-    $('preview').innerHTML=
-      `<div class="q">
-        <b>${bn(rows.length)}টি row পাওয়া গেছে</b>
-        <pre>${esc(
-          JSON.stringify(
-            rows.slice(0,5),
-            null,
-            2
-          )
-        )}</pre>
-      </div>`;
-
-    $('importBtn')
-      .classList
-      .remove('hidden');
-
-    msg(
-      'qmsg',
-      'Preview প্রস্তুত হয়েছে'
-    );
-
-  }catch(error){
-
-    console.error(error);
-
-    msg(
-      'qmsg',
-      'Excel/CSV পড়তে সমস্যা হয়েছে: '+error.message,
-      true
-    );
-  }
+  msg(
+    'qmsg',
+    'Preview প্রস্তুত হয়েছে'
+  );
 }
 
 
-/* =========================
-   NORMALIZE
-========================= */
-
 function norm(v){
-
   return String(v??'')
     .trim()
     .toLowerCase();
 }
 
 
-/* =========================
-   IMPORT QUESTIONS
-========================= */
-
 async function importRows(){
 
-  let ok=0;
-  let fail=[];
+  let ok=0,
+      fail=[];
 
-  for(let i=0;i<importData.length;i++){
+  for(
+    let i=0;
+    i<importData.length;
+    i++
+  ){
 
     const r=importData[i];
 
-    const rowNo=i+2;
-
-
-    /* =========================
-       CATEGORY
-    ========================= */
-
-    const categoryValue=
-      String(r.category??'').trim();
-
     const category=
-      Object.values(CATS).includes(categoryValue)
-        ?categoryValue
-        :CATS[cat];
+      Object.values(CATS)
+        .includes(
+          String(r.category||'').trim()
+        )
+        ? String(r.category).trim()
+        : CATS[cat];
 
+    const folderName=
+      String(r.folder||'').trim();
 
-    /* =========================
-       BASIC VALIDATION
-    ========================= */
+    const setName=
+      String(r.set||'').trim();
+
 
     if(
-      !String(r.question??'').trim()||
-      !String(r.option_a??'').trim()||
-      !String(r.option_b??'').trim()||
-      !String(r.option_c??'').trim()||
-      !String(r.option_d??'').trim()||
-      !String(r.correct_answer??'').trim()
+      !r.question||
+      !r.option_a||
+      !r.option_b||
+      !r.option_c||
+      !r.option_d||
+      !r.correct_answer
     ){
 
       fail.push(
-        `Row ${rowNo}: question, option_a, option_b, option_c, option_d ও correct_answer আবশ্যক`
+        `Row ${i+2}: question, option_a, option_b, option_c, option_d ও correct_answer আবশ্যক`
       );
 
       continue;
     }
 
 
-    /* =========================
-       SUBJECT ID
-       
-       প্রথমে Excel-এর
-       subject_id নেওয়া হবে।
-    ========================= */
-
-    let subjectId=null;
-
-    const rawSubjectId=
-      String(r.subject_id??'').trim();
-
-
-    if(rawSubjectId){
-
-      const parsedSubjectId=
-        Number(rawSubjectId);
-
-
-      if(
-        !Number.isInteger(parsedSubjectId)||
-        parsedSubjectId<=0
-      ){
-
-        fail.push(
-          `Row ${rowNo}: Subject ID সঠিক নয়: ${rawSubjectId}`
-        );
-
-        continue;
-      }
-
-
-      /*
-        Subject ID database-এ আছে কি না
-        যাচাই করা হচ্ছে।
-      */
-
-      const subjectCheck=
-        await db
-          .from('subjects')
-          .select('id,name')
-          .eq('id',parsedSubjectId)
-          .maybeSingle();
-
-
-      if(subjectCheck.error){
-
-        fail.push(
-          `Row ${rowNo}: Subject যাচাই করতে সমস্যা: ${subjectCheck.error.message}`
-        );
-
-        continue;
-      }
-
-
-      if(!subjectCheck.data){
-
-        fail.push(
-          `Row ${rowNo}: Subject ID পাওয়া যায়নি: ${parsedSubjectId}`
-        );
-
-        continue;
-      }
-
-
-      subjectId=
-        subjectCheck.data.id;
-
-    }else{
-
-      /*
-        subject_id না থাকলে
-        subject নাম দিয়ে খোঁজা হবে।
-      */
-
-      const subjectName=
-        String(r.subject??'').trim();
-
-
-      if(subjectName){
-
-        const sub=
-          subjects.find(
-            x=>
-              norm(x.name)===norm(subjectName)
-          );
-
-
-        if(!sub){
-
-          fail.push(
-            `Row ${rowNo}: Subject পাওয়া যায়নি: ${subjectName}`
-          );
-
-          continue;
-        }
-
-        subjectId=sub.id;
-
-      }else{
-
-        /*
-          questions.subject_id NOT NULL,
-          তাই Subject ছাড়া প্রশ্ন Import হবে না।
-        */
-
-        fail.push(
-          `Row ${rowNo}: subject_id অথবা subject আবশ্যক`
-        );
-
-        continue;
-      }
-    }
+    let fid=null,
+        sid=null;
 
 
     /* =========================
        FOLDER
     ========================= */
 
-    const folderName=
-      String(r.folder??'').trim();
-
-    const setName=
-      String(r.set??'').trim();
-
-    let fid=null;
-    let sid=null;
-
-
     if(folderName){
 
-      const fr=
-        await db
-          .from('question_bank_folders')
-          .select('id')
-          .eq('sub_category',category)
-          .eq('folder_name',folderName)
-          .maybeSingle();
-
+      const fr=await db
+        .from('question_bank_folders')
+        .select('id')
+        .eq('sub_category',category)
+        .eq('folder_name',folderName)
+        .maybeSingle();
 
       if(fr.error){
 
         fail.push(
-          `Row ${rowNo}: ${fr.error.message}`
+          `Row ${i+2}: ${fr.error.message}`
         );
 
         continue;
       }
 
-
-      fid=
-        fr.data?.id||null;
-
+      fid=fr.data?.id||null;
 
       if(!fid){
 
-        const x=
-          await db
-            .from('question_bank_folders')
-            .insert({
-              sub_category:category,
-              folder_name:folderName
-            })
-            .select('id')
-            .single();
-
+        const x=await db
+          .from('question_bank_folders')
+          .insert({
+            sub_category:category,
+            folder_name:folderName
+          })
+          .select('id')
+          .single();
 
         if(x.error){
 
           fail.push(
-            `Row ${rowNo}: ${x.error.message}`
+            `Row ${i+2}: ${x.error.message}`
           );
 
           continue;
         }
-
 
         fid=x.data.id;
       }
 
     }else{
 
-      /*
-        Excel-এ Folder না থাকলে
-        বর্তমানে selected Folder ব্যবহার করবে।
-      */
-
       const selectedFolder=
-        Number($('folder')?.value||0);
-
+        Number(
+          $('folder')?.value||0
+        );
 
       if(selectedFolder){
 
-        const check=
-          await db
-            .from('question_bank_folders')
-            .select('id,sub_category')
-            .eq('id',selectedFolder)
-            .maybeSingle();
-
+        const check=await db
+          .from('question_bank_folders')
+          .select('id,sub_category')
+          .eq('id',selectedFolder)
+          .maybeSingle();
 
         if(check.error){
 
           fail.push(
-            `Row ${rowNo}: ${check.error.message}`
+            `Row ${i+2}: ${check.error.message}`
           );
 
           continue;
         }
-
 
         if(
-          check.data&&
+          check.data &&
           check.data.sub_category===category
-        ){
-
+        )
           fid=check.data.id;
-
-        }else{
-
-          fail.push(
-            `Row ${rowNo}: নির্বাচিত Folder Category-এর সাথে মিলছে না`
-          );
-
-          continue;
-        }
       }
     }
 
@@ -1000,266 +793,162 @@ async function importRows(){
       if(!fid){
 
         fail.push(
-          `Row ${rowNo}: Set দেওয়া হয়েছে, তাই Folder প্রয়োজন`
+          `Row ${i+2}: Set দেওয়া হয়েছে, তাই Folder প্রয়োজন`
         );
 
         continue;
       }
 
-
-      const sr=
-        await db
-          .from('question_bank_sets')
-          .select('id')
-          .eq('folder_id',fid)
-          .eq('set_name',setName)
-          .maybeSingle();
-
+      const sr=await db
+        .from('question_bank_sets')
+        .select('id')
+        .eq('folder_id',fid)
+        .eq('set_name',setName)
+        .maybeSingle();
 
       if(sr.error){
 
         fail.push(
-          `Row ${rowNo}: ${sr.error.message}`
+          `Row ${i+2}: ${sr.error.message}`
         );
 
         continue;
       }
 
-
-      sid=
-        sr.data?.id||null;
-
+      sid=sr.data?.id||null;
 
       if(!sid){
 
-        const x=
-          await db
-            .from('question_bank_sets')
-            .insert({
-              folder_id:fid,
-              set_name:setName
-            })
-            .select('id')
-            .single();
-
+        const x=await db
+          .from('question_bank_sets')
+          .insert({
+            folder_id:fid,
+            set_name:setName
+          })
+          .select('id')
+          .single();
 
         if(x.error){
 
           fail.push(
-            `Row ${rowNo}: ${x.error.message}`
+            `Row ${i+2}: ${x.error.message}`
           );
 
           continue;
         }
-
 
         sid=x.data.id;
       }
 
     }else if(fid){
 
-      /*
-        Excel-এ Set না থাকলে
-        selected Set ব্যবহার করবে।
-      */
-
       const selectedSet=
-        Number($('set')?.value||0);
-
+        Number(
+          $('set')?.value||0
+        );
 
       if(selectedSet){
 
-        const sr=
-          await db
-            .from('question_bank_sets')
-            .select('id,folder_id')
-            .eq('id',selectedSet)
-            .maybeSingle();
-
-
-        if(sr.error){
-
-          fail.push(
-            `Row ${rowNo}: ${sr.error.message}`
-          );
-
-          continue;
-        }
-
+        const sr=await db
+          .from('question_bank_sets')
+          .select('id,folder_id')
+          .eq('id',selectedSet)
+          .maybeSingle();
 
         if(
-          sr.data&&
+          sr.data &&
           Number(sr.data.folder_id)===Number(fid)
-        ){
-
+        )
           sid=sr.data.id;
-
-        }else{
-
-          fail.push(
-            `Row ${rowNo}: নির্বাচিত Set এই Folder-এর নয়`
-          );
-
-          continue;
-        }
       }
     }
 
 
     /* =========================
-       QUESTION NUMBER
+       SUBJECT
     ========================= */
 
-    let questionNumber=null;
+    let sub=null;
 
-    const rawQno=
-      String(r.question_number??'').trim();
+    if(r.subject){
 
+      sub=subjects.find(
+        x=>norm(x.name)===norm(r.subject)
+      );
 
-    if(rawQno){
-
-      const qno=Number(rawQno);
-
-
-      if(
-        !Number.isInteger(qno)||
-        qno<=0
-      ){
+      if(!sub){
 
         fail.push(
-          `Row ${rowNo}: question_number সঠিক নয়: ${rawQno}`
+          `Row ${i+2}: Subject পাওয়া যায়নি: ${r.subject}`
         );
 
         continue;
       }
-
-
-      questionNumber=qno;
     }
 
-
-    /* =========================
-       CORRECT ANSWER
-    ========================= */
-
-    const correct=
-      String(r.correct_answer??'')
-        .trim()
-        .toUpperCase();
-
-
-    if(
-      !['A','B','C','D'].includes(correct)
-    ){
-
-      fail.push(
-        `Row ${rowNo}: correct_answer অবশ্যই A, B, C অথবা D হতে হবে`
-      );
-
-      continue;
-    }
-
-
-    /* =========================
-       FINAL QUESTION OBJECT
-    ========================= */
 
     const p={
-
       folder_id:fid,
-
       set_id:sid,
-
-      /*
-        সবচেয়ে গুরুত্বপূর্ণ:
-        subject_id এখন Excel থেকে
-        সরাসরি নেওয়া হচ্ছে।
-      */
-
-      subject_id:subjectId,
-
-      category:category,
-
+      subject_id:sub?.id||null,
+      category,
       source_name:
-        String(r.source??'').trim()||null,
-
+        String(r.source||'').trim()||null,
       source_type:cat,
-
       question_number:
-        questionNumber,
-
+        r.question_number
+          ? Number(r.question_number)
+          : null,
       question_text:
-        String(r.question??'').trim(),
-
+        String(r.question).trim(),
       option_a:
-        String(r.option_a??'').trim(),
-
+        String(r.option_a).trim(),
       option_b:
-        String(r.option_b??'').trim(),
-
+        String(r.option_b).trim(),
       option_c:
-        String(r.option_c??'').trim(),
-
+        String(r.option_c).trim(),
       option_d:
-        String(r.option_d??'').trim(),
-
+        String(r.option_d).trim(),
       correct_answer:
-        correct,
-
+        String(r.correct_answer)
+          .trim()
+          .toUpperCase(),
       explanation:
-        String(r.explanation??'').trim()||null
+        String(r.explanation||'')
+          .trim()||null
     };
 
 
-    /* =========================
-       INSERT
-    ========================= */
-
-    const x=
-      await db
-        .from('questions')
-        .insert(p);
+    const x=await db
+      .from('questions')
+      .insert(p);
 
 
-    if(x.error){
-
+    if(x.error)
       fail.push(
-        `Row ${rowNo}: ${x.error.message}`
+        `Row ${i+2}: ${x.error.message}`
       );
-
-    }else{
-
+    else
       ok++;
-    }
   }
 
-
-  /* =========================
-     RESULT
-  ========================= */
 
   msg(
     'qmsg',
     `✅ ${bn(ok)}টি Import হয়েছে${
       fail.length
-        ?` | ❌ ${bn(fail.length)}টি ব্যর্থ`
-        :''
+        ? ` | ❌ ${bn(fail.length)}টি ব্যর্থ`
+        : ''
     }`,
     !!fail.length
   );
 
 
-  /* =========================
-     FAILED ROWS
-  ========================= */
-
-  if(fail.length){
-
+  if(fail.length)
     $('preview').innerHTML+=
       '<div class="q">'+
       fail.map(esc).join('<br>')+
       '</div>';
-  }
 
 
   await loadQuestions();
@@ -1267,13 +956,12 @@ async function importRows(){
 
 
 /* =========================
-   CREATE EXAM
+   EXAM
 ========================= */
 
 async function createExam(){
 
-  const name=
-    $('examName').value.trim();
+  const name=$('examName').value.trim();
 
   if(!name)
     return msg(
@@ -1283,7 +971,11 @@ async function createExam(){
     );
 
 
-  function makeISO(date,time,fallback){
+  function makeISO(
+    date,
+    time,
+    fallback
+  ){
 
     if(date&&time){
 
@@ -1302,13 +994,11 @@ async function createExam(){
 
   const now=new Date();
 
-  const startAt=
-    makeISO(
-      $('startDate')?.value||'',
-      $('startTime')?.value||'',
-      now.toISOString()
-    );
-
+  const startAt=makeISO(
+    $('startDate')?.value||'',
+    $('startTime')?.value||'',
+    now.toISOString()
+  );
 
   const defaultEnd=
     new Date(
@@ -1317,12 +1007,11 @@ async function createExam(){
     );
 
 
-  const endAt=
-    makeISO(
-      $('endDate')?.value||'',
-      $('endTime')?.value||'',
-      defaultEnd.toISOString()
-    );
+  const endAt=makeISO(
+    $('endDate')?.value||'',
+    $('endTime')?.value||'',
+    defaultEnd.toISOString()
+  );
 
 
   if(
@@ -1336,42 +1025,26 @@ async function createExam(){
     );
 
 
-  const{
-    data:userData
-  }=await db.auth.getUser();
-
+  const{data:userData}=
+    await db.auth.getUser();
 
   const examinerId=
     userData?.user?.id||null;
 
 
-  const{
-    data,
-    error
-  }=await db
+  const{data,error}=await db
     .from('exams')
     .insert({
-
       exam_name:name,
-
       examiner_id:examinerId,
-
       status:$('examStatus').value,
-
       total_questions:0,
-
       marks_per_question:1,
-
       negative_mark:0,
-
       pass_mark:0,
-
       start_at:startAt,
-
       end_at:endAt,
-
       exam_token:crypto.randomUUID()
-
     })
     .select('id')
     .single();
@@ -1385,38 +1058,24 @@ async function createExam(){
     );
 
 
-  const s=
-    await db
-      .from('exam_settings')
-      .upsert({
-
-        exam_id:data.id,
-
-        total_questions:0,
-
-        total_marks:0,
-
-        pass_mark:0,
-
-        duration_minutes:20,
-
-        marks_per_question:1,
-
-        negative_mark:0,
-
-        show_answers:false,
-
-        multiple_attempts:false,
-
-        device_attempt_protection:true,
-
-        random_questions:false,
-
-        random_options:false
-
-      },{
-        onConflict:'exam_id'
-      });
+  const s=await db
+    .from('exam_settings')
+    .upsert({
+      exam_id:data.id,
+      total_questions:0,
+      total_marks:0,
+      pass_mark:0,
+      duration_minutes:20,
+      marks_per_question:1,
+      negative_mark:0,
+      show_answers:false,
+      multiple_attempts:false,
+      device_attempt_protection:true,
+      random_questions:false,
+      random_options:false
+    },{
+      onConflict:'exam_id'
+    });
 
 
   if(s.error)
@@ -1442,16 +1101,9 @@ async function createExam(){
 }
 
 
-/* =========================
-   EXAMS
-========================= */
-
 async function loadExams(){
 
-  const{
-    data,
-    error
-  }=await db
+  const{data,error}=await db
     .from('exams')
     .select(
       'id,exam_name,status,total_questions,marks_per_question,negative_mark,pass_mark'
@@ -1471,13 +1123,11 @@ async function loadExams(){
 
   exams=data||[];
 
-
   $('sExams').textContent=
     bn(exams.length);
 
 
   const active=$('sActive');
-
 
   if(active)
     active.textContent=
@@ -1492,38 +1142,30 @@ async function loadExams(){
     '<option value="">Exam নির্বাচন করুন</option>'+
     exams.map(x=>
       `<option value="${x.id}">
-        ${esc(x.exam_name)} (#${x.id})
+        ${esc(x.exam_name)}
+        (#${x.id})
       </option>`
     ).join('');
 
 
   $('examSelect').innerHTML=opt;
-
   $('mapExam').innerHTML=opt;
 
 
   $('exams').innerHTML=
     exams.map(x=>
       `<div class="examrow">
-
         <b>${esc(x.exam_name)}</b>
         · ${esc(x.status)}
         · ${bn(x.total_questions||0)} প্রশ্ন
-
         <br>
-
         <span class="link">
-          ${location.origin}
-          ${location.pathname.replace(/\/[^/]*$/,'/../')}
-          ?exam=${x.id}
+          ${location.origin}${location.pathname.replace(/\/[^/]*$/,'/../')}?exam=${x.id}
         </span>
-
         <br>
-
         <button onclick="copyLink(${x.id})">
           🔗 Exam Link কপি
         </button>
-
         <button
           class="secondary"
           onclick="activate(
@@ -1531,27 +1173,26 @@ async function loadExams(){
             '${x.status==='active'?'inactive':'active'}'
           )"
         >
-          ${x.status==='active'
-            ?'Inactive'
-            :'Active'}
+          ${
+            x.status==='active'
+              ? 'Inactive'
+              : 'Active'
+          }
         </button>
-
       </div>`
     ).join('');
 
 
-  const count=
-    await db
-      .from('questions')
-      .select('id',{
-        count:'exact',
-        head:true
-      });
+  const count=await db
+    .from('questions')
+    .select('id',{
+      count:'exact',
+      head:true
+    });
 
 
   if(!$('sQuestions'))
     return;
-
 
   $('sQuestions').textContent=
     bn(count.count||0);
@@ -1567,10 +1208,10 @@ async function copyLink(id){
     ).href+
     '?exam='+id;
 
-
   try{
 
-    await navigator.clipboard.writeText(base);
+    await navigator.clipboard
+      .writeText(base);
 
     alert('Exam Link copied');
 
@@ -1586,13 +1227,10 @@ async function copyLink(id){
 
 async function activate(id,status){
 
-  const{
-    error
-  }=await db
+  const{error}=await db
     .from('exams')
     .update({status})
     .eq('id',id);
-
 
   if(error)
     return msg(
@@ -1600,7 +1238,6 @@ async function activate(id,status){
       error.message,
       true
     );
-
 
   await loadExams();
 }
@@ -1616,16 +1253,11 @@ async function loadSettings(){
 
   if(!id)return;
 
-
-  const{
-    data,
-    error
-  }=await db
+  const{data,error}=await db
     .from('exam_settings')
     .select('*')
     .eq('exam_id',id)
     .maybeSingle();
-
 
   if(error)
     return msg(
@@ -1636,7 +1268,6 @@ async function loadSettings(){
 
 
   const s=data||{};
-
 
   $('totalQ').value=
     s.total_questions??0;
@@ -1704,71 +1335,49 @@ async function saveSettings(){
 
 
   const payload={
-
     exam_id:id,
-
     total_questions:
       Number($('totalQ').value)||0,
-
     total_marks:
       Number($('totalMarks').value)||0,
-
     pass_mark:
       Number($('pass').value)||0,
-
     duration_minutes:
       Number($('duration').value)||20,
-
     marks_per_question:
       Number($('marks').value)||1,
-
     negative_mark:
       Number($('negative').value)||0,
-
     examiner_name:
       $('examiner').value.trim()||null,
-
     syllabus:
       $('syllabus').value.trim()||null,
-
     show_answers:
       $('showAnswers').checked,
-
     multiple_attempts:
       $('multiple').checked,
-
     device_attempt_protection:
       $('device').checked,
-
     random_questions:
       $('randomQ').checked,
-
     random_options:
       $('randomO').checked,
-
     exam_date:
       $('startDate').value||null,
-
     start_time:
       $('startTime').value||null,
-
     end_date:
       $('endDate').value||null,
-
     end_time:
       $('endTime').value||null
   };
 
 
-  const{
-    error
-  }=await db
+  const{error}=await db
     .from('exam_settings')
     .upsert(
       payload,
-      {
-        onConflict:'exam_id'
-      }
+      {onConflict:'exam_id'}
     );
 
 
@@ -1780,25 +1389,19 @@ async function saveSettings(){
     );
 
 
-  const e=
-    await db
-      .from('exams')
-      .update({
-
-        total_questions:
-          payload.total_questions,
-
-        marks_per_question:
-          payload.marks_per_question,
-
-        negative_mark:
-          payload.negative_mark,
-
-        pass_mark:
-          payload.pass_mark
-
-      })
-      .eq('id',id);
+  const e=await db
+    .from('exams')
+    .update({
+      total_questions:
+        payload.total_questions,
+      marks_per_question:
+        payload.marks_per_question,
+      negative_mark:
+        payload.negative_mark,
+      pass_mark:
+        payload.pass_mark
+    })
+    .eq('id',id);
 
 
   if(e.error)
@@ -1819,7 +1422,7 @@ async function saveSettings(){
 
 
 /* =========================
-   QUESTION POOL
+   EXAM QUESTION POOL
 ========================= */
 
 async function loadPool(){
@@ -1834,13 +1437,12 @@ async function loadPool(){
     );
 
 
-  let q=
-    db
-      .from('questions')
-      .select(
-        'id,question_text,category,folder_id,set_id,question_number'
-      )
-      .limit(200);
+  let q=db
+    .from('questions')
+    .select(
+      'id,question_text,category,folder_id,set_id,question_number'
+    )
+    .limit(200);
 
 
   if($('mapFolder').value)
@@ -1857,10 +1459,7 @@ async function loadPool(){
     );
 
 
-  const{
-    data,
-    error
-  }=await q;
+  const{data,error}=await q;
 
 
   if(error)
@@ -1871,67 +1470,57 @@ async function loadPool(){
     );
 
 
-  const existing=
-    await db
-      .from('exam_questions')
-      .select('question_id')
-      .eq('exam_id',examId);
+  const existing=await db
+    .from('exam_questions')
+    .select('question_id')
+    .eq('exam_id',examId);
 
 
-  const ids=
-    new Set(
-      (existing.data||[])
-        .map(x=>String(x.question_id))
-    );
+  const ids=new Set(
+    (existing.data||[])
+      .map(x=>String(x.question_id))
+  );
 
 
   $('pool').innerHTML=
-    (data||[]).map(x=>
-      `<label class="q">
-
-        <input
-          type="checkbox"
-          class="poolq"
-          value="${x.id}"
-          ${ids.has(String(x.id))
-            ?'checked'
-            :''}
-        >
-
-        ${esc(x.question_text)}
-
-        <span class="small">
-          (${esc(x.category||'')})
-        </span>
-
-      </label>`
-    ).join('')+
-
-    `<button
-      onclick="saveMapping(${examId})"
-    >
-      Exam-এ নির্বাচিত প্রশ্ন Save করুন
-    </button>`;
+    (data||[])
+      .map(x=>
+        `<label class="q">
+          <input
+            type="checkbox"
+            class="poolq"
+            value="${x.id}"
+            ${
+              ids.has(String(x.id))
+                ? 'checked'
+                : ''
+            }
+          >
+          ${esc(x.question_text)}
+          <span class="small">
+            (${esc(x.category||'')})
+          </span>
+        </label>`
+      ).join('')+
+      `<button onclick="saveMapping(${examId})">
+        Exam-এ নির্বাচিত প্রশ্ন Save করুন
+      </button>`;
 }
 
 
 async function saveMapping(examId){
 
-  const ids=
-    [
-      ...document.querySelectorAll(
-        '.poolq:checked'
-      )
-    ].map(
-      x=>Number(x.value)
-    );
+  const ids=[
+    ...document.querySelectorAll(
+      '.poolq:checked'
+    )
+  ].map(x=>Number(x.value));
 
 
-  const old=
-    await db
-      .from('exam_questions')
-      .delete()
-      .eq('exam_id',examId);
+  const old=await db
+    .from('exam_questions')
+    .delete()
+    .eq('exam_id',examId);
 
 
   if(old.error)
@@ -1944,9 +1533,7 @@ async function saveMapping(examId){
 
   if(ids.length){
 
-    const{
-      error
-    }=await db
+    const{error}=await db
       .from('exam_questions')
       .insert(
         ids.map(
@@ -1957,7 +1544,6 @@ async function saveMapping(examId){
           })
         )
       );
-
 
     if(error)
       return msg(
@@ -1989,7 +1575,6 @@ async function saveMapping(examId){
     `✅ ${bn(ids.length)}টি প্রশ্ন Exam-এ যুক্ত হয়েছে`
   );
 
-
   await loadExams();
 }
 
@@ -2000,28 +1585,21 @@ async function saveMapping(examId){
 
 $('folder').onchange=loadSets;
 
-$('filterFolder').onchange=
-  async()=>{
-    await loadFilterSets();
-    await loadQuestions();
-  };
+$('filterFolder').onchange=async()=>{
+  await loadFilterSets();
+  await loadQuestions();
+};
 
-$('mapFolder').onchange=
-  loadMapSets;
-
-
-/* =========================
-   START
-========================= */
+$('mapFolder').onchange=loadMapSets;
 
 selectCategory('verification_test');
 
 init();
 
 
-/* =====================================================
+/* =========================
    SMART EDIT MODAL
-===================================================== */
+========================= */
 
 function ensureEditModal(){
 
@@ -2034,7 +1612,6 @@ function ensureEditModal(){
   st.id='smartEditModalStyle';
 
   st.textContent=`
-
     .smart-modal{
       position:fixed;
       inset:0;
@@ -2131,7 +1708,6 @@ function ensureEditModal(){
     }
 
     @media(max-width:650px){
-
       .smart-grid{
         grid-template-columns:1fr
       }
@@ -2156,11 +1732,9 @@ function ensureEditModal(){
   const m=document.createElement('div');
 
   m.id='smartEditModal';
-
   m.className='smart-modal hidden';
 
   m.innerHTML=`
-
     <div
       class="smart-modal-card"
       role="dialog"
@@ -2169,7 +1743,9 @@ function ensureEditModal(){
 
       <div class="smart-head">
 
-        <h2>✏️ প্রশ্ন Smart Edit</h2>
+        <h2>
+          ✏️ প্রশ্ন Smart Edit
+        </h2>
 
         <button
           type="button"
@@ -2192,7 +1768,8 @@ function ensureEditModal(){
         ক্যাটাগরি
       </label>
 
-      <select id="smartEditCategory"></select>
+      <select id="smartEditCategory">
+      </select>
 
 
       <div class="smart-grid">
@@ -2204,11 +1781,9 @@ function ensureEditModal(){
           </label>
 
           <select id="smartEditFolder">
-
             <option value="">
               Folder নির্বাচন করুন
             </option>
-
           </select>
 
         </div>
@@ -2221,11 +1796,9 @@ function ensureEditModal(){
           </label>
 
           <select id="smartEditSet">
-
             <option value="">
               Set নির্বাচন করুন
             </option>
-
           </select>
 
         </div>
@@ -2242,11 +1815,9 @@ function ensureEditModal(){
           </label>
 
           <select id="smartEditSubject">
-
             <option value="">
               বিষয় নির্বাচন করুন
             </option>
-
           </select>
 
         </div>
@@ -2282,58 +1853,35 @@ function ensureEditModal(){
       <div class="smart-grid">
 
         <div>
-
-          <label class="smart-label">
-            ক
-          </label>
-
+          <label class="smart-label">ক</label>
           <textarea
             id="smartEditA"
             rows="2"
           ></textarea>
-
         </div>
 
-
         <div>
-
-          <label class="smart-label">
-            খ
-          </label>
-
+          <label class="smart-label">খ</label>
           <textarea
             id="smartEditB"
             rows="2"
           ></textarea>
-
         </div>
 
-
         <div>
-
-          <label class="smart-label">
-            গ
-          </label>
-
+          <label class="smart-label">গ</label>
           <textarea
             id="smartEditC"
             rows="2"
           ></textarea>
-
         </div>
 
-
         <div>
-
-          <label class="smart-label">
-            ঘ
-          </label>
-
+          <label class="smart-label">ঘ</label>
           <textarea
             id="smartEditD"
             rows="2"
           ></textarea>
-
         </div>
 
       </div>
@@ -2348,12 +1896,10 @@ function ensureEditModal(){
           </label>
 
           <select id="smartEditCorrect">
-
             <option value="A">ক</option>
             <option value="B">খ</option>
             <option value="C">গ</option>
             <option value="D">ঘ</option>
-
           </select>
 
         </div>
@@ -2440,11 +1986,10 @@ function ensureEditModal(){
 
   m.querySelector(
     '#smartEditCategory'
-  ).onchange=
-    async()=>{
-      await loadSmartEditFolders();
-      await loadSmartEditSets();
-    };
+  ).onchange=async()=>{
+    await loadSmartEditFolders();
+    await loadSmartEditSets();
+  };
 
 
   m.querySelector(
@@ -2460,11 +2005,9 @@ function ensureEditModal(){
 }
 
 
-/* =========================
-   SMART EDIT FOLDERS
-========================= */
-
-async function loadSmartEditFolders(selected=null){
+async function loadSmartEditFolders(
+  selected=null
+){
 
   const category=
     $('smartEditCategory').value;
@@ -2480,10 +2023,7 @@ async function loadSmartEditFolders(selected=null){
   if(!category)return;
 
 
-  const{
-    data,
-    error
-  }=await db
+  const{data,error}=await db
     .from('question_bank_folders')
     .select('id,folder_name')
     .eq('sub_category',category)
@@ -2514,11 +2054,9 @@ async function loadSmartEditFolders(selected=null){
 }
 
 
-/* =========================
-   SMART EDIT SETS
-========================= */
-
-async function loadSmartEditSets(selected=null){
+async function loadSmartEditSets(
+  selected=null
+){
 
   const fid=
     Number(
@@ -2528,18 +2066,13 @@ async function loadSmartEditSets(selected=null){
   const el=
     $('smartEditSet');
 
-
   el.innerHTML=
     '<option value="">Set নির্বাচন করুন</option>';
-
 
   if(!fid)return;
 
 
-  const{
-    data,
-    error
-  }=await db
+  const{data,error}=await db
     .from('question_bank_sets')
     .select('id,set_name')
     .eq('folder_id',fid)
@@ -2570,15 +2103,12 @@ async function loadSmartEditSets(selected=null){
 }
 
 
-/* =========================
-   SMART EDIT SUBJECTS
-========================= */
-
-function fillSmartEditSubjects(selected=null){
+function fillSmartEditSubjects(
+  selected=null
+){
 
   const el=
     $('smartEditSubject');
-
 
   el.innerHTML=
     '<option value="">বিষয় নির্বাচন করুন</option>'+
@@ -2594,10 +2124,6 @@ function fillSmartEditSubjects(selected=null){
 }
 
 
-/* =========================
-   EDIT QUESTION
-========================= */
-
 async function editQuestion(id){
 
   ensureEditModal();
@@ -2605,10 +2131,7 @@ async function editQuestion(id){
   $('smartEditMsg').innerHTML='';
 
 
-  const{
-    data,
-    error
-  }=await db
+  const{data,error}=await db
     .from('questions')
     .select(
       'id,question_text,option_a,option_b,option_c,option_d,correct_answer,question_number,explanation,source_name,category,folder_id,set_id,subject_id'
@@ -2625,8 +2148,7 @@ async function editQuestion(id){
     );
 
 
-  $('smartEditId').value=
-    data.id;
+  $('smartEditId').value=data.id;
 
   $('smartEditQuestion').value=
     data.question_text||'';
@@ -2657,12 +2179,12 @@ async function editQuestion(id){
 
 
   $('smartEditCategory').innerHTML=
-    Object.entries(CATS).map(
-      ([k,v])=>
+    Object.entries(CATS)
+      .map(([k,v])=>
         `<option value="${esc(v)}">
           ${esc(v)}
         </option>`
-    ).join('');
+      ).join('');
 
 
   $('smartEditCategory').value=
@@ -2675,11 +2197,9 @@ async function editQuestion(id){
     data.subject_id
   );
 
-
   await loadSmartEditFolders(
     data.folder_id
   );
-
 
   await loadSmartEditSets(
     data.set_id
@@ -2698,10 +2218,6 @@ async function editQuestion(id){
 }
 
 
-/* =========================
-   SAVE EDITED QUESTION
-========================= */
-
 async function saveSmartEditedQuestion(){
 
   const id=
@@ -2709,22 +2225,18 @@ async function saveSmartEditedQuestion(){
       $('smartEditId').value
     );
 
-
   const category=
     $('smartEditCategory').value;
-
 
   const folderId=
     Number(
       $('smartEditFolder').value||0
     )||null;
 
-
   const setId=
     Number(
       $('smartEditSet').value||0
     )||null;
-
 
   const subjectId=
     Number(
@@ -2733,21 +2245,29 @@ async function saveSmartEditedQuestion(){
 
 
   const question=
-    $('smartEditQuestion').value.trim();
-
+    $('smartEditQuestion')
+      .value
+      .trim();
 
   const a=
-    $('smartEditA').value.trim();
+    $('smartEditA')
+      .value
+      .trim();
 
   const b=
-    $('smartEditB').value.trim();
+    $('smartEditB')
+      .value
+      .trim();
 
   const c=
-    $('smartEditC').value.trim();
+    $('smartEditC')
+      .value
+      .trim();
 
   const d=
-    $('smartEditD').value.trim();
-
+    $('smartEditD')
+      .value
+      .trim();
 
   const correct=
     $('smartEditCorrect').value;
@@ -2763,26 +2283,18 @@ async function saveSmartEditedQuestion(){
     !correct
   )
     return $('smartEditMsg').innerHTML=
-      `<div class="smart-msg smart-err">
-        প্রশ্ন, চারটি অপশন, সঠিক উত্তর ও ক্যাটাগরি পূরণ করুন।
-      </div>`;
-
-
-  if(!subjectId)
-    return $('smartEditMsg').innerHTML=
-      `<div class="smart-msg smart-err">
-        বিষয় নির্বাচন করুন।
-      </div>`;
+      '<div class="smart-msg smart-err">'+
+      'প্রশ্ন, চারটি অপশন, সঠিক উত্তর ও ক্যাটাগরি পূরণ করুন।'+
+      '</div>';
 
 
   if(setId){
 
-    const sr=
-      await db
-        .from('question_bank_sets')
-        .select('folder_id')
-        .eq('id',setId)
-        .maybeSingle();
+    const sr=await db
+      .from('question_bank_sets')
+      .select('folder_id')
+      .eq('id',setId)
+      .maybeSingle();
 
 
     if(sr.error)
@@ -2798,20 +2310,19 @@ async function saveSmartEditedQuestion(){
       folderId
     )
       return $('smartEditMsg').innerHTML=
-        `<div class="smart-msg smart-err">
-          নির্বাচিত Set এই Folder-এর নয়।
-        </div>`;
+        '<div class="smart-msg smart-err">'+
+        'নির্বাচিত Set এই Folder-এর নয়।'+
+        '</div>';
   }
 
 
   if(folderId){
 
-    const fr=
-      await db
-        .from('question_bank_folders')
-        .select('sub_category')
-        .eq('id',folderId)
-        .maybeSingle();
+    const fr=await db
+      .from('question_bank_folders')
+      .select('sub_category')
+      .eq('id',folderId)
+      .maybeSingle();
 
 
     if(fr.error)
@@ -2825,56 +2336,41 @@ async function saveSmartEditedQuestion(){
       fr.data?.sub_category!==category
     )
       return $('smartEditMsg').innerHTML=
-        `<div class="smart-msg smart-err">
-          নির্বাচিত Folder এই Category-এর নয়।
-        </div>`;
+        '<div class="smart-msg smart-err">'+
+        'নির্বাচিত Folder এই Category-এর নয়।'+
+        '</div>';
   }
 
 
   const payload={
-
     category,
-
     folder_id:folderId,
-
     set_id:setId,
-
     subject_id:subjectId,
-
     question_text:question,
-
     option_a:a,
-
     option_b:b,
-
     option_c:c,
-
     option_d:d,
-
     correct_answer:correct,
-
     question_number:
       $('smartEditQno').value
-        ?Number(
-          $('smartEditQno').value
-        )
-        :null,
-
+        ? Number(
+            $('smartEditQno').value
+          )
+        : null,
     source_name:
       $('smartEditSource')
         .value
         .trim()||null,
-
     explanation:
       $('smartEditExplanation')
         .value
         .trim()||null,
-
     source_type:
-      Object.keys(CATS)
-        .find(
-          k=>CATS[k]===category
-        )||cat
+      Object.keys(CATS).find(
+        k=>CATS[k]===category
+      )||cat
   };
 
 
@@ -2884,9 +2380,7 @@ async function saveSmartEditedQuestion(){
     'সংরক্ষণ হচ্ছে...';
 
 
-  const{
-    error
-  }=await db
+  const{error}=await db
     .from('questions')
     .update(payload)
     .eq('id',id);
@@ -2906,9 +2400,9 @@ async function saveSmartEditedQuestion(){
 
 
   $('smartEditMsg').innerHTML=
-    `<div class="smart-msg smart-ok">
-      ✅ পরিবর্তন সংরক্ষণ হয়েছে
-    </div>`;
+    '<div class="smart-msg smart-ok">'+
+    '✅ পরিবর্তন সংরক্ষণ হয়েছে'+
+    '</div>';
 
 
   await loadQuestions();
@@ -2923,10 +2417,6 @@ async function saveSmartEditedQuestion(){
 }
 
 
-/* =========================
-   REMOVE QUESTION
-========================= */
-
 async function removeQuestion(id){
 
   if(!confirm(
@@ -2935,9 +2425,7 @@ async function removeQuestion(id){
     return;
 
 
-  const{
-    error
-  }=await db
+  const{error}=await db
     .from('questions')
     .delete()
     .eq('id',id);
@@ -2956,27 +2444,25 @@ async function removeQuestion(id){
     '✅ প্রশ্ন Remove হয়েছে'
   );
 
-
   await loadQuestions();
 }
 
 
-/* =========================
-   LOAD QUESTIONS
-========================= */
+/* =====================================================
+   QUESTION BANK — LOAD QUESTIONS
+   ===================================================== */
 
 async function loadQuestions(){
 
-  let q=
-    db
-      .from('questions')
-      .select(
-        'id,question_text,option_a,option_b,option_c,option_d,correct_answer,question_number,category,folder_id,set_id,subject_id,subjects(name),question_bank_folders(folder_name,sub_category),question_bank_sets(set_name)'
-      )
-      .order('id',{
-        ascending:false
-      })
-      .limit(200);
+  let q=db
+    .from('questions')
+    .select(
+      'id,question_text,option_a,option_b,option_c,option_d,correct_answer,question_number,category,folder_id,set_id,subject_id,subjects(name),question_bank_folders(folder_name,sub_category),question_bank_sets(set_name)'
+    )
+    .order('id',{
+      ascending:false
+    })
+    .limit(200);
 
 
   const ff=
@@ -3021,10 +2507,7 @@ async function loadQuestions(){
     );
 
 
-  const{
-    data,
-    error
-  }=await q;
+  const{data,error}=await q;
 
 
   if(error)
@@ -3035,44 +2518,57 @@ async function loadQuestions(){
     );
 
 
+  const questions=data||[];
+
   const subjectFiltered=!!fsub;
 
 
+  /* =========================
+     QUESTION ROWS
+  ========================= */
+
   const rows=
-    (data||[])
+    questions
       .map(x=>{
 
         const folder=
           x.question_bank_folders
             ?.folder_name||'—';
 
-
         const set=
           x.question_bank_sets
             ?.set_name||'—';
 
-
         const qn=
           x.question_number||'—';
-
 
         const source=
           `${x.category||CATS[cat]} / ${folder} / ${set} / প্রশ্ন ${bn(qn)}`;
 
 
         return `
-
           <div
             class="q"
             id="bank-question-${x.id}"
           >
 
-            <div>
+            <div
+              style="
+                display:flex;
+                align-items:flex-start;
+                gap:8px;
+              "
+            >
 
               <input
                 type="checkbox"
                 class="bankQuestionCheck"
                 value="${x.id}"
+                onchange="updateBankSelectedCount()"
+                style="
+                  margin-top:4px;
+                  transform:scale(1.15);
+                "
               >
 
               <b>
@@ -3084,35 +2580,37 @@ async function loadQuestions(){
 
 
             <div>
-
               ক. ${esc(x.option_a)}
               <br>
-
               খ. ${esc(x.option_b)}
               <br>
-
               গ. ${esc(x.option_c)}
               <br>
-
               ঘ. ${esc(x.option_d)}
-
             </div>
 
 
             <div class="small">
 
               ${esc(x.category||'')}
+
               ·
+
               ${esc(x.subjects?.name||'')}
+
               ·
+
               সঠিক:
+
               ${esc(
                 ({
                   A:'ক',
                   B:'খ',
                   C:'গ',
                   D:'ঘ'
-                })[x.correct_answer]||
+                })[
+                  x.correct_answer
+                ]||
                 x.correct_answer
               )}
 
@@ -3128,7 +2626,10 @@ async function loadQuestions(){
 
               <a
                 href="#bank-question-${x.id}"
-                onclick="event.preventDefault();openSourceQuestion(${x.id})"
+                onclick="
+                  event.preventDefault();
+                  openSourceQuestion(${x.id})
+                "
               >
                 ${esc(source)}
               </a>
@@ -3138,8 +2639,9 @@ async function loadQuestions(){
 
             ${
               subjectFiltered
-              ?''
-              :`
+              ? ''
+              :
+              `
                 <div
                   class="actions"
                   style="margin-top:8px"
@@ -3169,24 +2671,174 @@ async function loadQuestions(){
       .join('');
 
 
-  $('questions').innerHTML=
-    rows||'কোনো প্রশ্ন নেই';
+  /* =========================
+     SELECTION BAR
+  ========================= */
 
+  const selectionBar=`
+    <div
+      id="questionSelectionBar"
+      class="q"
+      style="
+        margin-bottom:12px;
+        background:#f8fafc;
+        border:1px solid #e2e8f0;
+      "
+    >
+
+      <div
+        style="
+          display:flex;
+          align-items:center;
+          gap:8px;
+          flex-wrap:wrap;
+        "
+      >
+
+        <button
+          type="button"
+          class="secondary"
+          onclick="selectAllBankQuestions()"
+        >
+          ☑️ সব সিলেক্ট
+        </button>
+
+
+        <button
+          type="button"
+          class="secondary"
+          onclick="deselectAllBankQuestions()"
+        >
+          ☐ সব ডিসিলেক্ট
+        </button>
+
+
+        <b
+          id="bankSelectedCount"
+        >
+          ০টি সিলেক্ট করা হয়েছে
+        </b>
+
+
+        <span class="small">
+          মোট ${bn(questions.length)}টি প্রশ্ন
+        </span>
+
+      </div>
+
+    </div>
+  `;
+
+
+  $('questions').innerHTML=
+    questions.length
+      ? selectionBar+rows
+      : 'কোনো প্রশ্ন নেই';
+
+
+  /* =========================
+     MOVE BOX
+  ========================= */
 
   setupQuestionMoveUI();
+
+
+  /* =========================
+     COUNT
+  ========================= */
+
+  updateBankSelectedCount();
 }
 
 
-/* =========================
+/* =====================================================
+   SELECT ALL
+   ===================================================== */
+
+function selectAllBankQuestions(){
+
+  const checkboxes=
+    document.querySelectorAll(
+      '#questions .bankQuestionCheck'
+    );
+
+
+  checkboxes.forEach(
+    checkbox=>{
+      checkbox.checked=true;
+    }
+  );
+
+
+  updateBankSelectedCount();
+}
+
+
+/* =====================================================
+   DESELECT ALL
+   ===================================================== */
+
+function deselectAllBankQuestions(){
+
+  const checkboxes=
+    document.querySelectorAll(
+      '#questions .bankQuestionCheck'
+    );
+
+
+  checkboxes.forEach(
+    checkbox=>{
+      checkbox.checked=false;
+    }
+  );
+
+
+  updateBankSelectedCount();
+}
+
+
+/* =====================================================
+   SELECTED COUNT
+   ===================================================== */
+
+function updateBankSelectedCount(){
+
+  const selected=
+    document.querySelectorAll(
+      '#questions .bankQuestionCheck:checked'
+    ).length;
+
+
+  const counter=
+    $('bankSelectedCount');
+
+
+  if(counter){
+
+    counter.textContent=
+      `${bn(selected)}টি সিলেক্ট করা হয়েছে`;
+  }
+
+
+  const moveCounter=
+    $('moveSelectedCount');
+
+
+  if(moveCounter){
+
+    moveCounter.textContent=
+      `${bn(selected)}টি প্রশ্ন নির্বাচিত`;
+  }
+}
+
+
+/* =====================================================
    SOURCE QUESTION
-========================= */
+   ===================================================== */
 
 async function openSourceQuestion(id){
 
-  const{
-    data,
-    error
-  }=await db
+  const{data,error}=await db
     .from('questions')
     .select(
       'id,folder_id,set_id,category'
@@ -3205,16 +2857,14 @@ async function openSourceQuestion(id){
 
 
   const key=
-    Object.keys(CATS)
-      .find(
-        k=>CATS[k]===data.category
-      );
+    Object.keys(CATS).find(
+      k=>CATS[k]===data.category
+    );
 
 
   if(key){
 
     cat=key;
-
 
     document
       .querySelectorAll('.cats button')
@@ -3222,19 +2872,13 @@ async function openSourceQuestion(id){
         b=>b.classList.remove('active')
       );
 
-
     $('cat-'+key)
-      ?.classList
-      .add('active');
-
+      ?.classList.add('active');
 
     $('currentCat').textContent=
-      'বর্তমান Category: '+
-      CATS[key];
-
+      'বর্তমান Category: '+CATS[key];
 
     await loadFolders();
-
     await loadFilterFolders();
   }
 
@@ -3242,16 +2886,12 @@ async function openSourceQuestion(id){
   $('filterFolder').value=
     data.folder_id||'';
 
-
   await loadFilterSets();
-
 
   $('filterSet').value=
     data.set_id||'';
 
-
   $('filterSubject').value='';
-
 
   if($('search'))
     $('search').value='';
@@ -3260,40 +2900,39 @@ async function openSourceQuestion(id){
   await loadQuestions();
 
 
-  setTimeout(
-    ()=>{
-      const el=
-        document.getElementById(
-          'bank-question-'+id
-        );
+  setTimeout(()=>{
+
+    const el=
+      document.getElementById(
+        'bank-question-'+id
+      );
 
 
-      el?.scrollIntoView({
-        behavior:'smooth',
-        block:'center'
-      });
+    el?.scrollIntoView({
+      behavior:'smooth',
+      block:'center'
+    });
 
 
-      el?.classList.add(
+    el?.classList.add(
+      'source-highlight'
+    );
+
+
+    setTimeout(
+      ()=>el?.classList.remove(
         'source-highlight'
-      );
+      ),
+      1800
+    );
 
-
-      setTimeout(
-        ()=>el?.classList.remove(
-          'source-highlight'
-        ),
-        1800
-      );
-    },
-    50
-  );
+  },50);
 }
 
 
-/* =========================
-   MOVE QUESTION
-========================= */
+/* =====================================================
+   MOVE QUESTIONS
+   ===================================================== */
 
 async function loadMoveSets(){
 
@@ -3302,7 +2941,9 @@ async function loadMoveSets(){
       $('moveFolder')?.value||0
     );
 
-  const el=$('moveSet');
+  const el=
+    $('moveSet');
+
 
   if(!el)return;
 
@@ -3316,10 +2957,7 @@ async function loadMoveSets(){
   }
 
 
-  const{
-    data,
-    error
-  }=await db
+  const{data,error}=await db
     .from('question_bank_sets')
     .select('id,set_name')
     .eq('folder_id',fid)
@@ -3344,9 +2982,9 @@ async function loadMoveSets(){
 }
 
 
-/* =========================
+/* =====================================================
    MOVE UI
-========================= */
+   ===================================================== */
 
 function setupQuestionMoveUI(){
 
@@ -3361,9 +2999,11 @@ function setupQuestionMoveUI(){
 
   if(!box){
 
-    box=document.createElement('div');
+    box=
+      document.createElement('div');
 
-    box.id='questionMoveBox';
+    box.id=
+      'questionMoveBox';
 
     box.className='q';
 
@@ -3372,7 +3012,6 @@ function setupQuestionMoveUI(){
 
 
   box.innerHTML=`
-
     <div>
       <b>
         📦 নির্বাচিত প্রশ্ন অন্য Folder/Set-এ Move করুন
@@ -3391,11 +3030,13 @@ function setupQuestionMoveUI(){
           Destination Folder নির্বাচন করুন
         </option>
 
-        ${folders.map(x=>
-          `<option value="${x.id}">
-            ${esc(x.folder_name)}
-          </option>`
-        ).join('')}
+        ${
+          folders.map(x=>
+            `<option value="${x.id}">
+              ${esc(x.folder_name)}
+            </option>`
+          ).join('')
+        }
 
       </select>
 
@@ -3417,26 +3058,18 @@ function setupQuestionMoveUI(){
     >
 
       <button
-        id="selectAllQuestionsBtn"
-        class="secondary"
-      >
-        সব নির্বাচন
-      </button>
-
-
-      <button
-        id="clearAllQuestionsBtn"
-        class="secondary"
-      >
-        সব বাতিল
-      </button>
-
-
-      <button
         id="moveSelectedBtn"
       >
         📦 Move Selected Questions
       </button>
+
+      <span
+        id="moveSelectedCount"
+        class="small"
+        style="align-self:center"
+      >
+        ০টি প্রশ্ন নির্বাচিত
+      </span>
 
     </div>
 
@@ -3455,54 +3088,28 @@ function setupQuestionMoveUI(){
 
 
   box.querySelector(
-    '#selectAllQuestionsBtn'
-  ).onclick=
-    ()=>{
-      document
-        .querySelectorAll(
-          '.bankQuestionCheck'
-        )
-        .forEach(
-          x=>x.checked=true
-        );
-    };
-
-
-  box.querySelector(
-    '#clearAllQuestionsBtn'
-  ).onclick=
-    ()=>{
-      document
-        .querySelectorAll(
-          '.bankQuestionCheck'
-        )
-        .forEach(
-          x=>x.checked=false
-        );
-    };
-
-
-  box.querySelector(
     '#moveSelectedBtn'
   ).onclick=
     moveSelectedQuestions;
+
+
+  updateBankSelectedCount();
 }
 
 
-/* =========================
-   MOVE QUESTIONS
-========================= */
+/* =====================================================
+   MOVE SELECTED QUESTIONS
+   ===================================================== */
 
 async function moveSelectedQuestions(){
 
-  const ids=
-    [
-      ...document.querySelectorAll(
-        '.bankQuestionCheck:checked'
-      )
-    ].map(
-      x=>Number(x.value)
-    );
+  const ids=[
+    ...document.querySelectorAll(
+      '#questions .bankQuestionCheck:checked'
+    )
+  ].map(
+    x=>Number(x.value)
+  );
 
 
   if(!ids.length)
@@ -3535,12 +3142,11 @@ async function moveSelectedQuestions(){
 
   if(sid){
 
-    const sr=
-      await db
-        .from('question_bank_sets')
-        .select('id,folder_id')
-        .eq('id',sid)
-        .maybeSingle();
+    const sr=await db
+      .from('question_bank_sets')
+      .select('id,folder_id')
+      .eq('id',sid)
+      .maybeSingle();
 
 
     if(sr.error)
@@ -3564,15 +3170,15 @@ async function moveSelectedQuestions(){
   }
 
 
-  if(!confirm(
-    `${bn(ids.length)}টি প্রশ্ন নির্বাচিত Folder/Set-এ Move করবেন?`
-  ))
+  if(
+    !confirm(
+      `${bn(ids.length)}টি প্রশ্ন নির্বাচিত Folder/Set-এ Move করবেন?`
+    )
+  )
     return;
 
 
-  const{
-    error
-  }=await db
+  const{error}=await db
     .from('questions')
     .update({
       folder_id:fid,
