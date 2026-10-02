@@ -571,20 +571,34 @@ function template(){
 
   const rows=[
     [
+      'category',
+      'folder',
+      'set',
+      'subject',
+      'source',
+      'question_number',
       'question',
       'option_a',
       'option_b',
       'option_c',
       'option_d',
-      'correct_answer'
+      'correct_answer',
+      'explanation'
     ],
     [
+      'যাচাই পরীক্ষা',
+      '',
+      '',
+      '',
+      '',
+      '1',
       'বাংলাদেশের রাজধানী কোনটি?',
       'ঢাকা',
       'চট্টগ্রাম',
       'রাজশাহী',
       'খুলনা',
-      'A'
+      'A',
+      ''
     ]
   ];
 
@@ -606,20 +620,44 @@ function template(){
 
 /* =========================
    IMPORT HEADER NORMALIZER
-   ========================= */
+========================= */
+
+const IMPORT_REQUIRED_HEADERS=[
+  'question',
+  'option_a',
+  'option_b',
+  'option_c',
+  'option_d',
+  'correct_answer'
+];
+
 
 function normalizeImportHeader(v){
 
   return String(v??'')
     .replace(/^\uFEFF/,'')
     .normalize('NFKC')
+    .replace(
+      /[\u200B-\u200D\u2060\u00A0]/g,
+      ' '
+    )
+    .replace(
+      /[\r\n\t]+/g,
+      ' '
+    )
+    .replace(
+      /[–—−]/g,
+      '-'
+    )
     .trim()
     .toLowerCase()
-    .replace(/[\s\-]+/g,'_')
+    .replace(/\s+/g,'_')
     .replace(
       /[^a-z0-9_\u0980-\u09ff]/g,
       ''
-    );
+    )
+    .replace(/_+/g,'_')
+    .replace(/^_+|_+$/g,'');
 }
 
 
@@ -630,7 +668,8 @@ const IMPORT_HEADER_ALIASES={
     'questions',
     'question_text',
     'questiontext',
-    'প্রশ্ন'
+    'প্রশ্ন',
+    'প্রশ্ন_text'
   ],
 
   option_a:[
@@ -641,6 +680,7 @@ const IMPORT_HEADER_ALIASES={
     'a',
     'ক',
     'ক_অপশন',
+    'অপশন_ক',
     'ক_অপশন_'
   ],
 
@@ -652,6 +692,7 @@ const IMPORT_HEADER_ALIASES={
     'b',
     'খ',
     'খ_অপশন',
+    'অপশন_খ',
     'খ_অপশন_'
   ],
 
@@ -663,6 +704,7 @@ const IMPORT_HEADER_ALIASES={
     'c',
     'গ',
     'গ_অপশন',
+    'অপশন_গ',
     'গ_অপশন_'
   ],
 
@@ -674,6 +716,7 @@ const IMPORT_HEADER_ALIASES={
     'd',
     'ঘ',
     'ঘ_অপশন',
+    'অপশন_ঘ',
     'ঘ_অপশন_'
   ],
 
@@ -767,6 +810,201 @@ const IMPORT_HEADER_LOOKUP=
   );
 
 
+function getImportHeaderInfo(matrix){
+
+  const rows=
+    Array.isArray(matrix)
+      ? matrix
+      : [];
+
+  let best=null;
+
+  const maxHeaderSearch=
+    Math.min(rows.length,30);
+
+  for(
+    let rowIndex=0;
+    rowIndex<maxHeaderSearch;
+    rowIndex++
+  ){
+
+    const row=
+      Array.isArray(rows[rowIndex])
+        ? rows[rowIndex]
+        : [];
+
+    const map={};
+    const duplicates=[];
+
+    row.forEach(
+      (value,colIndex)=>{
+
+        const key=
+          IMPORT_HEADER_LOOKUP[
+            normalizeImportHeader(value)
+          ];
+
+        if(!key)
+          return;
+
+        if(
+          Object.prototype.hasOwnProperty
+            .call(map,key)
+        ){
+
+          duplicates.push(key);
+
+        }else{
+
+          map[key]=colIndex;
+        }
+      }
+    );
+
+    const foundRequired=
+      IMPORT_REQUIRED_HEADERS.filter(
+        key=>map[key]!==undefined
+      );
+
+    if(
+      !best||
+      foundRequired.length>
+      best.foundRequired.length
+    ){
+
+      best={
+        rowIndex,
+        map,
+        duplicates,
+        foundRequired,
+        originalHeader:row
+      };
+    }
+
+    if(
+      foundRequired.length===
+      IMPORT_REQUIRED_HEADERS.length
+    )
+      break;
+  }
+
+  return best;
+}
+
+
+function parseImportSheet(sheet){
+
+  const matrix=
+    XLSX.utils.sheet_to_json(
+      sheet,
+      {
+        header:1,
+        defval:'',
+        raw:false,
+        blankrows:true
+      }
+    );
+
+  if(!matrix.length){
+
+    return{
+      error:'ফাইলে কোনো data পাওয়া যায়নি',
+      rows:[],
+      headerRowIndex:-1
+    };
+  }
+
+  const headerInfo=
+    getImportHeaderInfo(matrix);
+
+  if(
+    !headerInfo||
+    headerInfo.foundRequired.length<
+    IMPORT_REQUIRED_HEADERS.length
+  ){
+
+    const found=
+      headerInfo?.foundRequired||[];
+
+    const missing=
+      IMPORT_REQUIRED_HEADERS.filter(
+        key=>!found.includes(key)
+      );
+
+    return{
+      error:
+        'Excel/CSV header পাওয়া যায়নি। প্রয়োজনীয় header: '+
+        IMPORT_REQUIRED_HEADERS.join(', ')+
+        '। Missing: '+
+        missing.join(', '),
+      rows:[],
+      headerRowIndex:
+        headerInfo?.rowIndex??-1,
+      missing,
+      found
+    };
+  }
+
+  if(headerInfo.duplicates.length){
+
+    return{
+      error:
+        'একই ধরনের header একাধিকবার পাওয়া গেছে: '+
+        [...new Set(headerInfo.duplicates)].join(', '),
+      rows:[],
+      headerRowIndex:headerInfo.rowIndex
+    };
+  }
+
+  const rows=[];
+
+  for(
+    let i=headerInfo.rowIndex+1;
+    i<matrix.length;
+    i++
+  ){
+
+    const sourceRow=
+      Array.isArray(matrix[i])
+        ? matrix[i]
+        : [];
+
+    const row={};
+    let hasAnyValue=false;
+
+    Object.entries(
+      headerInfo.map
+    ).forEach(
+      ([canonical,colIndex])=>{
+
+        const value=
+          sourceRow[colIndex]??'';
+
+        const text=
+          String(value??'');
+
+        if(text.trim()!=='')
+          hasAnyValue=true;
+
+        row[canonical]=text;
+      }
+    );
+
+    if(hasAnyValue)
+      rows.push({
+        ...row,
+        __excelRow:i+1
+      });
+  }
+
+  return{
+    rows,
+    headerRowIndex:headerInfo.rowIndex,
+    headerInfo
+  };
+}
+
+
 function normalizeImportRows(rawRows){
 
   return(rawRows||[]).map(raw=>{
@@ -776,6 +1014,14 @@ function normalizeImportRows(rawRows){
     Object.entries(raw||{}).forEach(
       ([header,value])=>{
 
+        if(
+          header==='__excelRow'
+        ){
+
+          row.__excelRow=value;
+          return;
+        }
+
         const normalized=
           normalizeImportHeader(header);
 
@@ -784,57 +1030,16 @@ function normalizeImportRows(rawRows){
             normalized
           ];
 
-        if(key&&row[key]==null)
+        if(
+          key&&
+          row[key]==null
+        )
           row[key]=value;
       }
     );
 
     return row;
   });
-}
-
-
-function validateImportHeaders(rawRows){
-
-  if(!rawRows?.length)
-    return[
-      'question',
-      'option_a',
-      'option_b',
-      'option_c',
-      'option_d',
-      'correct_answer'
-    ];
-
-  const found=new Set();
-
-  Object.keys(
-    rawRows[0]||{}
-  ).forEach(header=>{
-
-    const key=
-      IMPORT_HEADER_LOOKUP[
-        normalizeImportHeader(header)
-      ];
-
-    if(key)
-      found.add(key);
-  });
-
-
-  const required=[
-    'question',
-    'option_a',
-    'option_b',
-    'option_c',
-    'option_d',
-    'correct_answer'
-  ];
-
-
-  return required.filter(
-    key=>!found.has(key)
-  );
 }
 
 
@@ -846,8 +1051,10 @@ function normalizeCorrectAnswer(value){
 
   const v=
     String(value??'')
+      .normalize('NFKC')
       .trim()
-      .toUpperCase();
+      .toUpperCase()
+      .replace(/\s+/g,'_');
 
   const map={
 
@@ -876,13 +1083,66 @@ function normalizeCorrectAnswer(value){
     'OPTION_C':'C',
     'OPTION_D':'D',
 
-    'OPTION 1':'A',
-    'OPTION 2':'B',
-    'OPTION 3':'C',
-    'OPTION 4':'D'
+    'OPTION_1':'A',
+    'OPTION_2':'B',
+    'OPTION_3':'C',
+    'OPTION_4':'D',
+
+    'OPT_A':'A',
+    'OPT_B':'B',
+    'OPT_C':'C',
+    'OPT_D':'D'
   };
 
   return map[v]||v;
+}
+
+
+/* =========================
+   CATEGORY NORMALIZER
+========================= */
+
+function resolveImportCategory(value){
+
+  const raw=
+    String(value??'')
+      .normalize('NFKC')
+      .trim();
+
+  if(!raw){
+
+    return{
+      key:cat,
+      label:CATS[cat]
+    };
+  }
+
+  const n=
+    norm(raw);
+
+  for(
+    const[key,label] of Object.entries(CATS)
+  ){
+
+    if(
+      n===norm(key)||
+      n===norm(label)
+    ){
+
+      return{
+        key,
+        label
+      };
+    }
+  }
+
+  return{
+    error:
+      'অজানা Category: '+
+      raw+
+      '। গ্রহণযোগ্য Category: '+
+      Object.values(CATS).join(', ')
+  };
 }
 
 
@@ -891,6 +1151,17 @@ function normalizeCorrectAnswer(value){
 ========================= */
 
 async function previewImport(){
+
+  importData=[];
+
+  $('importBtn')
+    ?.classList
+    .add('hidden');
+
+  const preview=$('preview');
+
+  if(preview)
+    preview.innerHTML='';
 
   const f=$('file')?.files?.[0];
 
@@ -904,13 +1175,18 @@ async function previewImport(){
 
   try{
 
-    const data=XLSX.read(
-      await f.arrayBuffer(),
-      {
-        type:'array',
-        cellDates:false
-      }
-    );
+    const buffer=
+      await f.arrayBuffer();
+
+    const data=
+      XLSX.read(
+        buffer,
+        {
+          type:'array',
+          cellDates:false,
+          raw:false
+        }
+      );
 
 
     if(!data.SheetNames.length)
@@ -927,48 +1203,45 @@ async function previewImport(){
       ];
 
 
-    const rawRows=
-      XLSX.utils.sheet_to_json(
-        sheet,
-        {
-          defval:'',
-          raw:false
-        }
-      );
+    const parsed=
+      parseImportSheet(sheet);
 
 
-    if(!rawRows.length)
+    if(parsed.error){
+
       return msg(
         'qmsg',
-        'ফাইলে কোনো data row পাওয়া যায়নি',
+        parsed.error,
         true
       );
+    }
 
 
-    const missing=
-      validateImportHeaders(rawRows);
-
-
-    if(missing.length){
+    if(!parsed.rows.length){
 
       return msg(
         'qmsg',
-        'Excel header ঠিক নয়। প্রয়োজন: '+
-        missing.join(', ')+
-        '। Built-in Template ব্যবহার করুন।',
+        'Header-এর নিচে কোনো data row পাওয়া যায়নি',
         true
       );
     }
 
 
     importData=
-      normalizeImportRows(rawRows);
+      normalizeImportRows(
+        parsed.rows
+      );
 
 
     const invalid=[];
 
 
     importData.forEach((r,i)=>{
+
+      const displayRow=
+        r.__excelRow||
+        i+2;
+
 
       const required=[
         'question',
@@ -983,14 +1256,16 @@ async function previewImport(){
       const missingRow=
         required.filter(
           key=>
-            String(r[key]??'').trim()===''
+            String(
+              r[key]??''
+            ).trim()===''
         );
 
 
       if(missingRow.length){
 
         invalid.push(
-          `Row ${i+2}: ${missingRow.join(', ')} আবশ্যক`
+          `Row ${displayRow}: ${missingRow.join(', ')} আবশ্যক`
         );
 
         return;
@@ -1003,10 +1278,48 @@ async function previewImport(){
         );
 
 
-      if(!['A','B','C','D'].includes(answer)){
+      if(
+        !['A','B','C','D']
+          .includes(answer)
+      ){
 
         invalid.push(
-          `Row ${i+2}: correct_answer অবশ্যই A/B/C/D অথবা ক/খ/গ/ঘ হতে হবে`
+          `Row ${displayRow}: correct_answer অবশ্যই A/B/C/D, 1/2/3/4 অথবা ক/খ/গ/ঘ হতে হবে`
+        );
+
+        return;
+      }
+
+
+      const category=
+        resolveImportCategory(
+          r.category
+        );
+
+
+      if(category.error){
+
+        invalid.push(
+          `Row ${displayRow}: ${category.error}`
+        );
+      }
+
+
+      const qno=
+        parseQuestionNumber(
+          r.question_number
+        );
+
+
+      if(
+        String(
+          r.question_number??''
+        ).trim()&&
+        qno===null
+      ){
+
+        invalid.push(
+          `Row ${displayRow}: question_number সঠিক নয়`
         );
       }
 
@@ -1015,18 +1328,16 @@ async function previewImport(){
 
     if(invalid.length){
 
-      $('preview').innerHTML=
-        `<div class="q">
-          <b>Import-এর আগে নিচের সমস্যা ঠিক করুন:</b>
-          <div style="margin-top:8px">
-            ${invalid.map(esc).join('<br>')}
-          </div>
-        </div>`;
+      if(preview){
 
-
-      $('importBtn')
-        .classList
-        .add('hidden');
+        preview.innerHTML=
+          `<div class="q">
+            <b>Import-এর আগে নিচের সমস্যা ঠিক করুন:</b>
+            <div style="margin-top:8px">
+              ${invalid.map(esc).join('<br>')}
+            </div>
+          </div>`;
+      }
 
 
       return msg(
@@ -1045,42 +1356,142 @@ async function previewImport(){
         correct_answer:
           normalizeCorrectAnswer(
             r.correct_answer
-          )
+          ),
+
+        category:
+          String(
+            r.category??''
+          ).trim(),
+
+        folder:
+          String(
+            r.folder??''
+          ).trim(),
+
+        set:
+          String(
+            r.set??''
+          ).trim(),
+
+        subject:
+          String(
+            r.subject??''
+          ).trim(),
+
+        source:
+          String(
+            r.source??''
+          ).trim(),
+
+        question_number:
+          String(
+            r.question_number??''
+          ).trim(),
+
+        question:
+          String(
+            r.question??''
+          ).trim(),
+
+        option_a:
+          String(
+            r.option_a??''
+          ).trim(),
+
+        option_b:
+          String(
+            r.option_b??''
+          ).trim(),
+
+        option_c:
+          String(
+            r.option_c??''
+          ).trim(),
+
+        option_d:
+          String(
+            r.option_d??''
+          ).trim(),
+
+        explanation:
+          String(
+            r.explanation??''
+          ).trim()
 
       }));
 
 
-    $('preview').innerHTML=`
+    if(preview){
 
-      <div class="q">
+      const shownHeaders=[
+        'category',
+        'folder',
+        'set',
+        'subject',
+        'source',
+        'question_number',
+        'question',
+        'option_a',
+        'option_b',
+        'option_c',
+        'option_d',
+        'correct_answer',
+        'explanation'
+      ];
 
-        <b>
-          ✅ ${bn(importData.length)}টি row প্রস্তুত
-        </b>
+      preview.innerHTML=`
 
-        <div
-          class="small"
-          style="margin-top:6px"
-        >
-          Excel header স্বয়ংক্রিয়ভাবে চিনে নেওয়া হয়েছে।
-          A/B/C/D এবং ক/খ/গ/ঘ উভয় correct answer গ্রহণ করা হবে।
+        <div class="q">
+
+          <b>
+            ✅ ${bn(importData.length)}টি row প্রস্তুত
+          </b>
+
+          <div
+            class="small"
+            style="margin-top:6px"
+          >
+            Header row স্বয়ংক্রিয়ভাবে শনাক্ত হয়েছে।
+            প্রয়োজনীয় ৬টি header এবং অতিরিক্ত metadata header
+            গ্রহণ করা হয়েছে।
+          </div>
+
+          <div
+            class="small"
+            style="margin-top:6px"
+          >
+            Header:
+            ${shownHeaders.map(esc).join(', ')}
+          </div>
+
+          <pre>${esc(
+            JSON.stringify(
+              importData
+                .slice(0,5)
+                .map(r=>{
+                  const x={};
+
+                  shownHeaders.forEach(
+                    key=>{
+                      x[key]=r[key]??'';
+                    }
+                  );
+
+                  return x;
+                }),
+              null,
+              2
+            )
+          )}</pre>
+
         </div>
 
-        <pre>${esc(
-          JSON.stringify(
-            importData.slice(0,5),
-            null,
-            2
-          )
-        )}</pre>
-
-      </div>
-
-    `;
+      `;
+    }
 
 
     $('importBtn')
-      .classList
+      ?.classList
       .remove('hidden');
 
 
@@ -1097,6 +1508,8 @@ async function previewImport(){
       error
     );
 
+
+    importData=[];
 
     $('importBtn')
       ?.classList
@@ -1118,9 +1531,59 @@ async function previewImport(){
 ========================= */
 
 function norm(v){
+
   return String(v??'')
+    .normalize('NFKC')
+    .replace(
+      /\u00A0/g,
+      ' '
+    )
     .trim()
+    .replace(
+      /\s+/g,
+      ' '
+    )
     .toLowerCase();
+}
+
+
+/* =========================
+   QUESTION NUMBER
+========================= */
+
+function parseQuestionNumber(value){
+
+  const raw=
+    String(value??'')
+      .normalize('NFKC')
+      .trim();
+
+  if(!raw)
+    return null;
+
+  const english=
+    raw.replace(
+      /[০-৯]/g,
+      d=>
+        '০১২৩৪৫৬৭৮৯'
+          .indexOf(d)
+    );
+
+  const digits=
+    english.replace(
+      /[^\d]/g,
+      ''
+    );
+
+  if(!digits)
+    return null;
+
+  const n=
+    Number(digits);
+
+  return Number.isFinite(n)
+    ? n
+    : null;
 }
 
 
@@ -1142,13 +1605,130 @@ async function importRows(){
       fail=[];
 
 
+  const folderCache=new Map();
+  const setCache=new Map();
+
+
+  let selectedFolderId=
+    Number(
+      $('folder')?.value||0
+    )||null;
+
+  let selectedSetId=
+    Number(
+      $('set')?.value||0
+    )||null;
+
+
+  /* =========================
+     VALIDATE SELECTED FOLDER
+  ========================= */
+
+  if(selectedFolderId){
+
+    const check=await db
+      .from('question_bank_folders')
+      .select(
+        'id,sub_category'
+      )
+      .eq(
+        'id',
+        selectedFolderId
+      )
+      .maybeSingle();
+
+
+    if(check.error){
+
+      return msg(
+        'qmsg',
+        check.error.message,
+        true
+      );
+    }
+
+
+    if(!check.data){
+
+      return msg(
+        'qmsg',
+        'নির্বাচিত Folder পাওয়া যায়নি',
+        true
+      );
+    }
+
+
+    selectedFolderId=
+      check.data.id;
+
+  }
+
+
+  /* =========================
+     VALIDATE SELECTED SET
+  ========================= */
+
+  if(selectedSetId){
+
+    const sr=await db
+      .from('question_bank_sets')
+      .select(
+        'id,folder_id'
+      )
+      .eq(
+        'id',
+        selectedSetId
+      )
+      .maybeSingle();
+
+
+    if(sr.error){
+
+      return msg(
+        'qmsg',
+        sr.error.message,
+        true
+      );
+    }
+
+
+    if(!sr.data){
+
+      return msg(
+        'qmsg',
+        'নির্বাচিত Set পাওয়া যায়নি',
+        true
+      );
+    }
+
+
+    if(
+      !selectedFolderId||
+      Number(sr.data.folder_id)!==
+      Number(selectedFolderId)
+    ){
+
+      return msg(
+        'qmsg',
+        'নির্বাচিত Set নির্বাচিত Folder-এর নয়',
+        true
+      );
+    }
+  }
+
+
   for(
     let i=0;
     i<importData.length;
     i++
   ){
 
-    const r=importData[i];
+    const r=
+      importData[i];
+
+    const displayRow=
+      r.__excelRow||
+      i+2;
 
 
     /* =========================
@@ -1168,14 +1748,16 @@ async function importRows(){
     const missing=
       required.filter(
         key=>
-          String(r[key]??'').trim()===''
+          String(
+            r[key]??''
+          ).trim()===''
       );
 
 
     if(missing.length){
 
       fail.push(
-        `Row ${i+2}: ${missing.join(', ')} আবশ্যক`
+        `Row ${displayRow}: ${missing.join(', ')} আবশ্যক`
       );
 
       continue;
@@ -1188,10 +1770,13 @@ async function importRows(){
       );
 
 
-    if(!['A','B','C','D'].includes(correct)){
+    if(
+      !['A','B','C','D']
+        .includes(correct)
+    ){
 
       fail.push(
-        `Row ${i+2}: correct_answer ভুল — ${r.correct_answer}`
+        `Row ${displayRow}: correct_answer ভুল — ${r.correct_answer}`
       );
 
       continue;
@@ -1202,17 +1787,27 @@ async function importRows(){
        CATEGORY
     ========================= */
 
-    const suppliedCategory=
-      String(
-        r.category||''
-      ).trim();
+    const categoryInfo=
+      resolveImportCategory(
+        r.category
+      );
+
+
+    if(categoryInfo.error){
+
+      fail.push(
+        `Row ${displayRow}: ${categoryInfo.error}`
+      );
+
+      continue;
+    }
 
 
     const category=
-      Object.values(CATS)
-        .includes(suppliedCategory)
-        ? suppliedCategory
-        : CATS[cat];
+      categoryInfo.label;
+
+    const sourceType=
+      categoryInfo.key;
 
 
     /* =========================
@@ -1230,69 +1825,93 @@ async function importRows(){
 
     if(folderName){
 
-      const fr=await db
-        .from('question_bank_folders')
-        .select('id,sub_category')
-        .eq(
-          'sub_category',
-          category
+      const folderCacheKey=
+        norm(category)+
+        '||'+
+        norm(folderName);
+
+
+      if(
+        folderCache.has(
+          folderCacheKey
         )
-        .eq(
-          'folder_name',
-          folderName
-        )
-        .maybeSingle();
+      ){
 
+        fid=
+          folderCache.get(
+            folderCacheKey
+          );
 
-      if(fr.error){
+      }else{
 
-        fail.push(
-          `Row ${i+2}: ${fr.error.message}`
-        );
-
-        continue;
-      }
-
-
-      fid=
-        fr.data?.id||
-        null;
-
-
-      if(!fid){
-
-        const x=await db
+        const fr=await db
           .from('question_bank_folders')
-          .insert({
-            sub_category:category,
-            folder_name:folderName
-          })
-          .select('id')
-          .single();
+          .select(
+            'id,sub_category,folder_name'
+          )
+          .eq(
+            'sub_category',
+            category
+          )
+          .eq(
+            'folder_name',
+            folderName
+          )
+          .maybeSingle();
 
 
-        if(x.error){
+        if(fr.error){
 
           fail.push(
-            `Row ${i+2}: Folder তৈরি হয়নি — ${x.error.message}`
+            `Row ${displayRow}: ${fr.error.message}`
           );
 
           continue;
         }
 
 
-        fid=x.data.id;
+        fid=
+          fr.data?.id||
+          null;
+
+
+        if(!fid){
+
+          const x=await db
+            .from('question_bank_folders')
+            .insert({
+              sub_category:
+                category,
+              folder_name:
+                folderName
+            })
+            .select('id')
+            .single();
+
+
+          if(x.error){
+
+            fail.push(
+              `Row ${displayRow}: Folder তৈরি হয়নি — ${x.error.message}`
+            );
+
+            continue;
+          }
+
+
+          fid=x.data.id;
+        }
+
+
+        folderCache.set(
+          folderCacheKey,
+          fid
+        );
       }
 
     }else{
 
-      const selectedFolder=
-        Number(
-          $('folder')?.value||0
-        );
-
-
-      if(selectedFolder){
+      if(selectedFolderId){
 
         const check=await db
           .from('question_bank_folders')
@@ -1301,7 +1920,7 @@ async function importRows(){
           )
           .eq(
             'id',
-            selectedFolder
+            selectedFolderId
           )
           .maybeSingle();
 
@@ -1309,7 +1928,7 @@ async function importRows(){
         if(check.error){
 
           fail.push(
-            `Row ${i+2}: ${check.error.message}`
+            `Row ${displayRow}: ${check.error.message}`
           );
 
           continue;
@@ -1318,19 +1937,25 @@ async function importRows(){
 
         if(
           check.data &&
-          check.data.sub_category===category
+          check.data.sub_category===
+          category
         ){
 
-          fid=check.data.id;
+          fid=
+            check.data.id;
 
         }else{
 
           fail.push(
-            `Row ${i+2}: নির্বাচিত Folder এই Category-এর নয়`
+            `Row ${displayRow}: নির্বাচিত Folder এই Category-এর নয়`
           );
 
           continue;
         }
+
+      }else{
+
+        fid=null;
       }
     }
 
@@ -1353,76 +1978,100 @@ async function importRows(){
       if(!fid){
 
         fail.push(
-          `Row ${i+2}: Set দেওয়া হয়েছে, তাই Folder প্রয়োজন`
+          `Row ${displayRow}: Set দেওয়া হয়েছে, তাই Folder প্রয়োজন`
         );
 
         continue;
       }
 
 
-      const sr=await db
-        .from('question_bank_sets')
-        .select('id')
-        .eq(
-          'folder_id',
-          fid
+      const setCacheKey=
+        String(fid)+
+        '||'+
+        norm(setName);
+
+
+      if(
+        setCache.has(
+          setCacheKey
         )
-        .eq(
-          'set_name',
-          setName
-        )
-        .maybeSingle();
+      ){
 
+        sid=
+          setCache.get(
+            setCacheKey
+          );
 
-      if(sr.error){
+      }else{
 
-        fail.push(
-          `Row ${i+2}: ${sr.error.message}`
-        );
-
-        continue;
-      }
-
-
-      sid=
-        sr.data?.id||
-        null;
-
-
-      if(!sid){
-
-        const x=await db
+        const sr=await db
           .from('question_bank_sets')
-          .insert({
-            folder_id:fid,
-            set_name:setName
-          })
-          .select('id')
-          .single();
+          .select(
+            'id,folder_id,set_name'
+          )
+          .eq(
+            'folder_id',
+            fid
+          )
+          .eq(
+            'set_name',
+            setName
+          )
+          .maybeSingle();
 
 
-        if(x.error){
+        if(sr.error){
 
           fail.push(
-            `Row ${i+2}: Set তৈরি হয়নি — ${x.error.message}`
+            `Row ${displayRow}: ${sr.error.message}`
           );
 
           continue;
         }
 
 
-        sid=x.data.id;
+        sid=
+          sr.data?.id||
+          null;
+
+
+        if(!sid){
+
+          const x=await db
+            .from('question_bank_sets')
+            .insert({
+              folder_id:
+                fid,
+              set_name:
+                setName
+            })
+            .select('id')
+            .single();
+
+
+          if(x.error){
+
+            fail.push(
+              `Row ${displayRow}: Set তৈরি হয়নি — ${x.error.message}`
+            );
+
+            continue;
+          }
+
+
+          sid=x.data.id;
+        }
+
+
+        setCache.set(
+          setCacheKey,
+          sid
+        );
       }
 
     }else{
 
-      const selectedSet=
-        Number(
-          $('set')?.value||0
-        );
-
-
-      if(selectedSet){
+      if(selectedSetId){
 
         const sr=await db
           .from('question_bank_sets')
@@ -1431,7 +2080,7 @@ async function importRows(){
           )
           .eq(
             'id',
-            selectedSet
+            selectedSetId
           )
           .maybeSingle();
 
@@ -1439,7 +2088,7 @@ async function importRows(){
         if(sr.error){
 
           fail.push(
-            `Row ${i+2}: ${sr.error.message}`
+            `Row ${displayRow}: ${sr.error.message}`
           );
 
           continue;
@@ -1448,15 +2097,18 @@ async function importRows(){
 
         if(
           sr.data &&
-          Number(sr.data.folder_id)===Number(fid)
+          fid &&
+          Number(sr.data.folder_id)===
+          Number(fid)
         ){
 
-          sid=sr.data.id;
+          sid=
+            sr.data.id;
 
         }else{
 
           fail.push(
-            `Row ${i+2}: নির্বাচিত Set এই Folder-এর নয়`
+            `Row ${displayRow}: নির্বাচিত Set এই Folder-এর নয়`
           );
 
           continue;
@@ -1472,29 +2124,42 @@ async function importRows(){
     let sub=null;
 
 
-    if(
+    const subjectRaw=
       String(
         r.subject||''
-      ).trim()
-    ){
-
-      const subjectName=
-        String(
-          r.subject
-        ).trim();
+      ).trim();
 
 
-      sub=subjects.find(
-        x=>
-          norm(x.name)===
-          norm(subjectName)
-      );
+    if(subjectRaw){
+
+      if(
+        /^\d+$/.test(
+          subjectRaw
+        )
+      ){
+
+        sub=
+          subjects.find(
+            x=>
+              Number(x.id)===
+              Number(subjectRaw)
+          );
+
+      }else{
+
+        sub=
+          subjects.find(
+            x=>
+              norm(x.name)===
+              norm(subjectRaw)
+          );
+      }
 
 
       if(!sub){
 
         fail.push(
-          `Row ${i+2}: Subject পাওয়া যায়নি: ${subjectName}`
+          `Row ${displayRow}: Subject পাওয়া যায়নি: ${subjectRaw}`
         );
 
         continue;
@@ -1503,107 +2168,75 @@ async function importRows(){
 
 
     /* =========================
+       QUESTION NUMBER
+    ========================= */
+
+    const qNumber=
+      parseQuestionNumber(
+        r.question_number
+      );
+
+
+    /* =========================
        QUESTION PAYLOAD
     ========================= */
 
-    const questionNumber=
-      String(
-        r.question_number??''
-      ).trim();
-
-
-    let qNumber=null;
-
-
-    if(questionNumber){
-
-      const parsed=
-        Number(
-          questionNumber
-            .replace(/[^\d০-৯]/g,'')
-            .replace(
-              /[০-৯]/g,
-              d=>'০১২৩৪৫৬৭৮৯'.indexOf(d)
-            )
-        );
-
-
-      qNumber=
-        Number.isFinite(parsed)
-          ? parsed
-          : null;
-    }
-
-
     const p={
 
-      folder_id:fid,
+      folder_id:
+        fid,
 
-      set_id:sid,
+      set_id:
+        sid,
 
       subject_id:
         sub?.id||
         null,
 
       category:
-
         category,
 
       source_name:
-
         String(
           r.source||''
         ).trim()||
         null,
 
       source_type:
-
-        Object.keys(CATS)
-          .find(
-            k=>CATS[k]===category
-          )||
-        cat,
+        sourceType,
 
       question_number:
-
         qNumber,
 
       question_text:
-
         String(
           r.question
         ).trim(),
 
       option_a:
-
         String(
           r.option_a
         ).trim(),
 
       option_b:
-
         String(
           r.option_b
         ).trim(),
 
       option_c:
-
         String(
           r.option_c
         ).trim(),
 
       option_d:
-
         String(
           r.option_d
         ).trim(),
 
       correct_answer:
-
         correct,
 
       explanation:
-
         String(
           r.explanation||''
         ).trim()||
@@ -1623,7 +2256,7 @@ async function importRows(){
     if(x.error){
 
       fail.push(
-        `Row ${i+2}: ${x.error.message}`
+        `Row ${displayRow}: ${x.error.message}`
       );
 
     }else{
