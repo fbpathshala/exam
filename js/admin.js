@@ -563,6 +563,10 @@ function mode(m){
 }
 
 
+/* =========================
+   EXCEL TEMPLATE
+========================= */
+
 function template(){
 
   const rows=[
@@ -600,9 +604,295 @@ function template(){
 }
 
 
+/* =========================
+   IMPORT HEADER NORMALIZER
+   ========================= */
+
+function normalizeImportHeader(v){
+
+  return String(v??'')
+    .replace(/^\uFEFF/,'')
+    .normalize('NFKC')
+    .trim()
+    .toLowerCase()
+    .replace(/[\s\-]+/g,'_')
+    .replace(
+      /[^a-z0-9_\u0980-\u09ff]/g,
+      ''
+    );
+}
+
+
+const IMPORT_HEADER_ALIASES={
+
+  question:[
+    'question',
+    'questions',
+    'question_text',
+    'questiontext',
+    'প্রশ্ন'
+  ],
+
+  option_a:[
+    'option_a',
+    'optiona',
+    'option_1',
+    'option1',
+    'a',
+    'ক',
+    'ক_অপশন',
+    'ক_অপশন_'
+  ],
+
+  option_b:[
+    'option_b',
+    'optionb',
+    'option_2',
+    'option2',
+    'b',
+    'খ',
+    'খ_অপশন',
+    'খ_অপশন_'
+  ],
+
+  option_c:[
+    'option_c',
+    'optionc',
+    'option_3',
+    'option3',
+    'c',
+    'গ',
+    'গ_অপশন',
+    'গ_অপশন_'
+  ],
+
+  option_d:[
+    'option_d',
+    'optiond',
+    'option_4',
+    'option4',
+    'd',
+    'ঘ',
+    'ঘ_অপশন',
+    'ঘ_অপশন_'
+  ],
+
+  correct_answer:[
+    'correct_answer',
+    'correctanswer',
+    'correct',
+    'answer',
+    'right_answer',
+    'rightanswer',
+    'correct_option',
+    'correctoption',
+    'সঠিক_উত্তর',
+    'সঠিক উত্তর',
+    'উত্তর',
+    'সঠিক_উত্তর_'
+  ],
+
+  category:[
+    'category',
+    'cat',
+    'বিভাগ',
+    'ক্যাটাগরি'
+  ],
+
+  folder:[
+    'folder',
+    'folder_name',
+    'foldername',
+    'ফোল্ডার'
+  ],
+
+  set:[
+    'set',
+    'set_name',
+    'setname',
+    'সেট'
+  ],
+
+  subject:[
+    'subject',
+    'subject_name',
+    'subjectname',
+    'বিষয়',
+    'বিষয়'
+  ],
+
+  source:[
+    'source',
+    'source_name',
+    'sourcename',
+    'উৎস'
+  ],
+
+  question_number:[
+    'question_number',
+    'questionnumber',
+    'question_no',
+    'questionno',
+    'qno',
+    'q_no',
+    'number',
+    'ক্রমিক',
+    'প্রশ্ন_নম্বর',
+    'প্রশ্ন_নং'
+  ],
+
+  explanation:[
+    'explanation',
+    'ব্যাখ্যা'
+  ]
+};
+
+
+const IMPORT_HEADER_LOOKUP=
+  Object.entries(
+    IMPORT_HEADER_ALIASES
+  ).reduce(
+    (acc,[canonical,aliases])=>{
+
+      aliases.forEach(alias=>{
+        acc[
+          normalizeImportHeader(alias)
+        ]=canonical;
+      });
+
+      return acc;
+
+    },
+    {}
+  );
+
+
+function normalizeImportRows(rawRows){
+
+  return(rawRows||[]).map(raw=>{
+
+    const row={};
+
+    Object.entries(raw||{}).forEach(
+      ([header,value])=>{
+
+        const normalized=
+          normalizeImportHeader(header);
+
+        const key=
+          IMPORT_HEADER_LOOKUP[
+            normalized
+          ];
+
+        if(key&&row[key]==null)
+          row[key]=value;
+      }
+    );
+
+    return row;
+  });
+}
+
+
+function validateImportHeaders(rawRows){
+
+  if(!rawRows?.length)
+    return[
+      'question',
+      'option_a',
+      'option_b',
+      'option_c',
+      'option_d',
+      'correct_answer'
+    ];
+
+  const found=new Set();
+
+  Object.keys(
+    rawRows[0]||{}
+  ).forEach(header=>{
+
+    const key=
+      IMPORT_HEADER_LOOKUP[
+        normalizeImportHeader(header)
+      ];
+
+    if(key)
+      found.add(key);
+  });
+
+
+  const required=[
+    'question',
+    'option_a',
+    'option_b',
+    'option_c',
+    'option_d',
+    'correct_answer'
+  ];
+
+
+  return required.filter(
+    key=>!found.has(key)
+  );
+}
+
+
+/* =========================
+   CORRECT ANSWER NORMALIZER
+========================= */
+
+function normalizeCorrectAnswer(value){
+
+  const v=
+    String(value??'')
+      .trim()
+      .toUpperCase();
+
+  const map={
+
+    'A':'A',
+    'B':'B',
+    'C':'C',
+    'D':'D',
+
+    'ক':'A',
+    'খ':'B',
+    'গ':'C',
+    'ঘ':'D',
+
+    '১':'A',
+    '২':'B',
+    '৩':'C',
+    '৪':'D',
+
+    '1':'A',
+    '2':'B',
+    '3':'C',
+    '4':'D',
+
+    'OPTION_A':'A',
+    'OPTION_B':'B',
+    'OPTION_C':'C',
+    'OPTION_D':'D',
+
+    'OPTION 1':'A',
+    'OPTION 2':'B',
+    'OPTION 3':'C',
+    'OPTION 4':'D'
+  };
+
+  return map[v]||v;
+}
+
+
+/* =========================
+   PREVIEW IMPORT
+========================= */
+
 async function previewImport(){
 
-  const f=$('file').files[0];
+  const f=$('file')?.files?.[0];
 
   if(!f)
     return msg(
@@ -611,42 +901,221 @@ async function previewImport(){
       true
     );
 
-  const data=XLSX.read(
-    await f.arrayBuffer(),
-    {type:'array'}
-  );
 
-  const rows=
-    XLSX.utils.sheet_to_json(
-      data.Sheets[data.SheetNames[0]],
-      {defval:''}
+  try{
+
+    const data=XLSX.read(
+      await f.arrayBuffer(),
+      {
+        type:'array',
+        cellDates:false
+      }
     );
 
-  importData=rows;
 
-  $('preview').innerHTML=`
-    <div class="q">
-      <b>${bn(rows.length)}টি row পাওয়া গেছে</b>
-      <pre>${esc(
-        JSON.stringify(
-          rows.slice(0,5),
-          null,
-          2
-        )
-      )}</pre>
-    </div>
-  `;
+    if(!data.SheetNames.length)
+      return msg(
+        'qmsg',
+        'Excel/CSV-তে কোনো Sheet পাওয়া যায়নি',
+        true
+      );
 
-  $('importBtn')
-    .classList
-    .remove('hidden');
 
-  msg(
-    'qmsg',
-    'Preview প্রস্তুত হয়েছে'
-  );
+    const sheet=
+      data.Sheets[
+        data.SheetNames[0]
+      ];
+
+
+    const rawRows=
+      XLSX.utils.sheet_to_json(
+        sheet,
+        {
+          defval:'',
+          raw:false
+        }
+      );
+
+
+    if(!rawRows.length)
+      return msg(
+        'qmsg',
+        'ফাইলে কোনো data row পাওয়া যায়নি',
+        true
+      );
+
+
+    const missing=
+      validateImportHeaders(rawRows);
+
+
+    if(missing.length){
+
+      return msg(
+        'qmsg',
+        'Excel header ঠিক নয়। প্রয়োজন: '+
+        missing.join(', ')+
+        '। Built-in Template ব্যবহার করুন।',
+        true
+      );
+    }
+
+
+    importData=
+      normalizeImportRows(rawRows);
+
+
+    const invalid=[];
+
+
+    importData.forEach((r,i)=>{
+
+      const required=[
+        'question',
+        'option_a',
+        'option_b',
+        'option_c',
+        'option_d',
+        'correct_answer'
+      ];
+
+
+      const missingRow=
+        required.filter(
+          key=>
+            String(r[key]??'').trim()===''
+        );
+
+
+      if(missingRow.length){
+
+        invalid.push(
+          `Row ${i+2}: ${missingRow.join(', ')} আবশ্যক`
+        );
+
+        return;
+      }
+
+
+      const answer=
+        normalizeCorrectAnswer(
+          r.correct_answer
+        );
+
+
+      if(!['A','B','C','D'].includes(answer)){
+
+        invalid.push(
+          `Row ${i+2}: correct_answer অবশ্যই A/B/C/D অথবা ক/খ/গ/ঘ হতে হবে`
+        );
+      }
+
+    });
+
+
+    if(invalid.length){
+
+      $('preview').innerHTML=
+        `<div class="q">
+          <b>Import-এর আগে নিচের সমস্যা ঠিক করুন:</b>
+          <div style="margin-top:8px">
+            ${invalid.map(esc).join('<br>')}
+          </div>
+        </div>`;
+
+
+      $('importBtn')
+        .classList
+        .add('hidden');
+
+
+      return msg(
+        'qmsg',
+        `${bn(invalid.length)}টি row-তে সমস্যা আছে`,
+        true
+      );
+    }
+
+
+    importData=
+      importData.map(r=>({
+
+        ...r,
+
+        correct_answer:
+          normalizeCorrectAnswer(
+            r.correct_answer
+          )
+
+      }));
+
+
+    $('preview').innerHTML=`
+
+      <div class="q">
+
+        <b>
+          ✅ ${bn(importData.length)}টি row প্রস্তুত
+        </b>
+
+        <div
+          class="small"
+          style="margin-top:6px"
+        >
+          Excel header স্বয়ংক্রিয়ভাবে চিনে নেওয়া হয়েছে।
+          A/B/C/D এবং ক/খ/গ/ঘ উভয় correct answer গ্রহণ করা হবে।
+        </div>
+
+        <pre>${esc(
+          JSON.stringify(
+            importData.slice(0,5),
+            null,
+            2
+          )
+        )}</pre>
+
+      </div>
+
+    `;
+
+
+    $('importBtn')
+      .classList
+      .remove('hidden');
+
+
+    msg(
+      'qmsg',
+      '✅ Preview প্রস্তুত হয়েছে — এখন Import করা যাবে'
+    );
+
+
+  }catch(error){
+
+    console.error(
+      'Import preview error:',
+      error
+    );
+
+
+    $('importBtn')
+      ?.classList
+      .add('hidden');
+
+
+    msg(
+      'qmsg',
+      'Excel/CSV পড়তে সমস্যা হয়েছে: '+
+      (error?.message||error),
+      true
+    );
+  }
 }
 
+
+/* =========================
+   NORMALIZE
+========================= */
 
 function norm(v){
   return String(v??'')
@@ -655,10 +1124,23 @@ function norm(v){
 }
 
 
+/* =========================
+   IMPORT ROWS
+========================= */
+
 async function importRows(){
+
+  if(!importData.length)
+    return msg(
+      'qmsg',
+      'আগে একটি valid Excel/CSV Preview করুন',
+      true
+    );
+
 
   let ok=0,
       fail=[];
+
 
   for(
     let i=0;
@@ -668,54 +1150,99 @@ async function importRows(){
 
     const r=importData[i];
 
-    const category=
-      Object.values(CATS)
-        .includes(
-          String(r.category||'').trim()
-        )
-        ? String(r.category).trim()
-        : CATS[cat];
 
-    const folderName=
-      String(r.folder||'').trim();
+    /* =========================
+       REQUIRED DATA
+    ========================= */
 
-    const setName=
-      String(r.set||'').trim();
+    const required=[
+      'question',
+      'option_a',
+      'option_b',
+      'option_c',
+      'option_d',
+      'correct_answer'
+    ];
 
 
-    if(
-      !r.question||
-      !r.option_a||
-      !r.option_b||
-      !r.option_c||
-      !r.option_d||
-      !r.correct_answer
-    ){
+    const missing=
+      required.filter(
+        key=>
+          String(r[key]??'').trim()===''
+      );
+
+
+    if(missing.length){
 
       fail.push(
-        `Row ${i+2}: question, option_a, option_b, option_c, option_d ও correct_answer আবশ্যক`
+        `Row ${i+2}: ${missing.join(', ')} আবশ্যক`
       );
 
       continue;
     }
 
 
-    let fid=null,
-        sid=null;
+    const correct=
+      normalizeCorrectAnswer(
+        r.correct_answer
+      );
+
+
+    if(!['A','B','C','D'].includes(correct)){
+
+      fail.push(
+        `Row ${i+2}: correct_answer ভুল — ${r.correct_answer}`
+      );
+
+      continue;
+    }
+
+
+    /* =========================
+       CATEGORY
+    ========================= */
+
+    const suppliedCategory=
+      String(
+        r.category||''
+      ).trim();
+
+
+    const category=
+      Object.values(CATS)
+        .includes(suppliedCategory)
+        ? suppliedCategory
+        : CATS[cat];
 
 
     /* =========================
        FOLDER
     ========================= */
 
+    const folderName=
+      String(
+        r.folder||''
+      ).trim();
+
+
+    let fid=null;
+
+
     if(folderName){
 
       const fr=await db
         .from('question_bank_folders')
-        .select('id')
-        .eq('sub_category',category)
-        .eq('folder_name',folderName)
+        .select('id,sub_category')
+        .eq(
+          'sub_category',
+          category
+        )
+        .eq(
+          'folder_name',
+          folderName
+        )
         .maybeSingle();
+
 
       if(fr.error){
 
@@ -726,7 +1253,11 @@ async function importRows(){
         continue;
       }
 
-      fid=fr.data?.id||null;
+
+      fid=
+        fr.data?.id||
+        null;
+
 
       if(!fid){
 
@@ -739,14 +1270,16 @@ async function importRows(){
           .select('id')
           .single();
 
+
         if(x.error){
 
           fail.push(
-            `Row ${i+2}: ${x.error.message}`
+            `Row ${i+2}: Folder তৈরি হয়নি — ${x.error.message}`
           );
 
           continue;
         }
+
 
         fid=x.data.id;
       }
@@ -758,13 +1291,20 @@ async function importRows(){
           $('folder')?.value||0
         );
 
+
       if(selectedFolder){
 
         const check=await db
           .from('question_bank_folders')
-          .select('id,sub_category')
-          .eq('id',selectedFolder)
+          .select(
+            'id,sub_category'
+          )
+          .eq(
+            'id',
+            selectedFolder
+          )
           .maybeSingle();
+
 
         if(check.error){
 
@@ -775,11 +1315,22 @@ async function importRows(){
           continue;
         }
 
+
         if(
           check.data &&
           check.data.sub_category===category
-        )
+        ){
+
           fid=check.data.id;
+
+        }else{
+
+          fail.push(
+            `Row ${i+2}: নির্বাচিত Folder এই Category-এর নয়`
+          );
+
+          continue;
+        }
       }
     }
 
@@ -787,6 +1338,15 @@ async function importRows(){
     /* =========================
        SET
     ========================= */
+
+    const setName=
+      String(
+        r.set||''
+      ).trim();
+
+
+    let sid=null;
+
 
     if(setName){
 
@@ -799,12 +1359,20 @@ async function importRows(){
         continue;
       }
 
+
       const sr=await db
         .from('question_bank_sets')
         .select('id')
-        .eq('folder_id',fid)
-        .eq('set_name',setName)
+        .eq(
+          'folder_id',
+          fid
+        )
+        .eq(
+          'set_name',
+          setName
+        )
         .maybeSingle();
+
 
       if(sr.error){
 
@@ -815,7 +1383,11 @@ async function importRows(){
         continue;
       }
 
-      sid=sr.data?.id||null;
+
+      sid=
+        sr.data?.id||
+        null;
+
 
       if(!sid){
 
@@ -828,38 +1400,67 @@ async function importRows(){
           .select('id')
           .single();
 
+
         if(x.error){
 
           fail.push(
-            `Row ${i+2}: ${x.error.message}`
+            `Row ${i+2}: Set তৈরি হয়নি — ${x.error.message}`
           );
 
           continue;
         }
 
+
         sid=x.data.id;
       }
 
-    }else if(fid){
+    }else{
 
       const selectedSet=
         Number(
           $('set')?.value||0
         );
 
+
       if(selectedSet){
 
         const sr=await db
           .from('question_bank_sets')
-          .select('id,folder_id')
-          .eq('id',selectedSet)
+          .select(
+            'id,folder_id'
+          )
+          .eq(
+            'id',
+            selectedSet
+          )
           .maybeSingle();
+
+
+        if(sr.error){
+
+          fail.push(
+            `Row ${i+2}: ${sr.error.message}`
+          );
+
+          continue;
+        }
+
 
         if(
           sr.data &&
           Number(sr.data.folder_id)===Number(fid)
-        )
+        ){
+
           sid=sr.data.id;
+
+        }else{
+
+          fail.push(
+            `Row ${i+2}: নির্বাচিত Set এই Folder-এর নয়`
+          );
+
+          continue;
+        }
       }
     }
 
@@ -870,16 +1471,30 @@ async function importRows(){
 
     let sub=null;
 
-    if(r.subject){
+
+    if(
+      String(
+        r.subject||''
+      ).trim()
+    ){
+
+      const subjectName=
+        String(
+          r.subject
+        ).trim();
+
 
       sub=subjects.find(
-        x=>norm(x.name)===norm(r.subject)
+        x=>
+          norm(x.name)===
+          norm(subjectName)
       );
+
 
       if(!sub){
 
         fail.push(
-          `Row ${i+2}: Subject পাওয়া যায়নি: ${r.subject}`
+          `Row ${i+2}: Subject পাওয়া যায়নি: ${subjectName}`
         );
 
         continue;
@@ -887,49 +1502,134 @@ async function importRows(){
     }
 
 
+    /* =========================
+       QUESTION PAYLOAD
+    ========================= */
+
+    const questionNumber=
+      String(
+        r.question_number??''
+      ).trim();
+
+
+    let qNumber=null;
+
+
+    if(questionNumber){
+
+      const parsed=
+        Number(
+          questionNumber
+            .replace(/[^\d০-৯]/g,'')
+            .replace(
+              /[০-৯]/g,
+              d=>'০১২৩৪৫৬৭৮৯'.indexOf(d)
+            )
+        );
+
+
+      qNumber=
+        Number.isFinite(parsed)
+          ? parsed
+          : null;
+    }
+
+
     const p={
+
       folder_id:fid,
+
       set_id:sid,
-      subject_id:sub?.id||null,
-      category,
+
+      subject_id:
+        sub?.id||
+        null,
+
+      category:
+
+        category,
+
       source_name:
-        String(r.source||'').trim()||null,
-      source_type:cat,
+
+        String(
+          r.source||''
+        ).trim()||
+        null,
+
+      source_type:
+
+        Object.keys(CATS)
+          .find(
+            k=>CATS[k]===category
+          )||
+        cat,
+
       question_number:
-        r.question_number
-          ? Number(r.question_number)
-          : null,
+
+        qNumber,
+
       question_text:
-        String(r.question).trim(),
+
+        String(
+          r.question
+        ).trim(),
+
       option_a:
-        String(r.option_a).trim(),
+
+        String(
+          r.option_a
+        ).trim(),
+
       option_b:
-        String(r.option_b).trim(),
+
+        String(
+          r.option_b
+        ).trim(),
+
       option_c:
-        String(r.option_c).trim(),
+
+        String(
+          r.option_c
+        ).trim(),
+
       option_d:
-        String(r.option_d).trim(),
+
+        String(
+          r.option_d
+        ).trim(),
+
       correct_answer:
-        String(r.correct_answer)
-          .trim()
-          .toUpperCase(),
+
+        correct,
+
       explanation:
-        String(r.explanation||'')
-          .trim()||null
+
+        String(
+          r.explanation||''
+        ).trim()||
+        null
     };
 
+
+    /* =========================
+       INSERT
+    ========================= */
 
     const x=await db
       .from('questions')
       .insert(p);
 
 
-    if(x.error)
+    if(x.error){
+
       fail.push(
         `Row ${i+2}: ${x.error.message}`
       );
-    else
+
+    }else{
+
       ok++;
+    }
   }
 
 
@@ -944,11 +1644,30 @@ async function importRows(){
   );
 
 
-  if(fail.length)
-    $('preview').innerHTML+=
-      '<div class="q">'+
-      fail.map(esc).join('<br>')+
-      '</div>';
+  if(fail.length){
+
+    $('preview').innerHTML+=`
+
+      <div
+        class="q"
+        style="
+          margin-top:10px;
+          color:#b91c1c;
+        "
+      >
+
+        <b>
+          যেসব Row Import হয়নি:
+        </b>
+
+        <div style="margin-top:8px">
+          ${fail.map(esc).join('<br>')}
+        </div>
+
+      </div>
+
+    `;
+  }
 
 
   await loadQuestions();
@@ -2166,7 +2885,9 @@ async function editQuestion(id){
     data.option_d||'';
 
   $('smartEditCorrect').value=
-    data.correct_answer||'A';
+    normalizeCorrectAnswer(
+      data.correct_answer||'A'
+    );
 
   $('smartEditQno').value=
     data.question_number??'';
@@ -2270,7 +2991,9 @@ async function saveSmartEditedQuestion(){
       .trim();
 
   const correct=
-    $('smartEditCorrect').value;
+    normalizeCorrectAnswer(
+      $('smartEditCorrect').value
+    );
 
 
   if(
@@ -2609,7 +3332,9 @@ async function loadQuestions(){
                   C:'গ',
                   D:'ঘ'
                 })[
-                  x.correct_answer
+                  normalizeCorrectAnswer(
+                    x.correct_answer
+                  )
                 ]||
                 x.correct_answer
               )}
@@ -2736,16 +3461,7 @@ async function loadQuestions(){
       : 'কোনো প্রশ্ন নেই';
 
 
-  /* =========================
-     MOVE BOX
-  ========================= */
-
   setupQuestionMoveUI();
-
-
-  /* =========================
-     COUNT
-  ========================= */
 
   updateBankSelectedCount();
 }
