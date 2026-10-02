@@ -18,10 +18,10 @@ async function createFolder(){const name=$('newFolder').value.trim();if(!name)re
 async function createSet(){const folderId=$('folder').value,name=$('newSet').value.trim();if(!folderId)return msg('folderMsg','আগে Folder নির্বাচন করুন',true);if(!name)return msg('folderMsg','Set-এর নাম দিন',true);const{data,error}=await db.from('question_bank_sets').insert({folder_id:Number(folderId),set_name:name}).select('id,set_name').single();if(error)return msg('folderMsg',error.message,true);$('newSet').value='';await loadSets();$('set').value=data.id;msg('folderMsg','✅ Set তৈরি হয়েছে')}
 async function addManual(){const folderId=$('folder').value,setId=$('set').value,subjectId=$('subject').value,text=$('qtext').value.trim(),a=$('a').value.trim(),b=$('b').value.trim(),c=$('c').value.trim(),d=$('d').value.trim(),correct=$('correct').value;if(!folderId||!setId)return msg('qmsg','Category, Folder ও Set নির্বাচন করুন',true);if(!subjectId||!text||!a||!b||!c||!d||!correct)return msg('qmsg','বিষয়, প্রশ্ন, চার অপশন ও সঠিক উত্তর পূরণ করুন',true);const p={folder_id:Number(folderId),set_id:Number(setId),subject_id:Number(subjectId),question_text:text,option_a:a,option_b:b,option_c:c,option_d:d,correct_answer:correct,explanation:$('explanation').value.trim()||null,question_number:$('qno').value?Number($('qno').value):null,category:CATS[cat],source_name:$('source').value.trim()||null,source_type:cat};const{error}=await db.from('questions').insert(p);if(error)return msg('qmsg',error.message,true);['qno','source','qtext','a','b','c','d','explanation'].forEach(x=>$(x).value='');$('correct').value='';msg('qmsg','✅ প্রশ্ন Question Bank-এ যোগ হয়েছে');await loadQuestions()}
 function mode(m){$('manualBox').classList.toggle('hidden',m!=='manual');$('importBox').classList.toggle('hidden',m!=='import')}
-function template(){const rows=[['category','folder','set','subject','source','question_number','question','option_a','option_b','option_c','option_d','correct_answer','explanation'],['যাচাই পরীক্ষা','বাংলাদেশ','সেট-১','বাংলাদেশ','বিসিএস',1,'বাংলাদেশের রাজধানী কোনটি?','ঢাকা','চট্টগ্রাম','রাজশাহী','খুলনা','A','']];const ws=XLSX.utils.aoa_to_sheet(rows),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Questions');XLSX.writeFile(wb,'question-import-template.xlsx')}
+function template(){const selectedName=id=>{const el=$(id);if(!el||!el.value)return '';return String(el.selectedOptions?.[0]?.textContent||'').trim()};const rows=[['category','folder','set','subject','question_number','question','option_a','option_b','option_c','option_d','correct_answer','explanation'],[CATS[cat],selectedName('folder'),selectedName('set'),selectedName('subject'),1,'বাংলাদেশের রাজধানী কোনটি?','ঢাকা','চট্টগ্রাম','রাজশাহী','খুলনা','A','']];const ws=XLSX.utils.aoa_to_sheet(rows),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Questions');XLSX.writeFile(wb,'question-import-template.xlsx')}
 const IMPORT_REQUIRED_HEADERS=['question','option_a','option_b','option_c','option_d','correct_answer'];
 const IMPORT_HEADER_ALIASES={
- category:['category','cat','বিভাগ','ক্যাটাগরি'],folder:['folder','folder_name','foldername','ফোল্ডার'],set:['set','set_name','setname','সেট'],subject:['subject','subject_name','বিষয়','বিষয়'],source:['source','source_name','উৎস'],question_number:['question_number','questionnumber','question_no','questionno','qno','number','ক্রমিক','প্রশ্ন_নম্বর','প্রশ্ন_নং'],question:['question','questions','question_text','questiontext','প্রশ্ন'],option_a:['option_a','optiona','option_1','option1','a','ক','অপশন_ক'],option_b:['option_b','optionb','option_2','option2','b','খ','অপশন_খ'],option_c:['option_c','optionc','option_3','option3','c','গ','অপশন_গ'],option_d:['option_d','optiond','option_4','option4','d','ঘ','অপশন_ঘ'],correct_answer:['correct_answer','correctanswer','correct','answer','right_answer','correct_option','correctoption','সঠিক_উত্তর','উত্তর'],explanation:['explanation','ব্যাখ্যা']
+ category:['category','cat','বিভাগ','ক্যাটাগরি'],folder:['folder','folder_name','foldername','ফোল্ডার'],set:['set','set_name','setname','সেট'],subject:['subject','subject_name','বিষয়','বিষয়'],question_number:['question_number','questionnumber','question_no','questionno','qno','number','ক্রমিক','প্রশ্ন_নম্বর','প্রশ্ন_নং'],question:['question','questions','question_text','questiontext','প্রশ্ন'],option_a:['option_a','optiona','option_1','option1','a','ক','অপশন_ক'],option_b:['option_b','optionb','option_2','option2','b','খ','অপশন_খ'],option_c:['option_c','optionc','option_3','option3','c','গ','অপশন_গ'],option_d:['option_d','optiond','option_4','option4','d','ঘ','অপশন_ঘ'],correct_answer:['correct_answer','correctanswer','correct','answer','right_answer','correct_option','correctoption','সঠিক_উত্তর','উত্তর'],explanation:['explanation','ব্যাখ্যা']
 };
 const IMPORT_HEADER_LOOKUP={};
 Object.entries(IMPORT_HEADER_ALIASES).forEach(([k,vs])=>vs.forEach(v=>{const n=normalizeImportHeader(v);if(n)IMPORT_HEADER_LOOKUP[n]=k}));
@@ -54,14 +54,113 @@ async function previewImport(){
  try{
   const data=XLSX.read(await f.arrayBuffer(),{type:'array'}),sheet=data.Sheets[data.SheetNames[0]],parsed=parseImportSheet(sheet);
   if(parsed.error)return msg('qmsg',parsed.error,true);
-  const rows=parsed.rows.map(r=>({...r,category:String(r.category||CATS[cat]).trim(),folder:String(r.folder||'').trim(),set:String(r.set||'').trim(),subject:String(r.subject||'').trim(),source:String(r.source||'').trim(),question_number:String(r.question_number||'').trim(),question:String(r.question||'').trim(),option_a:String(r.option_a||'').trim(),option_b:String(r.option_b||'').trim(),option_c:String(r.option_c||'').trim(),option_d:String(r.option_d||'').trim(),correct_answer:parseImportCorrect(r.correct_answer),explanation:String(r.explanation||'').trim()}));
+  const rows=parsed.rows.map(r=>({...r,category:String(r.category||CATS[cat]).trim(),folder:String(r.folder||'').trim(),set:String(r.set||'').trim(),subject:String(r.subject||'').trim(),question_number:String(r.question_number||'').trim(),question:String(r.question||'').trim(),option_a:String(r.option_a||'').trim(),option_b:String(r.option_b||'').trim(),option_c:String(r.option_c||'').trim(),option_d:String(r.option_d||'').trim(),correct_answer:parseImportCorrect(r.correct_answer),explanation:String(r.explanation||'').trim()}));
   const bad=rows.filter(r=>!r.question||!r.option_a||!r.option_b||!r.option_c||!r.option_d||!['A','B','C','D'].includes(r.correct_answer));
   importData=rows;
   $('preview').innerHTML=`<div class="q"><b>${bn(rows.length)}টি row পাওয়া গেছে</b>${bad.length?`<br><span class="small">${bn(bad.length)}টি row-তে required data/answer সমস্যা আছে</span>`:''}<pre>${esc(JSON.stringify(rows.slice(0,5),null,2))}</pre></div>`;
   $('importBtn').classList.remove('hidden');msg('qmsg','Preview প্রস্তুত হয়েছে');
  }catch(e){msg('qmsg','Excel/CSV পড়তে সমস্যা: '+e.message,true)}
 }
-async function importRows(){let ok=0,fail=[];for(let i=0;i<importData.length;i++){const r=importData[i],category=Object.values(CATS).includes(String(r.category).trim())?String(r.category).trim():CATS[cat],folderName=String(r.folder||'').trim(),setName=String(r.set||'').trim();if(!folderName||!setName||!r.question||!r.option_a||!r.option_b||!r.option_c||!r.option_d||!r.correct_answer){fail.push(`Row ${i+2}: required field missing`);continue}let fr=await db.from('question_bank_folders').select('id').eq('sub_category',category).eq('folder_name',folderName).maybeSingle();if(fr.error){fail.push(`Row ${i+2}: ${fr.error.message}`);continue}let fid=fr.data?.id;if(!fid){const x=await db.from('question_bank_folders').insert({sub_category:category,folder_name:folderName}).select('id').single();if(x.error){fail.push(`Row ${i+2}: ${x.error.message}`);continue}fid=x.data.id}const sr=await db.from('question_bank_sets').select('id').eq('folder_id',fid).eq('set_name',setName).maybeSingle();let sid=sr.data?.id;if(!sid){const x=await db.from('question_bank_sets').insert({folder_id:fid,set_name:setName}).select('id').single();if(x.error){fail.push(`Row ${i+2}: ${x.error.message}`);continue}sid=x.data.id}let sub=null;if(r.subject){sub=subjects.find(x=>norm(x.name)===norm(r.subject));if(!sub){fail.push(`Row ${i+2}: Subject পাওয়া যায়নি: ${r.subject}`);continue}}const p={folder_id:fid,set_id:sid,subject_id:sub?.id||null,category,source_name:String(r.source||'').trim()||null,source_type:cat,question_number:r.question_number?Number(r.question_number):null,question_text:String(r.question).trim(),option_a:String(r.option_a).trim(),option_b:String(r.option_b).trim(),option_c:String(r.option_c).trim(),option_d:String(r.option_d).trim(),correct_answer:String(r.correct_answer).trim().toUpperCase(),explanation:String(r.explanation||'').trim()||null};const x=await db.from('questions').insert(p);if(x.error)fail.push(`Row ${i+2}: ${x.error.message}`);else ok++}msg('qmsg',`✅ ${bn(ok)}টি Import হয়েছে${fail.length?` | ❌ ${bn(fail.length)}টি ব্যর্থ`:''}`,!!fail.length);if(fail.length)$('preview').innerHTML+='<div class="q">'+fail.map(esc).join('<br>')+'</div>';await loadQuestions()}
+async function importRows(){
+ let ok=0,fail=[];
+ const selectedFolderId=Number($('folder')?.value||0)||null;
+ const selectedSetId=Number($('set')?.value||0)||null;
+ let selectedFolderMeta=null,selectedSetMeta=null;
+
+ for(let i=0;i<importData.length;i++){
+  const r=importData[i];
+  const category=Object.values(CATS).includes(String(r.category).trim())?String(r.category).trim():CATS[cat];
+  const folderName=String(r.folder||'').trim();
+  const setName=String(r.set||'').trim();
+
+  if(!r.question||!r.option_a||!r.option_b||!r.option_c||!r.option_d||!r.correct_answer){
+   fail.push(`Row ${i+2}: required field missing`);
+   continue;
+  }
+
+  let fid=null,sid=null;
+
+  if(folderName){
+   const fr=await db.from('question_bank_folders').select('id').eq('sub_category',category).eq('folder_name',folderName).maybeSingle();
+   if(fr.error){fail.push(`Row ${i+2}: ${fr.error.message}`);continue}
+   fid=fr.data?.id;
+   if(!fid){
+    const x=await db.from('question_bank_folders').insert({sub_category:category,folder_name:folderName}).select('id').single();
+    if(x.error){fail.push(`Row ${i+2}: ${x.error.message}`);continue}
+    fid=x.data.id;
+   }
+  }else if(selectedFolderId){
+   if(!selectedFolderMeta){
+    const fr=await db.from('question_bank_folders').select('id,sub_category').eq('id',selectedFolderId).maybeSingle();
+    if(fr.error){fail.push(`Row ${i+2}: ${fr.error.message}`);continue}
+    selectedFolderMeta=fr.data;
+   }
+   if(!selectedFolderMeta||selectedFolderMeta.sub_category!==category){
+    fail.push(`Row ${i+2}: নির্বাচিত Folder বর্তমান Category-এর সাথে মেলে না`);
+    continue;
+   }
+   fid=selectedFolderMeta.id;
+  }else{
+   fail.push(`Row ${i+2}: Folder দেওয়া নেই। Import-এর আগে Folder নির্বাচন করুন`);
+   continue;
+  }
+
+  if(setName){
+   const sr=await db.from('question_bank_sets').select('id').eq('folder_id',fid).eq('set_name',setName).maybeSingle();
+   if(sr.error){fail.push(`Row ${i+2}: ${sr.error.message}`);continue}
+   sid=sr.data?.id;
+   if(!sid){
+    const x=await db.from('question_bank_sets').insert({folder_id:fid,set_name:setName}).select('id').single();
+    if(x.error){fail.push(`Row ${i+2}: ${x.error.message}`);continue}
+    sid=x.data.id;
+   }
+  }else if(selectedSetId){
+   if(!selectedSetMeta){
+    const sr=await db.from('question_bank_sets').select('id,folder_id').eq('id',selectedSetId).maybeSingle();
+    if(sr.error){fail.push(`Row ${i+2}: ${sr.error.message}`);continue}
+    selectedSetMeta=sr.data;
+   }
+   if(!selectedSetMeta||Number(selectedSetMeta.folder_id)!==Number(fid)){
+    fail.push(`Row ${i+2}: নির্বাচিত Set নির্বাচিত Folder-এর সাথে মেলে না`);
+    continue;
+   }
+   sid=selectedSetMeta.id;
+  }else{
+   fail.push(`Row ${i+2}: Set দেওয়া নেই। Import-এর আগে Set নির্বাচন করুন`);
+   continue;
+  }
+
+  let sub=null;
+  if(r.subject){
+   sub=subjects.find(x=>norm(x.name)===norm(r.subject));
+   if(!sub){fail.push(`Row ${i+2}: Subject পাওয়া যায়নি: ${r.subject}`);continue}
+  }
+
+  const p={
+   folder_id:fid,
+   set_id:sid,
+   subject_id:sub?.id||null,
+   category,
+   source_type:cat,
+   question_number:r.question_number?Number(r.question_number):null,
+   question_text:String(r.question).trim(),
+   option_a:String(r.option_a).trim(),
+   option_b:String(r.option_b).trim(),
+   option_c:String(r.option_c).trim(),
+   option_d:String(r.option_d).trim(),
+   correct_answer:String(r.correct_answer).trim().toUpperCase(),
+   explanation:String(r.explanation||'').trim()||null
+  };
+
+  const x=await db.from('questions').insert(p);
+  if(x.error)fail.push(`Row ${i+2}: ${x.error.message}`);
+  else ok++;
+ }
+
+ msg('qmsg',`✅ ${bn(ok)}টি Import হয়েছে${fail.length?` | ❌ ${bn(fail.length)}টি ব্যর্থ`:''}`,!!fail.length);
+ if(fail.length)$('preview').innerHTML+='<div class="q">'+fail.map(esc).join('<br>')+'</div>';
+ await loadQuestions();
+}
 async function loadQuestions(){let q=db.from('questions').select('id,question_text,option_a,option_b,option_c,option_d,correct_answer,question_number,category,folder_id,set_id,subjects(name)').order('id',{ascending:false}).limit(200);if($('filterFolder').value)q=q.eq('folder_id',Number($('filterFolder').value));if($('filterSet').value)q=q.eq('set_id',Number($('filterSet').value));if($('filterSubject').value)q=q.eq('subject_id',Number($('filterSubject').value));const term=$('search').value.trim();if(term)q=q.ilike('question_text','%'+term+'%');const{data,error}=await q;if(error)return msg('qmsg',error.message,true);$('questions').innerHTML=(data||[]).map(x=>`<div class="q"><b>${bn(x.question_number||'')}. ${esc(x.question_text)}</b><div>ক. ${esc(x.option_a)}<br>খ. ${esc(x.option_b)}<br>গ. ${esc(x.option_c)}<br>ঘ. ${esc(x.option_d)}</div><div class="small">${esc(x.category)} · ${esc(x.subjects?.name||'')} · সঠিক: ${esc(({A:'ক',B:'খ',C:'গ',D:'ঘ'})[x.correct_answer]||x.correct_answer)}</div></div>`).join('')||'কোনো প্রশ্ন নেই'}
 async function createExam(){const name=$('examName').value.trim();if(!name)return msg('examMsg','পরীক্ষার নাম দিন',true);const{data,error}=await db.from('exams').insert({exam_name:name,status:$('examStatus').value,total_questions:0,marks_per_question:1,negative_mark:0,pass_mark:0}).select('id').single();if(error)return msg('examMsg',error.message,true);const s=await db.from('exam_settings').upsert({exam_id:data.id,total_questions:0,total_marks:0,pass_mark:0,duration_minutes:20,marks_per_question:1,negative_mark:0,show_answers:false,multiple_attempts:false,device_attempt_protection:true,random_questions:false,random_options:false},{onConflict:'exam_id'});if(s.error)return msg('examMsg',s.error.message,true);$('examName').value='';msg('examMsg','✅ Exam তৈরি হয়েছে');await loadExams();$('examSelect').value=data.id;loadSettings()}
 async function loadExams(){const{data,error}=await db.from('exams').select('id,exam_name,status,total_questions,marks_per_question,negative_mark,pass_mark').order('id',{ascending:false});if(error)return msg('examMsg',error.message,true);exams=data||[];$('sExams').textContent=bn(exams.length);$('sActive').textContent=bn(exams.filter(x=>x.status==='active').length);const opt='<option value="">Exam নির্বাচন করুন</option>'+exams.map(x=>`<option value="${x.id}">${esc(x.exam_name)} (#${x.id})</option>`).join('');$('examSelect').innerHTML=opt;$('mapExam').innerHTML=opt;$('exams').innerHTML=exams.map(x=>`<div class="examrow"><b>${esc(x.exam_name)}</b> · ${esc(x.status)} · ${bn(x.total_questions||0)} প্রশ্ন<br><span class="link">${location.origin}${location.pathname.replace(/\/[^/]*$/,'/../')}?exam=${x.id}</span><br><button onclick="copyLink(${x.id})">🔗 Exam Link কপি</button><button class="secondary" onclick="activate(${x.id},'${x.status==='active'?'inactive':'active'}')">${x.status==='active'?'Inactive':'Active'}</button></div>`).join('');const count=await db.from('questions').select('id',{count:'exact',head:true});$('sQuestions').textContent=bn(count.count||0)}
