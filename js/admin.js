@@ -1,219 +1,46 @@
-/*
-  ফেইসবুক পাঠশালা — Admin enhancement layer
-  বর্তমান admin.html-এর বিদ্যমান Exam/Question Bank logic অক্ষুণ্ণ রেখে
-  Question Bank থেকে bulk selection + select all/deselect all যোগ করে।
-*/
-(function(){
-  "use strict";
-
-  let poolQuestions = [];
-  const poolSelected = new Set();
-
-  const bn = window.bn || function(v){
-    return String(v).replace(/\d/g,d=>"০১২৩৪৫৬৭৮৯"[d]);
-  };
-  const esc = window.esc || function(v){
-    return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
-  };
-  const SUBJECTS = window.SUBJECTS || {
-    1:"বাংলা সাহিত্য",2:"বাংলা ব্যাকরণ",3:"গণিত",4:"ইংরেজি সাহিত্য",
-    5:"ইংরেজি ব্যাকরণ",6:"বাংলাদেশ",7:"আন্তর্জাতিক",8:"বিজ্ঞান",
-    9:"কম্পিউটার ও তথ্য প্রযুক্তি",10:"ভূগোল",11:"সাম্প্রতিক প্রশ্নোত্তর"
-  };
-
-  function addStyles(){
-    if(document.getElementById("bulkPoolStyles")) return;
-    const s=document.createElement("style");
-    s.id="bulkPoolStyles";
-    s.textContent=`
-      .bulk-pool-card{margin-top:18px}
-      .bulk-pool-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}
-      .bulk-pool-tools .btn{padding:9px 12px}
-      .bulk-pool-count{font-weight:700;color:#334155}
-      .bulk-pool-item{border:1px solid #e2e8f0;border-radius:12px;padding:12px;margin:8px 0;background:#fff}
-      .bulk-pool-item label{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
-      .bulk-pool-item input{width:auto;margin-top:4px}
-      .bulk-pool-meta{font-size:12px;color:#64748b;margin-top:5px}
-    `;
-    document.head.appendChild(s);
-  }
-
-  function getDraft(){
-    try{return window.draft || draft;}catch(e){return null;}
-  }
-
-  function renderPool(){
-    const box=document.getElementById("bulkQuestionPool");
-    const count=document.getElementById("bulkPoolSelectedCount");
-    if(!box) return;
-    if(!poolQuestions.length){
-      box.innerHTML='<p class="muted">কোনো প্রশ্ন পাওয়া যায়নি।</p>';
-      if(count) count.textContent="নির্বাচিত: ০টি";
-      return;
-    }
-    box.innerHTML=poolQuestions.map((q,i)=>{
-      const checked=poolSelected.has(String(q.id))?"checked":"";
-      const subject=q.subject_id?SUBJECTS[q.subject_id]:"";
-      return `<div class="bulk-pool-item">
-        <label>
-          <input type="checkbox" data-pool-id="${q.id}" ${checked}>
-          <span><b>${bn(i+1)}.</b> ${esc(q.question_text)}
-          <div class="bulk-pool-meta">${esc(q.source_name||"")} ${subject?"· "+esc(subject):""}</div>
-          <div class="small">ক) ${esc(q.option_a)} · খ) ${esc(q.option_b)} · গ) ${esc(q.option_c)} · ঘ) ${esc(q.option_d)}</div>
-          </span>
-        </label>
-      </div>`;
-    }).join("");
-    box.querySelectorAll("[data-pool-id]").forEach(el=>{
-      el.addEventListener("change",()=>{
-        const id=String(el.dataset.poolId);
-        if(el.checked) poolSelected.add(id); else poolSelected.delete(id);
-        updateCount();
-      });
-    });
-    updateCount();
-  }
-
-  function updateCount(){
-    const el=document.getElementById("bulkPoolSelectedCount");
-    if(el) el.textContent=`নির্বাচিত: ${bn(poolSelected.size)}টি`;
-  }
-
-  window.loadQuestionPool=async function(){
-    const box=document.getElementById("bulkQuestionPool");
-    if(!box) return;
-    box.innerHTML='<p class="muted">প্রশ্ন লোড হচ্ছে...</p>';
-    try{
-      if(!window.client) throw new Error("Supabase client পাওয়া যায়নি।");
-      let q=client.from("questions")
-        .select("id,question_text,option_a,option_b,option_c,option_d,correct_answer,explanation,source_type,source_name,subject_id")
-        .order("id",{ascending:false}).limit(200);
-
-      const source=document.getElementById("bulkPoolSource")?.value||"";
-      const subject=document.getElementById("bulkPoolSubject")?.value||"";
-      const search=document.getElementById("bulkPoolSearch")?.value.trim()||"";
-      if(source) q=q.eq("source_type",source);
-      if(subject) q=q.eq("subject_id",Number(subject));
-
-      const {data,error}=await q;
-      if(error) throw error;
-      poolQuestions=(data||[]).filter(x=>{
-        if(!search) return true;
-        const s=search.toLowerCase();
-        return String(x.question_text||"").toLowerCase().includes(s) ||
-               String(x.source_name||"").toLowerCase().includes(s);
-      });
-      poolSelected.clear();
-      renderPool();
-    }catch(e){
-      box.innerHTML=`<div class="status error">❌ ${esc(e.message||e)}</div>`;
-    }
-  };
-
-  window.selectAllPoolQuestions=function(){
-    poolQuestions.forEach(q=>poolSelected.add(String(q.id)));
-    renderPool();
-  };
-
-  window.clearAllPoolQuestions=function(){
-    poolSelected.clear();
-    renderPool();
-  };
-
-  window.addSelectedPoolQuestions=function(){
-    const d=getDraft();
-    if(!Array.isArray(d)){
-      alert("বর্তমান Draft প্রশ্ন তালিকা পাওয়া যায়নি।");
-      return;
-    }
-    const chosen=poolQuestions.filter(q=>poolSelected.has(String(q.id)));
-    if(!chosen.length){
-      alert("আগে অন্তত একটি প্রশ্ন নির্বাচন করুন।");
-      return;
-    }
-    let added=0;
-    chosen.forEach(q=>{
-      const exists=d.some(x=>String(x.source_question_id||"")===String(q.id));
-      if(exists) return;
-      d.push({
-        source_question_id:q.id,
-        question_text:q.question_text||"",
-        option_a:q.option_a||"",
-        option_b:q.option_b||"",
-        option_c:q.option_c||"",
-        option_d:q.option_d||"",
-        correct_answer:q.correct_answer||"A",
-        explanation:q.explanation||"",
-        subject_id:q.subject_id||null
-      });
-      added++;
-    });
-    if(typeof window.renderDraft==="function") window.renderDraft();
-    else { try{renderDraft();}catch(e){} }
-    const st=document.getElementById("draftStatus");
-    if(st){
-      st.className="status success";
-      st.textContent=`${bn(added)}টি প্রশ্ন ড্রাফটে যোগ হয়েছে।`;
-    }
-    poolSelected.clear();
-    updateCount();
-  };
-
-  function injectUI(){
-    if(document.getElementById("bulkQuestionPoolCard")) return;
-    const examTab=document.getElementById("examTab");
-    if(!examTab) return;
-    const cards=examTab.querySelectorAll(".card");
-    let anchor=null;
-    cards.forEach(c=>{
-      if(!anchor && c.querySelector("#manualQuestion")) anchor=c;
-    });
-    if(!anchor) return;
-
-    const card=document.createElement("div");
-    card.id="bulkQuestionPoolCard";
-    card.className="card bulk-pool-card";
-    card.innerHTML=`
-      <h3>📚 Question Bank থেকে একসাথে প্রশ্ন নির্বাচন</h3>
-      <p class="muted">এখানে প্রশ্নগুলো একসাথে নির্বাচন করতে পারবেন। <b>সব নির্বাচন</b> / <b>সব বাতিল</b> দিয়ে দ্রুত বাছাই করুন, তারপর ড্রাফটে যোগ করুন।</p>
-      <div class="grid3">
-        <select id="bulkPoolSource">
-          <option value="">সব ক্যাটাগরি</option>
-          <option value="verification_test">যাচাই পরীক্ষা</option>
-          <option value="job_solution">জব সলিউশন</option>
-        </select>
-        <select id="bulkPoolSubject">
-          <option value="">সব বিষয়</option>
-          <option value="1">বাংলা সাহিত্য</option><option value="2">বাংলা ব্যাকরণ</option>
-          <option value="3">গণিত</option><option value="4">ইংরেজি সাহিত্য</option>
-          <option value="5">ইংরেজি ব্যাকরণ</option><option value="6">বাংলাদেশ</option>
-          <option value="7">আন্তর্জাতিক</option><option value="8">বিজ্ঞান</option>
-          <option value="9">কম্পিউটার ও তথ্য প্রযুক্তি</option><option value="10">ভূগোল</option>
-          <option value="11">সাম্প্রতিক প্রশ্নোত্তর</option>
-        </select>
-        <input id="bulkPoolSearch" placeholder="সেট/পরীক্ষার নাম বা প্রশ্ন খুঁজুন">
-      </div>
-      <div class="bulk-pool-tools">
-        <button class="btn primary" type="button" id="bulkPoolLoadBtn">🔎 প্রশ্ন দেখুন</button>
-        <button class="btn secondary" type="button" id="bulkPoolAllBtn">☑️ সব নির্বাচন</button>
-        <button class="btn secondary" type="button" id="bulkPoolNoneBtn">☐ সব বাতিল</button>
-        <button class="btn success" type="button" id="bulkPoolAddBtn">➕ নির্বাচিত প্রশ্ন ড্রাফটে যোগ করুন</button>
-        <span id="bulkPoolSelectedCount" class="bulk-pool-count">নির্বাচিত: ০টি</span>
-      </div>
-      <div id="bulkQuestionPool"><p class="muted">ফিল্টার দিয়ে “প্রশ্ন দেখুন” চাপুন।</p></div>
-    `;
-    anchor.insertAdjacentElement("afterend",card);
-    document.getElementById("bulkPoolLoadBtn").onclick=window.loadQuestionPool;
-    document.getElementById("bulkPoolAllBtn").onclick=window.selectAllPoolQuestions;
-    document.getElementById("bulkPoolNoneBtn").onclick=window.clearAllPoolQuestions;
-    document.getElementById("bulkPoolAddBtn").onclick=window.addSelectedPoolQuestions;
-  }
-
-  function boot(){
-    addStyles();
-    injectUI();
-  }
-
-  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",boot);
-  else boot();
-})();
+const CATS={recruitment:'নিয়োগ পরীক্ষা',verification_test:'যাচাই পরীক্ষা',recent:'সাম্প্রতিক প্রশ্ন'};
+let cat='verification_test',folders=[],sets=[],subjects=[],exams=[],importData=[];
+const $=id=>document.getElementById(id),bn=n=>String(n??'').replace(/\d/g,d=>'০১২৩৪৫৬৭৮৯'[d]),esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+function msg(id,t,err=false){const e=$(id);if(!e)return;e.textContent=t;e.style.color=err?'#b91c1c':'#166534'}
+async function login(){msg('loginMsg','Login হচ্ছে...');const{error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)return msg('loginMsg',error.message,true);await init()}
+async function logout(){await db.auth.signOut();location.reload()}
+function showPage(p){document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));$(p)?.classList.remove('hidden');if(p==='bank')loadBank();if(p==='exam')loadExams()}
+async function init(){const{data,error}=await db.auth.getSession();if(error)return msg('loginMsg',error.message,true);if(!data.session){$('login').classList.remove('hidden');$('app').classList.add('hidden');return}$('login').classList.add('hidden');$('app').classList.remove('hidden');const ue=$('userEmail');if(ue)ue.textContent=data.session.user.email||'';await loadSubjects();await loadBank();await loadExams();showPage('dashboard')}
+async function loadSubjects(){const s=$('subject'),f=$('filterSubject');if(!s||!f)return;s.innerHTML='<option value="">বিষয় নির্বাচন করুন</option>';f.innerHTML='<option value="">সব বিষয়</option>';const{data,error}=await db.from('subjects').select('id,name').order('id');if(error){console.error(error);s.innerHTML='<option value="">বিষয় লোড হয়নি</option>';f.innerHTML='<option value="">বিষয় লোড হয়নি</option>';return msg('qmsg','Subject লোড হয়নি: '+error.message,true)}subjects=data||[];s.innerHTML='<option value="">বিষয় নির্বাচন করুন</option>'+subjects.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('');f.innerHTML='<option value="">সব বিষয়</option>'+subjects.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('')}
+async function loadBank(){await loadFolders();await loadFilterFolders();await loadQuestions()}
+async function selectCategory(c){cat=c;document.querySelectorAll('.cats button').forEach(b=>b.classList.remove('active'));$('cat-'+c)?.classList.add('active');$('currentCat').textContent='বর্তমান Category: '+CATS[c];await loadFolders();await loadFilterFolders()}
+async function loadFolders(){const{data,error}=await db.from('question_bank_folders').select('id,folder_name').eq('sub_category',CATS[cat]).order('id');if(error)return msg('folderMsg',error.message,true);folders=data||[];$('folder').innerHTML='<option value="">Folder নির্বাচন করুন</option>'+folders.map(x=>`<option value="${x.id}">${esc(x.folder_name)}</option>`).join('');$('mapFolder').innerHTML='<option value="">Folder নির্বাচন করুন</option>'+folders.map(x=>`<option value="${x.id}">${esc(x.folder_name)}</option>`).join('');$('filterFolder').innerHTML='<option value="">সব Folder</option>'+folders.map(x=>`<option value="${x.id}">${esc(x.folder_name)}</option>`).join('');await loadSets()}
+async function loadFilterFolders(){const{data,error}=await db.from('question_bank_folders').select('id,folder_name').eq('sub_category',CATS[cat]).order('id');if(error)return; $('filterFolder').innerHTML='<option value="">সব Folder</option>'+(data||[]).map(x=>`<option value="${x.id}">${esc(x.folder_name)}</option>`).join('')}
+async function loadSets(){const id=$('folder').value;if(!id){sets=[];$('set').innerHTML='<option value="">Set নির্বাচন করুন</option>';return}const{data,error}=await db.from('question_bank_sets').select('id,set_name').eq('folder_id',Number(id)).order('id');if(error)return msg('folderMsg',error.message,true);sets=data||[];$('set').innerHTML='<option value="">Set নির্বাচন করুন</option>'+sets.map(x=>`<option value="${x.id}">${esc(x.set_name)}</option>`).join('')}
+async function loadFilterSets(){const id=$('filterFolder').value;if(!id){$('filterSet').innerHTML='<option value="">সব Set</option>';return}const{data,error}=await db.from('question_bank_sets').select('id,set_name').eq('folder_id',Number(id)).order('id');if(error)return msg('qmsg',error.message,true);$('filterSet').innerHTML='<option value="">সব Set</option>'+(data||[]).map(x=>`<option value="${x.id}">${esc(x.set_name)}</option>`).join('')}
+async function loadMapSets(){const id=$('mapFolder').value;if(!id){$('mapSet').innerHTML='<option value="">সব Set</option>';return}const{data,error}=await db.from('question_bank_sets').select('id,set_name').eq('folder_id',Number(id)).order('id');if(error)return msg('mapMsg',error.message,true);$('mapSet').innerHTML='<option value="">সব Set</option>'+(data||[]).map(x=>`<option value="${x.id}">${esc(x.set_name)}</option>`).join('')}
+async function createFolder(){const name=$('newFolder').value.trim();if(!name)return msg('folderMsg','Folder-এর নাম দিন',true);const{data,error}=await db.from('question_bank_folders').insert({sub_category:CATS[cat],folder_name:name}).select('id,folder_name').single();if(error)return msg('folderMsg',error.message,true);$('newFolder').value='';await loadFolders();$('folder').value=data.id;await loadSets();msg('folderMsg','✅ Folder তৈরি হয়েছে')}
+async function createSet(){const folderId=$('folder').value,name=$('newSet').value.trim();if(!folderId)return msg('folderMsg','আগে Folder নির্বাচন করুন',true);if(!name)return msg('folderMsg','Set-এর নাম দিন',true);const{data,error}=await db.from('question_bank_sets').insert({folder_id:Number(folderId),set_name:name}).select('id,set_name').single();if(error)return msg('folderMsg',error.message,true);$('newSet').value='';await loadSets();$('set').value=data.id;msg('folderMsg','✅ Set তৈরি হয়েছে')}
+async function addManual(){const folderId=$('folder').value,setId=$('set').value,subjectId=$('subject').value,text=$('qtext').value.trim(),a=$('a').value.trim(),b=$('b').value.trim(),c=$('c').value.trim(),d=$('d').value.trim(),correct=$('correct').value;if(!folderId||!setId)return msg('qmsg','Category, Folder ও Set নির্বাচন করুন',true);if(!subjectId||!text||!a||!b||!c||!d||!correct)return msg('qmsg','বিষয়, প্রশ্ন, চার অপশন ও সঠিক উত্তর পূরণ করুন',true);const p={folder_id:Number(folderId),set_id:Number(setId),subject_id:Number(subjectId),question_text:text,option_a:a,option_b:b,option_c:c,option_d:d,correct_answer:correct,explanation:$('explanation').value.trim()||null,question_number:$('qno').value?Number($('qno').value):null,category:CATS[cat],source_name:$('source').value.trim()||null,source_type:cat};const{error}=await db.from('questions').insert(p);if(error)return msg('qmsg',error.message,true);['qno','source','qtext','a','b','c','d','explanation'].forEach(x=>$(x).value='');$('correct').value='';msg('qmsg','✅ প্রশ্ন Question Bank-এ যোগ হয়েছে');await loadQuestions()}
+function mode(m){$('manualBox').classList.toggle('hidden',m!=='manual');$('importBox').classList.toggle('hidden',m!=='import')}
+function template(){const rows=[['question','option_a','option_b','option_c','option_d','correct_answer'],['বাংলাদেশের রাজধানী কোনটি?','ঢাকা','চট্টগ্রাম','রাজশাহী','খুলনা','A']];const ws=XLSX.utils.aoa_to_sheet(rows),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Questions');XLSX.writeFile(wb,'question-import-template.xlsx')}
+async function previewImport(){const f=$('file').files[0];if(!f)return msg('qmsg','CSV/Excel file নির্বাচন করুন',true);const data=XLSX.read(await f.arrayBuffer(),{type:'array'}),rows=XLSX.utils.sheet_to_json(data.Sheets[data.SheetNames[0]],{defval:''});importData=rows;$('preview').innerHTML=`<div class="q"><b>${bn(rows.length)}টি row পাওয়া গেছে</b><pre>${esc(JSON.stringify(rows.slice(0,5),null,2))}</pre></div>`;$('importBtn').classList.remove('hidden');msg('qmsg','Preview প্রস্তুত হয়েছে')}
+function norm(v){return String(v??'').trim().toLowerCase()}
+async function importRows(){let ok=0,fail=[];for(let i=0;i<importData.length;i++){const r=importData[i],category=Object.values(CATS).includes(String(r.category||'').trim())?String(r.category).trim():CATS[cat],folderName=String(r.folder||'').trim(),setName=String(r.set||'').trim();if(!r.question||!r.option_a||!r.option_b||!r.option_c||!r.option_d||!r.correct_answer){fail.push(`Row ${i+2}: question, option_a, option_b, option_c, option_d ও correct_answer আবশ্যক`);continue}let fid=null,sid=null;if(folderName){const fr=await db.from('question_bank_folders').select('id').eq('sub_category',category).eq('folder_name',folderName).maybeSingle();if(fr.error){fail.push(`Row ${i+2}: ${fr.error.message}`);continue}fid=fr.data?.id||null;if(!fid){const x=await db.from('question_bank_folders').insert({sub_category:category,folder_name:folderName}).select('id').single();if(x.error){fail.push(`Row ${i+2}: ${x.error.message}`);continue}fid=x.data.id}}else{const selectedFolder=Number($('folder')?.value||0);if(selectedFolder){const check=await db.from('question_bank_folders').select('id,sub_category').eq('id',selectedFolder).maybeSingle();if(check.error){fail.push(`Row ${i+2}: ${check.error.message}`);continue}if(check.data&&check.data.sub_category===category)fid=check.data.id}}if(setName){if(!fid){fail.push(`Row ${i+2}: Set দেওয়া হয়েছে, তাই Folder প্রয়োজন`);continue}const sr=await db.from('question_bank_sets').select('id').eq('folder_id',fid).eq('set_name',setName).maybeSingle();if(sr.error){fail.push(`Row ${i+2}: ${sr.error.message}`);continue}sid=sr.data?.id||null;if(!sid){const x=await db.from('question_bank_sets').insert({folder_id:fid,set_name:setName}).select('id').single();if(x.error){fail.push(`Row ${i+2}: ${x.error.message}`);continue}sid=x.data.id}}else if(fid){const selectedSet=Number($('set')?.value||0);if(selectedSet){const sr=await db.from('question_bank_sets').select('id,folder_id').eq('id',selectedSet).maybeSingle();if(sr.data&&Number(sr.data.folder_id)===Number(fid))sid=sr.data.id}}let sub=null;if(r.subject){sub=subjects.find(x=>norm(x.name)===norm(r.subject));if(!sub){fail.push(`Row ${i+2}: Subject পাওয়া যায়নি: ${r.subject}`);continue}}const p={folder_id:fid,set_id:sid,subject_id:sub?.id||null,category,source_name:String(r.source||'').trim()||null,source_type:cat,question_number:r.question_number?Number(r.question_number):null,question_text:String(r.question).trim(),option_a:String(r.option_a).trim(),option_b:String(r.option_b).trim(),option_c:String(r.option_c).trim(),option_d:String(r.option_d).trim(),correct_answer:String(r.correct_answer).trim().toUpperCase(),explanation:String(r.explanation||'').trim()||null};const x=await db.from('questions').insert(p);if(x.error)fail.push(`Row ${i+2}: ${x.error.message}`);else ok++}msg('qmsg',`✅ ${bn(ok)}টি Import হয়েছে${fail.length?` | ❌ ${bn(fail.length)}টি ব্যর্থ`:''}`,!!fail.length);if(fail.length)$('preview').innerHTML+='<div class="q">'+fail.map(esc).join('<br>')+'</div>';await loadQuestions()}
+async function createExam(){const name=$('examName').value.trim();if(!name)return msg('examMsg','পরীক্ষার নাম দিন',true);function makeISO(date,time,fallback){if(date&&time){const d=new Date(`${date}T${time}:00+06:00`);if(!Number.isNaN(d.getTime()))return d.toISOString()}return fallback}const now=new Date();const startAt=makeISO($('startDate')?.value||'',$('startTime')?.value||'',now.toISOString());const defaultEnd=new Date(now.getTime()+365*24*60*60*1000);const endAt=makeISO($('endDate')?.value||'',$('endTime')?.value||'',defaultEnd.toISOString());if(new Date(endAt)<=new Date(startAt))return msg('examMsg','End date/time অবশ্যই Start date/time-এর পরে হতে হবে',true);const{data:userData}=await db.auth.getUser();const examinerId=userData?.user?.id||null;const{data,error}=await db.from('exams').insert({exam_name:name,examiner_id:examinerId,status:$('examStatus').value,total_questions:0,marks_per_question:1,negative_mark:0,pass_mark:0,start_at:startAt,end_at:endAt,exam_token:crypto.randomUUID()}).select('id').single();if(error)return msg('examMsg',error.message,true);const s=await db.from('exam_settings').upsert({exam_id:data.id,total_questions:0,total_marks:0,pass_mark:0,duration_minutes:20,marks_per_question:1,negative_mark:0,show_answers:false,multiple_attempts:false,device_attempt_protection:true,random_questions:false,random_options:false},{onConflict:'exam_id'});if(s.error)return msg('examMsg',s.error.message,true);$('examName').value='';msg('examMsg','✅ Exam তৈরি হয়েছে');await loadExams();$('examSelect').value=data.id;await loadSettings()}
+async function loadExams(){const{data,error}=await db.from('exams').select('id,exam_name,status,total_questions,marks_per_question,negative_mark,pass_mark').order('id',{ascending:false});if(error)return msg('examMsg',error.message,true);exams=data||[];$('sExams').textContent=bn(exams.length);const active=$('sActive');if(active)active.textContent=bn(exams.filter(x=>x.status==='active').length);const opt='<option value="">Exam নির্বাচন করুন</option>'+exams.map(x=>`<option value="${x.id}">${esc(x.exam_name)} (#${x.id})</option>`).join('');$('examSelect').innerHTML=opt;$('mapExam').innerHTML=opt;$('exams').innerHTML=exams.map(x=>`<div class="examrow"><b>${esc(x.exam_name)}</b> · ${esc(x.status)} · ${bn(x.total_questions||0)} প্রশ্ন<br><span class="link">${location.origin}${location.pathname.replace(/\/[^/]*$/,'/../')}?exam=${x.id}</span><br><button onclick="copyLink(${x.id})">🔗 Exam Link কপি</button><button class="secondary" onclick="activate(${x.id},'${x.status==='active'?'inactive':'active'}')">${x.status==='active'?'Inactive':'Active'}</button></div>`).join('');const count=await db.from('questions').select('id',{count:'exact',head:true});if(!$('sQuestions'))return;$('sQuestions').textContent=bn(count.count||0)}
+async function copyLink(id){const base=new URL('../index.html',location.href).href+'?exam='+id;try{await navigator.clipboard.writeText(base);alert('Exam Link copied')}catch(_){prompt('Exam Link',base)}}
+async function activate(id,status){const{error}=await db.from('exams').update({status}).eq('id',id);if(error)return msg('examMsg',error.message,true);await loadExams()}
+async function loadSettings(){const id=$('examSelect').value;if(!id)return;const{data,error}=await db.from('exam_settings').select('*').eq('exam_id',id).maybeSingle();if(error)return msg('settingsMsg',error.message,true);const s=data||{};$('totalQ').value=s.total_questions??0;$('totalMarks').value=s.total_marks??0;$('pass').value=s.pass_mark??0;$('duration').value=s.duration_minutes??20;$('marks').value=s.marks_per_question??1;$('negative').value=s.negative_mark??0;$('examiner').value=s.examiner_name??'';$('syllabus').value=s.syllabus??'';$('showAnswers').checked=!!s.show_answers;$('multiple').checked=!!s.multiple_attempts;$('device').checked=s.device_attempt_protection!==false;$('randomQ').checked=!!s.random_questions;$('randomO').checked=!!s.random_options;$('startDate').value=s.exam_date||'';$('startTime').value=s.start_time||'';$('endDate').value=s.end_date||'';$('endTime').value=s.end_time||''}
+async function saveSettings(){const id=$('examSelect').value;if(!id)return msg('settingsMsg','Exam নির্বাচন করুন',true);const payload={exam_id:id,total_questions:Number($('totalQ').value)||0,total_marks:Number($('totalMarks').value)||0,pass_mark:Number($('pass').value)||0,duration_minutes:Number($('duration').value)||20,marks_per_question:Number($('marks').value)||1,negative_mark:Number($('negative').value)||0,examiner_name:$('examiner').value.trim()||null,syllabus:$('syllabus').value.trim()||null,show_answers:$('showAnswers').checked,multiple_attempts:$('multiple').checked,device_attempt_protection:$('device').checked,random_questions:$('randomQ').checked,random_options:$('randomO').checked,exam_date:$('startDate').value||null,start_time:$('startTime').value||null,end_date:$('endDate').value||null,end_time:$('endTime').value||null};const{error}=await db.from('exam_settings').upsert(payload,{onConflict:'exam_id'});if(error)return msg('settingsMsg',error.message,true);const e=await db.from('exams').update({total_questions:payload.total_questions,marks_per_question:payload.marks_per_question,negative_mark:payload.negative_mark,pass_mark:payload.pass_mark}).eq('id',id);if(e.error)return msg('settingsMsg',e.error.message,true);msg('settingsMsg','✅ Exam Settings সংরক্ষিত হয়েছে');await loadExams()}
+async function loadPool(){const examId=$('mapExam').value;if(!examId)return msg('mapMsg','Exam নির্বাচন করুন',true);let q=db.from('questions').select('id,question_text,category,folder_id,set_id,question_number').limit(200);if($('mapFolder').value)q=q.eq('folder_id',Number($('mapFolder').value));if($('mapSet').value)q=q.eq('set_id',Number($('mapSet').value));const{data,error}=await q;if(error)return msg('mapMsg',error.message,true);const existing=await db.from('exam_questions').select('question_id').eq('exam_id',examId);const ids=new Set((existing.data||[]).map(x=>String(x.question_id)));$('pool').innerHTML=(data||[]).map(x=>`<label class="q"><input type="checkbox" class="poolq" value="${x.id}" ${ids.has(String(x.id))?'checked':''}> ${esc(x.question_text)} <span class="small">(${esc(x.category||'')})</span></label>`).join('')+`<button onclick="saveMapping(${examId})">Exam-এ নির্বাচিত প্রশ্ন Save করুন</button>`}
+async function saveMapping(examId){const ids=[...document.querySelectorAll('.poolq:checked')].map(x=>Number(x.value));const old=await db.from('exam_questions').delete().eq('exam_id',examId);if(old.error)return msg('mapMsg',old.error.message,true);if(ids.length){const{error}=await db.from('exam_questions').insert(ids.map((id,i)=>({exam_id:examId,question_id:id,question_order:i+1})));if(error)return msg('mapMsg',error.message,true)}await db.from('exams').update({total_questions:ids.length}).eq('id',examId);await db.from('exam_settings').update({total_questions:ids.length}).eq('exam_id',examId);msg('mapMsg',`✅ ${bn(ids.length)}টি প্রশ্ন Exam-এ যুক্ত হয়েছে`);await loadExams()}
+$('folder').onchange=loadSets;$('filterFolder').onchange=async()=>{await loadFilterSets();await loadQuestions()};$('mapFolder').onchange=loadMapSets;
+selectCategory('verification_test');init();
+function ensureEditModal(){if(document.getElementById('smartEditModal'))return;const st=document.createElement('style');st.id='smartEditModalStyle';st.textContent=`.smart-modal{position:fixed;inset:0;background:rgba(15,23,42,.62);display:flex;align-items:center;justify-content:center;padding:14px;z-index:9999}.smart-modal.hidden{display:none}.smart-modal-card{background:#fff;width:min(820px,100%);max-height:94vh;overflow:auto;border-radius:18px;box-shadow:0 24px 70px rgba(0,0,0,.25);padding:18px}.smart-head{display:flex;align-items:center;gap:10px;position:sticky;top:-18px;background:#fff;padding:4px 0 12px;z-index:2;border-bottom:1px solid #e5e7eb}.smart-head h2{margin:0;font-size:20px}.smart-close{width:auto!important;min-width:90px!important;background:#64748b!important;margin-left:auto}.smart-label{display:block;font-weight:700;margin:12px 0 6px}.smart-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.smart-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:15px;position:sticky;bottom:-18px;background:#fff;padding-top:12px;border-top:1px solid #e5e7eb}.smart-actions button{width:auto;min-width:120px}.smart-msg{margin-top:8px;padding:9px;border-radius:9px}.smart-ok{background:#ecfdf3;color:#166534}.smart-err{background:#fef2f2;color:#991b1b}@media(max-width:650px){.smart-grid{grid-template-columns:1fr}.smart-modal-card{padding:14px}.smart-actions{flex-direction:column}.smart-actions button{width:100%}}`;document.head.appendChild(st);const m=document.createElement('div');m.id='smartEditModal';m.className='smart-modal hidden';m.innerHTML=`<div class="smart-modal-card" role="dialog" aria-modal="true"><div class="smart-head"><h2>✏️ প্রশ্ন Smart Edit</h2><button type="button" class="smart-close" id="smartEditClose">বন্ধ করুন</button></div><input type="hidden" id="smartEditId"><label class="smart-label">ক্যাটাগরি</label><select id="smartEditCategory"></select><div class="smart-grid"><div><label class="smart-label">Folder</label><select id="smartEditFolder"><option value="">Folder নির্বাচন করুন</option></select></div><div><label class="smart-label">Set</label><select id="smartEditSet"><option value="">Set নির্বাচন করুন</option></select></div></div><div class="smart-grid"><div><label class="smart-label">বিষয়</label><select id="smartEditSubject"><option value="">বিষয় নির্বাচন করুন</option></select></div><div><label class="smart-label">প্রশ্ন নং</label><input id="smartEditQno" type="number" min="1"></div></div><label class="smart-label">প্রশ্ন</label><textarea id="smartEditQuestion" rows="4"></textarea><div class="smart-grid"><div><label class="smart-label">ক</label><textarea id="smartEditA" rows="2"></textarea></div><div><label class="smart-label">খ</label><textarea id="smartEditB" rows="2"></textarea></div><div><label class="smart-label">গ</label><textarea id="smartEditC" rows="2"></textarea></div><div><label class="smart-label">ঘ</label><textarea id="smartEditD" rows="2"></textarea></div></div><div class="smart-grid"><div><label class="smart-label">সঠিক উত্তর</label><select id="smartEditCorrect"><option value="A">ক</option><option value="B">খ</option><option value="C">গ</option><option value="D">ঘ</option></select></div><div><label class="smart-label">Source</label><input id="smartEditSource" placeholder="যেমন: বিসিএস"></div></div><label class="smart-label">ব্যাখ্যা</label><textarea id="smartEditExplanation" rows="5" placeholder="প্রয়োজনে ব্যাখ্যা লিখুন..."></textarea><div id="smartEditMsg"></div><div class="smart-actions"><button type="button" class="secondary" id="smartEditCancel">বাতিল</button><button type="button" id="smartEditSave">💾 পরিবর্তন সংরক্ষণ</button></div></div>`;document.body.appendChild(m);const close=()=>m.classList.add('hidden');m.querySelector('#smartEditClose').onclick=close;m.querySelector('#smartEditCancel').onclick=close;m.addEventListener('click',e=>{if(e.target===m)close()});m.querySelector('#smartEditCategory').onchange=async()=>{await loadSmartEditFolders();await loadSmartEditSets()};m.querySelector('#smartEditFolder').onchange=loadSmartEditSets;m.querySelector('#smartEditSave').onclick=saveSmartEditedQuestion}
+async function loadSmartEditFolders(selected=null){const category=$('smartEditCategory').value,el=$('smartEditFolder');if(!el)return;el.innerHTML='<option value="">Folder নির্বাচন করুন</option>';if(!category)return;const{data,error}=await db.from('question_bank_folders').select('id,folder_name').eq('sub_category',category).order('id');if(error){$('smartEditMsg').innerHTML=`<div class="smart-msg smart-err">${esc(error.message)}</div>`;return}el.innerHTML+=(data||[]).map(x=>`<option value="${x.id}">${esc(x.folder_name)}</option>`).join('');if(selected!=null)el.value=String(selected)}
+async function loadSmartEditSets(selected=null){const fid=Number($('smartEditFolder').value||0),el=$('smartEditSet');el.innerHTML='<option value="">Set নির্বাচন করুন</option>';if(!fid)return;const{data,error}=await db.from('question_bank_sets').select('id,set_name').eq('folder_id',fid).order('id');if(error){$('smartEditMsg').innerHTML=`<div class="smart-msg smart-err">${esc(error.message)}</div>`;return}el.innerHTML+=(data||[]).map(x=>`<option value="${x.id}">${esc(x.set_name)}</option>`).join('');if(selected!=null)el.value=String(selected)}
+function fillSmartEditSubjects(selected=null){const el=$('smartEditSubject');el.innerHTML='<option value="">বিষয় নির্বাচন করুন</option>'+(subjects||[]).map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('');if(selected!=null)el.value=String(selected)}
+async function editQuestion(id){ensureEditModal();$('smartEditMsg').innerHTML='';const{data,error}=await db.from('questions').select('id,question_text,option_a,option_b,option_c,option_d,correct_answer,question_number,explanation,source_name,category,folder_id,set_id,subject_id').eq('id',id).maybeSingle();if(error||!data)return msg('qmsg',error?.message||'প্রশ্ন পাওয়া যায়নি',true);$('smartEditId').value=data.id;$('smartEditQuestion').value=data.question_text||'';$('smartEditA').value=data.option_a||'';$('smartEditB').value=data.option_b||'';$('smartEditC').value=data.option_c||'';$('smartEditD').value=data.option_d||'';$('smartEditCorrect').value=data.correct_answer||'A';$('smartEditQno').value=data.question_number??'';$('smartEditSource').value=data.source_name||'';$('smartEditExplanation').value=data.explanation||'';$('smartEditCategory').innerHTML=Object.entries(CATS).map(([k,v])=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');$('smartEditCategory').value=data.category||CATS[cat]||'';fillSmartEditSubjects(data.subject_id);await loadSmartEditFolders(data.folder_id);await loadSmartEditSets(data.set_id);$('smartEditModal').classList.remove('hidden');setTimeout(()=>$('smartEditQuestion').focus(),50)}
+async function saveSmartEditedQuestion(){const id=Number($('smartEditId').value),category=$('smartEditCategory').value,folderId=Number($('smartEditFolder').value||0)||null,setId=Number($('smartEditSet').value||0)||null,subjectId=Number($('smartEditSubject').value||0)||null;const question=$('smartEditQuestion').value.trim(),a=$('smartEditA').value.trim(),b=$('smartEditB').value.trim(),c=$('smartEditC').value.trim(),d=$('smartEditD').value.trim(),correct=$('smartEditCorrect').value;if(!category||!question||!a||!b||!c||!d||!correct)return $('smartEditMsg').innerHTML='<div class="smart-msg smart-err">প্রশ্ন, চারটি অপশন, সঠিক উত্তর ও ক্যাটাগরি পূরণ করুন।</div>';if(setId){const sr=await db.from('question_bank_sets').select('folder_id').eq('id',setId).maybeSingle();if(sr.error)return $('smartEditMsg').innerHTML=`<div class="smart-msg smart-err">${esc(sr.error.message)}</div>`;if(!folderId||Number(sr.data?.folder_id)!==folderId)return $('smartEditMsg').innerHTML='<div class="smart-msg smart-err">নির্বাচিত Set এই Folder-এর নয়।</div>'}if(folderId){const fr=await db.from('question_bank_folders').select('sub_category').eq('id',folderId).maybeSingle();if(fr.error)return $('smartEditMsg').innerHTML=`<div class="smart-msg smart-err">${esc(fr.error.message)}</div>`;if(fr.data?.sub_category!==category)return $('smartEditMsg').innerHTML='<div class="smart-msg smart-err">নির্বাচিত Folder এই Category-এর নয়।</div>'}const payload={category,folder_id:folderId,set_id:setId,subject_id:subjectId,question_text:question,option_a:a,option_b:b,option_c:c,option_d:d,correct_answer:correct,question_number:$('smartEditQno').value?Number($('smartEditQno').value):null,source_name:$('smartEditSource').value.trim()||null,explanation:$('smartEditExplanation').value.trim()||null,source_type:Object.keys(CATS).find(k=>CATS[k]===category)||cat};$('smartEditSave').disabled=true;$('smartEditSave').textContent='সংরক্ষণ হচ্ছে...';const{error}=await db.from('questions').update(payload).eq('id',id);$('smartEditSave').disabled=false;$('smartEditSave').textContent='💾 পরিবর্তন সংরক্ষণ';if(error)return $('smartEditMsg').innerHTML=`<div class="smart-msg smart-err">${esc(error.message)}</div>`;$('smartEditMsg').innerHTML='<div class="smart-msg smart-ok">✅ পরিবর্তন সংরক্ষণ হয়েছে</div>';await loadQuestions();setTimeout(()=>$('smartEditModal').classList.add('hidden'),450)}
+async function removeQuestion(id){if(!confirm('এই প্রশ্নটি Remove করবেন?'))return;const{error}=await db.from('questions').delete().eq('id',id);if(error)return msg('qmsg',error.message,true);msg('qmsg','✅ প্রশ্ন Remove হয়েছে');await loadQuestions()}
+async function loadQuestions(){let q=db.from('questions').select('id,question_text,option_a,option_b,option_c,option_d,correct_answer,question_number,category,folder_id,set_id,subjects(name),question_bank_folders(folder_name,sub_category),question_bank_sets(set_name)').order('id',{ascending:false}).limit(200);const ff=$('filterFolder')?.value||'',fs=$('filterSet')?.value||'',fsub=$('filterSubject')?.value||'';if(ff)q=q.eq('folder_id',Number(ff));if(fs)q=q.eq('set_id',Number(fs));if(fsub)q=q.eq('subject_id',Number(fsub));const term=$('search')?.value.trim()||'';if(term)q=q.ilike('question_text','%'+term+'%');const{data,error}=await q;if(error)return msg('qmsg',error.message,true);const subjectFiltered=!!fsub;const rows=(data||[]).map(x=>{const folder=x.question_bank_folders?.folder_name||'—',set=x.question_bank_sets?.set_name||'—',qn=x.question_number||'—',source=`${x.category||CATS[cat]} / ${folder} / ${set} / প্রশ্ন ${bn(qn)}`;return `<div class="q" id="bank-question-${x.id}"><div><input type="checkbox" class="bankQuestionCheck" value="${x.id}"> <b>${bn(x.question_number||'')}. ${esc(x.question_text)}</b></div><div>ক. ${esc(x.option_a)}<br>খ. ${esc(x.option_b)}<br>গ. ${esc(x.option_c)}<br>ঘ. ${esc(x.option_d)}</div><div class="small">${esc(x.category||'')} · ${esc(x.subjects?.name||'')} · সঠিক: ${esc(({A:'ক',B:'খ',C:'গ',D:'ঘ'})[x.correct_answer]||x.correct_answer)}</div><div class="small" style="margin-top:6px">🔗 <a href="#bank-question-${x.id}" onclick="event.preventDefault();openSourceQuestion(${x.id})">${esc(source)}</a></div>${subjectFiltered?'':`<div class="actions" style="margin-top:8px"><button class="secondary" onclick="editQuestion(${x.id})">✏️ Edit</button><button class="secondary" onclick="removeQuestion(${x.id})">🗑️ Remove</button></div>`}</div>`}).join('');$('questions').innerHTML=rows||'কোনো প্রশ্ন নেই';setupQuestionMoveUI()}
+async function openSourceQuestion(id){const{data,error}=await db.from('questions').select('id,folder_id,set_id,category').eq('id',id).maybeSingle();if(error||!data)return msg('qmsg',error?.message||'Source প্রশ্ন পাওয়া যায়নি',true);const key=Object.keys(CATS).find(k=>CATS[k]===data.category);if(key){cat=key;document.querySelectorAll('.cats button').forEach(b=>b.classList.remove('active'));$('cat-'+key)?.classList.add('active');$('currentCat').textContent='বর্তমান Category: '+CATS[key];await loadFolders();await loadFilterFolders()}$('filterFolder').value=data.folder_id||'';await loadFilterSets();$('filterSet').value=data.set_id||'';$('filterSubject').value='';if($('search'))$('search').value='';await loadQuestions();setTimeout(()=>{const el=document.getElementById('bank-question-'+id);el?.scrollIntoView({behavior:'smooth',block:'center'});el?.classList.add('source-highlight');setTimeout(()=>el?.classList.remove('source-highlight'),1800)},50)}
+async function loadMoveSets(){const fid=Number($('moveFolder')?.value||0),el=$('moveSet');if(!el)return;if(!fid){el.innerHTML='<option value="">Set নির্বাচন করুন</option>';return}const{data,error}=await db.from('question_bank_sets').select('id,set_name').eq('folder_id',fid).order('id');if(error)return msg('moveMsg',error.message,true);el.innerHTML='<option value="">Set নির্বাচন করুন</option>'+(data||[]).map(x=>`<option value="${x.id}">${esc(x.set_name)}</option>`).join('')}
+function setupQuestionMoveUI(){const host=$('questions');if(!host)return;let box=$('questionMoveBox');if(!box){box=document.createElement('div');box.id='questionMoveBox';box.className='q';host.appendChild(box)}box.innerHTML=`<div><b>📦 নির্বাচিত প্রশ্ন অন্য Folder/Set-এ Move করুন</b></div><div class="grid" style="margin-top:8px"><select id="moveFolder"><option value="">Destination Folder নির্বাচন করুন</option>${folders.map(x=>`<option value="${x.id}">${esc(x.folder_name)}</option>`).join('')}</select><select id="moveSet"><option value="">Set নির্বাচন করুন</option></select></div><div class="actions" style="margin-top:8px"><button id="selectAllQuestionsBtn" class="secondary">সব নির্বাচন</button><button id="clearAllQuestionsBtn" class="secondary">সব বাতিল</button><button id="moveSelectedBtn">📦 Move Selected Questions</button></div><div id="moveMsg" class="small"></div>`;box.querySelector('#moveFolder').onchange=loadMoveSets;box.querySelector('#selectAllQuestionsBtn').onclick=()=>document.querySelectorAll('.bankQuestionCheck').forEach(x=>x.checked=true);box.querySelector('#clearAllQuestionsBtn').onclick=()=>document.querySelectorAll('.bankQuestionCheck').forEach(x=>x.checked=false);box.querySelector('#moveSelectedBtn').onclick=moveSelectedQuestions}
+async function moveSelectedQuestions(){const ids=[...document.querySelectorAll('.bankQuestionCheck:checked')].map(x=>Number(x.value));if(!ids.length)return msg('moveMsg','আগে প্রশ্ন নির্বাচন করুন',true);const fid=Number($('moveFolder').value||0),sid=Number($('moveSet').value||0)||null;if(!fid)return msg('moveMsg','Destination Folder নির্বাচন করুন',true);if(sid){const sr=await db.from('question_bank_sets').select('id,folder_id').eq('id',sid).maybeSingle();if(sr.error)return msg('moveMsg',sr.error.message,true);if(!sr.data||Number(sr.data.folder_id)!==fid)return msg('moveMsg','নির্বাচিত Set এই Folder-এর নয়',true)}if(!confirm(`${bn(ids.length)}টি প্রশ্ন নির্বাচিত Folder/Set-এ Move করবেন?`))return;const{error}=await db.from('questions').update({folder_id:fid,set_id:sid}).in('id',ids);if(error)return msg('moveMsg',error.message,true);msg('moveMsg',`✅ ${bn(ids.length)}টি প্রশ্ন Move হয়েছে`);await loadFolders();await loadQuestions()}
