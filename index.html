@@ -69,11 +69,11 @@ async function loadExam(){
  try{
   const examId=getExamId();
   if(!examId){
-   const {data:activeExams,error}=await supabaseClient.from("exams").select("id,exam_name,status,total_questions,duration_minutes,created_at").eq("status","active").order("created_at",{ascending:false});
+   const {data:activeExams,error}=await supabaseClient.from("exams").select("id,exam_name,status,total_questions,created_at").eq("status","active").order("created_at",{ascending:false});
    if(error)throw error;
    const list=document.getElementById("examList");
    if(!activeExams?.length)throw new Error("কোনো সক্রিয় পরীক্ষা পাওয়া যায়নি।");
-   list.innerHTML=activeExams.map(e=>`<div class="exam-list-item"><h3>${escapeHtml(e.exam_name||"পরীক্ষা")}</h3><div class="meta">প্রশ্ন: ${bn(Number(e.total_questions||0))}টি${e.duration_minutes?` • সময়: ${bn(Number(e.duration_minutes))} মিনিট`:""}</div><button class="btn" onclick="selectExam(${Number(e.id)})">এই পরীক্ষা নির্বাচন করুন</button></div>`).join("");
+   list.innerHTML=activeExams.map(e=>`<div class="exam-list-item"><h3>${escapeHtml(e.exam_name||"পরীক্ষা")}</h3><div class="meta">প্রশ্ন: ${bn(Number(e.total_questions||0))}টি</div><button class="btn" onclick="selectExam(${Number(e.id)})">এই পরীক্ষা নির্বাচন করুন</button></div>`).join("");
    document.getElementById("examListPage").classList.remove("hidden");
    document.getElementById("startPage").classList.add("hidden");
    return;
@@ -86,11 +86,10 @@ async function loadExam(){
   document.getElementById("startPage").classList.remove("hidden");
   document.getElementById("examTitle").textContent=exam.exam_name||exam.title||"পরীক্ষা";
 
-  // Optional settings: the student page must still work when the optional
-  // settings table has not been created yet. The basic exam duration comes
-  // from public.exams.duration_minutes.
+  // Exam timing/settings come from public.exam_settings.
+  // public.exams does not contain duration_minutes.
   settings={
-   duration_minutes:Number(exam.duration_minutes||20),
+   duration_minutes:20,
    total_questions:0,total_marks:0,pass_mark:0,marks_per_question:1,
    negative_mark:0,show_answers:false,random_questions:false,random_options:false,
    exam_date:null,start_time:null,end_date:null,end_time:null,examiner_name:null,show_result:true,show_rank:true,thank_you_message:"পরীক্ষায় অংশগ্রহণ করার জন্য ধন্যবাদ।",facebook_page_url:"https://www.facebook.com/facebookpathshala",facebook_group_url:"https://www.facebook.com/groups/facebookpathshala",question_display_mode:"all"
