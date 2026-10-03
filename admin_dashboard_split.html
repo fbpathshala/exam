@@ -11,6 +11,10 @@
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 
 <style>
+.edit-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:14px}
+.edit-modal.hidden{display:none}
+.edit-box{background:#fff;width:min(760px,100%);max-height:92vh;overflow:auto;border-radius:14px;padding:18px;box-sizing:border-box}
+.edit-box h3{margin-top:0}.edit-context{background:#f3f4f6;padding:10px;border-radius:10px;margin-bottom:12px;font-size:14px}.edit-box textarea{min-height:110px}.edit-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.question-card{position:relative}.question-card.highlight-question{outline:3px solid #f59e0b;background:#fffbeb}.select-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}.source-link{display:inline-block;margin:7px 0;text-decoration:none;font-weight:700;line-height:1.5}.bulk-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0;padding:10px;background:#f8fafc;border-radius:10px}.bulk-bar button{margin:0}
 .result-link{
   display:inline-block;
   text-decoration:none;
@@ -34,7 +38,37 @@
 }
 
 
-.source-line{margin-top:8px;line-height:1.9}.source-line a{font-weight:700;color:#0b63ce;text-decoration:underline;cursor:pointer}.source-line a:hover{opacity:.85}.source-highlight{outline:3px solid #f59e0b;outline-offset:3px;box-shadow:0 0 0 4px rgba(245,158,11,.15);transition:.2s}
+.qb-location-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:12px}
+.qb-toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.qb-toolbar button{margin:0}
+.qb-selection-info{margin-top:10px;padding:10px 12px;border-radius:8px;background:#f3f7f5;font-weight:700}
+.qb-list-heading{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.qb-count{padding:7px 10px;border-radius:999px;background:#eef5ff;font-weight:700;white-space:nowrap}
+.qb-card{border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin:12px 0;background:#fff}
+.qb-card.selected{outline:2px solid #0b7a4b;background:#f8fffb}
+.qb-card-head{display:flex;align-items:flex-start;gap:10px}
+.qb-check{width:20px;height:20px;flex:0 0 auto;margin-top:3px}
+.qb-question{font-size:18px;line-height:1.65;font-weight:700;flex:1}
+.qb-original{font-size:13px;font-weight:500;color:#64748b;margin-left:6px}
+.qb-source{display:block;margin:8px 0 12px;color:#0b6b44;font-weight:700;text-decoration:none;line-height:1.6}
+.qb-source:hover{text-decoration:underline}
+.qb-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.qb-option{padding:10px 12px;border:1px solid #e5e7eb;border-radius:8px;line-height:1.55}
+.qb-option.correct{border-color:#16a34a;background:#f0fdf4;font-weight:700}
+.qb-meta{font-size:13px;color:#64748b;margin-top:10px}.qb-correct{font-weight:700;color:#166534}.qb-explanation{margin-top:10px;color:#475569}.qb-explanation summary{cursor:pointer;font-weight:700}.qb-explanation div{padding:8px 0;line-height:1.6}
+.qb-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.qb-actions button{margin:0}
+.danger{background:#b91c1c!important;color:#fff!important}
+.qb-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}
+.qb-modal.hidden{display:none}
+.qb-modal-box{width:min(900px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:14px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.qb-modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.qb-context{padding:10px 12px;background:#f6f8fa;border-radius:8px;color:#475569;margin:10px 0 14px;line-height:1.6}
+.qb-modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+.qb-highlight{animation:qbFlash 2.5s ease}
+@keyframes qbFlash{0%,100%{background:#fff}25%,65%{background:#fff3bf}}
+@media(max-width:800px){.qb-location-grid{grid-template-columns:1fr 1fr}.qb-options{grid-template-columns:1fr}.qb-question{font-size:17px}}
+@media(max-width:520px){.qb-location-grid{grid-template-columns:1fr}.qb-card{padding:12px}.qb-toolbar button{width:100%}.qb-modal-box{padding:14px}.qb-modal-actions button{flex:1}}
 </style>
 </head>
 
@@ -149,405 +183,151 @@
 <!-- =========================
      QUESTION BANK
 ========================= -->
-
-<section
-  id="bank"
-  class="page hidden"
->
-
-
-  <div class="card">
-
-    <h2>
-      ১. Category → Folder → Set
-    </h2>
-
-
+<section id="bank" class="page hidden">
+  <div class="card qb-header-card">
+    <h2>🗂️ প্রশ্ন ব্যাংক</h2>
+    <p class="muted">আপনার মূল কাজের সুবিধার জন্য আগে প্রশ্নগুলো দেখা যাবে। প্রশ্ন যোগ/Import আলাদা অংশে রাখা হয়েছে।</p>
     <div class="cats">
+      <button id="cat-recruitment" onclick="selectCategory('recruitment')">নিয়োগ পরীক্ষা</button>
+      <button id="cat-verification_test" onclick="selectCategory('verification_test')">যাচাই পরীক্ষা</button>
+      <button id="cat-recent" onclick="selectCategory('recent')">সাম্প্রতিক প্রশ্ন</button>
+    </div>
+    <div id="currentCat" class="notice"></div>
 
-      <button
-        id="cat-recruitment"
-        onclick="selectCategory('recruitment')"
-      >
-        নিয়োগ পরীক্ষা
-      </button>
-
-      <button
-        id="cat-verification_test"
-        onclick="selectCategory('verification_test')"
-      >
-        যাচাই পরীক্ষা
-      </button>
-
-      <button
-        id="cat-recent"
-        onclick="selectCategory('recent')"
-      >
-        সাম্প্রতিক প্রশ্ন
-      </button>
-
+    <div class="qb-location-grid">
+      <div>
+        <label>Folder</label>
+        <select id="filterFolder"></select>
+      </div>
+      <div>
+        <label>Set</label>
+        <select id="filterSet"></select>
+      </div>
+      <div>
+        <label>বিষয়</label>
+        <select id="filterSubject"></select>
+      </div>
+      <div>
+        <label>প্রশ্ন খুঁজুন</label>
+        <input id="search" placeholder="প্রশ্নের শব্দ লিখুন">
+      </div>
     </div>
 
-
-    <div
-      id="currentCat"
-      class="notice"
-    ></div>
-
-
-    <div class="grid">
-
-
-      <div>
-
-        <label>
-          Folder
-        </label>
-
-        <select id="folder"></select>
-
-
-        <div
-          id="folderActions"
-          class="bank-actions"
-        >
-
-          <button
-            class="secondary"
-            type="button"
-            onclick="renameSelectedFolder()"
-          >
-            ✏️ Folder Rename
-          </button>
-
-          <button
-            class="secondary"
-            type="button"
-            onclick="deleteSelectedFolder()"
-          >
-            🗑️ Folder Delete
-          </button>
-
-        </div>
-
+    <details class="qb-manager">
+      <summary>⚙️ Folder / Set ব্যবস্থাপনা</summary>
+      <div class="qb-location-grid" style="margin-top:12px">
+        <div><label>Folder</label><select id="folder"></select></div>
+        <div><label>Set</label><select id="set"></select></div>
       </div>
-
-
-      <div>
-
-        <label>
-          Set
-        </label>
-
-        <select id="set"></select>
-
-
-        <div
-          id="setActions"
-          class="bank-actions"
-        >
-
-          <button
-            class="secondary"
-            type="button"
-            onclick="renameSelectedSet()"
-          >
-            ✏️ Set Rename
-          </button>
-
-          <button
-            class="secondary"
-            type="button"
-            onclick="deleteSelectedSet()"
-          >
-            🗑️ Set Delete
-          </button>
-
-        </div>
-
+      <div class="qb-toolbar">
+        <button class="secondary" type="button" onclick="renameSelectedFolder()">✏️ Folder Rename</button>
+        <button class="secondary" type="button" onclick="deleteSelectedFolder()">🗑️ Folder Delete</button>
+        <button class="secondary" type="button" onclick="renameSelectedSet()">✏️ Set Rename</button>
+        <button class="secondary" type="button" onclick="deleteSelectedSet()">🗑️ Set Delete</button>
       </div>
+      <div class="grid" style="margin-top:10px">
+        <input id="newFolder" placeholder="নতুন Folder-এর নাম">
+        <button onclick="createFolder()">＋ Folder তৈরি</button>
+        <input id="newSet" placeholder="নতুন Set-এর নাম">
+        <button onclick="createSet()">＋ Set তৈরি</button>
+      </div>
+    </details>
 
-
+    <div class="qb-toolbar">
+      <button type="button" onclick="selectVisibleQuestions(true)">☑️ সব নির্বাচন</button>
+      <button type="button" class="secondary" onclick="selectVisibleQuestions(false)">☐ সব বাদ</button>
+      <button type="button" class="secondary" onclick="selectByCurrentSet()">📦 এই Set-এর সব নির্বাচন</button>
+      <button type="button" class="secondary" onclick="selectByCurrentFolder()">📁 এই Folder-এর সব নির্বাচন</button>
+      <button type="button" class="danger" onclick="deleteSelectedQuestions()">🗑️ নির্বাচিত প্রশ্ন মুছুন</button>
+      <button type="button" class="secondary" onclick="loadQuestions()">↻ Refresh</button>
     </div>
-
-
-    <div class="grid">
-
-      <div>
-
-        <input
-          id="newFolder"
-          placeholder="নতুন Folder-এর নাম"
-        >
-
-      </div>
-
-      <button onclick="createFolder()">
-        ＋ Folder তৈরি
-      </button>
-
-    </div>
-
-
-    <div class="grid">
-
-      <div>
-
-        <input
-          id="newSet"
-          placeholder="নতুন Set-এর নাম"
-        >
-
-      </div>
-
-      <button onclick="createSet()">
-        ＋ Set তৈরি
-      </button>
-
-    </div>
-
-
-    <p
-      id="folderMsg"
-      class="msg"
-    ></p>
-
+    <div id="selectionInfo" class="qb-selection-info">নির্বাচিত: ০টি</div>
+    <p id="folderMsg" class="msg"></p>
+    <p id="qmsg" class="msg"></p>
   </div>
 
-
-  <!-- QUESTION UPLOAD -->
+  <div class="card">
+    <div class="qb-list-heading">
+      <div>
+        <h2>প্রশ্নসমূহ</h2>
+        <p class="muted">প্রশ্ন → অপশন → সঠিক উত্তর → Source → বিষয়। নিচে Copy / Edit / Delete থাকবে।</p>
+      </div>
+      <span id="questionCount" class="qb-count"></span>
+    </div>
+    <div id="questions"></div>
+  </div>
 
   <div class="card">
-
-    <h2>
-      ২. প্রশ্ন আপলোড
-    </h2>
-
-
+    <h2>➕ প্রশ্ন যোগ / Import</h2>
     <div class="tabs">
-
-      <button onclick="mode('manual')">
-        Manual
-      </button>
-
-      <button onclick="mode('import')">
-        CSV / Excel
-      </button>
-
+      <button onclick="mode('manual')">Manual প্রশ্ন</button>
+      <button onclick="mode('import')">CSV / Excel</button>
     </div>
-
 
     <div id="manualBox">
-
-
       <div class="grid">
-
-        <div>
-
-          <label>
-            বিষয়
-          </label>
-
-          <select id="subject"></select>
-
-        </div>
-
-
-        <div>
-
-          <label>
-            প্রশ্ন নম্বর
-          </label>
-
-          <input
-            id="qno"
-            type="number"
-          >
-
-        </div>
-
+        <div><label>বিষয়</label><select id="subject"></select></div>
+        <div><label>প্রশ্ন নম্বর</label><input id="qno" type="number"></div>
       </div>
-
-
-      <input
-        id="source"
-        placeholder="Source / পরীক্ষার নাম (ঐচ্ছিক)"
-      >
-
-
-      <textarea
-        id="qtext"
-        placeholder="প্রশ্ন"
-      ></textarea>
-
-
+      <textarea id="qtext" placeholder="প্রশ্ন লিখুন"></textarea>
       <div class="grid">
-
-        <input
-          id="a"
-          placeholder="ক. অপশন"
-        >
-
-        <input
-          id="b"
-          placeholder="খ. অপশন"
-        >
-
-        <input
-          id="c"
-          placeholder="গ. অপশন"
-        >
-
-        <input
-          id="d"
-          placeholder="ঘ. অপশন"
-        >
-
+        <input id="a" placeholder="ক. অপশন">
+        <input id="b" placeholder="খ. অপশন">
+        <input id="c" placeholder="গ. অপশন">
+        <input id="d" placeholder="ঘ. অপশন">
       </div>
-
-
       <div class="grid">
-
         <select id="correct">
-
-          <option value="">
-            সঠিক উত্তর
-          </option>
-
-          <option value="A">
-            ক
-          </option>
-
-          <option value="B">
-            খ
-          </option>
-
-          <option value="C">
-            গ
-          </option>
-
-          <option value="D">
-            ঘ
-          </option>
-
+          <option value="">সঠিক উত্তর</option>
+          <option value="A">ক</option><option value="B">খ</option><option value="C">গ</option><option value="D">ঘ</option>
         </select>
-
-
-        <input
-          id="explanation"
-          placeholder="ব্যাখ্যা (ঐচ্ছিক)"
-        >
-
+        <input id="explanation" placeholder="ব্যাখ্যা (ঐচ্ছিক)">
       </div>
-
-
-      <button onclick="addManual()">
-        প্রশ্ন Question Bank-এ যোগ করুন
-      </button>
-
+      <button onclick="addManual()">প্রশ্ন Question Bank-এ যোগ করুন</button>
     </div>
 
-
-    <!-- IMPORT -->
-
-    <div
-      id="importBox"
-      class="hidden"
-    >
-
-      <p class="muted">
-        Excel/CSV columns:
-        category, folder, set, subject,
-        question_number, question, option_a,
-        option_b, option_c, option_d,
-        correct_answer, explanation
-      </p>
-
-
-      <button
-        class="secondary"
-        onclick="template()"
-      >
-        Template ডাউনলোড
-      </button>
-
-
-      <input
-        id="file"
-        type="file"
-        accept=".csv,.xlsx,.xls"
-      >
-
-
-      <button onclick="previewImport()">
-        Preview
-      </button>
-
-
+    <div id="importBox" class="hidden">
+      <p class="muted">Required: <b>question, option_a, option_b, option_c, option_d, correct_answer</b><br>Optional: source, question_number, subject, explanation, category, folder, set</p>
+      <button class="secondary" onclick="template()">⬇️ CSV / Excel Template ডাউনলোড</button>
+      <input id="file" type="file" accept=".csv,.xlsx,.xls">
+      <button onclick="previewImport()">Preview</button>
       <div id="preview"></div>
-
-
-      <button
-        id="importBtn"
-        class="hidden"
-        onclick="importRows()"
-      >
-        Database-এ Import করুন
-      </button>
-
+      <button id="importBtn" class="hidden" onclick="importRows()">Database-এ Import করুন</button>
     </div>
-
-
-    <p
-      id="qmsg"
-      class="msg"
-    ></p>
-
   </div>
-
-
-  <!-- QUESTION BANK LIST -->
-
-  <div class="card">
-
-    <h2>
-      ৩. Question Bank
-    </h2>
-
-
-    <div class="grid">
-
-      <select id="filterFolder"></select>
-
-      <select id="filterSet"></select>
-
-    </div>
-
-
-    <div class="grid">
-
-      <select id="filterSubject"></select>
-
-      <input
-        id="search"
-        placeholder="প্রশ্ন খুঁজুন"
-      >
-
-    </div>
-
-
-    <button onclick="loadQuestions()">
-      Refresh
-    </button>
-
-
-    <div id="questions"></div>
-
-  </div>
-
-
 </section>
 
+<!-- EDIT QUESTION MODAL -->
+<div id="editModal" class="qb-modal hidden">
+  <div class="qb-modal-box">
+    <div class="qb-modal-head">
+      <h2>✏️ প্রশ্ন সম্পাদনা</h2>
+      <button type="button" class="secondary" onclick="closeEdit()">✕</button>
+    </div>
+    <div id="editContext" class="qb-context"></div>
+    <input id="editId" type="hidden">
+    <div class="grid">
+      <div><label>প্রশ্ন নম্বর</label><input id="editQno" type="number"></div>
+      <div><label>বিষয়</label><select id="editSubject"></select></div>
+    </div>
+    <textarea id="editText" placeholder="প্রশ্ন"></textarea>
+    <div class="grid">
+      <input id="editA" placeholder="ক. অপশন">
+      <input id="editB" placeholder="খ. অপশন">
+      <input id="editC" placeholder="গ. অপশন">
+      <input id="editD" placeholder="ঘ. অপশন">
+    </div>
+    <div class="grid">
+      <select id="editCorrect"><option value="">সঠিক উত্তর</option><option value="A">ক</option><option value="B">খ</option><option value="C">গ</option><option value="D">ঘ</option></select>
+      <input id="editExplanation" placeholder="ব্যাখ্যা (ঐচ্ছিক)">
+    </div>
+    <p id="editMsg" class="msg"></p>
+    <div class="qb-modal-actions">
+      <button class="secondary" onclick="closeEdit()">বাতিল</button>
+      <button onclick="saveEdit()">💾 Save Changes</button>
+    </div>
+  </div>
+</div>
 
 <!-- =========================
      EXAM MANAGEMENT
@@ -844,6 +624,34 @@
 
 </div>
 
+
+<!-- QUESTION EDIT MODAL -->
+<div id="editModal" class="edit-modal hidden">
+  <div class="edit-box">
+    <h3>প্রশ্ন সম্পাদনা</h3>
+    <div id="editContext" class="edit-context"></div>
+    <div class="grid">
+      <div><label>প্রশ্ন নম্বর</label><input id="editQno" type="number"></div>
+      <div><label>বিষয়</label><select id="editSubject"></select></div>
+    </div>
+    <label>প্রশ্ন</label><textarea id="editQtext"></textarea>
+    <div class="grid">
+      <input id="editA" placeholder="ক. অপশন">
+      <input id="editB" placeholder="খ. অপশন">
+      <input id="editC" placeholder="গ. অপশন">
+      <input id="editD" placeholder="ঘ. অপশন">
+    </div>
+    <div class="grid">
+      <select id="editCorrect"><option value="">সঠিক উত্তর</option><option value="A">ক</option><option value="B">খ</option><option value="C">গ</option><option value="D">ঘ</option></select>
+      <input id="editExplanation" placeholder="ব্যাখ্যা (ঐচ্ছিক)">
+    </div>
+    <div class="edit-actions">
+      <button type="button" onclick="saveQuestionEdit()">💾 Save Changes</button>
+      <button type="button" class="secondary" onclick="closeEditModal()">বাতিল</button>
+    </div>
+    <p id="editMsg" class="msg"></p>
+  </div>
+</div>
 
 <!-- SUPABASE -->
 
