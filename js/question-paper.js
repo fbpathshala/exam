@@ -1,0 +1,1 @@
+(async()=>{try{if(!await Paper.auth())return;const z=await Paper.load();window.currentPaperData=z;Paper.render(z,'question')}catch(e){document.getElementById('page').textContent='সমস্যা: '+e.message}})();
