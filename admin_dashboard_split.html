@@ -34,6 +34,15 @@
 }
 
 </style>
+<style>
+@media (max-width:600px){
+  .dashboard-top{position:relative;z-index:10001}
+  .admin-menu{position:relative;z-index:10002}
+  .admin-menu-btn{width:50px!important;height:50px!important;min-width:50px!important;min-height:50px!important;font-size:30px!important;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+  .admin-menu-panel{right:0;top:58px;width:min(260px,calc(100vw - 24px));max-height:calc(100vh - 80px);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px}
+  .admin-menu-panel button{min-height:48px!important;padding:12px 14px!important;font-size:16px!important;touch-action:manipulation}
+}
+</style>
 </head>
 
 <body>
@@ -94,7 +103,7 @@
 
     <button
       type="button"
-      class="admin-menu-btn"
+      class="admin-menu-btn" aria-label="মেনু খুলুন"
       id="adminMenuBtn"
       aria-label="মেনু"
     >☰</button>
@@ -851,6 +860,27 @@
 
 <script src="js/admin_dashboard_split.js"></script>
 
+
+<script>
+(function(){
+  function initAdminMenu(){
+    const btn=document.getElementById('adminMenuBtn');
+    const panel=document.getElementById('adminMenuPanel');
+    if(!btn||!panel)return;
+    const close=()=>{panel.classList.add('hidden');btn.setAttribute('aria-expanded','false')};
+    const toggle=(e)=>{if(e)e.stopPropagation();panel.classList.toggle('hidden');btn.setAttribute('aria-expanded',String(!panel.classList.contains('hidden')))};
+    btn.setAttribute('aria-expanded','false');
+    btn.addEventListener('click',toggle);
+    btn.addEventListener('touchend',function(e){e.preventDefault();toggle(e)},{passive:false});
+    panel.addEventListener('click',e=>e.stopPropagation());
+    panel.addEventListener('touchend',e=>e.stopPropagation(),{passive:true});
+    document.addEventListener('click',close);
+    document.addEventListener('touchend',close,{passive:true});
+    window.closeAdminMenu=close;
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initAdminMenu);else initAdminMenu();
+})();
+</script>
 
 <!-- =========================
      FOLDER / SET RENAME DELETE
