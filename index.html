@@ -6,12 +6,13 @@
 <title>MCQ Exam</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:"Noto Sans Bengali",Arial,sans-serif;background:#f3f6fb;color:#1f2937}.header{background:linear-gradient(135deg,#1d4ed8,#2563eb);color:#fff;text-align:center;padding:22px 15px;box-shadow:0 3px 14px rgba(29,78,216,.25)}.header h1{margin:0;font-size:25px}.container{max-width:760px;margin:22px auto;padding:0 14px}.card{background:#fff;border-radius:14px;padding:22px;box-shadow:0 4px 15px rgba(0,0,0,.08);margin-bottom:18px}h2{margin-top:0;font-size:21px}label.field{display:block;margin-top:15px;margin-bottom:6px;font-weight:700}input,select{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:8px;font-size:16px;background:#fff}.btn{border:0;border-radius:8px;padding:12px 18px;font-size:16px;cursor:pointer}.start-btn{width:100%;margin-top:22px;background:#2563eb;color:#fff}.next-btn{background:#2563eb;color:#fff}.prev-btn{background:#6b7280;color:#fff}.submit-btn{background:#16a34a;color:#fff}.btn:disabled{opacity:.55;cursor:not-allowed}.question{font-size:20px;font-weight:700;line-height:1.55;margin-bottom:18px}.option{display:flex;align-items:flex-start;gap:8px;background:#f8fafc;border:1px solid #e5e7eb;padding:13px;margin:10px 0;border-radius:9px;cursor:pointer}.option:hover{background:#eff6ff}.option.locked{cursor:default}.option input{width:auto;margin-top:3px}.topbar{display:flex;justify-content:space-between;gap:10px;margin-bottom:15px;font-weight:700}.timer{color:#dc2626}.progress{color:#2563eb}.nav-buttons{display:flex;justify-content:space-between;gap:10px;margin-top:20px}.nav-buttons button{flex:1}.status{padding:12px;border-radius:8px;margin-top:15px;background:#eff6ff;color:#1d4ed8}.error{background:#fef2f2;color:#b91c1c}.success{background:#f0fdf4;color:#15803d}.result{text-align:center}.score{font-size:40px;font-weight:800;color:#2563eb;margin:18px 0}.result-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:18px 0}.result-box{background:#f8fafc;border-radius:10px;padding:14px}.result-box strong{display:block;font-size:24px}.review{text-align:left;margin-top:20px}.review-item{border:1px solid #e5e7eb;border-radius:10px;padding:14px;margin:10px 0}.correct{color:#15803d}.wrong{color:#b91c1c}.muted{color:#6b7280}.review-correct{border-left:4px solid #16a34a;background:#f0fdf4}.review-wrong{border-left:4px solid #dc2626;background:#fef2f2}.review-explanation{margin-top:10px;padding:10px;border-radius:8px;background:#fff;border:1px solid #e5e7eb;line-height:1.6}.question-block{border-bottom:1px solid #e5e7eb;padding:0 0 16px;margin:0 0 18px}.question-block:last-child{border-bottom:0;margin-bottom:0}.question-block .question{margin-bottom:12px}.hidden{display:none!important}@media(max-width:600px){.header h1{font-size:21px}.card{padding:17px}.question{font-size:18px}.result-grid{grid-template-columns:1fr}.nav-buttons{flex-wrap:wrap}.nav-buttons button{min-width:45%}}
+*{box-sizing:border-box}body{margin:0;font-family:"Noto Sans Bengali",Arial,sans-serif;background:#f3f6fb;color:#1f2937}.header{background:linear-gradient(135deg,#1d4ed8,#2563eb);color:#fff;text-align:center;padding:22px 15px;box-shadow:0 3px 14px rgba(29,78,216,.25)}.header h1{margin:0;font-size:25px}.container{max-width:760px;margin:22px auto;padding:0 14px}.card{background:#fff;border-radius:14px;padding:22px;box-shadow:0 4px 15px rgba(0,0,0,.08);margin-bottom:18px}h2{margin-top:0;font-size:21px}label.field{display:block;margin-top:15px;margin-bottom:6px;font-weight:700}input,select{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:8px;font-size:16px;background:#fff}.btn{border:0;border-radius:8px;padding:12px 18px;font-size:16px;cursor:pointer}.start-btn{width:100%;margin-top:22px;background:#2563eb;color:#fff}.next-btn{background:#2563eb;color:#fff}.prev-btn{background:#6b7280;color:#fff}.submit-btn{background:#16a34a;color:#fff}.btn:disabled{opacity:.55;cursor:not-allowed}.question{font-size:20px;font-weight:700;line-height:1.55;margin-bottom:18px}.option{display:flex;align-items:flex-start;gap:8px;background:#f8fafc;border:1px solid #e5e7eb;padding:13px;margin:10px 0;border-radius:9px;cursor:pointer}.option:hover{background:#eff6ff}.option.locked{cursor:default}.option input{width:auto;margin-top:3px}.topbar{display:flex;justify-content:space-between;gap:10px;margin-bottom:15px;font-weight:700}.timer{color:#dc2626}.progress{color:#2563eb}.nav-buttons{display:flex;justify-content:space-between;gap:10px;margin-top:20px}.nav-buttons button{flex:1}.status{padding:12px;border-radius:8px;margin-top:15px;background:#eff6ff;color:#1d4ed8}.error{background:#fef2f2;color:#b91c1c}.success{background:#f0fdf4;color:#15803d}.result{text-align:center}.score{font-size:40px;font-weight:800;color:#2563eb;margin:18px 0}.result-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:18px 0}.result-box{background:#f8fafc;border-radius:10px;padding:14px}.result-box strong{display:block;font-size:24px}.review{text-align:left;margin-top:20px}.review-item{border:1px solid #e5e7eb;border-radius:10px;padding:14px;margin:10px 0}.correct{color:#15803d}.wrong{color:#b91c1c}.muted{color:#6b7280}.review-correct{border-left:4px solid #16a34a;background:#f0fdf4}.review-wrong{border-left:4px solid #dc2626;background:#fef2f2}.review-explanation{margin-top:10px;padding:10px;border-radius:8px;background:#fff;border:1px solid #e5e7eb;line-height:1.6}.question-block{border-bottom:1px solid #e5e7eb;padding:0 0 16px;margin:0 0 18px}.question-block:last-child{border-bottom:0;margin-bottom:0}.question-block .question{margin-bottom:12px}.hidden{display:none!important}.exam-list{display:grid;gap:12px}.exam-list-item{border:1px solid #dbeafe;border-radius:12px;padding:14px;background:#f8fbff}.exam-list-item h3{margin:0 0 8px;color:#1d4ed8}.exam-list-item .meta{color:#6b7280;font-size:14px;margin-bottom:10px}.exam-list-item .btn{background:#2563eb;color:#fff;width:100%}@media(max-width:600px){.header h1{font-size:21px}.card{padding:17px}.question{font-size:18px}.result-grid{grid-template-columns:1fr}.nav-buttons{flex-wrap:wrap}.nav-buttons button{min-width:45%}}
 .brand-badge{font-size:28px;line-height:1}.brand-name{font-size:30px;font-weight:900;letter-spacing:.2px;text-shadow:0 2px 8px rgba(0,0,0,.18)}.brand-sub{font-size:13px;opacity:.92;margin-top:3px}.result-brand{display:flex;align-items:center;justify-content:center;gap:10px;padding:10px 0 14px;border-bottom:1px solid #e5e7eb;margin-bottom:14px}.result-brand-title{font-size:20px;font-weight:800;color:#1d4ed8}.result-exam-title{font-size:18px;font-weight:800;color:#111827;margin-bottom:8px}.result-footer-brand{margin-top:22px;padding-top:14px;border-top:1px solid #e5e7eb;color:#6b7280;font-size:13px}.result-footer-brand strong{color:#1d4ed8}.social-highlight{margin-top:18px;padding:16px;border-radius:12px;background:linear-gradient(135deg,#eff6ff,#f8fbff);border:1px solid #bfdbfe;text-align:center}.social-highlight .social-title{font-size:18px;font-weight:900;color:#1d4ed8;margin-bottom:6px}.social-buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.social-box{padding:11px;border-radius:10px;background:#fff;border:1px solid #dbeafe;font-weight:800;color:#1e40af}@media(max-width:600px){.social-buttons{grid-template-columns:1fr}}.exam-summary{background:#f8fbff;border:1px solid #dbeafe;border-radius:12px;padding:14px;margin-bottom:18px}.exam-summary h2{margin:0 0 12px;color:#1d4ed8;text-align:center}.summary-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.summary-box{background:#fff;border:1px solid #e5e7eb;border-radius:9px;padding:10px;text-align:center}.summary-box span{display:block;font-size:12px;color:#6b7280;margin-bottom:4px}.summary-box strong{display:block;font-size:16px;color:#111827;word-break:break-word}@media(max-width:600px){.summary-grid{grid-template-columns:1fr 1fr}.summary-box strong{font-size:15px}}</style>
 </head>
 <body>
 <div class="header"><div class="brand-badge">📚</div><div class="brand-name">ফেসবুক পাঠশালা</div><div class="brand-sub">অনলাইন MCQ পরীক্ষা • জ্ঞান, অনুশীলন ও সাফল্যের পথে</div></div>
 <div class="container">
+<div id="examListPage" class="card hidden"><h2>সক্রিয় পরীক্ষাসমূহ</h2><p class="muted">যে পরীক্ষায় অংশ নিতে চান সেটি নির্বাচন করুন।</p><div id="examList" class="exam-list"></div></div>
 <div id="startPage" class="card">
 <div class="exam-summary">
   <h2 id="examTitle">Exam</h2>
@@ -66,12 +67,23 @@ function formatTimeRange(a,b){if(!a&&!b)return"নির্ধারিত ন�
 async function loadExam(){
  const status=document.getElementById("startStatus");
  try{
-  const examId=getExamId(); let q=supabaseClient.from("exams").select("*");
-  q=examId?q.eq("id",examId):q.eq("status","active").order("created_at",{ascending:false}).limit(1);
-  const {data:exams,error}=await q;
+  const examId=getExamId();
+  if(!examId){
+   const {data:activeExams,error}=await supabaseClient.from("exams").select("id,exam_name,status,total_questions,duration_minutes,created_at").eq("status","active").order("created_at",{ascending:false});
+   if(error)throw error;
+   const list=document.getElementById("examList");
+   if(!activeExams?.length)throw new Error("কোনো সক্রিয় পরীক্ষা পাওয়া যায়নি।");
+   list.innerHTML=activeExams.map(e=>`<div class="exam-list-item"><h3>${escapeHtml(e.exam_name||"পরীক্ষা")}</h3><div class="meta">প্রশ্ন: ${bn(Number(e.total_questions||0))}টি${e.duration_minutes?` • সময়: ${bn(Number(e.duration_minutes))} মিনিট`:""}</div><button class="btn" onclick="selectExam(${Number(e.id)})">এই পরীক্ষা নির্বাচন করুন</button></div>`).join("");
+   document.getElementById("examListPage").classList.remove("hidden");
+   document.getElementById("startPage").classList.add("hidden");
+   return;
+  }
+  const {data:exams,error}=await supabaseClient.from("exams").select("*").eq("id",examId).eq("status","active");
   if(error)throw error;
   if(!exams?.length)throw new Error("কোনো সক্রিয়/নির্বাচিত পরীক্ষা পাওয়া যায়নি।");
   exam=exams[0];
+  document.getElementById("examListPage").classList.add("hidden");
+  document.getElementById("startPage").classList.remove("hidden");
   document.getElementById("examTitle").textContent=exam.exam_name||exam.title||"পরীক্ষা";
 
   // Optional settings: the student page must still work when the optional
@@ -85,14 +97,11 @@ async function loadExam(){
   };
   try{
    const {data:st}=await supabaseClient.from("exam_settings").select("*").eq("exam_id",exam.id).maybeSingle();
-   // Preserve saved exam date/time from the older exam row when settings were stored there.
    settings={...settings,exam_date:exam.exam_date??null,start_time:exam.start_time??null,end_time:exam.end_time??null,...(st||{})};
   }catch(_){
    settings={...settings,exam_date:exam.exam_date??null,start_time:exam.start_time??null,end_time:exam.end_time??null};
   }
 
-  // New exam-question mapping is preferred. It lets the same Question Bank
-  // Load the fixed question snapshot for this exam. This does not modify any exam data.
   const {data:snapshotQuestions,error:snapshotError}=await supabaseClient.rpc("get_public_exam_questions",{p_exam_id:exam.id});
   if(snapshotError)throw snapshotError;
   let allQuestions=(snapshotQuestions||[]).map(q=>({
@@ -125,6 +134,7 @@ async function loadExam(){
   status.textContent="সমস্যা হয়েছে: "+e.message;
  }
 }
+function selectExam(id){location.href="?exam="+encodeURIComponent(id)}
 async function startExam(){
  const name=document.getElementById("studentName").value.trim(),facebookName=document.getElementById("facebookName").value.trim(),district=document.getElementById("district").value,mobile=document.getElementById("mobile").value.replace(/\D/g,"").trim();
  if(!name)return showStartError("নাম লিখুন।"); if(!facebookName)return showStartError("ফেসবুক আইডি নাম লিখুন।"); if(!district)return showStartError("নিজ জেলা নির্বাচন করুন।"); if(!/^01[3-9]\d{8}$/.test(mobile))return showStartError("সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন।"); if(!exam||!questions.length)return showStartError("পরীক্ষার তথ্য এখনো লোড হয়নি।");
