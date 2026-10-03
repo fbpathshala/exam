@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="ফেইসবুক পাঠশালা — শিক্ষা, পরীক্ষা, স্টাডি ম্যাটেরিয়াল ও শিক্ষামূলক সহায়তার একটি অনলাইন প্ল্যাটফর্ম।">
+<title>ফেইসবুক পাঠশালা</title>
+<style>
+*{box-sizing:border-box}
+:root{--primary:#1557c0;--primary2:#0d3f91;--text:#172033;--muted:#64748b;--bg:#f5f8fc;--border:#e2e8f0}
+html{scroll-behavior:smooth}body{margin:0;font-family:"Noto Sans Bengali","Noto Sans",Arial,sans-serif;background:var(--bg);color:var(--text)}
+a{text-decoration:none}.top{background:linear-gradient(135deg,var(--primary2),var(--primary));color:#fff;position:sticky;top:0;z-index:20;box-shadow:0 3px 14px rgba(15,23,42,.12)}
+.topbar{max-width:1100px;margin:auto;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;color:#fff}.siteLogo{display:block;width:min(460px,72vw);height:auto;max-height:82px;object-fit:contain}.logo{width:46px;height:46px;border-radius:14px;background:rgba(255,255,255,.16);display:grid;place-items:center;font-size:26px}
+.brandText strong{display:block;font-size:22px;line-height:1.15}.brandText span{display:block;font-size:12px;opacity:.9;margin-top:3px}
+.menuBtn{border:0;background:rgba(255,255,255,.16);color:#fff;width:46px;height:46px;border-radius:13px;font-size:27px;cursor:pointer}
+.wrap{max-width:1100px;margin:auto;padding:0 18px}.hero{padding:62px 0 48px}
+.heroCard{background:linear-gradient(135deg,#eaf2ff,#fff);border:1px solid #d8e5fb;border-radius:28px;padding:48px 30px;display:grid;grid-template-columns:1.25fr .75fr;gap:28px;align-items:center;overflow:hidden;position:relative}
+.heroCard:after{content:"";position:absolute;width:220px;height:220px;border-radius:50%;background:rgba(37,99,235,.08);right:-65px;top:-70px}
+.eyebrow{display:inline-block;background:#dbeafe;color:#164e9a;border-radius:999px;padding:7px 12px;font-size:13px;font-weight:800}
+h1{font-size:clamp(32px,6vw,52px);line-height:1.12;margin:16px 0 12px}.hero p{font-size:17px;line-height:1.85;color:var(--muted);max-width:650px;margin:0}
+.heroActions{display:flex;flex-wrap:wrap;gap:11px;margin-top:24px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:12px 17px;border-radius:12px;font-weight:800;border:1px solid transparent;cursor:pointer}
+.btn.primary{background:var(--primary);color:#fff}.btn.light{background:#fff;color:var(--text);border-color:#d6e0ee}
+.heroVisual{min-height:240px;display:grid;place-items:center;position:relative}.book{width:min(270px,80%);aspect-ratio:1/1;background:#fff;border:1px solid #dbe5f2;border-radius:30px;box-shadow:0 18px 45px rgba(37,99,235,.14);display:grid;place-items:center;font-size:90px;transform:rotate(-3deg)}
+.section{padding:22px 0 42px}.sectionHead{text-align:center;margin-bottom:22px}.sectionHead h2{font-size:28px;margin:0 0 7px}.sectionHead p{margin:0;color:var(--muted);line-height:1.7}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.card{background:#fff;border:1px solid var(--border);border-radius:19px;padding:21px;box-shadow:0 6px 22px rgba(15,23,42,.05);transition:.2s}
+.card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(15,23,42,.08)}.icon{width:48px;height:48px;border-radius:14px;background:#edf4ff;display:grid;place-items:center;font-size:25px;margin-bottom:13px}
+.card h3{margin:0 0 7px;font-size:18px}.card p{margin:0;color:var(--muted);font-size:14px;line-height:1.7}.cardLink{display:block;color:inherit}
+.about{display:grid;grid-template-columns:1fr 1fr;gap:18px}.info{background:#fff;border:1px solid var(--border);border-radius:22px;padding:27px}.info h2{margin:0 0 10px;font-size:25px}.info p{color:var(--muted);line-height:1.9;margin:0}
+.social{background:linear-gradient(135deg,#0d3f91,#2563eb);color:#fff;border-radius:24px;padding:30px;display:flex;align-items:center;justify-content:space-between;gap:20px}.social h2{margin:0 0 7px}.social p{margin:0;opacity:.9;line-height:1.7}
+.socialActions{display:flex;flex-wrap:wrap;gap:10px}.social .btn{background:#fff;color:#12366f}.footer{margin-top:30px;background:#101827;color:#cbd5e1;padding:30px 18px;text-align:center}.footer strong{color:#fff}.footer p{margin:8px 0 0;font-size:13px}
+.menu{display:none;position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:50}.panel{position:absolute;right:12px;top:12px;width:min(370px,calc(100% - 24px));background:#fff;border-radius:20px;padding:18px;box-shadow:0 20px 55px rgba(0,0,0,.2)}
+.panelTop{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 12px;border-bottom:1px solid var(--border)}.panelTop strong{font-size:18px}.close{border:0;background:#f1f5f9;border-radius:10px;width:38px;height:38px;font-size:20px;cursor:pointer}
+.link{display:flex;align-items:center;gap:10px;padding:14px 12px;border-radius:12px;color:var(--text);font-weight:800;margin-top:5px}.link:hover{background:#f1f5f9}.note{margin-top:10px;padding:12px;border-radius:12px;background:#f8fafc;color:var(--muted);font-size:12px;line-height:1.6}
+@media(max-width:850px){.cards{grid-template-columns:repeat(2,1fr)}.heroCard{grid-template-columns:1fr}.heroVisual{display:none}.about{grid-template-columns:1fr}}
+@media(max-width:520px){.siteLogo{width:min(330px,72vw);max-height:62px}.topbar{padding:9px 12px}wrap{padding:0 13px}.hero{padding:35px 0 25px}.heroCard{padding:30px 21px;border-radius:22px}.hero p{font-size:15px}.cards{grid-template-columns:1fr}.social{display:block;padding:24px}.socialActions{margin-top:17px}.section{padding-bottom:28px}}
+</style>
+
+<script src="/js/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/visitor.js"></script>
+</head>
+<body>
+<header class="top"><div class="topbar">
+<a class="brand" href="/" aria-label="ফেইসবুক পাঠশালা — হোম"><img class="siteLogo" src="/fbpathshala-logo-hd.jpg" alt="ফেইসবুক পাঠশালা — অনলাইনে শিক্ষা বিস্তারের বিশাল প্লাটফর্ম"></a>
+<button class="menuBtn" aria-label="মেনু খুলুন" onclick="openMenu()">☰</button>
+</div></header>
+
+<main>
+<section class="hero"><div class="wrap"><div class="heroCard">
+<div><span class="eyebrow">স্বাগতম ফেইসবুক পাঠশালায়</span><h1>শিখুন, অনুশীলন করুন,<br>এগিয়ে যান।</h1>
+<p>শিক্ষামূলক তথ্য, অনলাইন পরীক্ষা, স্টাডি ম্যাটেরিয়াল এবং প্রয়োজনীয় রিসোর্স—সবকিছু সহজভাবে এক জায়গায় পাওয়ার জন্য ফেইসবুক পাঠশালা।</p>
+<div class="heroActions"><a class="btn primary" href="/exam/">📝 পরীক্ষা দেখুন</a><a class="btn light" href="#resources">📚 আরও দেখুন</a></div></div>
+<div class="heroVisual" aria-hidden="true"><div class="book">📖</div></div>
+</div></div></section>
+
+<section class="section" id="resources"><div class="wrap"><div class="sectionHead"><h2>আপনার প্রয়োজনীয় রিসোর্স</h2><p>এক ক্লিকেই প্রয়োজনীয় জায়গায় পৌঁছে যান।</p></div>
+<div class="cards">
+<a class="card cardLink" href="/exam/"><div class="icon">📝</div><h3>অনলাইন পরীক্ষা</h3><p>চলমান ও উন্মুক্ত পরীক্ষাগুলো দেখুন এবং সরাসরি অংশ নিন।</p></a>
+<a class="card cardLink" href="/study-material/"><div class="icon">📚</div><h3>স্টাডি ম্যাটেরিয়াল</h3><p>পড়াশোনার প্রয়োজনীয় উপকরণ ও সহায়ক তথ্য দেখুন।</p></a>
+<a class="card cardLink" href="https://www.facebook.com/facebook.pathshala" target="_blank" rel="noopener"><div class="icon">📢</div><h3>গুরুত্বপূর্ণ পোস্ট</h3><p>ফেইসবুক পাঠশালার গুরুত্বপূর্ণ আপডেট ও পোস্ট দেখুন।</p></a>
+<a class="card cardLink" href="https://www.facebook.com/groups/facebookpathshala" target="_blank" rel="noopener"><div class="icon">👥</div><h3>ফেইসবুক গ্রুপ</h3><p>আমাদের গ্রুপে যুক্ত হয়ে শিক্ষামূলক আলোচনায় অংশ নিন।</p></a>
+</div></div></section>
+
+<section class="section"><div class="wrap"><div class="about">
+<div class="info"><h2>🎓 ফেইসবুক পাঠশালা সম্পর্কে</h2><p>ফেইসবুক পাঠশালা একটি শিক্ষামূলক অনলাইন প্ল্যাটফর্ম, যেখানে শিক্ষার্থীদের জন্য পরীক্ষা, পড়াশোনার উপকরণ এবং প্রয়োজনীয় তথ্য সহজভাবে তুলে ধরা হয়। আমাদের লক্ষ্য হলো শেখার সুযোগকে আরও সহজ ও সবার কাছে পৌঁছে দেওয়া।</p></div>
+<div class="info"><h2>💡 কীভাবে ব্যবহার করবেন?</h2><p>উপরের মেনু থেকে প্রয়োজনীয় বিভাগ নির্বাচন করুন। পরীক্ষা দিতে চাইলে “পরীক্ষা” নির্বাচন করুন। স্টাডি উপকরণের জন্য “স্টাডি ম্যাটেরিয়াল” এবং সামাজিক যোগাযোগের জন্য Facebook Page বা Group-এ প্রবেশ করুন।</p></div>
+</div></div></section>
+
+<section class="section"><div class="wrap"><div class="social"><div><h2>ফেইসবুক পাঠশালার সাথে যুক্ত থাকুন</h2><p>নতুন আপডেট, গুরুত্বপূর্ণ পোস্ট ও শিক্ষামূলক কার্যক্রম পেতে আমাদের সাথে থাকুন।</p></div>
+<div class="socialActions"><a class="btn" href="https://www.facebook.com/facebook.pathshala" target="_blank" rel="noopener">📘 Facebook Page</a><a class="btn" href="https://www.facebook.com/groups/facebookpathshala" target="_blank" rel="noopener">👥 Facebook Group</a></div></div></div></section>
+</main>
+
+<footer class="footer"><strong>📚 ফেইসবুক পাঠশালা</strong><p>তোমার জ্ঞানের আলোয় আলোকিত হোক চারপাশ</p><p>© <span id="year"></span> ফেইসবুক পাঠশালা — সর্বস্বত্ব সংরক্ষিত</p></footer>
+
+<div id="menu" class="menu" onclick="if(event.target===this)closeMenu()"><div class="panel">
+<div class="panelTop"><strong>ফেইসবুক পাঠশালা</strong><button class="close" aria-label="মেনু বন্ধ করুন" onclick="closeMenu()">×</button></div>
+<a class="link" href="/">🏠 হোম</a><a class="link" href="/exam/">📝 পরীক্ষা</a><a class="link" href="/study-material/">📚 স্টাডি ম্যাটেরিয়াল</a>
+<a class="link" href="https://www.facebook.com/facebook.pathshala" target="_blank" rel="noopener">📢 গুরুত্বপূর্ণ পোস্ট</a>
+<a class="link" href="https://www.facebook.com/groups/facebookpathshala" target="_blank" rel="noopener">👥 ফেইসবুক গ্রুপ</a>
+<div class="note">পরীক্ষা ও অন্যান্য বিভাগ আলাদা পেজে খোলা হবে। এই Home page-এ কোনো পরীক্ষার প্রশ্ন বা পরীক্ষার তালিকা রাখা হয়নি।</div>
+</div></div>
+<script>
+document.getElementById("year").textContent=new Date().getFullYear();
+function openMenu(){document.getElementById("menu").style.display="block";document.body.style.overflow="hidden"}
+function closeMenu(){document.getElementById("menu").style.display="none";document.body.style.overflow=""}
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeMenu()});
+</script>
+</body>
+</html>
