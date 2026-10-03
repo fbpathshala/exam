@@ -69,11 +69,11 @@ async function loadExam(){
  try{
   const examId=getExamId();
   if(!examId){
-   const {data:activeExams,error}=await supabaseClient.from("exams").select("id,exam_name,status,total_questions,duration_minutes,created_at").eq("status","active").order("created_at",{ascending:false});
+   const {data:activeExams,error}=await supabaseClient.from("exams").select("id,exam_name,status,total_questions,created_at").eq("status","active").order("created_at",{ascending:false});
    if(error)throw error;
    const list=document.getElementById("examList");
    if(!activeExams?.length)throw new Error("কোনো সক্রিয় পরীক্ষা পাওয়া যায়নি।");
-   list.innerHTML=activeExams.map(e=>`<div class="exam-list-item"><h3>${escapeHtml(e.exam_name||"পরীক্ষা")}</h3><div class="meta">প্রশ্ন: ${bn(Number(e.total_questions||0))}টি${e.duration_minutes?` • সময়: ${bn(Number(e.duration_minutes))} মিনিট`:""}</div><button class="btn" onclick="selectExam(${Number(e.id)})">এই পরীক্ষা নির্বাচন করুন</button></div>`).join("");
+   list.innerHTML=activeExams.map(e=>`<div class="exam-list-item"><h3>${escapeHtml(e.exam_name||"পরীক্ষা")}</h3><div class="meta">প্রশ্ন: ${bn(Number(e.total_questions||0))}টি</div><button class="btn" onclick="selectExam(${Number(e.id)})">এই পরীক্ষা নির্বাচন করুন</button></div>`).join("");
    document.getElementById("examListPage").classList.remove("hidden");
    document.getElementById("startPage").classList.add("hidden");
    return;
