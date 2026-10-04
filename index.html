@@ -5,7 +5,14 @@ const districts=["ঢাকা","চট্টগ্রাম","কুমিল�
 let exam=null,settings={},questions=[],answers={},optionMaps={},currentQuestion=0,timerInterval,timeLeft=0,student={},deviceToken="",resultData=null;
 const bn=n=>String(n).replace(/\d/g,d=>bnDigits[d]),esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function eid(){let x=new URLSearchParams(location.search).get("exam");return x&&/^\d+$/.test(x)?+x:null}
+function eid(){
+  const qs=new URLSearchParams(location.search);
+  const candidates=[qs.get("exam"),qs.get("exam_id"),qs.get("id")];
+  const hash=new URLSearchParams(String(location.hash||"").replace(/^#/,""));
+  candidates.push(hash.get("exam"),hash.get("exam_id"),hash.get("id"));
+  for(const x of candidates){if(x&&/^\d+$/.test(String(x).trim()))return Number(x)}
+  return null;
+}
 function status(t,c="status"){let e=document.getElementById("startStatus");e.className=c;e.textContent=t}
 function dhaka(){return new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Dhaka"}).format(new Date())}
 function device(){let k="mcq_exam_device_token_v1",t=localStorage.getItem(k);if(!t){t=crypto.randomUUID?crypto.randomUUID():"d-"+Date.now();localStorage.setItem(k,t)}return t}
