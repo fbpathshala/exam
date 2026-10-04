@@ -167,7 +167,7 @@
 
 .dashboard-cards{
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-columns:repeat(4,minmax(0,1fr));
   gap:14px
 }
 
@@ -204,9 +204,9 @@
   margin-top:6px
 }
 
-@media(max-width:480px){
+@media(max-width:800px){
   .dashboard-cards{
-    grid-template-columns:1fr
+    grid-template-columns:repeat(2,minmax(0,1fr))
   }
 }
 
@@ -307,7 +307,7 @@
       class="admin-menu-btn"
       id="adminMenuBtn"
       aria-label="মেনু"
-    >☰</button>
+    >⋮</button>
 
 
     <div
@@ -395,21 +395,7 @@
         class="smart-pill"
         id="smartHijri"
       >
-        🌙 হিজরি: লোড হচ্ছে...
-      </span>
-
-      <span
-        class="smart-pill"
-        id="smartSunrise"
-      >
-        🌅 সূর্যোদয়: লোড হচ্ছে...
-      </span>
-
-      <span
-        class="smart-pill"
-        id="smartSunset"
-      >
-        🌇 সূর্যাস্ত: লোড হচ্ছে...
+        🌙 হিজরি: বাংলাদেশে চাঁদ দেখা অনুযায়ী
       </span>
 
     </div>
@@ -485,7 +471,7 @@
       </span>
 
       <small>
-        ইউনিক ভিজিটর
+        Visitor tracking এখনো যুক্ত করা হয়নি
       </small>
 
     </div>
@@ -1208,96 +1194,454 @@
 <!-- =========================
      DASHBOARD SCRIPT
 ========================= -->
+
 <script>
+
 (function(){
-  const $=id=>document.getElementById(id);
-  const bn=n=>String(n??'').replace(/\d/g,d=>'০১২৩৪৫৬৭৮৯'[d]);
-  const hijriMonths=['মুহররম','সফর','রবিউল আউয়াল','রবিউস সানি','জমাদিউল আউয়াল','জমাদিউস সানি','রজব','শাবান','রমজান','শাওয়াল','জিলকদ','জিলহজ'];
 
-  function dhakaParts(){
-    const now=new Date();
-    const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Dhaka',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).formatToParts(now);
-    const get=t=>parts.find(x=>x.type===t)?.value||'';
-    return {year:+get('year'),month:+get('month'),day:+get('day'),hour:+get('hour'),minute:+get('minute'),second:+get('second')};
+  const bn = n =>
+    String(n ?? '')
+      .replace(
+        /\d/g,
+        d => '০১২৩৪৫৬৭৮৯'[d]
+      );
+
+
+  const bdMonths = [
+    'বৈশাখ',
+    'জ্যৈষ্ঠ',
+    'আষাঢ়',
+    'শ্রাবণ',
+    'ভাদ্র',
+    'আশ্বিন',
+    'কার্তিক',
+    'অগ্রহায়ণ',
+    'পৌষ',
+    'মাঘ',
+    'ফাল্গুন',
+    'চৈত্র'
+  ];
+
+
+  const bdWeek = [
+    'রবিবার',
+    'সোমবার',
+    'মঙ্গলবার',
+    'বুধবার',
+    'বৃহস্পতিবার',
+    'শুক্রবার',
+    'শনিবার'
+  ];
+
+
+  /*
+   * বাংলা তারিখ
+   *
+   * এটি Dashboard-এর
+   * আনুমানিক বাংলা ক্যালেন্ডার
+   * প্রদর্শনের জন্য।
+   */
+
+  function banglaDate(d){
+
+    const y = d.getFullYear();
+
+    let start = new Date(
+      y,
+      3,
+      14
+    );
+
+    let by = y - 593;
+
+
+    if(d < start){
+
+      by = y - 594;
+
+      start = new Date(
+        y - 1,
+        3,
+        14
+      );
+
+    }
+
+
+    let dayIndex =
+      Math.floor(
+        (d - start) / 86400000
+      );
+
+
+    const lens = [
+      31,
+      31,
+      31,
+      31,
+      31,
+      30,
+      30,
+      30,
+      30,
+      30,
+      30,
+      30
+    ];
+
+
+    let m = 0;
+
+
+    while(
+      m < 11 &&
+      dayIndex >= lens[m]
+    ){
+
+      dayIndex -= lens[m];
+
+      m++;
+
+    }
+
+
+    return (
+      bn(dayIndex + 1)
+      + ' '
+      + bdMonths[m]
+      + ' '
+      + bn(by)
+    );
+
   }
 
-  function banglaDate(p){
-    const starts=[14,14,15,16,16,16,16,16,15,15,14,14];
-    const names=['বৈশাখ','জ্যৈষ্ঠ','আষাঢ়','শ্রাবণ','ভাদ্র','আশ্বিন','কার্তিক','অগ্রহায়ণ','পৌষ','মাঘ','ফাল্গুন','চৈত্র'];
-    let m=p.month-1, y=p.year-593, day=p.day-starts[m]+1;
-    if(day<1){m--; if(m<0){m=11;y--;} day=p.day-(m===11?14:starts[m])+1; if(day<1)day+=30;}
-    return `${bn(day)} ${names[m]} ${bn(y)}`;
-  }
 
-  function hijriDate(){
-    try{
-      const d=new Date();
-      const parts=new Intl.DateTimeFormat('en-TN-u-ca-islamic-umalqura',{timeZone:'Asia/Dhaka',day:'numeric',month:'numeric',year:'numeric'}).formatToParts(d);
-      const day=parts.find(x=>x.type==='day')?.value;
-      const month=Number(parts.find(x=>x.type==='month')?.value||0);
-      const year=parts.find(x=>x.type==='year')?.value;
-      if(day&&month&&year)return `${bn(day)} ${hijriMonths[month-1]||''} ${bn(year)}`;
-    }catch(e){}
-    return 'বাংলাদেশে চাঁদ দেখা অনুযায়ী';
-  }
+  /*
+   * Bangladesh time
+   */
 
   function updateClock(){
-    const p=dhakaParts();
-    const now=new Date();
-    const english=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Dhaka',weekday:'long',month:'long',day:'numeric',year:'numeric'}).format(now);
-    const period=p.hour>=12?'PM':'AM';
-    const h=(p.hour%12)||12;
-    if($('smartToday'))$('smartToday').textContent=english;
-    if($('smartBangla'))$('smartBangla').textContent='🌾 বাংলা: '+banglaDate(p);
-    if($('smartHijri'))$('smartHijri').textContent='🌙 হিজরি: '+hijriDate();
-    if($('smartClock'))$('smartClock').textContent=`${String(h).padStart(2,'0')}:${String(p.minute).padStart(2,'0')}:${String(p.second).padStart(2,'0')} ${period}`;
+
+    const now = new Date();
+
+
+    const dateStr =
+      new Intl.DateTimeFormat(
+        'en-US',
+        {
+          timeZone:'Asia/Dhaka',
+          weekday:'long',
+          month:'long',
+          day:'numeric',
+          year:'numeric'
+        }
+      ).format(now);
+
+
+    const parts =
+      new Intl.DateTimeFormat(
+        'en-US',
+        {
+          timeZone:'Asia/Dhaka',
+          hour:'2-digit',
+          minute:'2-digit',
+          second:'2-digit',
+          hour12:true
+        }
+      ).formatToParts(now);
+
+
+    const hh =
+      parts.find(
+        x => x.type === 'hour'
+      )?.value || '--';
+
+
+    const mm =
+      parts.find(
+        x => x.type === 'minute'
+      )?.value || '--';
+
+
+    const ss =
+      parts.find(
+        x => x.type === 'second'
+      )?.value || '--';
+
+
+    const ap =
+      parts.find(
+        x => x.type === 'dayPeriod'
+      )?.value || '';
+
+
+    const dh =
+      new Date(
+        now.toLocaleString(
+          'en-US',
+          {
+            timeZone:'Asia/Dhaka'
+          }
+        )
+      );
+
+
+    const today =
+      document.getElementById(
+        'smartToday'
+      );
+
+
+    const clock =
+      document.getElementById(
+        'smartClock'
+      );
+
+
+    const bangla =
+      document.getElementById(
+        'smartBangla'
+      );
+
+
+    if(today){
+
+      today.textContent =
+        dateStr
+        + ' • '
+        + bdWeek[dh.getDay()];
+
+    }
+
+
+    if(clock){
+
+      clock.textContent =
+        hh
+        + ':'
+        + mm
+        + ':'
+        + ss
+        + ' '
+        + ap;
+
+    }
+
+
+    if(bangla){
+
+      bangla.textContent =
+        '🌾 বাংলা: '
+        + banglaDate(dh);
+
+    }
+
   }
 
-  async function loadSunTimes(){
-    const p=dhakaParts();
-    const date=`${p.year}-${String(p.month).padStart(2,'0')}-${String(p.day).padStart(2,'0')}`;
-    try{
-      const r=await fetch(`https://api.sunrise-sunset.org/json?lat=22.3569&lng=91.7832&date=${date}&formatted=0`);
-      const j=await r.json();
-      if(j.status!=='OK')throw Error('Sun API error');
-      const fmt=x=>new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Dhaka',hour:'numeric',minute:'2-digit',hour12:true}).format(new Date(x));
-      if($('smartSunrise'))$('smartSunrise').textContent='🌅 সূর্যোদয়: '+fmt(j.results.sunrise);
-      if($('smartSunset'))$('smartSunset').textContent='🌇 সূর্যাস্ত: '+fmt(j.results.sunset);
-    }catch(e){
-      if($('smartSunrise'))$('smartSunrise').textContent='🌅 সূর্যোদয়: তথ্য পাওয়া যায়নি';
-      if($('smartSunset'))$('smartSunset').textContent='🌇 সূর্যাস্ত: তথ্য পাওয়া যায়নি';
-      console.warn('Sunrise/sunset:',e);
-    }
-  }
+
+  /*
+   * Dashboard database statistics
+   */
 
   async function dashboardStats(){
-    if(typeof db==='undefined')return;
-    const q=await db.from('questions').select('id',{count:'exact',head:true});
-    const e=await db.from('exams').select('id',{count:'exact',head:true});
-    const a=await db.from('exam_attempts').select('id',{count:'exact',head:true});
-    const s=!a.error?a:await db.from('students').select('id',{count:'exact',head:true});
-    const v=await db.from('site_visitors').select('id',{count:'exact',head:true});
-    if($('sQuestions')&&!q.error)$('sQuestions').textContent=bn(q.count||0);
-    if($('sExams')&&!e.error)$('sExams').textContent=bn(e.count||0);
-    if($('sStudents')&&!s.error)$('sStudents').textContent=bn(s.count||0);
-    if($('sVisitors'))$('sVisitors').textContent=!v.error?bn(v.count||0):'—';
+
+    if(
+      typeof db === 'undefined'
+    ){
+
+      return;
+
+    }
+
+
+    const [
+      q,
+      e,
+      s
+    ] = await Promise.all([
+
+      db
+        .from('questions')
+        .select(
+          'id',
+          {
+            count:'exact',
+            head:true
+          }
+        ),
+
+      db
+        .from('exams')
+        .select(
+          'id',
+          {
+            count:'exact',
+            head:true
+          }
+        ),
+
+      db
+        .from('students')
+        .select(
+          'id',
+          {
+            count:'exact',
+            head:true
+          }
+        )
+
+    ]);
+
+
+    function setStat(
+      id,
+      value
+    ){
+
+      const el =
+        document.getElementById(id);
+
+
+      if(el){
+
+        el.textContent =
+          bn(value ?? 0);
+
+      }
+
+    }
+
+
+    if(!q.error){
+
+      setStat(
+        'sQuestions',
+        q.count
+      );
+
+    }
+
+
+    if(!e.error){
+
+      setStat(
+        'sExams',
+        e.count
+      );
+
+    }
+
+
+    if(!s.error){
+
+      setStat(
+        'sStudents',
+        s.count
+      );
+
+    }
+
   }
 
-  window.closeAdminMenu=function(){ $('adminMenuPanel')?.classList.add('hidden'); };
 
-  document.addEventListener('DOMContentLoaded',function(){
-    const btn=$('adminMenuBtn'),panel=$('adminMenuPanel');
-    if(btn&&panel)btn.onclick=e=>{e.stopPropagation();panel.classList.toggle('hidden');};
-    document.addEventListener('click',e=>{if(!e.target.closest('.admin-menu'))panel?.classList.add('hidden');});
-    updateClock();
-    loadSunTimes();
-    dashboardStats();
-    setInterval(updateClock,1000);
-    setInterval(loadSunTimes,60*60*1000);
-    setInterval(dashboardStats,5*60*1000);
-  });
+  /*
+   * Three-dot menu
+   */
+
+  window.closeAdminMenu =
+    function(){
+
+      document
+        .getElementById(
+          'adminMenuPanel'
+        )
+        ?.classList
+        .add('hidden');
+
+    };
+
+
+  document.addEventListener(
+    'click',
+    function(e){
+
+      const panel =
+        document.getElementById(
+          'adminMenuPanel'
+        );
+
+      const button =
+        document.getElementById(
+          'adminMenuBtn'
+        );
+
+
+      if(
+        panel &&
+        button &&
+        !panel.contains(e.target) &&
+        e.target !== button
+      ){
+
+        panel.classList.add(
+          'hidden'
+        );
+
+      }
+
+    }
+  );
+
+
+  document.addEventListener(
+    'DOMContentLoaded',
+    function(){
+
+      const button =
+        document.getElementById(
+          'adminMenuBtn'
+        );
+
+      const panel =
+        document.getElementById(
+          'adminMenuPanel'
+        );
+
+
+      if(button && panel){
+
+        button.onclick =
+          function(e){
+
+            e.stopPropagation();
+
+            panel.classList.toggle(
+              'hidden'
+            );
+
+          };
+
+      }
+
+
+      updateClock();
+
+      setInterval(
+        updateClock,
+        1000
+      );
+
+
+      dashboardStats();
+
+    }
+  );
+
+
 })();
+
 </script>
+
 
 <!-- =========================
      FOLDER / SET RENAME DELETE
