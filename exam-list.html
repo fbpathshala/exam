@@ -4,73 +4,135 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ফেইসবুক পাঠশালা — পরীক্ষার তালিকা</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f4f7fb;color:#172033}
-.top{background:#2563eb;color:#fff;padding:20px}
-.wrap{max-width:900px;margin:20px auto;padding:0 14px}
-.card{background:#fff;border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 4px 16px #0001}
-input,select{padding:12px;border:1px solid #ccd5e1;border-radius:10px;font-size:16px}
-input{width:100%}
-.exam{border:1px solid #e2e8f0;border-radius:14px;padding:16px;margin-top:12px}
-.btn{display:inline-block;background:#2563eb;color:#fff;padding:11px 15px;border-radius:10px;text-decoration:none;font-weight:bold;margin-top:10px}
-.error{background:#fee2e2;color:#991b1b}
-.muted{color:#64748b}
+
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f4f7fb;
+  color:#172033
+}
+
+.top{
+  background:#2563eb;
+  color:#fff;
+  padding:20px
+}
+
+.wrap{
+  max-width:900px;
+  margin:20px auto;
+  padding:0 14px
+}
+
+.card{
+  background:#fff;
+  border-radius:16px;
+  padding:20px;
+  margin-bottom:14px;
+  box-shadow:0 4px 16px #0001
+}
+
+input,select{
+  padding:12px;
+  border:1px solid #ccd5e1;
+  border-radius:10px;
+  font-size:16px
+}
+
+input{
+  width:100%
+}
+
+.exam{
+  border:1px solid #e2e8f0;
+  border-radius:14px;
+  padding:16px;
+  margin-top:12px
+}
+
+.btn{
+  display:inline-block;
+  background:#2563eb;
+  color:#fff;
+  padding:11px 15px;
+  border-radius:10px;
+  text-decoration:none;
+  font-weight:bold;
+  margin-top:10px
+}
+
+.error{
+  background:#fee2e2;
+  color:#991b1b
+}
+
+.muted{
+  color:#64748b
+}
 </style>
 </head>
 
 <body>
 
 <header class="top">
-<b>📚 ফেইসবুক পাঠশালা</b>
-<div>পরীক্ষার তালিকা</div>
+  <b>📚 ফেইসবুক পাঠশালা</b>
+  <div>পরীক্ষার তালিকা</div>
 </header>
 
 <main class="wrap">
 
 <section class="card">
-<h2>📝 পরীক্ষার তালিকা</h2>
 
-<input
-  id="search"
-  placeholder="পরীক্ষার নাম খুঁজুন"
-  oninput="render()"
->
+  <h2>📝 পরীক্ষার তালিকা</h2>
 
-<br><br>
+  <input
+    id="search"
+    placeholder="পরীক্ষার নাম খুঁজুন"
+    oninput="render()"
+  >
 
-<select id="filter" onchange="render()">
-  <option value="all">সব পরীক্ষা</option>
-  <option value="active">সক্রিয় পরীক্ষা</option>
-</select>
+  <br><br>
+
+  <select id="filter" onchange="render()">
+    <option value="all">সব পরীক্ষা</option>
+    <option value="active">সক্রিয় পরীক্ষা</option>
+  </select>
 
 </section>
 
 <section id="list" class="card muted">
-পরীক্ষার তালিকা লোড হচ্ছে...
+  পরীক্ষার তালিকা লোড হচ্ছে...
 </section>
 
 </main>
 
 <script>
 
-const sb=supabase.createClient(
+const sb = supabase.createClient(
   'https://ydvbnalhcnfqpxkkmywr.supabase.co',
   'sb_publishable_xCbSWDkASsbUPl-WmygyMw_eVrJY_9a'
 );
 
-const BN='০১২৩৪৫৬৭৮৯';
+const BN = '০১২৩৪৫৬৭৮৯';
 
-let exams=[];
+let exams = [];
 
-const bn=x=>
-  String(x??'').replace(/\d/g,d=>BN[d]);
 
-const esc=x=>
-  String(x??'').replace(
+/* ইংরেজি সংখ্যা → বাংলা সংখ্যা */
+const bn = x =>
+  String(x ?? '').replace(/\d/g, d => BN[d]);
+
+
+/* HTML নিরাপদ রাখার জন্য */
+const esc = x =>
+  String(x ?? '').replace(
     /[&<>"']/g,
-    m=>({
+    m => ({
       '&':'&amp;',
       '<':'&lt;',
       '>':'&gt;',
@@ -80,63 +142,74 @@ const esc=x=>
   );
 
 
+/*
+==================================================
+পরীক্ষার তালিকা লোড
+==================================================
+*/
 async function load(){
 
   try{
 
-    /*
-      প্রথমে পরীক্ষাগুলো লোড
-    */
-    const r=await sb
+    /* পরীক্ষাগুলো লোড */
+    const r = await sb
       .from('exams')
       .select('id,exam_name,status,total_questions')
       .order('id',{ascending:false});
 
     if(r.error) throw r.error;
 
-    exams=r.data||[];
+    exams = r.data || [];
 
 
     /*
-      গুরুত্বপূর্ণ পরিবর্তন:
-      পরীক্ষার প্রকৃত প্রশ্ন সংখ্যা
-      exam_questions টেবিল থেকে গণনা করা হচ্ছে।
-      
-      ফলে exams.total_questions ভুল/০ হলেও
-      Exam List-এ সঠিক সংখ্যা দেখাবে।
+    ------------------------------------------------
+    গুরুত্বপূর্ণ:
+    প্রশ্ন সংখ্যা exams.total_questions থেকে নয়,
+    সরাসরি exam_questions টেবিল থেকে গণনা করা হচ্ছে।
+    
+    তাই Exam 27-এর মতো ক্ষেত্রে যদি exams-এ
+    total_questions = 0 থাকে, তবুও এখানে
+    আসল ৪০টি প্রশ্ন দেখাবে।
+    ------------------------------------------------
     */
-    const q=await sb
+
+    const q = await sb
       .from('exam_questions')
       .select('exam_id,question_id');
 
     if(q.error) throw q.error;
 
 
-    const questionCount={};
+    const questionCount = {};
 
-    (q.data||[]).forEach(row=>{
 
-      const id=String(row.exam_id);
+    (q.data || []).forEach(row => {
 
-      questionCount[id]=
-        (questionCount[id]||0)+1;
+      const examId = String(row.exam_id);
+
+      questionCount[examId] =
+        (questionCount[examId] || 0) + 1;
 
     });
 
 
     /*
-      Exam settings থেকে অন্যান্য তথ্য
+    ------------------------------------------------
+    Exam Settings থেকে অন্যান্য তথ্য নেওয়া
+    ------------------------------------------------
     */
-    const s=await sb
+
+    const s = await sb
       .from('exam_settings')
       .select(
         'exam_id,total_questions,total_marks,duration_minutes,exam_date'
       );
 
 
-    const settingsMap=new Map(
-      (!s.error ? (s.data||[]) : [])
-        .map(x=>[
+    const settingsMap = new Map(
+      (!s.error ? (s.data || []) : [])
+        .map(x => [
           String(x.exam_id),
           x
         ])
@@ -144,20 +217,22 @@ async function load(){
 
 
     /*
-      সব তথ্য একত্র করা
+    ------------------------------------------------
+    সব তথ্য একত্র করা
+    ------------------------------------------------
     */
-    exams=exams.map(x=>({
+
+    exams = exams.map(x => ({
 
       ...x,
 
-      ...(settingsMap.get(String(x.id))||{}),
+      ...(settingsMap.get(String(x.id)) || {}),
 
       /*
-        exam_questions-এর count-ই
-        সর্বশেষ ও নির্ভরযোগ্য count
+      সর্বশেষ ও নির্ভরযোগ্য প্রশ্ন সংখ্যা
       */
       total_questions:
-        questionCount[String(x.id)]||0
+        questionCount[String(x.id)] || 0
 
     }));
 
@@ -167,47 +242,53 @@ async function load(){
 
   }catch(e){
 
-    const el=document.getElementById('list');
+    const el = document.getElementById('list');
 
-    el.className='card error';
+    el.className = 'card error';
 
-    el.textContent=
-      'পরীক্ষার তালিকা লোড করতে সমস্যা হয়েছে: '+
-      (e.message||'অজানা সমস্যা');
+    el.textContent =
+      'পরীক্ষার তালিকা লোড করতে সমস্যা হয়েছে: ' +
+      (e.message || 'অজানা সমস্যা');
 
   }
 
 }
 
 
+/*
+==================================================
+তালিকা প্রদর্শন
+==================================================
+*/
 function render(){
 
-  const q=
+  const q =
     document
       .getElementById('search')
       .value
       .toLowerCase()
       .trim();
 
-  const f=
+
+  const f =
     document
       .getElementById('filter')
       .value;
 
 
-  const rows=exams.filter(e=>
+  const rows = exams.filter(e =>
 
     (
-      f==='all' ||
-      String(e.status||'')
-        .toLowerCase()==='active'
+      f === 'all' ||
+      String(e.status || '')
+        .toLowerCase() === 'active'
     )
 
     &&
 
     (
       !q ||
-      String(e.exam_name||'')
+      String(e.exam_name || '')
         .toLowerCase()
         .includes(q)
     )
@@ -215,65 +296,72 @@ function render(){
   );
 
 
-  document.getElementById('list').innerHTML=
+  document.getElementById('list').innerHTML =
 
     rows.length
 
     ?
 
-    rows.map(e=>{
+    rows.map(e => {
 
-      const active=
-        String(e.status||'')
-          .toLowerCase()==='active';
+      const active =
+        String(e.status || '')
+          .toLowerCase() === 'active';
 
 
       return `
 
-      <div class="exam">
+        <div class="exam">
 
-        <b>
-          ${esc(
-            e.exam_name ||
-            'নামহীন পরীক্ষা'
-          )}
-        </b>
+          <b>
+            ${esc(
+              e.exam_name ||
+              'নামহীন পরীক্ষা'
+            )}
+          </b>
 
-        <p>
-          প্রশ্ন:
-          ${bn(e.total_questions||0)}
-          · মোট নম্বর:
-          ${bn(e.total_marks||0)}
+
+          <p>
+            প্রশ্ন:
+            ${bn(e.total_questions || 0)}
+
+            · মোট নম্বর:
+            ${bn(e.total_marks || 0)}
+
+            ${
+              e.duration_minutes
+              ?
+              ' · সময়: ' +
+              bn(e.duration_minutes) +
+              ' মিনিট'
+              :
+              ''
+            }
+          </p>
+
 
           ${
-            e.duration_minutes
+            active
+
             ?
-            ' · সময়: '+
-            bn(e.duration_minutes)+
-            ' মিনিট'
+
+            `
+            <a
+              class="btn"
+              href="index.html?exam=${encodeURIComponent(e.id)}"
+            >
+              পরীক্ষা শুরু করুন →
+            </a>
+            `
+
             :
-            ''
+
+            `
+            পরীক্ষাটি বর্তমানে সক্রিয় নয়
+            `
           }
-        </p>
 
-        ${
-          active
-
-          ?
-
-          `<a
-             class="btn"
-             href="index.html?exam=${encodeURIComponent(e.id)}"
-           >
-             পরীক্ষা শুরু করুন →
-           </a>`
-
-          :
-
-          'পরীক্ষাটি বর্তমানে সক্রিয় নয়'
-        }
-
-      </div>
+        </div>
 
       `;
 
@@ -286,6 +374,7 @@ function render(){
 }
 
 
+/* শুরু */
 load();
 
 </script>
