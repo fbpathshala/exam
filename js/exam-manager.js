@@ -42,6 +42,7 @@ async function loadExams(){
     <button onclick="location.href='answer-paper.html?exam=${e.id}'">✅ পরীক্ষার উত্তরপত্র</button>
     <button onclick="renameExam(${e.id},'${safeName}')">✏️ পরীক্ষার নাম পরিবর্তন</button>
     <button onclick="location.href='exam-setting.html?exam=${e.id}'">⚙️ পরীক্ষার সেটিংস পরিবর্তন</button>
+    <button onclick="location.href='results.html?exam=${e.id}'">📊 পরীক্ষার ফলাফল</button>
     <button onclick="copyLink('${safeLink}')">🔗 পরীক্ষার লিংক</button>
     <button class="secondary" onclick="toggleStatus(${e.id},'${e.status==='active'?'ended':'active'}')">${e.status==='active'?'🟢 পরীক্ষা Active':'🔴 পরীক্ষা Inactive'}</button>
     <button class="danger" onclick="deleteExam(${e.id},'${safeName}')">🗑️ পরীক্ষা Delete</button>
