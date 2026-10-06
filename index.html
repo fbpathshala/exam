@@ -107,24 +107,27 @@ async function loadExam(){
 }
 function resultCacheKey(){return "mcq_last_result_v2_"+String(exam?.id||"")+"_"+String(deviceToken||device());}
 function preparePreviousResultAccess(){
-  try{
-    deviceToken=device();
-    const raw=localStorage.getItem(resultCacheKey());
-    document.getElementById("previousResultBtn").style.display=raw?"block":"none";
-  }catch(_){document.getElementById("previousResultBtn").style.display="none"}
+  const b=document.getElementById("previousResultBtn");
+  if(b)b.style.display="block";
 }
-function showPreviousResult(){
+async function showPreviousResult(){
+  const mobile=document.getElementById("mobile").value.replace(/\D/g,"");
+  if(!/^01[3-9]\d{8}$/.test(mobile)){status("আগের ফলাফল দেখতে সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন।","status error");return}
   try{
-    const raw=localStorage.getItem(resultCacheKey());
-    if(!raw){status("আগের ফলাফলের তথ্য এই ব্রাউজারে পাওয়া যায়নি।","status error");return}
-    const cached=JSON.parse(raw);
-    resultData=cached.resultData;
-    settings={...settings,...(cached.settings||{})};
-    exam={...exam,...(cached.exam||{})};
+    const r=await sb.rpc("get_previous_exam_result",{p_exam_id:exam.id,p_mobile:mobile,p_attempt_date:dhaka()});
+    if(r.error)throw r.error;
+    if(!r.data?.success)throw Error(r.data?.message||"আগের ফলাফল পাওয়া যায়নি।");
+    resultData=r.data;
+    resultData.total_questions=+resultData.total_questions||0;
+    resultData.total_marks=+resultData.total_marks||(+settings.total_marks||resultData.total_questions*(+settings.marks_per_question||1));
+    resultData.percentage=resultData.total_marks?(+resultData.score||0)/resultData.total_marks*100:0;
     showResult();
-  }catch(e){console.error(e);status("আগের ফলাফল খোলা যায়নি।","status error")}
+  }catch(e){
+    console.error(e);
+    status("আগের ফলাফল দেখাতে সমস্যা হয়েছে: "+(e.message||e),"status error");
+  }
 }
-async function startExam(){let name=studentName.value.trim(),facebookName=document.getElementById("facebookName").value.trim(),districtV=district.value,mobile=document.getElementById("mobile").value.replace(/\D/g,"");if(!name)return status("❌ নাম লিখুন।","status error");if(!facebookName)return status("❌ ফেসবুক আইডি নাম লিখুন।","status error");if(!districtV)return status("❌ নিজ জেলা নির্বাচন করুন।","status error");if(!/^01[3-9]\d{8}$/.test(mobile))return status("❌ সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন।","status error");student={name,facebookName,district:districtV,mobile};deviceToken=device();try{let c=await sb.rpc("check_exam_attempt",{p_exam_id:exam.id,p_mobile:mobile,p_device_token:deviceToken,p_attempt_date:dhaka()});if(c.error)throw c.error;if(c.data?.already_attempted){preparePreviousResultAccess();const b=document.getElementById("previousResultBtn");if(b&&b.style.display!=="none"){status("এই ডিভাইস থেকে পরীক্ষা ইতিমধ্যে দেওয়া হয়েছে। নতুন করে পরীক্ষা দেওয়া যাবে না; আগের ফলাফল/উত্তরপত্র দেখতে নিচের বাটনটি ব্যবহার করুন।","status error");return}throw Error(c.data.reason||"এই পরীক্ষাটি আজ ইতিমধ্যে দেওয়া হয়েছে।");}startPage.classList.add("hidden");examPage.classList.remove("hidden");timeLeft=(+settings.duration_minutes||20)*60;answers={};currentQuestion=0;renderQuestion();startTimer()}catch(e){status("❌ "+e.message,"status error")}}
+async function startExam(){let name=studentName.value.trim(),facebookName=document.getElementById("facebookName").value.trim(),districtV=district.value,mobile=document.getElementById("mobile").value.replace(/\D/g,"");if(!name)return status("❌ নাম লিখুন।","status error");if(!facebookName)return status("❌ ফেসবুক আইডি নাম লিখুন।","status error");if(!districtV)return status("❌ নিজ জেলা নির্বাচন করুন।","status error");if(!/^01[3-9]\d{8}$/.test(mobile))return status("❌ সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন।","status error");student={name,facebookName,district:districtV,mobile};deviceToken=device();try{let c=await sb.rpc("check_exam_attempt",{p_exam_id:exam.id,p_mobile:mobile,p_device_token:deviceToken,p_attempt_date:dhaka()});if(c.error)throw c.error;if(c.data?.already_attempted){preparePreviousResultAccess();const b=document.getElementById("previousResultBtn");if(b)b.style.display="block";const prev=await sb.rpc("get_previous_exam_result",{p_exam_id:exam.id,p_mobile:mobile,p_attempt_date:dhaka()});if(!prev.error&&prev.data?.success){resultData=prev.data;resultData.total_questions=+resultData.total_questions||0;resultData.total_marks=+resultData.total_marks||(+settings.total_marks||resultData.total_questions*(+settings.marks_per_question||1));resultData.percentage=resultData.total_marks?(+resultData.score||0)/resultData.total_marks*100:0;showResult();return}status("এই পরীক্ষাটি ইতোমধ্যে দেওয়া হয়েছে। নতুন করে পরীক্ষা দেওয়া যাবে না। নিচের বাটন থেকে আগের ফলাফল/উত্তরপত্র দেখুন।","status error");return;}startPage.classList.add("hidden");examPage.classList.remove("hidden");timeLeft=(+settings.duration_minutes||20)*60;answers={};currentQuestion=0;renderQuestion();startTimer()}catch(e){status("❌ "+e.message,"status error")}}
 function renderQuestion(){if(settings.question_display_mode==="single"){allQuestions.classList.add("hidden");singleQuestionWrap.classList.remove("hidden");let q=questions[currentQuestion];progress.textContent=`প্রশ্ন ${bn(currentQuestion+1)} / ${bn(questions.length)}`;questionText.textContent=q.question_text;options.innerHTML="";(optionMaps[q.id]||["A","B","C","D"]).forEach((l,i)=>{let d=document.createElement("label");d.className="option";d.innerHTML=`<input type="radio" name="answer" value="${l}" ${answers[q.id]===l?"checked":""}><strong>${letters[String.fromCharCode(65+i)]}.</strong><span>${esc(q["option_"+l.toLowerCase()])}</span>`;d.querySelector("input").onchange=e=>answers[q.id]=e.target.value;options.appendChild(d)});prevBtn.style.visibility=currentQuestion?"visible":"hidden";nextBtn.classList.toggle("hidden",currentQuestion===questions.length-1);submitBtn.classList.toggle("hidden",currentQuestion!==questions.length-1)}else{singleQuestionWrap.classList.add("hidden");allQuestions.classList.remove("hidden");progress.textContent="মোট প্রশ্ন "+bn(questions.length)+"টি";prevBtn.classList.add("hidden");nextBtn.classList.add("hidden");submitBtn.classList.remove("hidden");allQuestions.innerHTML="";questions.forEach((q,i)=>{let w=document.createElement("div");w.className="question-block";w.innerHTML=`<div class="question">${bn(i+1)}. ${esc(q.question_text)}</div>`;(optionMaps[q.id]||["A","B","C","D"]).forEach((l,j)=>{let d=document.createElement("label");d.className="option";d.innerHTML=`<input type="radio" name="q_${q.id}" value="${l}" ${answers[q.id]===l?"checked":""}><strong>${letters[String.fromCharCode(65+j)]}.</strong><span>${esc(q["option_"+l.toLowerCase()])}</span>`;d.querySelector("input").onchange=e=>answers[q.id]=e.target.value;w.appendChild(d)});allQuestions.appendChild(w)})}}
 function nextQuestion(){if(currentQuestion<questions.length-1){currentQuestion++;renderQuestion()}}function previousQuestion(){if(currentQuestion>0){currentQuestion--;renderQuestion()}}
 function startTimer(){clearInterval(timerInterval);updateTimer();timerInterval=setInterval(()=>{timeLeft--;updateTimer();if(timeLeft<=0){clearInterval(timerInterval);submitExam(true)}},1000)}
@@ -156,19 +159,7 @@ resultData.percentage=resultData.total_marks?(+resultData.score||0)/resultData.t
 /* সবচেয়ে গুরুত্বপূর্ণ fix:
    Result review আর database-এর original/random order থেকে পুনর্গঠন করা হচ্ছে না।
    একই questions + optionMaps + answers ব্যবহার করা হচ্ছে যা student পরীক্ষার সময় দেখেছিল। */
-if(Array.isArray(resultData.review)&&resultData.review.length){
-  const backendReview=resultData.review;
-  resultData.review=questions.map((q,i)=>{
-    const b=backendReview.find(x=>String(x.question_id)===String(q.id));
-    if(!b)return null;
-    const map=(optionMaps[q.id]||["A","B","C","D"]).slice();
-    const selected=String(b.selected_option||answers[q.id]||"").toUpperCase();
-    const correct=String(b.correct_option||"").toUpperCase();
-    return {question_id:q.id,display_order:i,question_text:b.question_text||q.question_text,options:map.map((original,j)=>({display_letter:String.fromCharCode(65+j),original_letter:original,text:q["option_"+original.toLowerCase()]||"",selected:original===selected,correct:original===correct})),selected_option:selected||null,correct_option:correct||null,is_correct:selected!==""&&selected===correct,explanation:b.explanation||q.explanation||""};
-  }).filter(Boolean);
-}else{
-  resultData.review=buildExactStudentReview();
-}
+resultData.review=buildExactStudentReview();
 
 /* Attempt reload-এর জন্য browser-এ exact view রেখে দিচ্ছি। */
 if(resultData.attempt_id){try{localStorage.setItem("mcq_attempt_view_"+resultData.attempt_id,JSON.stringify({question_order:questions.map(q=>q.id),option_maps:optionMaps,review:resultData.review}))}catch(_){}}
@@ -176,7 +167,28 @@ try{localStorage.setItem(resultCacheKey(),JSON.stringify({resultData,settings,ex
 preparePreviousResultAccess();
 
 showResult();
-}catch(e){console.error(e);submitBtn.disabled=false;alert("ফলাফল সংরক্ষণ করতে সমস্যা হয়েছে: "+e.message)}}
+}catch(e){
+ console.error(e);
+ submitBtn.disabled=false;
+ const msg=String(e?.message||e);
+ if(msg.includes("exam_attempts_exam_id_student_id_attempt_date_key")||msg.includes("duplicate key value violates unique constraint")){
+   try{
+     const prev=await sb.rpc("get_previous_exam_result",{p_exam_id:exam.id,p_mobile:student.mobile,p_attempt_date:dhaka()});
+     if(!prev.error&&prev.data?.success){
+       resultData=prev.data;
+       resultData.total_questions=+resultData.total_questions||0;
+       resultData.total_marks=+resultData.total_marks||(+settings.total_marks||resultData.total_questions*(+settings.marks_per_question||1));
+       resultData.percentage=resultData.total_marks?(+resultData.score||0)/resultData.total_marks*100:0;
+       showResult();
+       return;
+     }
+   }catch(_){ }
+   status("এই পরীক্ষাটি ইতোমধ্যে দেওয়া হয়েছে। আগের ফলাফল/উত্তরপত্র দেখুন।","status error");
+   preparePreviousResultAccess();
+   return;
+ }
+ alert("ফলাফল সংরক্ষণ করতে সমস্যা হয়েছে: "+msg);
+}}
 
 function showResult(){examPage.classList.add("hidden");resultPage.classList.remove("hidden");resultExamTitle.textContent=exam.exam_name||"পরীক্ষার ফলাফল";resultMessage.textContent=settings.thank_you_message||"পরীক্ষায় অংশগ্রহণ করার জন্য ধন্যবাদ।";let d=resultData||{},show=settings.show_result!==false;score.classList.toggle("hidden",!show);document.querySelector("#resultPage .result-grid").classList.toggle("hidden",!show);score.textContent=bn(d.score||0)+" / "+bn(d.total_marks||0);marks.textContent=bn(d.score||0);percentage.textContent=bn(Math.round(d.percentage||0))+"%";rank.textContent=d.rank?bn(d.rank):"—";rankTotal.textContent=d.rank_total?bn(d.rank_total):"—";document.querySelectorAll("#resultPage .result-box")[2]?.classList.toggle("hidden",settings.show_rank===false);document.querySelectorAll("#resultPage .result-box")[3]?.classList.toggle("hidden",settings.show_rank===false);passStatus.textContent=d.pass_mark?((+d.score>=+d.pass_mark?"✅ উত্তীর্ণ":"❌ অনুত্তীর্ণ")+" — পাস নম্বর "+bn(d.pass_mark)):"";if(settings.show_answers===true&&Array.isArray(d.review))renderReview(d.review);socialHighlight.classList.remove("hidden");fbPageLink.href=settings.facebook_page_url||"https://www.facebook.com/facebookpathshala";fbGroupLink.href=settings.facebook_group_url||"https://www.facebook.com/groups/facebookpathshala"}
 
