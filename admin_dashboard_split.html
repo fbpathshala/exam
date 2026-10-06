@@ -32,6 +32,7 @@
 .bank-actions button{
   margin:0
 }
+
 </style>
 </head>
 
@@ -113,23 +114,16 @@
 
       <button
         type="button"
-        onclick="showPage('bank')"
+        onclick="showPage('bank');closeAdminMenu()"
       >
         🗂️ প্রশ্ন ব্যাংক
       </button>
 
       <button
         type="button"
-        onclick="showPage('exam')"
+        onclick="showPage('exam');closeAdminMenu()"
       >
         📋 পরীক্ষা পরিচালনা
-      </button>
-
-      <button
-        type="button"
-        onclick="location.href='results-manager.html'"
-      >
-        📊 পরীক্ষার ফলাফল
       </button>
 
       <button
@@ -828,11 +822,11 @@
 
 
     <a
-      href="results-manager.html"
+      href="results.html"
       target="_blank"
       class="result-link"
     >
-      📊 পরীক্ষার ফলাফল
+      📊 Result দেখুন
     </a>
 
 
@@ -1335,5 +1329,15 @@
 
 </script>
 
+<script>
+(function(){
+  const btn=document.getElementById('adminMenuBtn');
+  const panel=document.getElementById('adminMenuPanel');
+  if(!btn||!panel)return;
+  window.closeAdminMenu=function(){panel.classList.add('hidden')};
+  btn.addEventListener('click',function(e){e.stopPropagation();panel.classList.toggle('hidden')});
+  document.addEventListener('click',function(e){if(!e.target.closest('.admin-menu'))panel.classList.add('hidden')});
+})();
+</script>
 </body>
 </html>
