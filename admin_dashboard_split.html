@@ -33,6 +33,13 @@
   margin:0
 }
 
+
+
+/* Restored Admin Control menu behaviour */
+.admin-menu{position:relative;z-index:10000}
+.admin-menu-panel{position:absolute;right:0;top:calc(100% + 8px);z-index:10001;min-width:220px}
+.admin-menu-panel.hidden{display:none!important}
+.admin-menu-panel button{display:block;width:100%;text-align:left}
 </style>
 </head>
 
@@ -121,7 +128,7 @@
 
       <button
         type="button"
-        onclick="showPage('exam');closeAdminMenu()"
+        onclick="location.href='exam-manager.html'"
       >
         📋 পরীক্ষা পরিচালনা
       </button>
@@ -1329,14 +1336,22 @@
 
 </script>
 
+
 <script>
 (function(){
   const btn=document.getElementById('adminMenuBtn');
   const panel=document.getElementById('adminMenuPanel');
   if(!btn||!panel)return;
   window.closeAdminMenu=function(){panel.classList.add('hidden')};
-  btn.addEventListener('click',function(e){e.stopPropagation();panel.classList.toggle('hidden')});
-  document.addEventListener('click',function(e){if(!e.target.closest('.admin-menu'))panel.classList.add('hidden')});
+  btn.addEventListener('click',function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    panel.classList.toggle('hidden');
+  });
+  panel.addEventListener('click',function(e){e.stopPropagation()});
+  document.addEventListener('click',function(e){
+    if(!e.target.closest('.admin-menu'))panel.classList.add('hidden');
+  });
 })();
 </script>
 </body>
