@@ -6,74 +6,38 @@ const CATS = {
 
 let cat = 'verification_test';
 let subjects = [];
+let pendingImportRows = [];
 
 const $ = id => document.getElementById(id);
+const bn = n => String(n ?? '').replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
+const esc = v => String(v ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 
-const bn = n =>
-  String(n ?? '').replace(
-    /\d/g,
-    d => '০১২৩৪৫৬৭৮৯'[d]
-  );
-
-const esc = v =>
-  String(v ?? '').replace(
-    /[&<>"']/g,
-    m => ({
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#039;'
-    }[m])
-  );
-
-function msg(id, text, err = false) {
+function msg(id, text, err=false) {
   const el = $(id);
   if (!el) return;
-
   el.textContent = text;
   el.style.color = err ? '#b91c1c' : '#166534';
 }
 
-/* =========================
-   MENU
-========================= */
-
 function setupMenu() {
-  const btn = $('adminMenuBtn');
-  const panel = $('adminMenuPanel');
-
+  const btn = $('adminMenuBtn'), panel = $('adminMenuPanel');
   if (!btn || !panel) return;
-
   btn.addEventListener('click', e => {
     e.stopPropagation();
     panel.classList.toggle('hidden');
   });
-
   document.addEventListener('click', e => {
-    if (!panel.contains(e.target) && e.target !== btn) {
-      panel.classList.add('hidden');
-    }
+    if (!panel.contains(e.target) && e.target !== btn) panel.classList.add('hidden');
   });
 }
 
-/* =========================
-   LOGIN
-========================= */
-
 async function login() {
-  msg('loginMsg', 'Login হচ্ছে...');
-
-  const { error } = await db.auth.signInWithPassword({
+  msg('loginMsg','Login হচ্ছে...');
+  const {error} = await db.auth.signInWithPassword({
     email: $('email').value.trim(),
     password: $('password').value
   });
-
-  if (error) {
-    msg('loginMsg', error.message, true);
-    return;
-  }
-
+  if (error) return msg('loginMsg', error.message, true);
   await init();
 }
 
@@ -82,1078 +46,412 @@ async function logout() {
   location.reload();
 }
 
-/* =========================
-   INIT
-========================= */
-
 async function init() {
   setupMenu();
-
-  const { data, error } = await db.auth.getSession();
-
-  if (error) {
-    msg('loginMsg', error.message, true);
-    return;
-  }
-
+  const {data,error} = await db.auth.getSession();
+  if (error) return msg('loginMsg', error.message, true);
   if (!data.session) return;
-
   $('login')?.classList.add('hidden');
   $('app')?.classList.remove('hidden');
-
   await loadSubjects();
   await selectCategory(cat);
 }
 
-/* =========================
-   SUBJECTS
-========================= */
-
 async function loadSubjects() {
-  const { data, error } = await db
-    .from('subjects')
-    .select('id,name')
-    .order('id');
-
-  if (error) {
-    msg('loginMsg', error.message, true);
-    return;
-  }
-
+  const {data,error} = await db.from('subjects').select('id,name').order('id');
+  if (error) return msg('loginMsg', error.message, true);
   subjects = data || [];
-
   const el = $('subject');
-
-  if (!el) return;
-
-  el.innerHTML =
-    '<option value="">বিষয় নির্বাচন করুন</option>' +
-    subjects
-      .map(
-        x =>
-          `<option value="${x.id}">${esc(x.name)}</option>`
-      )
-      .join('');
+  if (el) {
+    el.innerHTML = '<option value="">বিষয় নির্বাচন করুন</option>' +
+      subjects.map(x => `<option value="${x.id}">${esc(x.name)}</option>`).join('');
+  }
 }
-
-/* =========================
-   CATEGORY
-========================= */
 
 async function selectCategory(c) {
   if (!CATS[c]) return;
-
   cat = c;
-
-  document
-    .querySelectorAll('.cats button')
-    .forEach(b => b.classList.remove('active'));
-
+  document.querySelectorAll('.cats button').forEach(b => b.classList.remove('active'));
   $('cat-' + c)?.classList.add('active');
-
-  if ($('currentCat')) {
-    $('currentCat').textContent =
-      'বর্তমান Category: ' + CATS[c];
-  }
-
+  if ($('currentCat')) $('currentCat').textContent = 'বর্তমান Category: ' + CATS[c];
   await loadFolders();
 }
 
-/* =========================
-   FOLDER
-========================= */
-
 async function loadFolders() {
-  const { data, error } = await db
-    .from('question_bank_folders')
-    .select('id,folder_name')
-    .eq('sub_category', CATS[cat])
-    .order('id');
-
-  if (error) {
-    msg('loginMsg', error.message, true);
-    return;
-  }
-
+  const {data,error} = await db.from('question_bank_folders')
+    .select('id,folder_name').eq('sub_category', CATS[cat]).order('id');
+  if (error) return msg('loginMsg', error.message, true);
   const el = $('folder');
-
   if (!el) return;
-
-  el.innerHTML =
-    '<option value="">Folder নির্বাচন করুন</option>' +
-    (data || [])
-      .map(
-        x =>
-          `<option value="${x.id}">${esc(x.folder_name)}</option>`
-      )
-      .join('');
-
+  el.innerHTML = '<option value="">Folder নির্বাচন করুন</option>' +
+    (data || []).map(x => `<option value="${x.id}">${esc(x.folder_name)}</option>`).join('');
   await loadSets();
 }
 
-/* =========================
-   SET
-========================= */
-
 async function loadSets() {
-  const folderId = $('folder')?.value;
-  const el = $('set');
-
+  const folderId = $('folder')?.value, el = $('set');
   if (!el) return;
-
   if (!folderId) {
-    el.innerHTML =
-      '<option value="">Set নির্বাচন করুন</option>';
+    el.innerHTML = '<option value="">Set নির্বাচন করুন</option>';
     return;
   }
-
-  const { data, error } = await db
-    .from('question_bank_sets')
-    .select('id,set_name')
-    .eq('folder_id', Number(folderId))
-    .order('id');
-
-  if (error) {
-    msg('loginMsg', error.message, true);
-    return;
-  }
-
-  el.innerHTML =
-    '<option value="">Set নির্বাচন করুন</option>' +
-    (data || [])
-      .map(
-        x =>
-          `<option value="${x.id}">${esc(x.set_name)}</option>`
-      )
-      .join('');
+  const {data,error} = await db.from('question_bank_sets')
+    .select('id,set_name').eq('folder_id', Number(folderId)).order('id');
+  if (error) return msg('loginMsg', error.message, true);
+  el.innerHTML = '<option value="">Set নির্বাচন করুন</option>' +
+    (data || []).map(x => `<option value="${x.id}">${esc(x.set_name)}</option>`).join('');
 }
-
-/* =========================
-   TEXT NORMALIZATION
-========================= */
 
 function norm(value) {
-  return String(value ?? '')
-    .trim()
-    .toLowerCase()
-    .replace(/[‐-‒–—−]/g, '-')
-    .replace(/\s+/g, ' ');
+  return String(value ?? '').replace(/\uFEFF/g,'').replace(/\u00A0/g,' ').trim()
+    .replace(/\s+/g,' ').replace(/[‐‑‒–—−]/g,'-').toLowerCase();
 }
-
-/* =========================
-   CATEGORY NORMALIZATION
-========================= */
-
-/*
-  CSV/Excel-এর category থাকলে সেটি
-  system-এর existing Category-এর সঙ্গে মিলানো হবে।
-
-  কোনো নতুন Category তৈরি করা হবে না।
-*/
 
 function normalizeCategory(value) {
-  const raw = norm(value);
-
-  if (!raw) return null;
-
   const aliases = {
-    'নিয়োগ পরীক্ষা': 'নিয়োগ পরীক্ষা',
-    'নিয়োগ': 'নিয়োগ পরীক্ষা',
-    'নিয়োগ পরিক্ষা': 'নিয়োগ পরীক্ষা',
-
-    'recruitment': 'নিয়োগ পরীক্ষা',
-    'recruitment exam': 'নিয়োগ পরীক্ষা',
-
-    'যাচাই পরীক্ষা': 'যাচাই পরীক্ষা',
-    'যাচাই': 'যাচাই পরীক্ষা',
-    'যাচাই পরিক্ষা': 'যাচাই পরীক্ষা',
-
-    'verification': 'যাচাই পরীক্ষা',
-    'verification test': 'যাচাই পরীক্ষা',
-
-    'সাম্প্রতিক প্রশ্ন': 'সাম্প্রতিক প্রশ্ন',
-    'সাম্প্রতিক': 'সাম্প্রতিক প্রশ্ন',
-
-    'recent': 'সাম্প্রতিক প্রশ্ন',
-    'recent questions': 'সাম্প্রতিক প্রশ্ন'
+    'নিয়োগ পরীক্ষা':'নিয়োগ পরীক্ষা','নিয়োগ':'নিয়োগ পরীক্ষা',
+    'নিয়োগ পরীক্ষা':'নিয়োগ পরীক্ষা','নিয়োগ':'নিয়োগ পরীক্ষা',
+    'recruitment':'নিয়োগ পরীক্ষা','recruitment exam':'নিয়োগ পরীক্ষা',
+    'যাচাই পরীক্ষা':'যাচাই পরীক্ষা','যাচাই':'যাচাই পরীক্ষা',
+    'verification':'যাচাই পরীক্ষা','verification test':'যাচাই পরীক্ষা',
+    'সাম্প্রতিক প্রশ্ন':'সাম্প্রতিক প্রশ্ন','সাম্প্রতিক':'সাম্প্রতিক প্রশ্ন',
+    'recent':'সাম্প্রতিক প্রশ্ন','recent questions':'সাম্প্রতিক প্রশ্ন'
   };
-
-  return aliases[raw] || null;
+  return aliases[norm(value)] || null;
 }
 
-/* =========================
-   CSV / EXCEL HEADER CHECK
-========================= */
-
-const REQUIRED_HEADERS = [
-  'question',
-  'option_a',
-  'option_b',
-  'option_c',
-  'option_d',
-  'correct_answer'
-];
-
-const OPTIONAL_HEADERS = [
-  'question_number',
-  'subject',
-  'explanation',
-  'category'
-];
-
-const FORBIDDEN_HEADERS = [
-  'source',
-  'folder',
-  'set'
-];
-
 function normalizeHeader(value) {
-  return String(value ?? '')
-    .trim()
-    .toLowerCase();
+  return norm(value).replace(/[\s\-]+/g,'_');
+}
+
+const HEADER_ALIASES = {
+  question: ['question'],
+  option_a: ['option_a'],
+  option_b: ['option_b'],
+  option_c: ['option_c'],
+  option_d: ['option_d'],
+  correct_answer: ['correct_answer'],
+  question_number: ['question_number'],
+  subject: ['subject'],
+  explanation: ['explanation'],
+  category: ['category']
+};
+
+const REQUIRED_HEADERS = ['question','option_a','option_b','option_c','option_d','correct_answer'];
+const ALLOWED_HEADERS = Object.keys(HEADER_ALIASES);
+
+function canonicalHeader(value) {
+  const h = normalizeHeader(value);
+  for (const [canonical, aliases] of Object.entries(HEADER_ALIASES)) {
+    if (aliases.some(a => normalizeHeader(a) === h)) return canonical;
+  }
+  return null;
 }
 
 function validateHeaders(rows) {
-  if (!rows || !rows.length) {
-    return {
-      ok: false,
-      message: 'ফাইলে কোনো প্রশ্ন পাওয়া যায়নি।'
-    };
+  if (!rows.length) throw new Error('ফাইলে কোনো data row পাওয়া যায়নি।');
+  const originalHeaders = Object.keys(rows[0] || {});
+  if (!originalHeaders.length) throw new Error('ফাইলের header পাওয়া যায়নি।');
+
+  const canonical = originalHeaders.map(canonicalHeader);
+  const unknown = originalHeaders.filter((h,i) => !canonical[i]);
+  if (unknown.length) {
+    throw new Error(`অপরিচিত column পাওয়া গেছে: ${unknown.join(', ')}। Template-এর ১০টি column ব্যবহার করুন।`);
   }
 
-  const headers = Object.keys(rows[0]).map(
-    normalizeHeader
-  );
-
-  /*
-    পুরোনো Source/Folder/Set ভিত্তিক template
-    যাতে ভুল করে ব্যবহার না করা যায়।
-  */
-
-  const forbiddenFound =
-    FORBIDDEN_HEADERS.filter(
-      h => headers.includes(h)
-    );
-
-  if (forbiddenFound.length) {
-    return {
-      ok: false,
-      message:
-        `এই ফাইলে পুরোনো/অনুমোদনহীন column আছে: ${forbiddenFound.join(', ')}। ` +
-        `নতুন Template ব্যবহার করুন।`
-    };
+  const duplicates = canonical.filter((h,i,a) => h && a.indexOf(h) !== i);
+  if (duplicates.length) {
+    throw new Error(`একই column একাধিকবার আছে: ${[...new Set(duplicates)].join(', ')}`);
   }
 
-  const missingRequired =
-    REQUIRED_HEADERS.filter(
-      h => !headers.includes(h)
-    );
-
-  if (missingRequired.length) {
-    return {
-      ok: false,
-      message:
-        `Required column পাওয়া যায়নি: ${missingRequired.join(', ')}`
-    };
+  const missing = REQUIRED_HEADERS.filter(h => !canonical.includes(h));
+  if (missing.length) {
+    throw new Error(`Required column নেই: ${missing.join(', ')}`);
   }
-
-  return {
-    ok: true,
-    headers
-  };
 }
 
-/* =========================
-   TEMPLATE
-========================= */
-
-function template() {
-  /*
-    Required:
-    question
-    option_a
-    option_b
-    option_c
-    option_d
-    correct_answer
-
-    Optional:
-    question_number
-    subject
-    explanation
-    category
-
-    Source / Folder / Set নেই।
-  */
-
-  const headers = [
-    'question',
-    'option_a',
-    'option_b',
-    'option_c',
-    'option_d',
-    'correct_answer',
-    'question_number',
-    'subject',
-    'explanation',
-    'category'
-  ];
-
-  const example = [
-    'বাংলাদেশের রাজধানী কোনটি?',
-    'ঢাকা',
-    'চট্টগ্রাম',
-    'রাজশাহী',
-    'খুলনা',
-    'A',
-    '',
-    '',
-    '',
-    ''
-  ];
-
-  const ws =
-    XLSX.utils.aoa_to_sheet([
-      headers,
-      example
-    ]);
-
-  ws['!cols'] = [
-    { wch: 35 },
-    { wch: 20 },
-    { wch: 20 },
-    { wch: 20 },
-    { wch: 20 },
-    { wch: 16 },
-    { wch: 18 },
-    { wch: 20 },
-    { wch: 35 },
-    { wch: 22 }
-  ];
-
-  const wb =
-    XLSX.utils.book_new();
-
-  XLSX.utils.book_append_sheet(
-    wb,
-    ws,
-    'Questions'
-  );
-
-  XLSX.writeFile(
-    wb,
-    'question-import-template.xlsx'
-  );
-}
-
-/* =========================
-   READ EXCEL / CSV
-========================= */
-
-function readWorkbook(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onload = e => {
-      try {
-        const wb = XLSX.read(
-          e.target.result,
-          {
-            type: 'array',
-            raw: false
-          }
-        );
-
-        const sheetName =
-          wb.SheetNames[0];
-
-        if (!sheetName) {
-          reject(
-            new Error(
-              'Excel/CSV ফাইলে কোনো Sheet পাওয়া যায়নি।'
-            )
-          );
-          return;
-        }
-
-        const sheet =
-          wb.Sheets[sheetName];
-
-        if (!sheet) {
-          reject(
-            new Error(
-              'Excel/CSV ফাইলে কোনো Sheet পাওয়া যায়নি।'
-            )
-          );
-          return;
-        }
-
-        const rows =
-          XLSX.utils.sheet_to_json(
-            sheet,
-            {
-              defval: '',
-              raw: false
-            }
-          );
-
-        resolve(rows);
-      } catch (err) {
-        reject(err);
-      }
-    };
-
-    reader.onerror = () => {
-      reject(
-        new Error(
-          'ফাইল পড়া যাচ্ছে না।'
-        )
-      );
-    };
-
-    reader.readAsArrayBuffer(file);
+function remapRows(rows) {
+  return rows.map(row => {
+    const out = {};
+    Object.entries(row).forEach(([key,value]) => {
+      const canonical = canonicalHeader(key);
+      if (canonical) out[canonical] = String(value ?? '').trim();
+    });
+    return out;
   });
 }
 
-/* =========================
-   PREVIEW IMPORT
-========================= */
+async function ensureXLSX() {
+  if (window.XLSX) return;
+  await new Promise((resolve,reject) => {
+    const existing = document.querySelector('script[data-question-xlsx="1"]');
+    if (existing) {
+      existing.addEventListener('load', resolve, {once:true});
+      existing.addEventListener('error', () => reject(new Error('Excel/CSV library লোড হয়নি।')), {once:true});
+      return;
+    }
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+    s.async = true;
+    s.dataset.questionXlsx = '1';
+    s.onload = resolve;
+    s.onerror = () => reject(new Error('Excel/CSV library লোড হয়নি। ইন্টারনেট সংযোগ পরীক্ষা করুন।'));
+    document.head.appendChild(s);
+  });
+  if (!window.XLSX) throw new Error('Excel/CSV library পাওয়া যায়নি।');
+}
+
+/* ঠিক ১০টি column। */
+async function template() {
+  const headers = [
+    'question','option_a','option_b','option_c','option_d',
+    'correct_answer','question_number','subject','explanation','category'
+  ];
+  const example = [
+    'বাংলাদেশের রাজধানী কোনটি?','ঢাকা','চট্টগ্রাম','রাজশাহী','খুলনা',
+    'A','1','বাংলাদেশ','',CATS[cat]
+  ];
+  await ensureXLSX();
+  const ws = XLSX.utils.aoa_to_sheet([headers, example]);
+  ws['!cols'] = [
+    {wch:35},{wch:20},{wch:20},{wch:20},{wch:20},
+    {wch:16},{wch:18},{wch:20},{wch:35},{wch:22}
+  ];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Questions');
+  XLSX.writeFile(wb, 'question-import-template.xlsx');
+}
+
+async function downloadTemplate() {
+  try {
+    await template();
+  } catch (err) {
+    msg('importMsg', err.message || 'Template তৈরি করা যায়নি।', true);
+  }
+}
+
+async function readWorkbook(file) {
+  await ensureXLSX();
+  const buffer = await file.arrayBuffer();
+  const wb = XLSX.read(buffer,{type:'array',raw:false,cellText:true,cellDates:false});
+  if (!wb.SheetNames?.length) throw new Error('Excel/CSV ফাইলে কোনো Sheet পাওয়া যায়নি।');
+  const sheet = wb.Sheets[wb.SheetNames[0]];
+  if (!sheet) throw new Error('Excel/CSV ফাইলে কোনো Sheet পাওয়া যায়নি।');
+  const rows = XLSX.utils.sheet_to_json(sheet,{defval:'',raw:false});
+  validateHeaders(rows);
+  return remapRows(rows);
+}
+
+function showImportButton(show) {
+  ['importBtn','importQuestionsBtn'].forEach(id => {
+    const el = $(id);
+    if (!el) return;
+    el.disabled = !show;
+    el.classList.toggle('hidden', !show);
+  });
+}
+
+function renderPreview(rows, failed=[]) {
+  const box = $('importPreview');
+  if (!box) return;
+  const parts = [`<b>মোট Row: ${bn(rows.length)}</b>`];
+  if (failed.length) {
+    parts.push('<div style="margin-top:10px"><b>যেসব Row-তে সমস্যা:</b></div>');
+    parts.push(failed.slice(0,100).map(x => `<div class="q">${esc(x)}</div>`).join(''));
+  }
+  const sample = rows.slice(0,5);
+  if (sample.length) {
+    parts.push('<div style="margin-top:10px"><b>Preview:</b></div>');
+    parts.push(sample.map((r,i) =>
+      `<div class="q"><b>Row ${bn(i+2)}</b><br>${esc(r.question || '(question খালি)')}</div>`
+    ).join(''));
+  }
+  box.innerHTML = parts.join('');
+}
 
 async function previewImport() {
-  const file =
-    $('importFile')?.files?.[0];
+  const file = $('importFile')?.files?.[0];
+  if (!file) return msg('importMsg','আগে CSV/Excel ফাইল নির্বাচন করুন।',true);
+  if (!$('folder')?.value || !$('set')?.value)
+    return msg('importMsg','আগে Folder এবং Set নির্বাচন করুন।',true);
 
-  if (!file) {
-    msg(
-      'importMsg',
-      'আগে CSV/Excel ফাইল নির্বাচন করুন।',
-      true
-    );
-    return;
-  }
-
-  if (
-    !$('folder')?.value ||
-    !$('set')?.value
-  ) {
-    msg(
-      'importMsg',
-      'আগে Folder এবং Set নির্বাচন করুন।',
-      true
-    );
-    return;
-  }
-
+  showImportButton(false);
+  msg('importMsg','ফাইল যাচাই করা হচ্ছে...');
   try {
-    const rows =
-      await readWorkbook(file);
-
-    const headerCheck =
-      validateHeaders(rows);
-
-    if (!headerCheck.ok) {
-      msg(
-        'importMsg',
-        headerCheck.message,
-        true
-      );
-      return;
+    const rows = await readWorkbook(file);
+    const failed = validateRows(rows);
+    pendingImportRows = rows.filter((_,i) => !failed.some(x => x.rowIndex === i));
+    renderPreview(rows, failed.map(x => `Row ${x.rowNo}: ${x.message}`));
+    if (!pendingImportRows.length) {
+      return msg('importMsg','কোনো valid Row পাওয়া যায়নি।',true);
     }
-
-    if ($('importPreview')) {
-      $('importPreview').innerHTML =
-        `<b>মোট Row: ${bn(rows.length)}</b><br><br>` +
-        rows
-          .slice(0, 5)
-          .map(
-            (r, i) =>
-              `<div class="q">
-                <b>Row ${bn(i + 2)}</b><br>
-                ${esc(
-                  r.question ||
-                  '(question খালি)'
-                )}
-              </div>`
-          )
-          .join('');
-    }
-
-    msg(
-      'importMsg',
-      `ফাইল ঠিকভাবে পড়া গেছে। মোট ${bn(rows.length)}টি Row পাওয়া গেছে।`
-    );
-  } catch (err) {
-    msg(
-      'importMsg',
-      err.message ||
-        'ফাইল পড়তে সমস্যা হয়েছে।',
-      true
-    );
+    showImportButton(true);
+    msg('importMsg',`মোট ${bn(rows.length)}টি Row | Valid ${bn(pendingImportRows.length)} | Invalid ${bn(rows.length-pendingImportRows.length)}${failed.length ? ' — Invalid Row বাদ থাকবে।' : ''}`, failed.length > 0);
+  } catch(err) {
+    pendingImportRows = [];
+    if ($('importPreview')) $('importPreview').innerHTML = '';
+    msg('importMsg',err.message || 'ফাইল যাচাই করতে সমস্যা হয়েছে।',true);
   }
 }
 
-/* =========================
-   IMPORT QUESTIONS
-========================= */
+function validateRows(rows) {
+  const failed = [];
+  rows.forEach((row,i) => {
+    const rowNo = i + 2;
+    const missing = [];
+    if (!row.question) missing.push('question');
+    if (!row.option_a) missing.push('option_a');
+    if (!row.option_b) missing.push('option_b');
+    if (!row.option_c) missing.push('option_c');
+    if (!row.option_d) missing.push('option_d');
+    if (!row.correct_answer) missing.push('correct_answer');
+    if (missing.length) failed.push({rowIndex:i,rowNo,message:`Required field খালি — ${missing.join(', ')}`});
+
+    const correct = String(row.correct_answer || '').trim().toUpperCase();
+    if (correct && !['A','B','C','D'].includes(correct)) {
+      failed.push({rowIndex:i,rowNo,message:'correct_answer অবশ্যই A, B, C অথবা D হতে হবে।'});
+    }
+
+    if (String(row.question_number ?? '').trim() !== '') {
+      const n = Number(String(row.question_number).trim());
+      if (!Number.isFinite(n) || n <= 0 || !Number.isInteger(n)) {
+        failed.push({rowIndex:i,rowNo,message:'question_number অবশ্যই ০-এর চেয়ে বড় পূর্ণসংখ্যা হতে হবে।'});
+      }
+    }
+
+    if (String(row.category ?? '').trim() && !normalizeCategory(row.category)) {
+      failed.push({rowIndex:i,rowNo,message:`category "${row.category}" পরিচিত Category নয়।`});
+    }
+
+    if (String(row.subject ?? '').trim()) {
+      const found = subjects.find(s => norm(s.name) === norm(row.subject));
+      if (!found) failed.push({rowIndex:i,rowNo,message:`subject "${row.subject}" পাওয়া যায়নি।`});
+    }
+  });
+  return failed.filter((x,i,a) => a.findIndex(y => y.rowIndex === x.rowIndex) === i);
+}
 
 async function importRows() {
-  const file =
-    $('importFile')?.files?.[0];
+  const file = $('importFile')?.files?.[0];
+  if (!file) return msg('importMsg','আগে CSV/Excel ফাইল নির্বাচন করুন।',true);
 
-  if (!file) {
-    msg(
-      'importMsg',
-      'আগে CSV/Excel ফাইল নির্বাচন করুন।',
-      true
-    );
-    return;
+  const folderId = $('folder')?.value, setId = $('set')?.value;
+  if (!folderId || !setId)
+    return msg('importMsg','আগে Folder এবং Set নির্বাচন করুন।',true);
+
+  let rows = pendingImportRows;
+  if (!rows.length) {
+    try { rows = await readWorkbook(file); }
+    catch(err) { return msg('importMsg',err.message || 'ফাইল পড়তে সমস্যা হয়েছে।',true); }
+    const failed = validateRows(rows);
+    rows = rows.filter((_,i) => !failed.some(x => x.rowIndex === i));
   }
+  if (!rows.length) return msg('importMsg','কোনো valid প্রশ্ন পাওয়া যায়নি।',true);
 
-  const folderId =
-    $('folder')?.value;
+  showImportButton(false);
+  msg('importMsg','Database-এ প্রশ্ন যোগ হচ্ছে...');
 
-  const setId =
-    $('set')?.value;
-
-  if (!folderId || !setId) {
-    msg(
-      'importMsg',
-      'আগে Folder এবং Set নির্বাচন করুন।',
-      true
-    );
-    return;
-  }
-
-  let rows;
-
-  try {
-    rows =
-      await readWorkbook(file);
-  } catch (err) {
-    msg(
-      'importMsg',
-      err.message ||
-        'ফাইল পড়তে সমস্যা হয়েছে।',
-      true
-    );
-    return;
-  }
-
-  const headerCheck =
-    validateHeaders(rows);
-
-  if (!headerCheck.ok) {
-    msg(
-      'importMsg',
-      headerCheck.message,
-      true
-    );
-    return;
-  }
-
-  const folderNumber =
-    Number(folderId);
-
-  const setNumber =
-    Number(setId);
-
-  if (
-    !Number.isInteger(folderNumber) ||
-    !Number.isInteger(setNumber)
-  ) {
-    msg(
-      'importMsg',
-      'Folder বা Set নির্বাচন সঠিক নয়।',
-      true
-    );
-    return;
-  }
-
-  let success = 0;
-  const failed = [];
-
-  /*
-    Upload destination:
-    নির্বাচিত Category + Folder + Set
-
-    CSV-এর Folder/Set ব্যবহার করা হবে না।
-  */
-
-  for (
-    let i = 0;
-    i < rows.length;
-    i++
-  ) {
-    const row = rows[i];
-    const rowNo = i + 2;
-
-    /* -------------------------
-       Required fields
-    ------------------------- */
-
-    const question =
-      String(
-        row.question ?? ''
-      ).trim();
-
-    const a =
-      String(
-        row.option_a ?? ''
-      ).trim();
-
-    const b =
-      String(
-        row.option_b ?? ''
-      ).trim();
-
-    const c =
-      String(
-        row.option_c ?? ''
-      ).trim();
-
-    const d =
-      String(
-        row.option_d ?? ''
-      ).trim();
-
-    const correct =
-      String(
-        row.correct_answer ?? ''
-      )
-        .trim()
-        .toUpperCase();
-
-    const missing = [];
-
-    if (!question)
-      missing.push('question');
-
-    if (!a)
-      missing.push('option_a');
-
-    if (!b)
-      missing.push('option_b');
-
-    if (!c)
-      missing.push('option_c');
-
-    if (!d)
-      missing.push('option_d');
-
-    if (!correct)
-      missing.push('correct_answer');
-
-    if (missing.length) {
-      failed.push(
-        `Row ${rowNo}: Required field খালি — ${missing.join(', ')}`
-      );
-      continue;
-    }
-
-    if (
-      !['A', 'B', 'C', 'D'].includes(
-        correct
-      )
-    ) {
-      failed.push(
-        `Row ${rowNo}: correct_answer অবশ্যই A, B, C অথবা D হতে হবে।`
-      );
-      continue;
-    }
-
-    /* -------------------------
-       Question Number
-    ------------------------- */
-
+  const payload = rows.map(row => {
     let questionNumber = null;
+    if (String(row.question_number ?? '').trim() !== '') questionNumber = Number(row.question_number);
 
-    const qnoRaw =
-      String(
-        row.question_number ?? ''
-      ).trim();
-
-    if (qnoRaw !== '') {
-      const n =
-        Number(qnoRaw);
-
-      if (
-        !Number.isFinite(n) ||
-        n <= 0 ||
-        !Number.isInteger(n)
-      ) {
-        failed.push(
-          `Row ${rowNo}: question_number অবশ্যই ০-এর চেয়ে বড় পূর্ণসংখ্যা হতে হবে।`
-        );
-        continue;
-      }
-
-      questionNumber = n;
-    }
-
-    /* -------------------------
-       Category
-    ------------------------- */
-
-    let category =
-      CATS[cat];
-
-    const suppliedCategory =
-      String(
-        row.category ?? ''
-      ).trim();
-
-    if (suppliedCategory) {
-      const normalized =
-        normalizeCategory(
-          suppliedCategory
-        );
-
-      if (!normalized) {
-        failed.push(
-          `Row ${rowNo}: category "${suppliedCategory}" পরিচিত Category নয়। নতুন Category তৈরি করা হবে না।`
-        );
-        continue;
-      }
-
-      category = normalized;
-    }
-
-    /* -------------------------
-       Subject
-    ------------------------- */
+    let category = CATS[cat];
+    if (String(row.category ?? '').trim()) category = normalizeCategory(row.category);
 
     let subjectId = null;
-
-    const suppliedSubject =
-      String(
-        row.subject ?? ''
-      ).trim();
-
-    if (suppliedSubject) {
-      const found =
-        subjects.find(
-          s =>
-            norm(s.name) ===
-            norm(suppliedSubject)
-        );
-
-      if (!found) {
-        failed.push(
-          `Row ${rowNo}: subject "${suppliedSubject}" পাওয়া যায়নি।`
-        );
-        continue;
-      }
-
-      subjectId = found.id;
+    if (String(row.subject ?? '').trim()) {
+      const found = subjects.find(s => norm(s.name) === norm(row.subject));
+      subjectId = found?.id ?? null;
     }
 
-    /* -------------------------
-       Explanation
-    ------------------------- */
+    return {
+      folder_id:Number(folderId),
+      set_id:Number(setId),
+      subject_id:subjectId,
+      category,
+      question_number:questionNumber,
+      question_text:String(row.question ?? '').trim(),
+      option_a:String(row.option_a ?? '').trim(),
+      option_b:String(row.option_b ?? '').trim(),
+      option_c:String(row.option_c ?? '').trim(),
+      option_d:String(row.option_d ?? '').trim(),
+      correct_answer:String(row.correct_answer ?? '').trim().toUpperCase(),
+      explanation:String(row.explanation ?? '').trim() || null
+    };
+  });
 
-    const explanation =
-      String(
-        row.explanation ?? ''
-      ).trim() || null;
+  const {error} = await db.from('questions').insert(payload);
+  pendingImportRows = [];
 
-    /* -------------------------
-       DATABASE INSERT
-    -------------------------
-
-       লক্ষ্য করুন:
-
-       এখানে কোনো
-       source
-       source_type
-       source field
-
-       নেই।
-
-       Source পরিচয় স্বয়ংক্রিয়ভাবে
-       Category + Folder + Set +
-       Question Number থেকেই পাওয়া যাবে।
-    */
-
-    const { error } =
-      await db
-        .from('questions')
-        .insert({
-          folder_id: folderNumber,
-          set_id: setNumber,
-          subject_id: subjectId,
-
-          category,
-
-          question_number:
-            questionNumber,
-
-          question_text:
-            question,
-
-          option_a: a,
-          option_b: b,
-          option_c: c,
-          option_d: d,
-
-          correct_answer:
-            correct,
-
-          explanation
-        });
-
-    if (error) {
-      failed.push(
-        `Row ${rowNo}: ${error.message}`
-      );
-    } else {
-      success++;
-    }
+  if (error) {
+    if ($('importPreview')) $('importPreview').innerHTML = `<div class="q">${esc(error.message)}</div>`;
+    return msg('importMsg',`Database-এ কোনো প্রশ্ন যোগ হয়নি। ${error.message}`,true);
   }
 
-  let result =
-    `সফলভাবে ${bn(success)}টি প্রশ্ন যোগ হয়েছে।`;
-
-  if (failed.length) {
-    result +=
-      ` ${bn(failed.length)}টি Row যোগ হয়নি।`;
-
-    if ($('importPreview')) {
-      $('importPreview').innerHTML =
-        '<b>যেসব Row যোগ হয়নি:</b><br><br>' +
-        failed
-          .map(
-            x =>
-              `<div class="q">${esc(x)}</div>`
-          )
-          .join('');
-    }
-  } else {
-    if ($('importPreview')) {
-      $('importPreview').innerHTML = '';
-    }
-  }
-
-  msg(
-    'importMsg',
-    result,
-    failed.length > 0
-  );
+  if ($('importPreview')) $('importPreview').innerHTML = '';
+  msg('importMsg',`সফলভাবে ${bn(payload.length)}টি প্রশ্ন যোগ হয়েছে।`);
 }
 
-/* =========================
-   MANUAL QUESTION
-========================= */
-
 async function addManual() {
-  const folderId =
-    $('folder')?.value;
+  const folderId = $('folder')?.value, setId = $('set')?.value;
+  if (!folderId || !setId) return msg('manualMsg','আগে Folder এবং Set নির্বাচন করুন।',true);
 
-  const setId =
-    $('set')?.value;
+  const question = $('question')?.value.trim();
+  const a = $('optionA')?.value.trim(), b = $('optionB')?.value.trim();
+  const c = $('optionC')?.value.trim(), d = $('optionD')?.value.trim();
+  const correct = $('correctAnswer')?.value.trim().toUpperCase();
+  const explanation = $('explanation')?.value.trim() || null;
+  const qnoRaw = $('questionNumber')?.value.trim() || '';
+  const subjectId = $('subject')?.value || null;
 
-  if (!folderId || !setId) {
-    msg(
-      'manualMsg',
-      'আগে Folder এবং Set নির্বাচন করুন।',
-      true
-    );
-    return;
-  }
-
-  const question =
-    $('question')
-      ?.value
-      .trim();
-
-  const a =
-    $('optionA')
-      ?.value
-      .trim();
-
-  const b =
-    $('optionB')
-      ?.value
-      .trim();
-
-  const c =
-    $('optionC')
-      ?.value
-      .trim();
-
-  const d =
-    $('optionD')
-      ?.value
-      .trim();
-
-  const correct =
-    $('correctAnswer')
-      ?.value
-      .trim()
-      .toUpperCase();
-
-  const explanation =
-    $('explanation')
-      ?.value
-      .trim() || null;
-
-  const qnoRaw =
-    $('questionNumber')
-      ?.value
-      .trim() || '';
-
-  const subjectId =
-    $('subject')?.value || null;
-
-  /* Required validation */
-
-  if (
-    !question ||
-    !a ||
-    !b ||
-    !c ||
-    !d ||
-    !correct
-  ) {
-    msg(
-      'manualMsg',
-      'প্রয়োজনীয় ঘরগুলো পূরণ করুন।',
-      true
-    );
-    return;
-  }
-
-  if (
-    !['A', 'B', 'C', 'D'].includes(
-      correct
-    )
-  ) {
-    msg(
-      'manualMsg',
-      'সঠিক উত্তর A, B, C অথবা D হতে হবে।',
-      true
-    );
-    return;
-  }
-
-  /* Question Number */
+  if (!question || !a || !b || !c || !d || !correct)
+    return msg('manualMsg','প্রয়োজনীয় ঘরগুলো পূরণ করুন।',true);
+  if (!['A','B','C','D'].includes(correct))
+    return msg('manualMsg','সঠিক উত্তর A, B, C অথবা D হতে হবে।',true);
 
   let questionNumber = null;
-
   if (qnoRaw) {
-    const n =
-      Number(qnoRaw);
-
-    if (
-      !Number.isInteger(n) ||
-      n <= 0
-    ) {
-      msg(
-        'manualMsg',
-        'প্রশ্ন নম্বর অবশ্যই ০-এর চেয়ে বড় পূর্ণসংখ্যা হতে হবে।',
-        true
-      );
-      return;
-    }
-
+    const n = Number(qnoRaw);
+    if (!Number.isInteger(n) || n <= 0)
+      return msg('manualMsg','প্রশ্ন নম্বর অবশ্যই ০-এর চেয়ে বড় পূর্ণসংখ্যা হতে হবে।',true);
     questionNumber = n;
   }
 
-  /*
-    Manual Question destination:
-
-    বর্তমান UI-এর
-    Category + Folder + Set
-
-    এগুলোর ভিত্তিতেই প্রশ্ন সংরক্ষণ হবে।
-
-    কোনো Source field নেই।
-  */
-
-  const { error } =
-    await db
-      .from('questions')
-      .insert({
-        folder_id: Number(folderId),
-        set_id: Number(setId),
-
-        subject_id:
-          subjectId
-            ? Number(subjectId)
-            : null,
-
-        category:
-          CATS[cat],
-
-        question_number:
-          questionNumber,
-
-        question_text:
-          question,
-
-        option_a: a,
-        option_b: b,
-        option_c: c,
-        option_d: d,
-
-        correct_answer:
-          correct,
-
-        explanation
-      });
-
-  if (error) {
-    msg(
-      'manualMsg',
-      error.message,
-      true
-    );
-    return;
-  }
-
-  msg(
-    'manualMsg',
-    'প্রশ্ন সফলভাবে যোগ হয়েছে।'
-  );
-
-  /* Clear form */
-
-  [
-    'question',
-    'questionNumber',
-    'optionA',
-    'optionB',
-    'optionC',
-    'optionD',
-    'explanation'
-  ].forEach(id => {
-    if ($(id)) {
-      $(id).value = '';
-    }
+  const {error} = await db.from('questions').insert({
+    folder_id:Number(folderId),
+    set_id:Number(setId),
+    subject_id:subjectId ? Number(subjectId) : null,
+    category:CATS[cat],
+    question_number:questionNumber,
+    question_text:question,
+    option_a:a,
+    option_b:b,
+    option_c:c,
+    option_d:d,
+    correct_answer:correct,
+    explanation
   });
 
-  if ($('correctAnswer')) {
-    $('correctAnswer').value = '';
-  }
+  if (error) return msg('manualMsg',error.message,true);
+  msg('manualMsg','প্রশ্ন সফলভাবে যোগ হয়েছে।');
 
-  if ($('subject')) {
-    $('subject').value = '';
-  }
+  ['question','questionNumber','optionA','optionB','optionC','optionD','explanation']
+    .forEach(id => { if ($(id)) $(id).value=''; });
+  if ($('correctAnswer')) $('correctAnswer').value='';
+  if ($('subject')) $('subject').value='';
 }
 
-/* =========================
-   EVENTS
-========================= */
+window.template = template;
+window.downloadTemplate = downloadTemplate;
+window.previewImport = previewImport;
+window.importRows = importRows;
+window.addManual = addManual;
+window.selectCategory = selectCategory;
+window.loadSets = loadSets;
+window.login = login;
+window.logout = logout;
 
-document.addEventListener(
-  'DOMContentLoaded',
-  () => {
-    if ($('folder')) {
-      $('folder').addEventListener(
-        'change',
-        loadSets
-      );
-    }
-
-    init();
-  }
-);
+document.addEventListener('DOMContentLoaded', () => {
+  if ($('folder')) $('folder').addEventListener('change',loadSets);
+  init();
+});
