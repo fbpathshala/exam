@@ -1,8 +1,3 @@
-/* =========================================================
-   QUESTION CREATE
-   Category → Folder → Set → Subject → Question
-========================================================= */
-
 const CATS = {
   recruitment: "নিয়োগ পরীক্ষা",
   verification_test: "যাচাই পরীক্ষা",
@@ -18,11 +13,13 @@ function el(id) {
   return document.getElementById(id);
 }
 
+function normalizeText(value) {
+  if (value === undefined || value === null) return "";
+  return String(value).trim();
+}
 
 function showMessage(id, message, type = "normal") {
-
   const box = el(id);
-
   if (!box) return;
 
   box.textContent = message;
@@ -36,85 +33,64 @@ function showMessage(id, message, type = "normal") {
   }
 }
 
-
 function clearMessage(id) {
   showMessage(id, "");
 }
 
 
-function fillSelect(selectId, items, placeholder, valueKey, textKey) {
-
-  const select = el(selectId);
-
-  if (!select) return;
-
-  select.innerHTML = "";
-
-  const first = document.createElement("option");
-  first.value = "";
-  first.textContent = placeholder;
-
-  select.appendChild(first);
-
-  items.forEach(item => {
-
-    const option = document.createElement("option");
-
-    option.value = item[valueKey];
-    option.textContent = item[textKey];
-
-    select.appendChild(option);
-
-  });
-}
-
-
-function categoryList() {
-
-  return Object.entries(CATS).map(([value, label]) => ({
-    value,
-    label
-  }));
-
-}
-
+/* =========================================================
+   CATEGORY
+========================================================= */
 
 function fillCategorySelect(selectId) {
 
   const select = el(selectId);
-
   if (!select) return;
 
   select.innerHTML =
-    `<option value="">ক্যাটাগরি নির্বাচন করুন</option>`;
+    '<option value="">ক্যাটাগরি নির্বাচন করুন</option>';
 
-  categoryList().forEach(item => {
+  Object.entries(CATS).forEach(([key, label]) => {
 
     const option = document.createElement("option");
 
-    option.value = item.value;
-    option.textContent = item.label;
+    option.value = key;
+    option.textContent = label;
 
     select.appendChild(option);
-
   });
-
 }
 
 
-function normalizeText(value) {
+/*
+  Database-এ Category হয়তো:
+  - recruitment
+  - নিয়োগ পরীক্ষা
 
-  if (value === undefined || value === null) {
-    return "";
-  }
+  দুটো যেকোনো একটি হতে পারে।
+  তাই দুইভাবেই match করা হচ্ছে।
+*/
 
-  return String(value).trim();
+function categoryMatches(folderCategory, selectedCategory) {
 
+  const dbValue =
+    normalizeText(folderCategory);
+
+  const selectedKey =
+    normalizeText(selectedCategory);
+
+  const selectedLabel =
+    CATS[selectedKey] || selectedKey;
+
+  return (
+    dbValue === selectedKey ||
+    dbValue === selectedLabel
+  );
 }
 
 
 /* =========================================================
-   LOAD SUBJECTS
+   SUBJECTS
 ========================================================= */
 
 async function loadSubjects() {
@@ -126,7 +102,7 @@ async function loadSubjects() {
 
   if (error) {
 
-    console.error("Subject loading error:", error);
+    console.error(error);
 
     showMessage(
       "questionMsg",
@@ -135,22 +111,30 @@ async function loadSubjects() {
     );
 
     return;
-
   }
 
-  fillSelect(
-    "subject",
-    data || [],
-    "বিষয় নির্বাচন করুন",
-    "id",
-    "subject_name"
-  );
+  const select = el("subject");
 
+  if (!select) return;
+
+  select.innerHTML =
+    '<option value="">বিষয় নির্বাচন করুন</option>';
+
+  (data || []).forEach(subject => {
+
+    const option =
+      document.createElement("option");
+
+    option.value = subject.id;
+    option.textContent = subject.subject_name;
+
+    select.appendChild(option);
+  });
 }
 
 
 /* =========================================================
-   LOAD ALL FOLDERS
+   GET ALL FOLDERS
 ========================================================= */
 
 async function getAllFolders() {
@@ -161,20 +145,16 @@ async function getAllFolders() {
     .order("folder_name");
 
   if (error) {
-
     console.error("Folder loading error:", error);
-
     throw error;
-
   }
 
   return data || [];
-
 }
 
 
 /* =========================================================
-   CATEGORY → FOLDER
+   LOAD FOLDERS BY CATEGORY
 ========================================================= */
 
 async function loadFoldersForCategory(
@@ -188,41 +168,75 @@ async function loadFoldersForCategory(
   if (!select) return;
 
   select.innerHTML =
-    `<option value="">Folder নির্বাচন করুন</option>`;
+    '<option value="">Folder নির্বাচন করুন</option>';
 
   if (!category) return;
 
-  const folders = await getAllFolders();
+  try {
 
-  const filtered = folders.filter(
-    folder => folder.sub_category === CATS[category]
-  );
+    const folders =
+      await getAllFolders();
 
-  filtered.forEach(folder => {
+    const filtered =
+      folders.filter(folder =>
+        categoryMatches(
+          folder.sub_category,
+          category
+        )
+      );
 
-    const option = document.createElement("option");
+    filtered.forEach(folder => {
 
-    option.value = folder.id;
-    option.textContent = folder.folder_name;
+      const option =
+        document.createElement("option");
 
-    select.appendChild(option);
+      option.value = folder.id;
+      option.textContent = folder.folder_name;
 
-  });
+      select.appendChild(option);
+    });
 
-  if (
-    keepValue &&
-    filtered.some(folder => String(folder.id) === String(keepValue))
-  ) {
+    if (
+      keepValue &&
+      filtered.some(
+        folder =>
+          String(folder.id) === String(keepValue)
+      )
+    ) {
+      select.value = keepValue;
+    }
 
-    select.value = keepValue;
+  } catch (error) {
 
+    console.error(error);
+
+    if (
+      selectId === "folder" ||
+      selectId === "setFolder"
+    ) {
+
+      showMessage(
+        "folderMsg",
+        "Folder লোড করা যায়নি: " +
+        error.message,
+        "error"
+      );
+
+    } else {
+
+      showMessage(
+        "questionMsg",
+        "Folder লোড করা যায়নি: " +
+        error.message,
+        "error"
+      );
+    }
   }
-
 }
 
 
 /* =========================================================
-   FOLDER → SET
+   LOAD SETS
 ========================================================= */
 
 async function loadSetsForFolder(
@@ -236,7 +250,7 @@ async function loadSetsForFolder(
   if (!select) return;
 
   select.innerHTML =
-    `<option value="">Set নির্বাচন করুন</option>`;
+    '<option value="">Set নির্বাচন করুন</option>';
 
   if (!folderId) return;
 
@@ -248,73 +262,85 @@ async function loadSetsForFolder(
 
   if (error) {
 
-    console.error("Set loading error:", error);
+    console.error(error);
 
     showMessage(
       "setMsg",
-      "Set লোড করা যায়নি: " + error.message,
+      "Set লোড করা যায়নি: " +
+      error.message,
       "error"
     );
 
     return;
-
   }
 
   (data || []).forEach(set => {
 
-    const option = document.createElement("option");
+    const option =
+      document.createElement("option");
 
     option.value = set.id;
     option.textContent = set.set_name;
 
     select.appendChild(option);
-
   });
 
   if (
     keepValue &&
-    (data || []).some(set => String(set.id) === String(keepValue))
+    (data || []).some(
+      set =>
+        String(set.id) === String(keepValue)
+    )
   ) {
-
     select.value = keepValue;
-
   }
-
 }
 
 
 /* =========================================================
-   REFRESH MANAGEMENT DROPDOWNS
+   REFRESH MANAGEMENT
 ========================================================= */
 
 async function refreshManagementFolders(
-  selectedCategory = "",
-  selectedFolder = ""
+  category = "",
+  folderId = ""
 ) {
 
-  const folderCategory = el("folderCategory");
+  const categorySelect =
+    el("folderCategory");
 
-  if (folderCategory) {
-    folderCategory.value = selectedCategory;
+  if (categorySelect) {
+    categorySelect.value = category;
   }
 
   await loadFoldersForCategory(
-    selectedCategory,
+    category,
     "folder",
-    selectedFolder
+    folderId
   );
 
   await loadFoldersForCategory(
-    selectedCategory,
+    category,
     "setFolder",
-    selectedFolder
+    folderId
   );
 
-  await loadSetsForFolder(
-    selectedFolder,
-    "set"
-  );
+  if (folderId) {
 
+    await loadSetsForFolder(
+      folderId,
+      "set"
+    );
+
+  } else {
+
+    const setSelect = el("set");
+
+    if (setSelect) {
+      setSelect.innerHTML =
+        '<option value="">Set নির্বাচন করুন</option>';
+    }
+  }
 }
 
 
@@ -328,7 +354,8 @@ async function refreshQuestionDestination(
   setId = ""
 ) {
 
-  const categorySelect = el("questionCategory");
+  const categorySelect =
+    el("questionCategory");
 
   if (categorySelect) {
     categorySelect.value = category;
@@ -345,7 +372,6 @@ async function refreshQuestionDestination(
     "questionSet",
     setId
   );
-
 }
 
 
@@ -363,47 +389,61 @@ async function initQuestionCreate() {
     await loadSubjects();
 
     /*
-      Management:
-      Category → Folder → Set
+      শুরুতে কোনো Category selected থাকবে না।
+      Category নির্বাচন করার পর Folder আসবে।
     */
 
     await refreshManagementFolders();
-
-    /*
-      Question:
-      Category → Folder → Set
-    */
 
     await refreshQuestionDestination();
 
 
     /* -----------------------------------------
-       Folder Management Category Change
+       MANAGEMENT CATEGORY
     ----------------------------------------- */
 
     el("folderCategory").addEventListener(
       "change",
       async function () {
 
-        const category = this.value;
+        clearMessage("folderMsg");
 
-        await refreshManagementFolders(category);
+        const category =
+          this.value;
+
+        /*
+          Category বদলালে পুরোনো Folder/Set
+          selection পরিষ্কার হবে।
+        */
+
+        await refreshManagementFolders(
+          category
+        );
 
       }
     );
 
 
     /* -----------------------------------------
-       Folder Management Folder Change
+       MANAGEMENT FOLDER
     ----------------------------------------- */
 
     el("folder").addEventListener(
       "change",
       async function () {
 
-        const folderId = this.value;
+        clearMessage("folderMsg");
 
-        el("setFolder").value = folderId;
+        const folderId =
+          this.value;
+
+        /*
+          Folder selection দুটো management
+          dropdown-এ একই থাকবে।
+        */
+
+        el("setFolder").value =
+          folderId;
 
         await loadSetsForFolder(
           folderId,
@@ -415,16 +455,20 @@ async function initQuestionCreate() {
 
 
     /* -----------------------------------------
-       Set Management Folder Change
+       SET MANAGEMENT FOLDER
     ----------------------------------------- */
 
     el("setFolder").addEventListener(
       "change",
       async function () {
 
-        const folderId = this.value;
+        clearMessage("setMsg");
 
-        el("folder").value = folderId;
+        const folderId =
+          this.value;
+
+        el("folder").value =
+          folderId;
 
         await loadSetsForFolder(
           folderId,
@@ -436,14 +480,17 @@ async function initQuestionCreate() {
 
 
     /* -----------------------------------------
-       Question Category Change
+       QUESTION CATEGORY
     ----------------------------------------- */
 
     el("questionCategory").addEventListener(
       "change",
       async function () {
 
-        const category = this.value;
+        clearMessage("questionMsg");
+
+        const category =
+          this.value;
 
         await refreshQuestionDestination(
           category
@@ -454,14 +501,17 @@ async function initQuestionCreate() {
 
 
     /* -----------------------------------------
-       Question Folder Change
+       QUESTION FOLDER
     ----------------------------------------- */
 
     el("questionFolder").addEventListener(
       "change",
       async function () {
 
-        const folderId = this.value;
+        clearMessage("questionMsg");
+
+        const folderId =
+          this.value;
 
         await loadSetsForFolder(
           folderId,
@@ -471,19 +521,17 @@ async function initQuestionCreate() {
       }
     );
 
-
   } catch (error) {
 
     console.error(error);
 
     showMessage(
       "questionMsg",
-      "পেজ প্রস্তুত করতে সমস্যা হয়েছে: " + error.message,
+      "পেজ প্রস্তুত করতে সমস্যা হয়েছে: " +
+      error.message,
       "error"
     );
-
   }
-
 }
 
 
@@ -495,8 +543,13 @@ async function addFolder() {
 
   clearMessage("folderMsg");
 
-  const category = el("folderCategory").value;
-  const name = normalizeText(el("newFolder").value);
+  const category =
+    el("folderCategory").value;
+
+  const name =
+    normalizeText(
+      el("newFolder").value
+    );
 
   if (!category) {
 
@@ -507,7 +560,6 @@ async function addFolder() {
     );
 
     return;
-
   }
 
   if (!name) {
@@ -519,29 +571,29 @@ async function addFolder() {
     );
 
     return;
-
   }
 
-  const { data: existing, error: checkError } = await db
-    .from("question_bank_folders")
-    .select("id")
-    .eq("sub_category", CATS[category])
-    .eq("folder_name", name)
-    .limit(1);
 
-  if (checkError) {
+  /*
+    একই Category-তে একই নামের Folder আছে কি না
+    যাচাই করা হচ্ছে।
+  */
 
-    showMessage(
-      "folderMsg",
-      "Folder যাচাই করা যায়নি: " + checkError.message,
-      "error"
+  const folders =
+    await getAllFolders();
+
+  const duplicate =
+    folders.some(folder =>
+
+      categoryMatches(
+        folder.sub_category,
+        category
+      ) &&
+      normalizeText(folder.folder_name)
+        .toLowerCase() === name.toLowerCase()
     );
 
-    return;
-
-  }
-
-  if (existing && existing.length > 0) {
+  if (duplicate) {
 
     showMessage(
       "folderMsg",
@@ -550,13 +602,17 @@ async function addFolder() {
     );
 
     return;
-
   }
 
 
   const { error } = await db
     .from("question_bank_folders")
     .insert({
+      /*
+        নতুন data-তে বাংলা Category label
+        রাখা হচ্ছে, যাতে existing structure-এর
+        সঙ্গে সামঞ্জস্য থাকে।
+      */
       sub_category: CATS[category],
       folder_name: name
     });
@@ -567,17 +623,19 @@ async function addFolder() {
 
     showMessage(
       "folderMsg",
-      "Folder তৈরি হয়নি: " + error.message,
+      "Folder তৈরি হয়নি: " +
+      error.message,
       "error"
     );
 
     return;
-
   }
 
   el("newFolder").value = "";
 
-  await refreshManagementFolders(category);
+  await refreshManagementFolders(
+    category
+  );
 
   await refreshQuestionDestination(
     el("questionCategory").value
@@ -588,7 +646,6 @@ async function addFolder() {
     "Folder সফলভাবে তৈরি হয়েছে।",
     "success"
   );
-
 }
 
 
@@ -600,9 +657,16 @@ async function renameFolder() {
 
   clearMessage("folderMsg");
 
-  const category = el("folderCategory").value;
-  const folderId = el("folder").value;
-  const newName = normalizeText(el("newFolder").value);
+  const category =
+    el("folderCategory").value;
+
+  const folderId =
+    el("folder").value;
+
+  const newName =
+    normalizeText(
+      el("newFolder").value
+    );
 
   if (!category) {
 
@@ -613,7 +677,6 @@ async function renameFolder() {
     );
 
     return;
-
   }
 
   if (!folderId) {
@@ -625,7 +688,6 @@ async function renameFolder() {
     );
 
     return;
-
   }
 
   if (!newName) {
@@ -637,40 +699,37 @@ async function renameFolder() {
     );
 
     return;
-
   }
 
 
-  const { data: existing, error: checkError } = await db
-    .from("question_bank_folders")
-    .select("id")
-    .eq("sub_category", CATS[category])
-    .eq("folder_name", newName)
-    .neq("id", folderId)
-    .limit(1);
+  const folders =
+    await getAllFolders();
 
-  if (checkError) {
+  const duplicate =
+    folders.some(folder =>
+
+      String(folder.id) !==
+      String(folderId) &&
+
+      categoryMatches(
+        folder.sub_category,
+        category
+      ) &&
+
+      normalizeText(folder.folder_name)
+        .toLowerCase() ===
+      newName.toLowerCase()
+    );
+
+  if (duplicate) {
 
     showMessage(
       "folderMsg",
-      "Folder যাচাই করা যায়নি: " + checkError.message,
+      "এই Category-তে এই নামে Folder আগে থেকেই আছে।",
       "error"
     );
 
     return;
-
-  }
-
-  if (existing && existing.length > 0) {
-
-    showMessage(
-      "folderMsg",
-      "এই Category-তে এই নামে Folder আছে।",
-      "error"
-    );
-
-    return;
-
   }
 
 
@@ -685,13 +744,14 @@ async function renameFolder() {
 
     showMessage(
       "folderMsg",
-      "Folder Rename হয়নি: " + error.message,
+      "Folder Rename হয়নি: " +
+      error.message,
       "error"
     );
 
     return;
-
   }
+
 
   el("newFolder").value = "";
 
@@ -700,12 +760,28 @@ async function renameFolder() {
     folderId
   );
 
+  /*
+    Question destination-এ একই Folder
+    থাকলে সেটিও refresh হবে।
+  */
+
+  if (
+    el("questionFolder").value ===
+    String(folderId)
+  ) {
+
+    await refreshQuestionDestination(
+      el("questionCategory").value,
+      folderId,
+      el("questionSet").value
+    );
+  }
+
   showMessage(
     "folderMsg",
     "Folder সফলভাবে Rename হয়েছে।",
     "success"
   );
-
 }
 
 
@@ -717,7 +793,8 @@ async function deleteFolder() {
 
   clearMessage("folderMsg");
 
-  const folderId = el("folder").value;
+  const folderId =
+    el("folder").value;
 
   if (!folderId) {
 
@@ -728,16 +805,17 @@ async function deleteFolder() {
     );
 
     return;
-
   }
 
 
   /*
-    নিরাপত্তা:
-    Folder-এর ভিতরে Set থাকলে Folder Delete হবে না।
+    Folder-এর মধ্যে Set থাকলে Delete নয়।
   */
 
-  const { data: sets, error: setError } = await db
+  const {
+    data: sets,
+    error: setError
+  } = await db
     .from("question_bank_sets")
     .select("id")
     .eq("folder_id", folderId)
@@ -747,32 +825,36 @@ async function deleteFolder() {
 
     showMessage(
       "folderMsg",
-      "Folder-এর Set যাচাই করা যায়নি: " + setError.message,
+      "Folder-এর Set যাচাই করা যায়নি: " +
+      setError.message,
       "error"
     );
 
     return;
-
   }
 
   if (sets && sets.length > 0) {
 
     showMessage(
       "folderMsg",
-      "এই Folder-এর মধ্যে Set আছে। আগে Setগুলো সরাতে হবে। প্রশ্ন বা Setসহ Folder মুছে দেওয়া হবে না।",
+      "এই Folder-এর মধ্যে Set আছে। আগে Setগুলো সরাতে হবে।",
       "error"
     );
 
     return;
-
   }
 
 
-  const ok = confirm(
-    "আপনি কি সত্যিই এই Folder Delete করতে চান?"
-  );
+  const ok =
+    confirm(
+      "আপনি কি সত্যিই এই Folder Delete করতে চান?"
+    );
 
   if (!ok) return;
+
+
+  const category =
+    el("folderCategory").value;
 
 
   const { error } = await db
@@ -784,18 +866,18 @@ async function deleteFolder() {
 
     showMessage(
       "folderMsg",
-      "Folder Delete হয়নি: " + error.message,
+      "Folder Delete হয়নি: " +
+      error.message,
       "error"
     );
 
     return;
-
   }
 
 
-  const category = el("folderCategory").value;
-
-  await refreshManagementFolders(category);
+  await refreshManagementFolders(
+    category
+  );
 
   await refreshQuestionDestination(
     el("questionCategory").value
@@ -806,7 +888,6 @@ async function deleteFolder() {
     "Folder সফলভাবে Delete হয়েছে।",
     "success"
   );
-
 }
 
 
@@ -818,8 +899,13 @@ async function addSet() {
 
   clearMessage("setMsg");
 
-  const folderId = el("setFolder").value;
-  const name = normalizeText(el("newSet").value);
+  const folderId =
+    el("setFolder").value;
+
+  const name =
+    normalizeText(
+      el("newSet").value
+    );
 
   if (!folderId) {
 
@@ -830,7 +916,6 @@ async function addSet() {
     );
 
     return;
-
   }
 
   if (!name) {
@@ -842,11 +927,13 @@ async function addSet() {
     );
 
     return;
-
   }
 
 
-  const { data: existing, error: checkError } = await db
+  const {
+    data: existing,
+    error: checkError
+  } = await db
     .from("question_bank_sets")
     .select("id")
     .eq("folder_id", folderId)
@@ -857,15 +944,15 @@ async function addSet() {
 
     showMessage(
       "setMsg",
-      "Set যাচাই করা যায়নি: " + checkError.message,
+      "Set যাচাই করা যায়নি: " +
+      checkError.message,
       "error"
     );
 
     return;
-
   }
 
-  if (existing && existing.length > 0) {
+  if (existing && existing.length) {
 
     showMessage(
       "setMsg",
@@ -874,7 +961,6 @@ async function addSet() {
     );
 
     return;
-
   }
 
 
@@ -889,13 +975,14 @@ async function addSet() {
 
     showMessage(
       "setMsg",
-      "Set তৈরি হয়নি: " + error.message,
+      "Set তৈরি হয়নি: " +
+      error.message,
       "error"
     );
 
     return;
-
   }
+
 
   el("newSet").value = "";
 
@@ -904,17 +991,22 @@ async function addSet() {
     "set"
   );
 
-  await loadSetsForFolder(
-    folderId,
-    "questionSet"
-  );
+  if (
+    el("questionFolder").value ===
+    String(folderId)
+  ) {
+
+    await loadSetsForFolder(
+      folderId,
+      "questionSet"
+    );
+  }
 
   showMessage(
     "setMsg",
     "Set সফলভাবে তৈরি হয়েছে।",
     "success"
   );
-
 }
 
 
@@ -926,9 +1018,16 @@ async function renameSet() {
 
   clearMessage("setMsg");
 
-  const folderId = el("setFolder").value;
-  const setId = el("set").value;
-  const newName = normalizeText(el("newSet").value);
+  const folderId =
+    el("setFolder").value;
+
+  const setId =
+    el("set").value;
+
+  const newName =
+    normalizeText(
+      el("newSet").value
+    );
 
   if (!folderId) {
 
@@ -939,7 +1038,6 @@ async function renameSet() {
     );
 
     return;
-
   }
 
   if (!setId) {
@@ -951,7 +1049,6 @@ async function renameSet() {
     );
 
     return;
-
   }
 
   if (!newName) {
@@ -963,11 +1060,13 @@ async function renameSet() {
     );
 
     return;
-
   }
 
 
-  const { data: existing, error: checkError } = await db
+  const {
+    data: existing,
+    error: checkError
+  } = await db
     .from("question_bank_sets")
     .select("id")
     .eq("folder_id", folderId)
@@ -979,15 +1078,15 @@ async function renameSet() {
 
     showMessage(
       "setMsg",
-      "Set যাচাই করা যায়নি: " + checkError.message,
+      "Set যাচাই করা যায়নি: " +
+      checkError.message,
       "error"
     );
 
     return;
-
   }
 
-  if (existing && existing.length > 0) {
+  if (existing && existing.length) {
 
     showMessage(
       "setMsg",
@@ -996,7 +1095,6 @@ async function renameSet() {
     );
 
     return;
-
   }
 
 
@@ -1011,13 +1109,14 @@ async function renameSet() {
 
     showMessage(
       "setMsg",
-      "Set Rename হয়নি: " + error.message,
+      "Set Rename হয়নি: " +
+      error.message,
       "error"
     );
 
     return;
-
   }
+
 
   el("newSet").value = "";
 
@@ -1027,18 +1126,11 @@ async function renameSet() {
     setId
   );
 
-  await loadSetsForFolder(
-    el("questionFolder").value,
-    "questionSet",
-    el("questionSet").value === setId ? setId : ""
-  );
-
   showMessage(
     "setMsg",
     "Set সফলভাবে Rename হয়েছে।",
     "success"
   );
-
 }
 
 
@@ -1050,7 +1142,8 @@ async function deleteSet() {
 
   clearMessage("setMsg");
 
-  const setId = el("set").value;
+  const setId =
+    el("set").value;
 
   if (!setId) {
 
@@ -1061,16 +1154,17 @@ async function deleteSet() {
     );
 
     return;
-
   }
 
 
   /*
     প্রশ্ন থাকলে Set Delete হবে না।
-    এতে পুরোনো Question নিরাপদ থাকবে।
   */
 
-  const { data: questions, error: questionError } = await db
+  const {
+    data: questions,
+    error: questionError
+  } = await db
     .from("questions")
     .select("id")
     .eq("set_id", setId)
@@ -1086,7 +1180,6 @@ async function deleteSet() {
     );
 
     return;
-
   }
 
   if (questions && questions.length > 0) {
@@ -1098,18 +1191,20 @@ async function deleteSet() {
     );
 
     return;
-
   }
 
 
-  const ok = confirm(
-    "আপনি কি সত্যিই এই Set Delete করতে চান?"
-  );
+  const ok =
+    confirm(
+      "আপনি কি সত্যিই এই Set Delete করতে চান?"
+    );
 
   if (!ok) return;
 
 
-  const folderId = el("setFolder").value;
+  const folderId =
+    el("setFolder").value;
+
 
   const { error } = await db
     .from("question_bank_sets")
@@ -1120,12 +1215,12 @@ async function deleteSet() {
 
     showMessage(
       "setMsg",
-      "Set Delete হয়নি: " + error.message,
+      "Set Delete হয়নি: " +
+      error.message,
       "error"
     );
 
     return;
-
   }
 
 
@@ -1134,107 +1229,128 @@ async function deleteSet() {
     "set"
   );
 
-  await loadSetsForFolder(
-    el("questionFolder").value,
-    "questionSet"
-  );
+  if (
+    el("questionFolder").value ===
+    String(folderId)
+  ) {
+
+    await loadSetsForFolder(
+      folderId,
+      "questionSet"
+    );
+  }
 
   showMessage(
     "setMsg",
     "Set সফলভাবে Delete হয়েছে।",
     "success"
   );
-
 }
 
 
 /* =========================================================
-   SAVE MANUAL QUESTION
+   SAVE QUESTION
 ========================================================= */
 
 async function saveQuestion() {
 
   clearMessage("questionMsg");
 
-  const category = el("questionCategory").value;
-  const folderId = el("questionFolder").value;
-  const setId = el("questionSet").value;
-  const subjectId = el("subject").value;
+  const category =
+    el("questionCategory").value;
+
+  const folderId =
+    el("questionFolder").value;
+
+  const setId =
+    el("questionSet").value;
+
+  const subjectId =
+    el("subject").value;
 
   const questionNumber =
-    normalizeText(el("questionNumber").value);
+    normalizeText(
+      el("questionNumber").value
+    );
 
   const question =
-    normalizeText(el("question").value);
+    normalizeText(
+      el("question").value
+    );
 
   const optionA =
-    normalizeText(el("optionA").value);
+    normalizeText(
+      el("optionA").value
+    );
 
   const optionB =
-    normalizeText(el("optionB").value);
+    normalizeText(
+      el("optionB").value
+    );
 
   const optionC =
-    normalizeText(el("optionC").value);
+    normalizeText(
+      el("optionC").value
+    );
 
   const optionD =
-    normalizeText(el("optionD").value);
+    normalizeText(
+      el("optionD").value
+    );
 
   const correctAnswer =
-    normalizeText(el("correctAnswer").value);
+    normalizeText(
+      el("correctAnswer").value
+    );
 
   const explanation =
-    normalizeText(el("explanation").value);
+    normalizeText(
+      el("explanation").value
+    );
 
 
   if (!category) {
-
     showMessage(
       "questionMsg",
       "Category নির্বাচন করুন।",
       "error"
     );
-
     return;
-
   }
 
   if (!folderId) {
-
     showMessage(
       "questionMsg",
       "Folder নির্বাচন করুন।",
       "error"
     );
-
     return;
-
   }
 
   if (!setId) {
-
     showMessage(
       "questionMsg",
       "Set নির্বাচন করুন।",
       "error"
     );
-
     return;
-
   }
 
   if (!question) {
-
     showMessage(
       "questionMsg",
       "প্রশ্ন লিখুন।",
       "error"
     );
-
     return;
-
   }
 
-  if (!optionA || !optionB || !optionC || !optionD) {
+  if (
+    !optionA ||
+    !optionB ||
+    !optionC ||
+    !optionD
+  ) {
 
     showMessage(
       "questionMsg",
@@ -1243,7 +1359,6 @@ async function saveQuestion() {
     );
 
     return;
-
   }
 
   if (!correctAnswer) {
@@ -1255,13 +1370,8 @@ async function saveQuestion() {
     );
 
     return;
-
   }
 
-
-  /*
-    Question destination একসাথে সংরক্ষণ।
-  */
 
   const payload = {
 
@@ -1271,24 +1381,32 @@ async function saveQuestion() {
 
     set_id: setId,
 
-    subject_id: subjectId || null,
+    subject_id:
+      subjectId || null,
 
-    question_number: questionNumber || null,
+    question_number:
+      questionNumber || null,
 
-    question_text: question,
+    question_text:
+      question,
 
-    option_a: optionA,
+    option_a:
+      optionA,
 
-    option_b: optionB,
+    option_b:
+      optionB,
 
-    option_c: optionC,
+    option_c:
+      optionC,
 
-    option_d: optionD,
+    option_d:
+      optionD,
 
-    correct_answer: correctAnswer,
+    correct_answer:
+      correctAnswer,
 
-    explanation: explanation || null
-
+    explanation:
+      explanation || null
   };
 
 
@@ -1305,19 +1423,18 @@ async function saveQuestion() {
 
     showMessage(
       "questionMsg",
-      "প্রশ্ন সংরক্ষণ হয়নি: " + error.message,
+      "প্রশ্ন সংরক্ষণ হয়নি: " +
+      error.message,
       "error"
     );
 
     return;
-
   }
 
 
   /*
-    সফল হলে শুধু Question field পরিষ্কার।
-    Category / Folder / Set / Subject রাখা হবে,
-    যাতে একই destination-এ পরের প্রশ্ন দ্রুত যোগ করা যায়।
+    Destination রেখে দেওয়া হচ্ছে।
+    ফলে একই Folder/Set-এ পরপর প্রশ্ন দেওয়া যাবে।
   */
 
   el("questionNumber").value = "";
@@ -1329,13 +1446,11 @@ async function saveQuestion() {
   el("correctAnswer").value = "";
   el("explanation").value = "";
 
-
   showMessage(
     "questionMsg",
-    "প্রশ্ন সফলভাবে সংরক্ষণ হয়েছে। পরের প্রশ্ন একই Category → Folder → Set-এ যোগ করতে পারবেন।",
+    "প্রশ্ন সফলভাবে সংরক্ষণ হয়েছে।",
     "success"
   );
-
 }
 
 
@@ -1345,64 +1460,72 @@ async function saveQuestion() {
 
 function getImportFile() {
 
-  const input = el("importFile");
+  const input =
+    el("importFile");
 
-  if (!input || !input.files || !input.files[0]) {
+  if (
+    !input ||
+    !input.files ||
+    !input.files[0]
+  ) {
     return null;
   }
 
   return input.files[0];
-
 }
 
 
 async function readImportRows() {
 
-  const file = getImportFile();
+  const file =
+    getImportFile();
 
   if (!file) {
-    throw new Error("আগে CSV/Excel ফাইল নির্বাচন করুন।");
+    throw new Error(
+      "আগে CSV/Excel ফাইল নির্বাচন করুন।"
+    );
   }
 
   if (typeof XLSX === "undefined") {
-    throw new Error("Excel/CSV reader লোড হয়নি।");
+    throw new Error(
+      "Excel/CSV reader লোড হয়নি।"
+    );
   }
 
+  const buffer =
+    await file.arrayBuffer();
 
-  const buffer = await file.arrayBuffer();
-
-  const workbook = XLSX.read(
-    buffer,
-    {
-      type: "array"
-    }
-  );
+  const workbook =
+    XLSX.read(
+      buffer,
+      {
+        type: "array"
+      }
+    );
 
   const sheetName =
     workbook.SheetNames[0];
 
   if (!sheetName) {
-    throw new Error("ফাইলে কোনো Sheet পাওয়া যায়নি।");
+    throw new Error(
+      "ফাইলে কোনো Sheet পাওয়া যায়নি।"
+    );
   }
 
   const sheet =
     workbook.Sheets[sheetName];
 
-  const rows =
-    XLSX.utils.sheet_to_json(
-      sheet,
-      {
-        defval: ""
-      }
-    );
-
-  return rows;
-
+  return XLSX.utils.sheet_to_json(
+    sheet,
+    {
+      defval: ""
+    }
+  );
 }
 
 
 /* =========================================================
-   PREVIEW IMPORT
+   PREVIEW
 ========================================================= */
 
 async function previewImport() {
@@ -1411,7 +1534,8 @@ async function previewImport() {
 
   try {
 
-    const rows = await readImportRows();
+    const rows =
+      await readImportRows();
 
     if (!rows.length) {
 
@@ -1422,37 +1546,28 @@ async function previewImport() {
       );
 
       return;
-
     }
-
 
     const preview =
       rows
         .slice(0, 10)
-        .map((row, index) => {
-
-          return (
+        .map(
+          (row, index) =>
             "প্রশ্ন " +
             (index + 1) +
             ": " +
-            normalizeText(
-              row.question
-            )
-          );
-
-        })
+            normalizeText(row.question)
+        )
         .join("\n\n");
 
-
-    el("importPreview").textContent =
-      preview;
-
+    el("importPreview")
+      .textContent = preview;
 
     showMessage(
       "importMsg",
       "মোট " +
       rows.length +
-      "টি প্রশ্ন পাওয়া গেছে। প্রথম ১০টি Preview দেখানো হয়েছে।",
+      "টি প্রশ্ন পাওয়া গেছে।",
       "success"
     );
 
@@ -1465,14 +1580,12 @@ async function previewImport() {
       error.message,
       "error"
     );
-
   }
-
 }
 
 
 /* =========================================================
-   IMPORT QUESTIONS
+   IMPORT
 ========================================================= */
 
 async function importQuestions() {
@@ -1492,118 +1605,114 @@ async function importQuestions() {
 
 
     if (!category) {
-
       showMessage(
         "importMsg",
         "প্রথমে Category নির্বাচন করুন।",
         "error"
       );
-
       return;
-
     }
 
     if (!folderId) {
-
       showMessage(
         "importMsg",
         "প্রথমে Folder নির্বাচন করুন।",
         "error"
       );
-
       return;
-
     }
 
     if (!setId) {
-
       showMessage(
         "importMsg",
         "প্রথমে Set নির্বাচন করুন।",
         "error"
       );
-
       return;
-
     }
 
 
     const rows =
       await readImportRows();
 
-
     if (!rows.length) {
-
       showMessage(
         "importMsg",
         "Import করার মতো কোনো প্রশ্ন নেই।",
         "error"
       );
-
       return;
-
     }
 
 
-    const records = rows.map(row => {
+    const records =
+      rows.map(row => ({
 
-      return {
+        category,
 
-        category: category,
+        folder_id:
+          folderId,
 
-        folder_id: folderId,
-
-        set_id: setId,
+        set_id:
+          setId,
 
         subject_id:
-          normalizeText(row.subject_id) || null,
+          normalizeText(
+            row.subject_id
+          ) || null,
 
         question_number:
-          normalizeText(row.question_number) || null,
+          normalizeText(
+            row.question_number
+          ) || null,
 
         question_text:
-          normalizeText(row.question),
+          normalizeText(
+            row.question
+          ),
 
         option_a:
-          normalizeText(row.option_a),
+          normalizeText(
+            row.option_a
+          ),
 
         option_b:
-          normalizeText(row.option_b),
+          normalizeText(
+            row.option_b
+          ),
 
         option_c:
-          normalizeText(row.option_c),
+          normalizeText(
+            row.option_c
+          ),
 
         option_d:
-          normalizeText(row.option_d),
+          normalizeText(
+            row.option_d
+          ),
 
         correct_answer:
-          normalizeText(row.correct_answer),
+          normalizeText(
+            row.correct_answer
+          ),
 
         explanation:
-          normalizeText(row.explanation) || null
+          normalizeText(
+            row.explanation
+          ) || null
 
-      };
+      }));
 
-    });
-
-
-    /*
-      Basic validation
-    */
 
     const invalidIndex =
-      records.findIndex(record => {
-
-        return (
-          !record.question_text ||
-          !record.option_a ||
-          !record.option_b ||
-          !record.option_c ||
-          !record.option_d ||
-          !record.correct_answer
-        );
-
-      });
+      records.findIndex(record =>
+        !record.question_text ||
+        !record.option_a ||
+        !record.option_b ||
+        !record.option_c ||
+        !record.option_d ||
+        !record.correct_answer
+      );
 
 
     if (invalidIndex !== -1) {
@@ -1612,40 +1721,32 @@ async function importQuestions() {
         "importMsg",
         "প্রশ্ন " +
         (invalidIndex + 1) +
-        "-এ প্রয়োজনীয় তথ্য অসম্পূর্ণ।",
+        "-এর প্রয়োজনীয় তথ্য অসম্পূর্ণ।",
         "error"
       );
 
       return;
-
     }
 
 
-    /*
-      Import selected destination-এই হবে।
-      CSV-এর category/folder/set দিয়ে destination
-      পরিবর্তন করা যাবে না।
-    */
+    const { error } =
+      await db
+        .from("questions")
+        .insert(records);
 
-    const { error } = await db
-      .from("questions")
-      .insert(records);
 
     if (error) {
 
-      console.error(
-        "Import error:",
-        error
-      );
+      console.error(error);
 
       showMessage(
         "importMsg",
-        "Import হয়নি: " + error.message,
+        "Import হয়নি: " +
+        error.message,
         "error"
       );
 
       return;
-
     }
 
 
@@ -1656,8 +1757,8 @@ async function importQuestions() {
       "success"
     );
 
-
-    el("importPreview").textContent = "";
+    el("importPreview")
+      .textContent = "";
 
   } catch (error) {
 
@@ -1668,14 +1769,12 @@ async function importQuestions() {
       error.message,
       "error"
     );
-
   }
-
 }
 
 
 /* =========================================================
-   DOWNLOAD TEMPLATE
+   TEMPLATE
 ========================================================= */
 
 function downloadTemplate() {
@@ -1689,30 +1788,20 @@ function downloadTemplate() {
     );
 
     return;
-
   }
 
 
   const rows = [
 
     {
-
       question_number: "১",
-
       question: "প্রশ্ন লিখুন",
-
       option_a: "অপশন ক",
-
       option_b: "অপশন খ",
-
       option_c: "অপশন গ",
-
       option_d: "অপশন ঘ",
-
       correct_answer: "ক",
-
       explanation: "ব্যাখ্যা"
-
     }
 
   ];
@@ -1734,7 +1823,6 @@ function downloadTemplate() {
     workbook,
     "question_template.xlsx"
   );
-
 }
 
 
