@@ -1,10 +1,352 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="bn">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ফেইসবুক পাঠশালা — প্রশ্ন তৈরি</title><link rel="stylesheet" href="css/admin.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script></head>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Question Create</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      color: #222;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 20px auto;
+      padding: 0 15px 40px;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    button {
+      cursor: pointer;
+      background: #f1f1f1;
+    }
+
+    button.primary {
+      background: #222;
+      color: #fff;
+      border-color: #222;
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .message {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #444;
+    }
+
+    .question-area {
+      display: grid;
+      gap: 12px;
+    }
+
+    .option-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    #importPreview {
+      white-space: pre-wrap;
+      background: #f7f7f7;
+      padding: 10px;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+
+    @media (max-width: 750px) {
+      .grid,
+      .button-grid,
+      .option-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
 <body>
-<div id="login" class="center"><div class="card login"><h1>ফেইসবুক পাঠশালা</h1><h2>প্রশ্ন তৈরি</h2><input id="email" type="email" placeholder="Admin Email"><input id="password" type="password" placeholder="Password"><button onclick="login()">Login</button><p id="loginMsg" class="msg"></p></div></div>
-<div id="app" class="hidden"><header class="dashboard-top"><div class="dashboard-brand"><h1>ফেইসবুক পাঠশালা</h1><p>প্রশ্ন তৈরি</p></div><div class="admin-menu"><button type="button" class="admin-menu-btn" id="adminMenuBtn">☰</button><div class="admin-menu-panel hidden" id="adminMenuPanel"><button onclick="location.href='dashboard.html'">🏠 ড্যাশবোর্ড</button><button onclick="location.href='question_create.html'">➕ প্রশ্ন তৈরি</button><button onclick="location.href='question_bank.html'">🗂️ প্রশ্ন ব্যাংক</button><button onclick="location.href='admin_dashboard_split.html?section=exam'">📋 পরীক্ষা পরিচালনা</button><button class="logout" onclick="logout()">🚪 লগ আউট</button></div></div></header>
-<main><div class="card"><h2>১. Category → Folder → Set</h2><div class="cats"><button id="cat-recruitment" onclick="selectCategory('recruitment')">নিয়োগ পরীক্ষা</button><button id="cat-verification_test" onclick="selectCategory('verification_test')">যাচাই পরীক্ষা</button><button id="cat-recent" onclick="selectCategory('recent')">সাম্প্রতিক প্রশ্ন</button></div><div id="currentCat" class="notice"></div><div class="grid"><div><label>Folder</label><select id="folder"></select><div class="bank-actions"><button type="button" class="secondary" onclick="renameSelectedFolder()">✏️ Folder Rename</button><button type="button" class="secondary" onclick="deleteSelectedFolder()">🗑️ Folder Delete</button></div></div><div><label>Set</label><select id="set"></select><div class="bank-actions"><button type="button" class="secondary" onclick="renameSelectedSet()">✏️ Set Rename</button><button type="button" class="secondary" onclick="deleteSelectedSet()">🗑️ Set Delete</button></div></div></div><div class="grid"><input id="newFolder" placeholder="নতুন Folder-এর নাম"><button type="button" onclick="createFolder()">＋ Folder তৈরি</button></div><div class="grid"><input id="newSet" placeholder="নতুন Set-এর নাম"><button type="button" onclick="createSet()">＋ Set তৈরি</button></div><p id="folderMsg" class="msg"></p></div>
-<div class="card"><h2>২. Manual প্রশ্ন তৈরি</h2><div class="grid"><div><label>বিষয়</label><select id="subject"></select></div><div><label>প্রশ্ন নম্বর</label><input id="questionNumber" type="number"></div></div><textarea id="question" placeholder="প্রশ্ন"></textarea><div class="grid"><input id="optionA" placeholder="ক. অপশন"><input id="optionB" placeholder="খ. অপশন"><input id="optionC" placeholder="গ. অপশন"><input id="optionD" placeholder="ঘ. অপশন"></div><div class="grid"><select id="correctAnswer"><option value="">সঠিক উত্তর</option><option value="A">ক</option><option value="B">খ</option><option value="C">গ</option><option value="D">ঘ</option></select><input id="explanation" placeholder="ব্যাখ্যা (ঐচ্ছিক)"></div><button type="button" onclick="addManual()">প্রশ্ন Question Bank-এ যোগ করুন</button><p id="manualMsg" class="msg"></p></div>
-<div class="card"><h2>৩. CSV / Excel Upload</h2><p class="muted">Required: question, option_a, option_b, option_c, option_d, correct_answer. Optional: question_number, subject, explanation, category.</p><button type="button" class="secondary" onclick="template()">Template ডাউনলোড</button><input id="importFile" type="file" accept=".csv,.xlsx,.xls"><button type="button" onclick="previewImport()">Preview</button><div id="importPreview"></div><button id="importBtn" class="hidden" type="button" onclick="importRows()">Database-এ Import করুন</button></div></main></div>
-<script src="js/supabase.js"></script><script src="js/question_create.js"></script></body></html>
+
+<div class="container">
+
+  <h1>প্রশ্ন তৈরি</h1>
+
+  <!-- =========================
+       FOLDER MANAGEMENT
+  ========================== -->
+  <div class="card">
+
+    <h2>❏ Folder</h2>
+
+    <div class="button-grid">
+      <button onclick="addFolder()">❖ Add Folder</button>
+      <button onclick="renameFolder()">❖ Rename Folder</button>
+      <button onclick="deleteFolder()">❖ Delete Folder</button>
+    </div>
+
+    <div class="grid">
+
+      <select id="folderCategory">
+        <option value="">ক্যাটাগরি নির্বাচন করুন</option>
+      </select>
+
+      <select id="folder">
+        <option value="">Folder নির্বাচন করুন</option>
+      </select>
+
+      <input
+        type="text"
+        id="newFolder"
+        placeholder="নতুন Folder-এর নাম"
+      >
+
+    </div>
+
+    <div id="folderMsg" class="message"></div>
+
+  </div>
+
+
+  <!-- =========================
+       SET MANAGEMENT
+  ========================== -->
+  <div class="card">
+
+    <h2>❏ Set</h2>
+
+    <div class="button-grid">
+      <button onclick="addSet()">❖ Add Set</button>
+      <button onclick="renameSet()">❖ Rename Set</button>
+      <button onclick="deleteSet()">❖ Delete Set</button>
+    </div>
+
+    <div class="grid">
+
+      <select id="setFolder">
+        <option value="">Folder নির্বাচন করুন</option>
+      </select>
+
+      <select id="set">
+        <option value="">Set নির্বাচন করুন</option>
+      </select>
+
+      <input
+        type="text"
+        id="newSet"
+        placeholder="নতুন Set-এর নাম"
+      >
+
+    </div>
+
+    <div id="setMsg" class="message"></div>
+
+  </div>
+
+
+  <!-- =========================
+       MANUAL QUESTION
+  ========================== -->
+  <div class="card">
+
+    <h2>প্রশ্ন যোগ করুন</h2>
+
+    <div class="grid">
+
+      <select id="questionCategory">
+        <option value="">Category নির্বাচন করুন</option>
+      </select>
+
+      <select id="questionFolder">
+        <option value="">Folder নির্বাচন করুন</option>
+      </select>
+
+      <select id="questionSet">
+        <option value="">Set নির্বাচন করুন</option>
+      </select>
+
+      <select id="subject">
+        <option value="">বিষয় নির্বাচন করুন</option>
+      </select>
+
+      <input
+        type="text"
+        id="questionNumber"
+        placeholder="প্রশ্ন নম্বর"
+      >
+
+    </div>
+
+    <br>
+
+    <div class="question-area">
+
+      <textarea
+        id="question"
+        placeholder="প্রশ্ন লিখুন"
+      ></textarea>
+
+      <div class="option-grid">
+
+        <input
+          type="text"
+          id="optionA"
+          placeholder="অপশন ক"
+        >
+
+        <input
+          type="text"
+          id="optionB"
+          placeholder="অপশন খ"
+        >
+
+        <input
+          type="text"
+          id="optionC"
+          placeholder="অপশন গ"
+        >
+
+        <input
+          type="text"
+          id="optionD"
+          placeholder="অপশন ঘ"
+        >
+
+      </div>
+
+      <select id="correctAnswer">
+        <option value="">সঠিক উত্তর নির্বাচন করুন</option>
+        <option value="ক">ক</option>
+        <option value="খ">খ</option>
+        <option value="গ">গ</option>
+        <option value="ঘ">ঘ</option>
+      </select>
+
+      <textarea
+        id="explanation"
+        placeholder="ব্যাখ্যা"
+      ></textarea>
+
+      <button
+        class="primary"
+        onclick="saveQuestion()"
+      >
+        প্রশ্ন সংরক্ষণ
+      </button>
+
+    </div>
+
+    <div id="questionMsg" class="message"></div>
+
+  </div>
+
+
+  <!-- =========================
+       CSV / EXCEL IMPORT
+  ========================== -->
+  <div class="card">
+
+    <h2>CSV / Excel থেকে প্রশ্ন যোগ</h2>
+
+    <p>
+      এখানে উপরের নির্বাচিত
+      <strong>Category → Folder → Set</strong>
+      অনুযায়ী প্রশ্নগুলো সংরক্ষণ হবে।
+    </p>
+
+    <input
+      type="file"
+      id="importFile"
+      accept=".csv,.xlsx,.xls"
+    >
+
+    <br><br>
+
+    <div class="button-grid">
+
+      <button onclick="downloadTemplate()">
+        Template
+      </button>
+
+      <button onclick="previewImport()">
+        Preview
+      </button>
+
+      <button
+        class="primary"
+        onclick="importQuestions()"
+      >
+        Import
+      </button>
+
+    </div>
+
+    <div id="importMsg" class="message"></div>
+
+    <pre id="importPreview"></pre>
+
+  </div>
+
+</div>
+
+
+<!-- Supabase -->
+<script src="js/supabase.js"></script>
+
+<!-- Excel/CSV reader -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<!-- Page JS -->
+<script src="js/question_create.js"></script>
+
+</body>
+</html>
