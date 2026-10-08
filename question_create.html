@@ -20,7 +20,16 @@
     .container {
       max-width: 1100px;
       margin: 20px auto;
-      padding: 0 15px 40px;
+      padding: 0 15px 50px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 20px;
     }
 
     .card {
@@ -31,19 +40,22 @@
       margin-bottom: 18px;
     }
 
-    h1 {
-      margin-top: 0;
-    }
-
-    h2 {
-      margin-top: 0;
-      font-size: 20px;
-    }
-
     .grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
+      gap: 12px;
+    }
+
+    .question-destination {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .option-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
     }
 
     input,
@@ -58,7 +70,7 @@
     }
 
     textarea {
-      min-height: 90px;
+      min-height: 100px;
       resize: vertical;
     }
 
@@ -73,28 +85,43 @@
       border-color: #222;
     }
 
+    button.danger {
+      background: #fff;
+      color: #b00020;
+      border-color: #d88;
+    }
+
     .button-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
-      margin-bottom: 12px;
     }
 
     .message {
       margin-top: 10px;
       font-size: 14px;
-      color: #444;
+      min-height: 20px;
+    }
+
+    .hint {
+      color: #666;
+      font-size: 13px;
+      margin: 6px 0 12px;
+    }
+
+    .label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .field {
+      min-width: 0;
     }
 
     .question-area {
       display: grid;
       gap: 12px;
-    }
-
-    .option-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
     }
 
     #importPreview {
@@ -103,12 +130,25 @@
       padding: 10px;
       border-radius: 8px;
       overflow-x: auto;
+      max-height: 350px;
+      overflow-y: auto;
     }
 
-    @media (max-width: 750px) {
+    .required {
+      color: #c00;
+    }
+
+    @media (max-width: 850px) {
+      .question-destination {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 650px) {
       .grid,
       .button-grid,
-      .option-grid {
+      .option-grid,
+      .question-destination {
         grid-template-columns: 1fr;
       }
     }
@@ -126,30 +166,45 @@
   ========================== -->
   <div class="card">
 
-    <h2>❏ Folder</h2>
+    <h2>❏ Folder Management</h2>
 
-    <div class="button-grid">
-      <button onclick="addFolder()">❖ Add Folder</button>
-      <button onclick="renameFolder()">❖ Rename Folder</button>
-      <button onclick="deleteFolder()">❖ Delete Folder</button>
+    <div class="hint">
+      Folder তৈরি, Rename বা Delete করার জন্য Category নির্বাচন করুন।
     </div>
 
     <div class="grid">
 
-      <select id="folderCategory">
-        <option value="">ক্যাটাগরি নির্বাচন করুন</option>
-      </select>
+      <div class="field">
+        <label class="label">ক্যাটাগরি</label>
+        <select id="folderCategory">
+          <option value="">ক্যাটাগরি নির্বাচন করুন</option>
+        </select>
+      </div>
 
-      <select id="folder">
-        <option value="">Folder নির্বাচন করুন</option>
-      </select>
+      <div class="field">
+        <label class="label">Folder</label>
+        <select id="folder">
+          <option value="">Folder নির্বাচন করুন</option>
+        </select>
+      </div>
 
-      <input
-        type="text"
-        id="newFolder"
-        placeholder="নতুন Folder-এর নাম"
-      >
+      <div class="field">
+        <label class="label">নতুন Folder-এর নাম</label>
+        <input
+          type="text"
+          id="newFolder"
+          placeholder="নতুন Folder-এর নাম"
+        >
+      </div>
 
+    </div>
+
+    <br>
+
+    <div class="button-grid">
+      <button onclick="addFolder()">❖ Add Folder</button>
+      <button onclick="renameFolder()">❖ Rename Folder</button>
+      <button class="danger" onclick="deleteFolder()">❖ Delete Folder</button>
     </div>
 
     <div id="folderMsg" class="message"></div>
@@ -162,30 +217,45 @@
   ========================== -->
   <div class="card">
 
-    <h2>❏ Set</h2>
+    <h2>❏ Set Management</h2>
 
-    <div class="button-grid">
-      <button onclick="addSet()">❖ Add Set</button>
-      <button onclick="renameSet()">❖ Rename Set</button>
-      <button onclick="deleteSet()">❖ Delete Set</button>
+    <div class="hint">
+      আগে Folder নির্বাচন করুন। তারপর সেই Folder-এর Set তৈরি/পরিবর্তন করুন।
     </div>
 
     <div class="grid">
 
-      <select id="setFolder">
-        <option value="">Folder নির্বাচন করুন</option>
-      </select>
+      <div class="field">
+        <label class="label">Folder</label>
+        <select id="setFolder">
+          <option value="">Folder নির্বাচন করুন</option>
+        </select>
+      </div>
 
-      <select id="set">
-        <option value="">Set নির্বাচন করুন</option>
-      </select>
+      <div class="field">
+        <label class="label">Set</label>
+        <select id="set">
+          <option value="">Set নির্বাচন করুন</option>
+        </select>
+      </div>
 
-      <input
-        type="text"
-        id="newSet"
-        placeholder="নতুন Set-এর নাম"
-      >
+      <div class="field">
+        <label class="label">নতুন Set-এর নাম</label>
+        <input
+          type="text"
+          id="newSet"
+          placeholder="নতুন Set-এর নাম"
+        >
+      </div>
 
+    </div>
+
+    <br>
+
+    <div class="button-grid">
+      <button onclick="addSet()">❖ Add Set</button>
+      <button onclick="renameSet()">❖ Rename Set</button>
+      <button class="danger" onclick="deleteSet()">❖ Delete Set</button>
     </div>
 
     <div id="setMsg" class="message"></div>
@@ -194,35 +264,60 @@
 
 
   <!-- =========================
-       MANUAL QUESTION
+       QUESTION CREATE
   ========================== -->
   <div class="card">
 
-    <h2>প্রশ্ন যোগ করুন</h2>
+    <h2>❏ প্রশ্ন যোগ করুন</h2>
 
-    <div class="grid">
+    <div class="hint">
+      প্রশ্ন যোগ করার সময় Category → Folder → Set → বিষয় একই জায়গা থেকে নির্বাচন করুন।
+    </div>
 
-      <select id="questionCategory">
-        <option value="">Category নির্বাচন করুন</option>
-      </select>
+    <div class="question-destination">
 
-      <select id="questionFolder">
-        <option value="">Folder নির্বাচন করুন</option>
-      </select>
+      <div class="field">
+        <label class="label">
+          Category <span class="required">*</span>
+        </label>
 
-      <select id="questionSet">
-        <option value="">Set নির্বাচন করুন</option>
-      </select>
+        <select id="questionCategory">
+          <option value="">Category নির্বাচন করুন</option>
+        </select>
+      </div>
 
-      <select id="subject">
-        <option value="">বিষয় নির্বাচন করুন</option>
-      </select>
 
-      <input
-        type="text"
-        id="questionNumber"
-        placeholder="প্রশ্ন নম্বর"
-      >
+      <div class="field">
+        <label class="label">
+          Folder <span class="required">*</span>
+        </label>
+
+        <select id="questionFolder">
+          <option value="">Folder নির্বাচন করুন</option>
+        </select>
+      </div>
+
+
+      <div class="field">
+        <label class="label">
+          Set <span class="required">*</span>
+        </label>
+
+        <select id="questionSet">
+          <option value="">Set নির্বাচন করুন</option>
+        </select>
+      </div>
+
+
+      <div class="field">
+        <label class="label">
+          বিষয়
+        </label>
+
+        <select id="subject">
+          <option value="">বিষয় নির্বাচন করুন</option>
+        </select>
+      </div>
 
     </div>
 
@@ -230,10 +325,17 @@
 
     <div class="question-area">
 
+      <input
+        type="text"
+        id="questionNumber"
+        placeholder="প্রশ্ন নম্বর (ঐচ্ছিক)"
+      >
+
       <textarea
         id="question"
         placeholder="প্রশ্ন লিখুন"
       ></textarea>
+
 
       <div class="option-grid">
 
@@ -263,18 +365,26 @@
 
       </div>
 
+
       <select id="correctAnswer">
-        <option value="">সঠিক উত্তর নির্বাচন করুন</option>
+
+        <option value="">
+          সঠিক উত্তর নির্বাচন করুন
+        </option>
+
         <option value="ক">ক</option>
         <option value="খ">খ</option>
         <option value="গ">গ</option>
         <option value="ঘ">ঘ</option>
+
       </select>
+
 
       <textarea
         id="explanation"
-        placeholder="ব্যাখ্যা"
+        placeholder="ব্যাখ্যা (ঐচ্ছিক)"
       ></textarea>
+
 
       <button
         class="primary"
@@ -291,17 +401,15 @@
 
 
   <!-- =========================
-       CSV / EXCEL IMPORT
+       CSV / EXCEL
   ========================== -->
   <div class="card">
 
-    <h2>CSV / Excel থেকে প্রশ্ন যোগ</h2>
+    <h2>❏ CSV / Excel থেকে প্রশ্ন যোগ</h2>
 
-    <p>
-      এখানে উপরের নির্বাচিত
-      <strong>Category → Folder → Set</strong>
-      অনুযায়ী প্রশ্নগুলো সংরক্ষণ হবে।
-    </p>
+    <div class="hint">
+      নিচের নির্বাচিত Category → Folder → Set অনুযায়ী সব প্রশ্ন সংরক্ষণ হবে।
+    </div>
 
     <input
       type="file"
@@ -339,13 +447,10 @@
 </div>
 
 
-<!-- Supabase -->
 <script src="js/supabase.js"></script>
 
-<!-- Excel/CSV reader -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
-<!-- Page JS -->
 <script src="js/question_create.js"></script>
 
 </body>
