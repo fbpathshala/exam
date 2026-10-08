@@ -118,6 +118,14 @@
   <div class="card">
     <div class="section-head"><div><h2 style="margin-bottom:4px">৩. CSV / Excel Upload</h2><p class="section-note">নির্বাচিত Category → Folder → Set-এ একসাথে অনেক প্রশ্ন Import করুন।</p></div></div>
     <p class="muted">Required: question, option_a, option_b, option_c, option_d, correct_answer. Optional: question_number, subject, explanation, category.</p>
+    <div class="destination"><strong>প্রশ্নের গন্তব্য</strong><small>CSV/Excel-এর সব প্রশ্ন এই নির্বাচিত Category → Folder → Set-এ যাবে।</small></div>
+    <div class="grid">
+      <div><label>Category</label><select id="importCategory"></select></div>
+      <div><label>Folder</label><select id="importFolder"></select></div>
+    </div>
+    <div class="grid" style="margin-bottom:10px">
+      <div><label>Set</label><select id="importSet"></select></div><div></div>
+    </div>
     <div class="inline-actions"><button type="button" class="secondary" onclick="template()">Template ডাউনলোড</button><input id="importFile" type="file" accept=".csv,.xlsx,.xls"></div>
     <button type="button" onclick="previewImport()">Preview</button>
     <div id="importPreview"></div>
@@ -127,6 +135,6 @@
 </main>
 </div>
 <script src="js/supabase.js?v=20261008-1"></script>
-<script src="js/question_create.js?v=20261008-1"></script>
+<script src="js/question_create.js?v=20261008-2"></script>
 </body>
 </html>
