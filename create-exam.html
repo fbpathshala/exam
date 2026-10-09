@@ -1,1 +1,65 @@
-<!doctype html><html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>নতুন পরীক্ষা তৈরি</title><link rel="stylesheet" href="css/admin.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body><main class="dashboard-wrap"><div class="card"><h1>➕ নতুন পরীক্ষা তৈরি</h1><p>পরীক্ষা তৈরি হলে পরে Exam Manager থেকে প্রশ্ন, নাম ও অন্যান্য সেটিংস নিয়ন্ত্রণ করা যাবে।</p><label>পরীক্ষার নাম</label><input id="examName" placeholder="যেমন: মডেল টেস্ট–৫"><label>স্ট্যাটাস</label><select id="examStatus"><option value="active">Active</option><option value="inactive">Inactive</option></select><button id="saveBtn">পরীক্ষা তৈরি করুন</button><button class="secondary" onclick="location.href='exam-manager.html'">← পরীক্ষা পরিচালনায় ফিরুন</button><p id="msg" class="msg"></p></div></main><script src="js/supabase.js"></script><script src="js/create-exam.js"></script></body></html>
+
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>পরীক্ষা তৈরি</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<main class="wrap">
+  <section class="card">
+    <h1>➕ পরীক্ষা তৈরি</h1>
+    <p>পরীক্ষার প্রাথমিক তথ্য ও সেটিংস নির্ধারণ করো।</p>
+
+    <label>পরীক্ষার নাম
+      <input id="examName" placeholder="যেমন: মডেল টেস্ট–৫">
+    </label>
+
+    <label>পরীক্ষার সময় (মিনিট)
+      <input id="duration" type="number" min="1" value="20">
+    </label>
+
+    <label>প্রতি প্রশ্নের নম্বর
+      <input id="marks" type="number" min="0" step="0.25" value="1">
+    </label>
+
+    <label>নেগেটিভ মার্ক
+      <input id="negative" type="number" min="0" step="0.01" value="0">
+    </label>
+
+    <label>পাস নম্বর
+      <input id="passMark" type="number" min="0" step="0.25" value="0">
+    </label>
+
+    <label>পরীক্ষার স্ট্যাটাস
+      <select id="examStatus">
+        <option value="active">চালু</option>
+        <option value="inactive">বন্ধ</option>
+      </select>
+    </label>
+
+    <button id="saveBtn">পরীক্ষা তৈরি করুন</button>
+    <button onclick="location.href='exam-manager.html'">
+      ধাপ ৪: পরীক্ষা ব্যবস্থাপনা
+    </button>
+
+    <p id="msg" role="status"></p>
+  </section>
+</main>
+
+<style>
+.wrap{max-width:700px;margin:25px auto;padding:16px}
+.card{padding:22px;background:#fff;border-radius:12px;box-shadow:0 3px 15px #0001}
+label{display:block;margin:15px 0;font-weight:600}
+input,select{display:block;width:100%;box-sizing:border-box;padding:10px;margin-top:6px;border:1px solid #ccc;border-radius:7px}
+button{padding:11px 16px;margin:5px 3px;border:0;border-radius:7px;background:#1769aa;color:white;cursor:pointer}
+#msg{white-space:pre-wrap}
+</style>
+
+<script src="js/supabase.js"></script>
+<script src="js/create-exam.js"></script>
+</body>
+</html>
