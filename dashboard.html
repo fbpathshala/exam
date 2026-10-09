@@ -14,29 +14,24 @@
   margin:auto;
   padding:18px
 }
-
 .dashboard-top{
   display:flex;
   align-items:center;
   justify-content:space-between;
   margin-bottom:16px
 }
-
 .dashboard-brand h1{
   margin:0;
   font-size:24px
 }
-
 .dashboard-brand p{
   margin:4px 0;
   color:#64748b;
   font-size:13px
 }
-
 .admin-menu{
   position:relative
 }
-
 .admin-menu-btn{
   width:46px!important;
   height:46px!important;
@@ -48,12 +43,11 @@
   border-radius:12px!important;
   cursor:pointer
 }
-
 .admin-menu-panel{
   position:absolute;
   right:0;
   top:54px;
-  width:240px;
+  width:260px;
   background:#fff;
   border:1px solid #e5e7eb;
   border-radius:14px;
@@ -61,18 +55,15 @@
   padding:8px;
   z-index:100
 }
-
 .admin-menu-panel button{
   display:block;
   width:100%;
   margin:3px 0;
   text-align:left
 }
-
 .admin-menu-panel .logout{
   background:#dc2626
 }
-
 .smart-date{
   background:linear-gradient(135deg,#0f172a,#1e3a5f);
   color:#fff;
@@ -80,24 +71,20 @@
   padding:22px;
   margin-bottom:16px
 }
-
 .smart-date .label{
   font-size:12px;
   opacity:.72
 }
-
 .smart-date .today{
   font-size:25px;
   font-weight:800;
   margin:5px 0 12px
 }
-
 .smart-lines{
   display:flex;
   flex-wrap:wrap;
   gap:8px
 }
-
 .smart-pill{
   background:rgba(255,255,255,.1);
   border:1px solid rgba(255,255,255,.12);
@@ -105,24 +92,20 @@
   padding:7px 11px;
   font-size:13px
 }
-
 .smart-clock{
   font-size:30px;
   font-weight:800;
   margin-top:15px
 }
-
 .smart-zone{
   font-size:12px;
   opacity:.7
 }
-
 .dashboard-cards{
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
   gap:14px
 }
-
 .dashboard-stat{
   background:#fff;
   border:1px solid #e5e7eb;
@@ -130,75 +113,60 @@
   padding:18px;
   box-shadow:0 8px 22px rgba(15,23,42,.06)
 }
-
 .dashboard-stat .icon{
   font-size:25px
 }
-
 .dashboard-stat b{
   display:block;
   font-size:30px;
   margin:10px 0 3px
 }
-
 .dashboard-stat span{
   color:#64748b;
   font-size:13px;
   font-weight:700
 }
-
 .dashboard-stat small{
   display:block;
   color:#94a3b8;
   font-size:11px;
   margin-top:6px
 }
-
 .hidden{
   display:none!important
 }
-
 .status{
   margin-top:12px;
   color:#64748b;
   font-size:12px
 }
-
 .error{
   color:#b91c1c
 }
-
 @media(max-width:800px){
   .dashboard-cards{
     grid-template-columns:repeat(2,minmax(0,1fr))
   }
 }
-
 @media(max-width:480px){
   .dashboard-wrap{
     padding:12px
   }
-
   .dashboard-brand h1{
     font-size:20px
   }
-
   .smart-date{
     padding:18px
   }
-
   .smart-date .today{
     font-size:21px
   }
-
   .smart-clock{
     font-size:26px
   }
-
   .dashboard-stat{
     padding:14px
   }
-
   .dashboard-stat b{
     font-size:25px
   }
@@ -210,11 +178,8 @@
 
 <!-- LOGIN -->
 <div id="login" class="center">
-
   <div class="card login">
-
     <h1>ফেইসবুক পাঠশালা</h1>
-
     <h2>ড্যাশবোর্ড</h2>
 
     <input
@@ -229,88 +194,71 @@
       placeholder="Password"
     >
 
-    <button id="loginBtn">
-      Login
-    </button>
-
+    <button id="loginBtn">Login</button>
     <p id="loginMsg" class="msg"></p>
-
   </div>
-
 </div>
-
 
 <!-- DASHBOARD -->
 <div id="app" class="hidden">
-
   <div class="dashboard-wrap">
 
     <!-- HEADER -->
     <header class="dashboard-top">
-
       <div class="dashboard-brand">
-
-        <h1>
-          ফেইসবুক পাঠশালা
-        </h1>
-
-        <p>
-          Admin Dashboard
-        </p>
-
+        <h1>ফেইসবুক পাঠশালা</h1>
+        <p>Admin Dashboard</p>
       </div>
-
 
       <!-- THREE LINE MENU -->
       <div class="admin-menu">
-
         <button
           class="admin-menu-btn"
           id="adminMenuBtn"
           aria-label="মেনু"
-        >
-          ☰
-        </button>
-
+        >☰</button>
 
         <div
           class="admin-menu-panel hidden"
           id="adminMenuPanel"
         >
 
-          <!-- প্রশ্ন তৈরি -->
+          <!-- ১. প্রশ্ন তৈরি -->
           <button
             onclick="location.href='question_create.html'"
           >
-            ➕ প্রশ্ন তৈরি
+            📝 প্রশ্ন তৈরি
           </button>
 
-
-          <!-- প্রশ্ন ব্যাংক -->
+          <!-- ২. প্রশ্ন ব্যাংক -->
           <button
             onclick="location.href='question_bank.html'"
           >
             🗂️ প্রশ্ন ব্যাংক
           </button>
 
+          <!-- ৩. পরীক্ষা তৈরি -->
+          <button
+            onclick="location.href='create-exam.html'"
+          >
+            ➕ পরীক্ষা তৈরি
+          </button>
 
-          <!-- পরীক্ষা পরিচালনা -->
+          <!-- ৪. পরীক্ষা সেটিংস ও ব্যবস্থাপনা -->
           <button
             onclick="location.href='exam-manager.html'"
           >
-            📋 পরীক্ষা পরিচালনা
+            ⚙️ পরীক্ষা সেটিংস ও ব্যবস্থাপনা
           </button>
 
-
-          <!-- ফলাফল পর্যালোচনা -->
+          <!-- ৫. ফলাফল পর্যালোচনা -->
           <button
             onclick="location.href='results.html'"
           >
             📊 ফলাফল পর্যালোচনা
           </button>
 
-
-          <!-- লগ আউট -->
+          <!-- ৬. লগ আউট -->
           <button
             class="logout"
             id="logoutBtn"
@@ -319,156 +267,81 @@
           </button>
 
         </div>
-
       </div>
-
     </header>
-
 
     <!-- DATE / TIME -->
     <section class="smart-date">
-
       <div class="label">
         আজকের দিন • বাংলাদেশ সময়
       </div>
 
-      <div
-        class="today"
-        id="smartToday"
-      >
+      <div class="today" id="smartToday">
         লোড হচ্ছে...
       </div>
 
-
       <div class="smart-lines">
-
-        <span
-          class="smart-pill"
-          id="smartBangla"
-        >
+        <span class="smart-pill" id="smartBangla">
           🌾 বাংলা: লোড হচ্ছে...
         </span>
 
-
-        <span
-          class="smart-pill"
-          id="smartHijri"
-        >
+        <span class="smart-pill" id="smartHijri">
           🌙 হিজরি: লোড হচ্ছে...
         </span>
-
       </div>
 
-
-      <div
-        class="smart-clock"
-        id="smartClock"
-      >
+      <div class="smart-clock" id="smartClock">
         --:--:--
       </div>
-
 
       <div class="smart-zone">
         Asia/Dhaka • UTC+6
       </div>
-
     </section>
-
 
     <!-- STATISTICS -->
     <div class="dashboard-cards">
 
       <!-- মোট প্রশ্ন -->
       <div class="dashboard-stat">
-
-        <div class="icon">
-          📝
-        </div>
-
-        <b id="sQuestions">
-          ০
-        </b>
-
-        <span>
-          মোট প্রশ্ন
-        </span>
-
+        <div class="icon">📝</div>
+        <b id="sQuestions">০</b>
+        <span>মোট প্রশ্ন</span>
       </div>
-
 
       <!-- মোট পরীক্ষা -->
       <div class="dashboard-stat">
-
-        <div class="icon">
-          📋
-        </div>
-
-        <b id="sExams">
-          ০
-        </b>
-
-        <span>
-          মোট পরীক্ষা
-        </span>
-
+        <div class="icon">📋</div>
+        <b id="sExams">০</b>
+        <span>মোট পরীক্ষা</span>
       </div>
-
 
       <!-- মোট পরীক্ষার্থী -->
       <div class="dashboard-stat">
-
-        <div class="icon">
-          👨‍🎓
-        </div>
-
-        <b id="sStudents">
-          ০
-        </b>
-
-        <span>
-          মোট পরীক্ষার্থী
-        </span>
-
+        <div class="icon">👨‍🎓</div>
+        <b id="sStudents">০</b>
+        <span>মোট পরীক্ষার্থী</span>
         <small>
           জমা দেওয়া পরীক্ষার সংখ্যা অনুযায়ী গণনা।
         </small>
-
       </div>
-
 
       <!-- মোট ভিজিটর -->
       <div class="dashboard-stat">
-
-        <div class="icon">
-          👁️
-        </div>
-
-        <b id="sVisitors">
-          ০
-        </b>
-
-        <span>
-          মোট ভিজিটর
-        </span>
-
+        <div class="icon">👁️</div>
+        <b id="sVisitors">০</b>
+        <span>মোট ভিজিটর</span>
         <small>
           একটি ব্রাউজার/ডিভাইসকে একজন ইউনিক ভিজিটর হিসেবে গণনা করা হয়।
         </small>
-
       </div>
 
     </div>
 
-
-    <div
-      id="status"
-      class="status"
-    ></div>
+    <div id="status" class="status"></div>
 
   </div>
-
 </div>
-
 
 <script src="js/supabase.js"></script>
 
@@ -479,7 +352,6 @@
   const bn = n =>
     String(n ?? '')
       .replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
-
 
   /* বাংলা মাস */
   const banglaMonths = [
@@ -497,31 +369,19 @@
     'চৈত্র'
   ];
 
-
   /* বাংলা তারিখ */
   function banglaDate(d){
-
     let y = d.getFullYear();
-
     let start = new Date(y,3,14);
-
     let by = y - 593;
 
-
     if(d < start){
-
       by = y - 594;
-
       start = new Date(y-1,3,14);
-
     }
 
-
     let dayIndex =
-      Math.floor(
-        (d-start)/86400000
-      );
-
+      Math.floor((d-start)/86400000);
 
     let lengths = [
       31,31,31,31,
@@ -529,21 +389,15 @@
       30,30,30,30
     ];
 
-
     let month = 0;
-
 
     while(
       month < 11 &&
       dayIndex >= lengths[month]
     ){
-
       dayIndex -= lengths[month];
-
       month++;
-
     }
-
 
     return (
       bn(dayIndex+1) +
@@ -552,15 +406,11 @@
       ' ' +
       bn(by)
     );
-
   }
-
 
   /* সময় ও তারিখ */
   function clock(){
-
     const now = new Date();
-
 
     const parts =
       new Intl.DateTimeFormat(
@@ -578,35 +428,26 @@
         }
       ).formatToParts(now);
 
-
     const value = type =>
-      parts.find(
-        x => x.type === type
-      )?.value || '';
-
+      parts.find(x => x.type === type)?.value || '';
 
     const dhakaDate =
       new Date(
         now.toLocaleString(
           'en-US',
-          {
-            timeZone:'Asia/Dhaka'
-          }
+          {timeZone:'Asia/Dhaka'}
         )
       );
-
 
     document.getElementById(
       'smartToday'
     ).textContent =
-
       value('month') +
       ' ' +
       value('day') +
       ', ' +
       value('year') +
       ' • ' +
-
       new Intl.DateTimeFormat(
         'bn-BD',
         {
@@ -615,11 +456,9 @@
         }
       ).format(now);
 
-
     document.getElementById(
       'smartClock'
     ).textContent =
-
       value('hour') +
       ':' +
       value('minute') +
@@ -628,19 +467,13 @@
       ' ' +
       value('dayPeriod');
 
-
     document.getElementById(
       'smartBangla'
     ).textContent =
-
-      '🌾 বাংলা: ' +
-      banglaDate(dhakaDate);
-
+      '🌾 বাংলা: ' + banglaDate(dhakaDate);
 
     /* হিজরি */
-
     try{
-
       const h =
         new Intl.DateTimeFormat(
           'en-US-u-ca-islamic',
@@ -652,12 +485,8 @@
           }
         ).formatToParts(now);
 
-
       const hv = type =>
-        h.find(
-          x => x.type === type
-        )?.value || '';
-
+        h.find(x => x.type === type)?.value || '';
 
       const hijriMonths = [
         '',
@@ -675,62 +504,36 @@
         'জিলহজ'
       ];
 
-
       document.getElementById(
         'smartHijri'
       ).textContent =
-
         '🌙 হিজরি: ' +
-
         bn(hv('day')) +
         ' ' +
-
-        (
-          hijriMonths[
-            Number(hv('month'))
-          ] || ''
-        ) +
-
+        (hijriMonths[Number(hv('month'))] || '') +
         ' ' +
-
         bn(hv('year')) +
-
         ' হিজরি';
 
-
     }catch(e){
-
       document.getElementById(
         'smartHijri'
-      ).textContent =
-        '🌙 হিজরি: —';
-
+      ).textContent = '🌙 হিজরি: —';
     }
-
   }
-
 
   /* Element helper */
   function $(id){
     return document.getElementById(id);
   }
 
-
   /* সংখ্যা সেট */
-  function setNumber(
-    id,
-    value
-  ){
-
-    $(id).textContent =
-      bn(value || 0);
-
+  function setNumber(id,value){
+    $(id).textContent = bn(value || 0);
   }
-
 
   /* Dashboard statistics */
   async function stats(){
-
     const [
       questions,
       exams,
@@ -738,51 +541,27 @@
       visitors
     ] = await Promise.all([
 
-      db
-        .from('questions')
-        .select(
-          'id',
-          {
-            count:'exact',
-            head:true
-          }
-        ),
+      db.from('questions').select(
+        'id',
+        {count:'exact',head:true}
+      ),
 
+      db.from('exams').select(
+        'id',
+        {count:'exact',head:true}
+      ),
 
-      db
-        .from('exams')
-        .select(
-          'id',
-          {
-            count:'exact',
-            head:true
-          }
-        ),
+      db.from('exam_attempts').select(
+        'id',
+        {count:'exact',head:true}
+      ),
 
-
-      db
-        .from('exam_attempts')
-        .select(
-          'id',
-          {
-            count:'exact',
-            head:true
-          }
-        ),
-
-
-      db
-        .from('site_visitors')
-        .select(
-          'id',
-          {
-            count:'exact',
-            head:true
-          }
-        )
+      db.from('site_visitors').select(
+        'id',
+        {count:'exact',head:true}
+      )
 
     ]);
-
 
     const data = [
       questions,
@@ -791,176 +570,90 @@
       visitors
     ];
 
-
-    data.forEach(
-      (item,index) => {
-
-        if(!item.error){
-
-          setNumber(
-            [
-              'sQuestions',
-              'sExams',
-              'sStudents',
-              'sVisitors'
-            ][index],
-
-            item.count
-          );
-
-        }
-
+    data.forEach((item,index) => {
+      if(!item.error){
+        setNumber(
+          [
+            'sQuestions',
+            'sExams',
+            'sStudents',
+            'sVisitors'
+          ][index],
+          item.count
+        );
       }
-    );
+    });
 
-
-    const bad =
-      data.find(
-        x => x.error
-      );
-
+    const bad = data.find(x => x.error);
 
     if(bad){
-
       $('status').innerHTML =
         '<span class="error">' +
         'ডেটা লোডে সমস্যা: ' +
         bad.error.message +
         '</span>';
-
     }
-
   }
-
 
   /* শুরু */
   async function init(){
-
-    const {
-      data,
-      error
-    } =
+    const {data,error} =
       await db.auth.getSession();
 
-
     if(error){
-
-      $('loginMsg').textContent =
-        error.message;
-
+      $('loginMsg').textContent = error.message;
       return;
-
     }
-
 
     if(data.session){
-
-      $('login')
-        .classList
-        .add('hidden');
-
-
-      $('app')
-        .classList
-        .remove('hidden');
-
+      $('login').classList.add('hidden');
+      $('app').classList.remove('hidden');
 
       clock();
-
-
-      setInterval(
-        clock,
-        1000
-      );
-
-
+      setInterval(clock,1000);
       stats();
-
     }
-
   }
 
-
   /* Login */
-  $('loginBtn').onclick =
-    async function(){
+  $('loginBtn').onclick = async function(){
+    const {error} =
+      await db.auth.signInWithPassword({
+        email:$('email').value.trim(),
+        password:$('password').value
+      });
 
-      const {
-        error
-      } =
-        await db.auth.signInWithPassword({
+    if(error){
+      $('loginMsg').textContent = error.message;
+      return;
+    }
 
-          email:
-            $('email')
-              .value
-              .trim(),
-
-          password:
-            $('password')
-              .value
-
-        });
-
-
-      if(error){
-
-        $('loginMsg').textContent =
-          error.message;
-
-        return;
-
-      }
-
-
-      init();
-
-    };
-
+    init();
+  };
 
   /* Logout */
-  $('logoutBtn').onclick =
-    async function(){
-
-      await db.auth.signOut();
-
-      location.reload();
-
-    };
-
+  $('logoutBtn').onclick = async function(){
+    await db.auth.signOut();
+    location.reload();
+  };
 
   /* Three-line Menu */
-  $('adminMenuBtn').onclick =
-    function(e){
+  $('adminMenuBtn').onclick = function(e){
+    e.stopPropagation();
 
-      e.stopPropagation();
-
-      $('adminMenuPanel')
-        .classList
-        .toggle('hidden');
-
-    };
-
+    $('adminMenuPanel')
+      .classList
+      .toggle('hidden');
+  };
 
   /* বাইরে ক্লিক করলে Menu বন্ধ */
-  document.addEventListener(
-    'click',
-    function(e){
-
-      if(
-        !e.target.closest(
-          '.admin-menu'
-        )
-      ){
-
-        $('adminMenuPanel')
-          .classList
-          .add('hidden');
-
-      }
-
+  document.addEventListener('click',function(e){
+    if(!e.target.closest('.admin-menu')){
+      $('adminMenuPanel')
+        .classList
+        .add('hidden');
     }
-  );
-
+  });
 
   /* Start */
   init();
