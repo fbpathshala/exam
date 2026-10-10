@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>পরীক্ষা ব্যবস্থাপনা | FB Pathshala</title>
+  <title>পরীক্ষার সেটিংস</title>
 
   <style>
     * {
@@ -12,46 +12,51 @@
 
     body {
       margin: 0;
-      padding: 16px;
-      font-family: Arial, sans-serif;
-      background: #f3f6fa;
+      padding: 20px;
+      background: #f4f6f9;
       color: #222;
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
     }
 
     .container {
-      max-width: 850px;
+      max-width: 760px;
       margin: 0 auto;
+      padding: 24px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      text-align: center;
+      font-size: 25px;
     }
 
     h2 {
-      text-align: center;
-      color: #176b43;
-      margin-bottom: 20px;
-    }
-
-    .card {
-      background: #fff;
-      padding: 18px;
-      margin-bottom: 18px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      margin-top: 26px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 19px;
     }
 
     label {
       display: block;
-      font-weight: bold;
       margin: 14px 0 6px;
+      font-weight: bold;
     }
 
-    input,
+    input[type="text"],
+    input[type="number"],
+    input[type="url"],
     select,
     textarea {
       width: 100%;
       padding: 11px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 16px;
-      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      font: inherit;
     }
 
     textarea {
@@ -61,14 +66,14 @@
 
     .checkbox-row {
       display: flex;
-      align-items: center;
-      gap: 10px;
+      align-items: flex-start;
+      gap: 9px;
       margin: 14px 0;
     }
 
     .checkbox-row input {
-      width: auto;
-      transform: scale(1.2);
+      margin-top: 6px;
+      transform: scale(1.15);
     }
 
     .checkbox-row label {
@@ -77,203 +82,161 @@
     }
 
     button {
-      border: none;
-      border-radius: 6px;
-      padding: 12px 16px;
-      margin-top: 14px;
-      width: 100%;
-      background: #176b43;
+      padding: 11px 17px;
+      border: 0;
+      border-radius: 7px;
+      background: #087443;
       color: white;
       font-size: 16px;
       cursor: pointer;
     }
 
     button:disabled {
-      background: #999;
+      opacity: 0.55;
       cursor: not-allowed;
     }
 
-    .secondary-button {
-      background: #2458a6;
+    .load-button {
+      margin-top: 12px;
+      background: #175cd3;
+    }
+
+    .save-button {
+      width: 100%;
+      margin-top: 22px;
+      font-weight: bold;
     }
 
     .message {
       margin-top: 12px;
       padding: 10px;
-      border-radius: 6px;
-      display: none;
+      border-radius: 7px;
       overflow-wrap: anywhere;
     }
 
+    .message:empty {
+      display: none;
+    }
+
     .success {
-      display: block;
-      background: #e5f7eb;
-      color: #176b43;
+      background: #e8f7ed;
+      color: #176534;
     }
 
     .error {
-      display: block;
-      background: #fdeaea;
-      color: #b42318;
+      background: #fdecec;
+      color: #a32121;
     }
 
     .hint {
-      color: #666;
-      font-size: 13px;
-      line-height: 1.6;
+      color: #555;
+      font-size: 14px;
     }
 
-    .section-title {
-      color: #176b43;
-      margin-top: 0;
-    }
+    @media (max-width: 500px) {
+      body {
+        padding: 10px;
+      }
 
-    @media (min-width: 600px) {
-      .two-columns {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0 16px;
+      .container {
+        padding: 16px;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="container">
+  <main class="container">
+    <h1>পরীক্ষার সেটিংস</h1>
 
-    <h2>পরীক্ষা ব্যবস্থাপনা</h2>
+    <label for="examSelect">পরীক্ষা নির্বাচন করুন</label>
+    <select id="examSelect">
+      <option value="">পরীক্ষা নির্বাচন করুন</option>
+    </select>
 
-    <div class="card">
-      <h3 class="section-title">পরীক্ষা নির্বাচন</h3>
+    <button type="button" id="loadExamSettings" class="load-button">
+      সেটিংস লোড করুন
+    </button>
 
-      <label for="examSelect">পরীক্ষার তালিকা</label>
-      <select id="examSelect">
-        <option value="">পরীক্ষা লোড হচ্ছে...</option>
-      </select>
+    <div id="loadMessage" class="message" role="status"></div>
 
-      <button type="button" id="loadExamSettings" class="secondary-button">
-        পরীক্ষার সেটিংস লোড করুন
-      </button>
+    <form id="examSettingsForm">
+      <h2>পরীক্ষার মূল তথ্য</h2>
 
-      <div id="loadMessage" class="message" role="status"></div>
-    </div>
+      <label for="examName">পরীক্ষার নাম</label>
+      <input type="text" id="examName" required>
 
-    <form id="examSettingsForm" class="card">
-      <h3 class="section-title">পরীক্ষার সেটিংস পরিবর্তন</h3>
+      <label for="duration">পরীক্ষার সময় (মিনিট)</label>
+      <input type="number" id="duration" min="1" step="1" required>
 
-      <p class="hint">
-        পরীক্ষা নির্বাচন করে সেটিংস লোড করুন। পরিবর্তন করার পর সেভ করলে
-        সংশ্লিষ্ট পরীক্ষার সেটিংস আপডেট হবে।
-      </p>
+      <label for="marks">প্রতি প্রশ্নের নম্বর</label>
+      <input type="number" id="marks" min="0" step="any" required>
 
-      <div class="two-columns">
-        <div>
-          <label for="examName">পরীক্ষার নাম</label>
-          <input
-            type="text"
-            id="examName"
-            name="examName"
-            required
-          >
-        </div>
+      <label for="negative">প্রতি ভুল উত্তরের নেগেটিভ মার্ক</label>
+      <input type="number" id="negative" min="0" step="any" required>
 
-        <div>
-          <label for="duration">সময় (মিনিট)</label>
-          <input
-            type="number"
-            id="duration"
-            name="duration"
-            min="1"
-            required
-          >
-        </div>
+      <label for="passMark">পাস নম্বর</label>
+      <input type="number" id="passMark" min="0" step="any" required>
 
-        <div>
-          <label for="marks">প্রতি প্রশ্নের নম্বর</label>
-          <input
-            type="number"
-            id="marks"
-            name="marks"
-            min="0"
-            step="any"
-            required
-          >
-        </div>
-
-        <div>
-          <label for="negative">নেগেটিভ মার্ক</label>
-          <input
-            type="number"
-            id="negative"
-            name="negative"
-            min="0"
-            step="any"
-            required
-          >
-        </div>
-
-        <div>
-          <label for="passMark">পাস নম্বর</label>
-          <input
-            type="number"
-            id="passMark"
-            name="passMark"
-            min="0"
-            step="any"
-            required
-          >
-        </div>
-      </div>
-
-      <hr style="border:0;border-top:1px solid #eee;margin:22px 0;">
-
-      <h3 class="section-title">পরীক্ষার ফলাফল ও উত্তরপত্র</h3>
+      <h2>ফলাফল ও উত্তরপত্র</h2>
 
       <div class="checkbox-row">
-        <input type="checkbox" id="showResult" name="showResult">
-        <label for="showResult">পরীক্ষা শেষে ফলাফল দেখাবে</label>
+        <input type="checkbox" id="showResult">
+        <label for="showResult">শিক্ষার্থীকে পরীক্ষার ফলাফল দেখান</label>
       </div>
 
       <div class="checkbox-row">
-        <input type="checkbox" id="showPosition" name="showPosition">
-        <label for="showPosition">শিক্ষার্থীর অবস্থান/মেধাক্রম দেখাবে</label>
+        <input type="checkbox" id="showPosition">
+        <label for="showPosition">শিক্ষার্থীকে মেধাক্রম/অবস্থান দেখান</label>
       </div>
 
       <div class="checkbox-row">
-        <input type="checkbox" id="showAnswerPaper" name="showAnswerPaper">
-        <label for="showAnswerPaper">উত্তরপত্র দেখার সুযোগ থাকবে</label>
+        <input type="checkbox" id="showAnswerPaper">
+        <label for="showAnswerPaper">শিক্ষার্থীকে উত্তরপত্র দেখার সুযোগ দিন</label>
       </div>
 
       <label for="thankYouMessage">পরীক্ষা শেষে ধন্যবাদ বার্তা</label>
-      <textarea
-        id="thankYouMessage"
-        name="thankYouMessage"
-        placeholder="পরীক্ষায় অংশগ্রহণের জন্য ধন্যবাদ..."
-      ></textarea>
+      <textarea id="thankYouMessage" placeholder="পরীক্ষায় অংশগ্রহণ করার জন্য ধন্যবাদ।"></textarea>
 
-      <label for="groupLink">ফেসবুক গ্রুপের লিংক</label>
+      <h2>Facebook লিংক</h2>
+
+      <label for="pageLink">Facebook Page URL</label>
       <input
         type="url"
-        id="groupLink"
-        name="groupLink"
-        placeholder="https://www.facebook.com/groups/..."
+        id="pageLink"
+        placeholder="https://www.facebook.com/yourpage"
       >
 
       <div class="checkbox-row">
-        <input type="checkbox" id="showGroupLink" name="showGroupLink">
-        <label for="showGroupLink">ফলাফল পৃষ্ঠায় গ্রুপে যোগ দেওয়ার লিংক দেখাবে</label>
+        <input type="checkbox" id="showPageLink">
+        <label for="showPageLink">পরীক্ষা শেষে Facebook Page লিংক দেখান</label>
       </div>
 
-      <button type="submit" id="saveSettings">
+      <label for="groupLink">Facebook Group URL</label>
+      <input
+        type="url"
+        id="groupLink"
+        placeholder="https://www.facebook.com/groups/yourgroup"
+      >
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="showGroupLink">
+        <label for="showGroupLink">পরীক্ষা শেষে Facebook Group লিংক দেখান</label>
+      </div>
+
+      <p class="hint">
+        এই সেটিংস নির্বাচিত পরীক্ষার জন্য প্রযোজ্য হবে। সেটিংস পরিবর্তন করলে
+        আগের শিক্ষার্থীদের পরীক্ষার রেকর্ড মুছে ফেলার কথা নয়।
+      </p>
+
+      <button type="submit" id="saveSettings" class="save-button">
         সেটিংস সেভ করুন
       </button>
 
       <div id="settingsMessage" class="message" role="status"></div>
     </form>
+  </main>
 
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
   <script src="js/exam-manager.js"></script>
 </body>
