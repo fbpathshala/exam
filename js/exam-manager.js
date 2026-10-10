@@ -9,6 +9,12 @@
   const DEFAULT_THANK_YOU =
     "পরীক্ষায় অংশগ্রহণ করার জন্য ধন্যবাদ।";
 
+  const DEFAULT_PAGE_URL =
+    "https://www.facebook.com/facebookpathshala";
+
+  const DEFAULT_GROUP_URL =
+    "https://www.facebook.com/groups/facebookpathshala";
+
   function showMessage(id, message, success = true) {
     const el = $(id);
     if (!el) return;
@@ -31,9 +37,13 @@
     return exam.exam_name || exam.title || exam.name || "";
   }
 
-  function numberValue(id, fallback = 0) {
-    const value = Number($(id).value);
-    return Number.isFinite(value) ? value : fallback;
+  function numberValue(id, fallback = NaN) {
+    const el = $(id);
+    const value = Number(el.value);
+
+    return el.value.trim() !== "" && Number.isFinite(value)
+      ? value
+      : fallback;
   }
 
   function getSelectedExamId() {
@@ -51,11 +61,14 @@
       "showPosition",
       "showAnswerPaper",
       "thankYouMessage",
+      "pageLink",
+      "showPageLink",
       "groupLink",
       "showGroupLink",
       "saveSettings"
     ].forEach((id) => {
-      if ($(id)) $(id).disabled = !enabled;
+      const el = $(id);
+      if (el) el.disabled = !enabled;
     });
   }
 
@@ -65,8 +78,8 @@
 
     const { data, error } = await db
       .from("exams")
-      .select("*")
-      .order("created_at", { ascending: false });
+      .select("id, exam_name")
+      .order("id", { ascending: false });
 
     if (error) throw error;
 
@@ -88,11 +101,7 @@
     });
 
     if (!data || data.length === 0) {
-      showMessage(
-        "loadMessage",
-        "কোনো পরীক্ষা পাওয়া যায়নি।",
-        false
-      );
+      showMessage("loadMessage", "কোনো পরীক্ষা পাওয়া যায়নি।", false);
     }
 
     return data || [];
@@ -135,12 +144,11 @@
       currentSettings = settings || {};
 
       fillForm(exam, currentSettings);
-
       setFormEnabled(true);
 
       showMessage(
         "loadMessage",
-        "পরীক্ষার সেটিংস লোড হয়েছে। এখন পরিবর্তন করতে পারবেন।"
+        "সেটিংস লোড হয়েছে। এখন পরিবর্তন করে সেভ করতে পারবেন।"
       );
     } catch (error) {
       console.error("Load exam settings error:", error);
@@ -160,24 +168,16 @@
     $("examName").value = getExamName(exam);
 
     $("duration").value =
-      settings.duration_minutes ??
-      exam.duration ??
-      20;
+      settings.duration_minutes ?? 20;
 
     $("marks").value =
-      settings.marks_per_question ??
-      exam.marks_per_question ??
-      1;
+      settings.marks_per_question ?? 1;
 
     $("negative").value =
-      settings.negative_mark ??
-      exam.negative_mark ??
-      0;
+      settings.negative_mark ?? 0;
 
     $("passMark").value =
-      settings.pass_mark ??
-      exam.pass_mark ??
-      0;
+      settings.pass_mark ?? 0;
 
     $("showResult").checked =
       settings.show_result !== false;
@@ -189,33 +189,56 @@
       settings.show_answers === true;
 
     $("thankYouMessage").value =
-      settings.thank_you_message ??
-      DEFAULT_THANK_YOU;
+      settings.thank_you_message ?? DEFAULT_THANK_YOU;
+
+    $("pageLink").value =
+      settings.facebook_page_url ?? DEFAULT_PAGE_URL;
+
+    $("showPageLink").checked =
+      settings.show_page_link === true;
 
     $("groupLink").value =
-      settings.facebook_group_url ?? "";
+      settings.facebook_group_url ?? DEFAULT_GROUP_URL;
 
     $("showGroupLink").checked =
       settings.show_group_link === true;
   }
 
+  function validateUrl(id, label) {
+    const value = $(id).value.trim();
+
+    if (!value) return null;
+
+    try {
+      const url = new URL(value);
+
+      if (url.protocol !== "https:" && url.protocol !== "http:") {
+        throw new Error();
+      }
+
+      return value;
+    } catch {
+      throw new Error(label + " সঠিক URL নয়।");
+    }
+  }
+
   function validateForm() {
     const name = $("examName").value.trim();
-    const duration = numberValue("duration", NaN);
-    const marks = numberValue("marks", NaN);
-    const negative = numberValue("negative", NaN);
-    const passMark = numberValue("passMark", NaN);
+    const duration = numberValue("duration");
+    const marks = numberValue("marks");
+    const negative = numberValue("negative");
+    const passMark = numberValue("passMark");
 
     if (!name) {
       throw new Error("পরীক্ষার নাম লিখুন।");
     }
 
-    if (!Number.isFinite(duration) || duration <= 0) {
-      throw new Error("পরীক্ষার সময় সঠিকভাবে লিখুন।");
+    if (!Number.isInteger(duration) || duration <= 0) {
+      throw new Error("পরীক্ষার সময় ১ বা তার বেশি পূর্ণসংখ্যা হতে হবে।");
     }
 
     if (!Number.isFinite(marks) || marks < 0) {
-      throw new Error("প্রতি প্রশ্নের নম্বর সঠিক নয়।");
+      throw new Error("প্রতি প্রশ্নের নম্বর সঠিকভাবে লিখুন।");
     }
 
     if (!Number.isFinite(negative) || negative < 0) {
@@ -231,7 +254,9 @@
       duration,
       marks,
       negative,
-      passMark
+      passMark,
+      pageUrl: validateUrl("pageLink", "Facebook Page"),
+      groupUrl: validateUrl("groupLink", "Facebook Group")
     };
   }
 
@@ -241,7 +266,11 @@
     const db = getDB();
     const examId = getSelectedExamId();
 
-    if (!examId || !currentExam || String(currentExam.id) !== String(examId)) {
+    if (
+      !examId ||
+      !currentExam ||
+      String(currentExam.id) !== String(examId)
+    ) {
       showMessage(
         "settingsMessage",
         "প্রথমে পরীক্ষা নির্বাচন করে সেটিংস লোড করুন।",
@@ -256,23 +285,19 @@
     try {
       const values = validateForm();
 
-      const examUpdate = {
-        exam_name: values.name,
-        duration: values.duration,
-        marks_per_question: values.marks,
-        negative_mark: values.negative,
-        pass_mark: values.passMark
-      };
-
+      // exams টেবিলে শুধু নিশ্চিতভাবে ব্যবহৃত পরীক্ষার নাম আপডেট হবে।
       const { error: examError } = await db
         .from("exams")
-        .update(examUpdate)
+        .update({
+          exam_name: values.name
+        })
         .eq("id", examId);
 
       if (examError) throw examError;
 
+      // প্রতিটি পরীক্ষার নিজস্ব সেটিংস exam_settings-এ থাকবে।
       const settingsUpdate = {
-        exam_id: examId,
+        exam_id: Number(examId),
         duration_minutes: values.duration,
         marks_per_question: values.marks,
         negative_mark: values.negative,
@@ -286,9 +311,10 @@
           $("thankYouMessage").value.trim() ||
           DEFAULT_THANK_YOU,
 
-        facebook_group_url:
-          $("groupLink").value.trim() || null,
+        facebook_page_url: values.pageUrl,
+        show_page_link: $("showPageLink").checked,
 
+        facebook_group_url: values.groupUrl,
         show_group_link: $("showGroupLink").checked
       };
 
@@ -298,13 +324,11 @@
           onConflict: "exam_id"
         });
 
-      if (settingsError) {
-        throw settingsError;
-      }
+      if (settingsError) throw settingsError;
 
       currentExam = {
         ...currentExam,
-        ...examUpdate
+        exam_name: values.name
       };
 
       currentSettings = {
@@ -312,18 +336,18 @@
         ...settingsUpdate
       };
 
+      const selectedId = String(examId);
       await loadExams();
-
-      $("examSelect").value = String(examId);
+      $("examSelect").value = selectedId;
 
       showMessage(
         "settingsMessage",
-        "সেটিংস সফলভাবে সেভ হয়েছে। আগের শিক্ষার্থীদের রেকর্ড পরিবর্তন করা হয়নি।"
+        "সেটিংস সফলভাবে সেভ হয়েছে। আগের শিক্ষার্থীদের রেকর্ড মুছে ফেলা হয়নি।"
       );
 
       showMessage(
         "loadMessage",
-        "পরীক্ষার সেটিংস আপডেট হয়েছে।"
+        "নির্বাচিত পরীক্ষার সেটিংস আপডেট হয়েছে।"
       );
     } catch (error) {
       console.error("Save settings error:", error);
@@ -373,7 +397,7 @@
 
       showMessage(
         "loadMessage",
-        "পরীক্ষা নির্বাচন করে সেটিংস লোড করুন।"
+        "একটি পরীক্ষা নির্বাচন করে সেটিংস লোড করুন।"
       );
     } catch (error) {
       console.error("Initialization error:", error);
