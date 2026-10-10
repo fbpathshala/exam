@@ -2,23 +2,19 @@
   "use strict";
 
   const $ = (id) => document.getElementById(id);
-
   let currentQuestions = [];
   let selectedQuestionIds = new Set();
 
   function showMessage(id, message, success = true) {
     const el = $(id);
     if (!el) return;
-
     el.textContent = message;
     el.style.color = success ? "#15803d" : "#dc2626";
   }
 
   function getDB() {
     if (!window.db) {
-      throw new Error(
-        "Supabase সংযোগ পাওয়া যায়নি। js/supabase.js পরীক্ষা করুন।"
-      );
+      throw new Error("Supabase সংযোগ পাওয়া যায়নি।");
     }
     return window.db;
   }
@@ -27,54 +23,21 @@
     return String(value ?? "").trim();
   }
 
-  function getQuestionId(question) {
-    return question.id ??
-      question.question_id ??
-      question.uuid ??
-      null;
+  function getQuestionId(q) {
+    return q.id ?? q.question_id ?? null;
   }
 
-  function getQuestionText(question) {
-    return question.question ??
-      question.question_text ??
-      question.question_bn ??
-      question.text ??
-      question.title ??
-      "প্রশ্নের লেখা পাওয়া যায়নি";
+  function getQuestionText(q) {
+    return q.question_text ?? q.question ?? q.text ?? "প্রশ্নের লেখা পাওয়া যায়নি";
   }
 
-  function getOptionText(question, index) {
-    const options = [
-      question.option_a ?? question.option1 ?? question.a,
-      question.option_b ?? question.option2 ?? question.b,
-      question.option_c ?? question.option3 ?? question.c,
-      question.option_d ?? question.option4 ?? question.d
-    ];
-
-    if (Array.isArray(question.options)) {
-      return question.options[index] ?? "";
-    }
-
-    return options[index] ?? "";
-  }
-
-  function getQuestionOptions(question) {
-    return ["ক", "খ", "গ", "ঘ"].map((label, index) => {
-      const value = getOptionText(question, index);
-      return value ? `${label}. ${value}` : "";
-    }).filter(Boolean);
-  }
-
-  function clearQuestionList(message) {
-    currentQuestions = [];
-    selectedQuestionIds.clear();
-
-    $("questionList").replaceChildren();
-
-    showMessage(
-      "questionCount",
-      message
-    );
+  function getOptions(q) {
+    return [
+      q.option_a ?? q.option1 ?? q.a,
+      q.option_b ?? q.option2 ?? q.b,
+      q.option_c ?? q.option3 ?? q.c,
+      q.option_d ?? q.option4 ?? q.d
+    ].filter(Boolean);
   }
 
   async function loadExams() {
@@ -83,29 +46,15 @@
 
     const { data, error } = await db
       .from("exams")
-      .select("*")
-      .order("created_at", { ascending: false });
+      .select("id, exam_name")
+      .order("id", { ascending: false });
 
     if (error) throw error;
 
-    select.replaceChildren();
-
-    const placeholder = document.createElement("option");
-    placeholder.value = "";
-    placeholder.textContent = "পরীক্ষা নির্বাচন করুন";
-    select.appendChild(placeholder);
+    select.replaceChildren(new Option("পরীক্ষা নির্বাচন করুন", ""));
 
     (data || []).forEach((exam) => {
-      const option = document.createElement("option");
-
-      option.value = exam.id;
-      option.textContent =
-        exam.exam_name ??
-        exam.title ??
-        exam.name ??
-        `পরীক্ষা ${exam.id}`;
-
-      select.appendChild(option);
+      select.add(new Option(exam.exam_name || `পরীক্ষা ${exam.id}`, exam.id));
     });
   }
 
@@ -113,31 +62,20 @@
     const db = getDB();
     const select = $("folderSelect");
 
-    select.replaceChildren();
-
-    const placeholder = document.createElement("option");
-    placeholder.value = "";
-    placeholder.textContent = "ফোল্ডার নির্বাচন করুন";
-    select.appendChild(placeholder);
+    select.replaceChildren(new Option("ফোল্ডার নির্বাচন করুন", ""));
 
     const { data, error } = await db
-      .from("question_folders")
-      .select("*")
-      .order("name");
+      .from("question_bank_folders")
+      .select("id, folder_name")
+      .order("folder_name");
 
     if (error) throw error;
 
     (data || []).forEach((folder) => {
-      const option = document.createElement("option");
-
-      option.value = folder.id;
-      option.textContent =
-        folder.name ??
-        folder.folder_name ??
-        `ফোল্ডার ${folder.id}`;
-
-      select.appendChild(option);
+      select.add(new Option(folder.folder_name, folder.id));
     });
+
+    $("setSelect").replaceChildren(new Option("সেট নির্বাচন করুন", ""));
   }
 
   async function loadSets() {
@@ -145,41 +83,26 @@
     const folderId = $("folderSelect").value;
     const select = $("setSelect");
 
-    select.replaceChildren();
-
-    const placeholder = document.createElement("option");
-    placeholder.value = "";
-    placeholder.textContent = "সেট নির্বাচন করুন";
-    select.appendChild(placeholder);
-
+    select.replaceChildren(new Option("সেট নির্বাচন করুন", ""));
     clearQuestionList("প্রশ্নের সেট নির্বাচন করুন।");
 
     if (!folderId) return;
 
     const { data, error } = await db
-      .from("question_sets")
-      .select("*")
-      .eq("folder_id", folderId)
-      .order("name");
+      .from("question_bank_sets")
+      .select("id, set_name")
+      .eq("folder_id", Number(folderId))
+      .order("set_name");
 
     if (error) throw error;
 
     (data || []).forEach((set) => {
-      const option = document.createElement("option");
-
-      option.value = set.id;
-      option.textContent =
-        set.name ??
-        set.set_name ??
-        `সেট ${set.id}`;
-
-      select.appendChild(option);
+      select.add(new Option(set.set_name, set.id));
     });
   }
 
   async function createExam() {
     const db = getDB();
-
     const examName = normalize($("examName").value);
     const duration = Number($("duration").value);
     const marks = Number($("marks").value);
@@ -191,23 +114,8 @@
       return;
     }
 
-    if (!Number.isFinite(duration) || duration <= 0) {
-      showMessage("createMessage", "পরীক্ষার সময় সঠিকভাবে লিখুন।", false);
-      return;
-    }
-
-    if (!Number.isFinite(marks) || marks < 0) {
-      showMessage("createMessage", "প্রতি প্রশ্নের নম্বর সঠিক নয়।", false);
-      return;
-    }
-
-    if (!Number.isFinite(negative) || negative < 0) {
-      showMessage("createMessage", "Negative Mark সঠিক নয়।", false);
-      return;
-    }
-
-    if (!Number.isFinite(passMark) || passMark < 0) {
-      showMessage("createMessage", "পাস নম্বর সঠিক নয়।", false);
+    if (duration <= 0 || marks < 0 || negative < 0 || passMark < 0) {
+      showMessage("createMessage", "সময় ও নম্বরের ঘরগুলো সঠিকভাবে পূরণ করুন।", false);
       return;
     }
 
@@ -215,48 +123,61 @@
     button.disabled = true;
 
     try {
-      const { data, error } = await db
+      // exams টেবিলে শুধু নিশ্চিতভাবে ব্যবহৃত কলাম পাঠানো হচ্ছে।
+      const { data: exam, error: examError } = await db
         .from("exams")
-        .insert({
-          exam_name: examName,
-          duration: duration,
+        .insert({ exam_name: examName })
+        .select("id, exam_name")
+        .single();
+
+      if (examError) throw examError;
+
+      // সময় ও নম্বর exam_settings টেবিলে রাখা হবে।
+      const { error: settingsError } = await db
+        .from("exam_settings")
+        .upsert({
+          exam_id: exam.id,
+          duration_minutes: duration,
           marks_per_question: marks,
           negative_mark: negative,
           pass_mark: passMark
-        })
-        .select()
-        .single();
+        }, { onConflict: "exam_id" });
 
-      if (error) throw error;
+      if (settingsError) {
+        // সেটিংস সেভ না হলেও তৈরি হওয়া পরীক্ষাটি মুছে ফেলা হবে না।
+        throw new Error(
+          "পরীক্ষা তৈরি হয়েছে, কিন্তু সেটিংস সেভ হয়নি: " +
+          settingsError.message
+        );
+      }
 
       await loadExams();
-
-      $("examSelect").value = data.id;
-
+      $("examSelect").value = String(exam.id);
       $("examName").value = "";
 
-      showMessage(
-        "createMessage",
-        "পরীক্ষা সফলভাবে তৈরি হয়েছে।"
-      );
+      showMessage("createMessage", "পরীক্ষা সফলভাবে তৈরি হয়েছে।");
     } catch (error) {
-      console.error("Create exam error:", error);
-
-      showMessage(
-        "createMessage",
-        "পরীক্ষা তৈরি হয়নি: " + (error.message || "অজানা সমস্যা"),
-        false
-      );
+      console.error(error);
+      showMessage("createMessage", error.message || "পরীক্ষা তৈরি হয়নি।", false);
     } finally {
       button.disabled = false;
     }
   }
 
+  function clearQuestionList(message) {
+    currentQuestions = [];
+    selectedQuestionIds.clear();
+
+    if ($("questionList")) $("questionList").replaceChildren();
+    showMessage("questionCount", message);
+  }
+
   async function loadQuestions() {
     const db = getDB();
+    const examId = $("examSelect").value;
     const setId = $("setSelect").value;
 
-    if (!$("examSelect").value) {
+    if (!examId) {
       showMessage("questionMessage", "আগে পরীক্ষা নির্বাচন করুন।", false);
       return;
     }
@@ -270,30 +191,35 @@
     button.disabled = true;
 
     try {
-      const { data, error } = await db
+      const { data: questions, error } = await db
         .from("questions")
-        .select("*")
-        .eq("set_id", setId);
+        .select("id, question_text, option_a, option_b, option_c, option_d, set_id")
+        .eq("set_id", Number(setId))
+        .order("id");
 
       if (error) throw error;
 
-      currentQuestions = data || [];
-      selectedQuestionIds.clear();
+      const { data: saved, error: savedError } = await db
+        .from("exam_questions")
+        .select("question_id")
+        .eq("exam_id", Number(examId));
+
+      if (savedError) throw savedError;
+
+      currentQuestions = questions || [];
+      selectedQuestionIds = new Set(
+        (saved || []).map((row) => String(row.question_id))
+      );
 
       renderQuestions();
 
       showMessage(
         "questionMessage",
-        `সেট থেকে ${currentQuestions.length}টি প্রশ্ন পাওয়া গেছে।`
+        `সেট থেকে ${currentQuestions.length}টি প্রশ্ন পাওয়া গেছে। আগে যোগ করা প্রশ্নও চিহ্নিত আছে।`
       );
     } catch (error) {
-      console.error("Load questions error:", error);
-
-      showMessage(
-        "questionMessage",
-        "প্রশ্ন লোড হয়নি: " + (error.message || "অজানা সমস্যা"),
-        false
-      );
+      console.error(error);
+      showMessage("questionMessage", "প্রশ্ন লোড হয়নি: " + error.message, false);
     } finally {
       button.disabled = false;
     }
@@ -303,13 +229,13 @@
     const container = $("questionList");
     container.replaceChildren();
 
-    currentQuestions.forEach((question) => {
-      const id = getQuestionId(question);
-
-      if (id === null) return;
+    currentQuestions.forEach((q, index) => {
+      const id = getQuestionId(q);
+      if (id == null) return;
 
       const label = document.createElement("label");
-      label.className = "question";
+      label.style.cssText =
+        "display:flex;gap:10px;padding:12px;border-bottom:1px solid #ddd;align-items:flex-start";
 
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
@@ -317,37 +243,26 @@
       checkbox.checked = selectedQuestionIds.has(String(id));
 
       checkbox.addEventListener("change", () => {
-        const key = String(id);
-
-        if (checkbox.checked) {
-          selectedQuestionIds.add(key);
-        } else {
-          selectedQuestionIds.delete(key);
-        }
-
+        if (checkbox.checked) selectedQuestionIds.add(String(id));
+        else selectedQuestionIds.delete(String(id));
         updateQuestionCount();
       });
 
-      const content = document.createElement("div");
-
+      const text = document.createElement("div");
       const title = document.createElement("div");
-      title.textContent = getQuestionText(question);
-      content.appendChild(title);
+      title.textContent = `${index + 1}. ${getQuestionText(q)}`;
+      text.appendChild(title);
 
-      const options = getQuestionOptions(question);
-
+      const options = getOptions(q);
       if (options.length) {
-        const optionText = document.createElement("small");
-        optionText.style.display = "block";
-        optionText.style.marginTop = "6px";
-        optionText.textContent = options.join(" | ");
-
-        content.appendChild(optionText);
+        const details = document.createElement("small");
+        details.textContent = options.join(" | ");
+        details.style.display = "block";
+        details.style.marginTop = "6px";
+        text.appendChild(details);
       }
 
-      label.appendChild(checkbox);
-      label.appendChild(content);
-
+      label.append(checkbox, text);
       container.appendChild(label);
     });
 
@@ -362,14 +277,10 @@
   }
 
   function selectAllQuestions() {
-    currentQuestions.forEach((question) => {
-      const id = getQuestionId(question);
-
-      if (id !== null) {
-        selectedQuestionIds.add(String(id));
-      }
+    currentQuestions.forEach((q) => {
+      const id = getQuestionId(q);
+      if (id != null) selectedQuestionIds.add(String(id));
     });
-
     renderQuestions();
   }
 
@@ -380,15 +291,10 @@
 
   async function saveQuestions() {
     const db = getDB();
-    const examId = $("examSelect").value;
+    const examId = Number($("examSelect").value);
 
     if (!examId) {
       showMessage("questionMessage", "পরীক্ষা নির্বাচন করুন।", false);
-      return;
-    }
-
-    if (selectedQuestionIds.size === 0) {
-      showMessage("questionMessage", "অন্তত একটি প্রশ্ন নির্বাচন করুন।", false);
       return;
     }
 
@@ -396,73 +302,81 @@
     button.disabled = true;
 
     try {
-      const rows = Array.from(selectedQuestionIds).map((questionId) => ({
-        exam_id: examId,
-        question_id: questionId
-      }));
-
-      const { error } = await db
+      const selectedIds = [...selectedQuestionIds].map(Number);
+      const existingResult = await db
         .from("exam_questions")
-        .upsert(rows, {
-          onConflict: "exam_id,question_id",
-          ignoreDuplicates: true
-        });
+        .select("question_id")
+        .eq("exam_id", examId);
 
-      if (error) throw error;
+      if (existingResult.error) throw existingResult.error;
+
+      const existingIds = (existingResult.data || []).map(
+        (row) => Number(row.question_id)
+      );
+
+      const toAdd = selectedIds.filter((id) => !existingIds.includes(id));
+      const toRemove = existingIds.filter((id) => !selectedIds.includes(id));
+
+      if (toAdd.length) {
+        const { error } = await db.from("exam_questions").insert(
+          toAdd.map((id, index) => ({
+            exam_id: examId,
+            question_id: id,
+            question_order: index + 1
+          }))
+        );
+        if (error) throw error;
+      }
+
+      if (toRemove.length) {
+        const { error } = await db
+          .from("exam_questions")
+          .delete()
+          .eq("exam_id", examId)
+          .in("question_id", toRemove);
+
+        if (error) throw error;
+      }
 
       showMessage(
         "questionMessage",
-        `${rows.length}টি প্রশ্ন পরীক্ষার সঙ্গে সংরক্ষণ করা হয়েছে।`
+        `সংরক্ষণ সম্পন্ন। নতুন যোগ: ${toAdd.length}টি, বাদ: ${toRemove.length}টি।`
       );
     } catch (error) {
-      console.error("Save exam questions error:", error);
-
-      showMessage(
-        "questionMessage",
-        "প্রশ্ন সংরক্ষণ হয়নি: " + (error.message || "অজানা সমস্যা"),
-        false
-      );
+      console.error(error);
+      showMessage("questionMessage", "প্রশ্ন সংরক্ষণ হয়নি: " + error.message, false);
     } finally {
       button.disabled = false;
     }
   }
 
   async function initialize() {
+    $("createExam").addEventListener("click", createExam);
+    $("loadQuestions").addEventListener("click", loadQuestions);
+    $("selectAll").addEventListener("click", selectAllQuestions);
+    $("clearAll").addEventListener("click", clearAllQuestions);
+    $("saveQuestions").addEventListener("click", saveQuestions);
+
+    $("folderSelect").addEventListener("change", async () => {
+      try {
+        await loadSets();
+      } catch (error) {
+        showMessage("questionMessage", "সেট লোড হয়নি: " + error.message, false);
+      }
+    });
+
+    $("setSelect").addEventListener("change", () => {
+      clearQuestionList("প্রশ্ন দেখতে ‘প্রশ্ন দেখুন’ বাটনে চাপ দিন।");
+    });
+
     try {
-      $("createExam").addEventListener("click", createExam);
-      $("loadQuestions").addEventListener("click", loadQuestions);
-      $("selectAll").addEventListener("click", selectAllQuestions);
-      $("clearAll").addEventListener("click", clearAllQuestions);
-      $("saveQuestions").addEventListener("click", saveQuestions);
-
-      $("folderSelect").addEventListener("change", async () => {
-        try {
-          await loadSets();
-        } catch (error) {
-          showMessage(
-            "questionMessage",
-            error.message || "প্রশ্নের সেট লোড হয়নি।",
-            false
-          );
-        }
-      });
-
-      $("setSelect").addEventListener("change", () => {
-        clearQuestionList("প্রশ্ন দেখতে ‘প্রশ্ন দেখুন’ বাটনে চাপ দিন।");
-      });
-
       await loadExams();
       await loadFolders();
-
       showMessage("createMessage", "পরীক্ষা তৈরির জন্য প্রস্তুত।");
     } catch (error) {
-      console.error("Initialization error:", error);
-
-      showMessage(
-        "createMessage",
-        "ডেটাবেজ লোড হয়নি: " + (error.message || "অজানা সমস্যা"),
-        false
-      );
+      console.error(error);
+      showMessage("createMessage", "ডেটাবেজ লোড হয়নি: " + error.message, false);
+      showMessage("questionMessage", "ডেটাবেজ লোড হয়নি: " + error.message, false);
     }
   }
 
