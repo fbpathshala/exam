@@ -1,79 +1,280 @@
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>পরীক্ষা সেটিংস ও ব্যবস্থাপনা</title>
-<link rel="stylesheet" href="css/admin.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-.wrap{max-width:1100px;margin:24px auto;padding:12px}
-.card{background:#fff;padding:17px;border-radius:12px;margin:12px 0;box-shadow:0 3px 14px #0001}
-.exam-card{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.exam-title{font-weight:bold;color:#075985;cursor:pointer;text-decoration:underline}
-.actions{display:flex;gap:6px;flex-wrap:wrap}
-button,.btn{padding:9px 12px;border:0;border-radius:7px;background:#1769aa;color:#fff;cursor:pointer;text-decoration:none;display:inline-block}
-.secondary{background:#64748b}.danger{background:#b91c1c}.green{background:#15803d}
-.hidden{display:none}
-label{display:inline-block;margin:8px}
-input,select{padding:8px;max-width:100%}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.pool{max-height:330px;overflow:auto;border:1px solid #ddd;padding:10px;border-radius:7px}
-.qrow{display:block;padding:7px;border-bottom:1px solid #eee}
-#pageMsg,#mapMsg{white-space:pre-wrap}
-@media(max-width:650px){.grid{grid-template-columns:1fr}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>পরীক্ষা ব্যবস্থাপনা | FB Pathshala</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: Arial, sans-serif;
+      background: #f3f6fa;
+      color: #222;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: 0 auto;
+    }
+
+    h2 {
+      text-align: center;
+      color: #176b43;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: #fff;
+      padding: 18px;
+      margin-bottom: 18px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin: 14px 0 6px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+      background: #fff;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .checkbox-row input {
+      width: auto;
+      transform: scale(1.2);
+    }
+
+    .checkbox-row label {
+      margin: 0;
+      font-weight: normal;
+    }
+
+    button {
+      border: none;
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-top: 14px;
+      width: 100%;
+      background: #176b43;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background: #999;
+      cursor: not-allowed;
+    }
+
+    .secondary-button {
+      background: #2458a6;
+    }
+
+    .message {
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 6px;
+      display: none;
+      overflow-wrap: anywhere;
+    }
+
+    .success {
+      display: block;
+      background: #e5f7eb;
+      color: #176b43;
+    }
+
+    .error {
+      display: block;
+      background: #fdeaea;
+      color: #b42318;
+    }
+
+    .hint {
+      color: #666;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .section-title {
+      color: #176b43;
+      margin-top: 0;
+    }
+
+    @media (min-width: 600px) {
+      .two-columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0 16px;
+      }
+    }
+  </style>
 </head>
+
 <body>
-<main class="wrap">
-  <section class="card">
-    <h1>⚙️ পরীক্ষা সেটিংস ও ব্যবস্থাপনা</h1>
-    <p>পরীক্ষার নাম চাপলে লিংক কপি হবে।</p>
-    <a class="btn" href="create-exam.html">➕ পরীক্ষা তৈরি</a>
-    <a class="btn secondary" href="dashboard.html">ড্যাশবোর্ড</a>
-    <p id="pageMsg"></p>
-  </section>
+  <div class="container">
 
-  <div id="exams">পরীক্ষার তালিকা লোড হচ্ছে…</div>
+    <h2>পরীক্ষা ব্যবস্থাপনা</h2>
 
-  <section id="mapping" class="card hidden">
-    <h2>প্রশ্ন যোগ/বিয়োগ</h2>
-    <p id="mappingExamName"></p>
+    <div class="card">
+      <h3 class="section-title">পরীক্ষা নির্বাচন</h3>
 
-    <div class="grid">
-      <div>
-        <label>ফোল্ডার
-          <select id="folder"><option value="">নির্বাচন</option></select>
-        </label>
-        <label>সেট
-          <select id="set"><option value="">নির্বাচন</option></select>
-        </label>
-        <button id="loadPool">প্রশ্ন দেখুন</button>
-      </div>
+      <label for="examSelect">পরীক্ষার তালিকা</label>
+      <select id="examSelect">
+        <option value="">পরীক্ষা লোড হচ্ছে...</option>
+      </select>
 
-      <div>
-        <b>নির্বাচিত প্রশ্ন</b>
-        <div id="selectedList" class="pool"></div>
-      </div>
+      <button type="button" id="loadExamSettings" class="secondary-button">
+        পরীক্ষার সেটিংস লোড করুন
+      </button>
+
+      <div id="loadMessage" class="message" role="status"></div>
     </div>
 
-    <p>
-      <button id="selectAll" class="secondary">সব নির্বাচন</button>
-      <button id="deselectAll" class="secondary">সব বাদ</button>
-    </p>
+    <form id="examSettingsForm" class="card">
+      <h3 class="section-title">পরীক্ষার সেটিংস পরিবর্তন</h3>
 
-    <div id="pool" class="pool"></div>
+      <p class="hint">
+        পরীক্ষা নির্বাচন করে সেটিংস লোড করুন। পরিবর্তন করার পর সেভ করলে
+        সংশ্লিষ্ট পরীক্ষার সেটিংস আপডেট হবে।
+      </p>
 
-    <p>
-      <button id="saveMap" class="green">প্রশ্ন সংরক্ষণ</button>
-      <button id="closeMapping" class="secondary">বন্ধ</button>
-    </p>
-    <p id="mapMsg"></p>
-  </section>
-</main>
+      <div class="two-columns">
+        <div>
+          <label for="examName">পরীক্ষার নাম</label>
+          <input
+            type="text"
+            id="examName"
+            name="examName"
+            required
+          >
+        </div>
 
-<script src="js/supabase.js"></script>
-<script src="js/exam-manager.js"></script>
+        <div>
+          <label for="duration">সময় (মিনিট)</label>
+          <input
+            type="number"
+            id="duration"
+            name="duration"
+            min="1"
+            required
+          >
+        </div>
+
+        <div>
+          <label for="marks">প্রতি প্রশ্নের নম্বর</label>
+          <input
+            type="number"
+            id="marks"
+            name="marks"
+            min="0"
+            step="any"
+            required
+          >
+        </div>
+
+        <div>
+          <label for="negative">নেগেটিভ মার্ক</label>
+          <input
+            type="number"
+            id="negative"
+            name="negative"
+            min="0"
+            step="any"
+            required
+          >
+        </div>
+
+        <div>
+          <label for="passMark">পাস নম্বর</label>
+          <input
+            type="number"
+            id="passMark"
+            name="passMark"
+            min="0"
+            step="any"
+            required
+          >
+        </div>
+      </div>
+
+      <hr style="border:0;border-top:1px solid #eee;margin:22px 0;">
+
+      <h3 class="section-title">পরীক্ষার ফলাফল ও উত্তরপত্র</h3>
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="showResult" name="showResult">
+        <label for="showResult">পরীক্ষা শেষে ফলাফল দেখাবে</label>
+      </div>
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="showPosition" name="showPosition">
+        <label for="showPosition">শিক্ষার্থীর অবস্থান/মেধাক্রম দেখাবে</label>
+      </div>
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="showAnswerPaper" name="showAnswerPaper">
+        <label for="showAnswerPaper">উত্তরপত্র দেখার সুযোগ থাকবে</label>
+      </div>
+
+      <label for="thankYouMessage">পরীক্ষা শেষে ধন্যবাদ বার্তা</label>
+      <textarea
+        id="thankYouMessage"
+        name="thankYouMessage"
+        placeholder="পরীক্ষায় অংশগ্রহণের জন্য ধন্যবাদ..."
+      ></textarea>
+
+      <label for="groupLink">ফেসবুক গ্রুপের লিংক</label>
+      <input
+        type="url"
+        id="groupLink"
+        name="groupLink"
+        placeholder="https://www.facebook.com/groups/..."
+      >
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="showGroupLink" name="showGroupLink">
+        <label for="showGroupLink">ফলাফল পৃষ্ঠায় গ্রুপে যোগ দেওয়ার লিংক দেখাবে</label>
+      </div>
+
+      <button type="submit" id="saveSettings">
+        সেটিংস সেভ করুন
+      </button>
+
+      <div id="settingsMessage" class="message" role="status"></div>
+    </form>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/exam-manager.js"></script>
 </body>
 </html>
