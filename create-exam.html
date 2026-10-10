@@ -1,1 +1,214 @@
-<!doctype html><html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>নতুন পরীক্ষা তৈরি</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><link rel="stylesheet" href="css/admin.css"><style>body{font-family:Arial,sans-serif;background:#f2f5f9;padding:14px}.wrap{max-width:900px;margin:auto}.card{background:white;padding:18px;border-radius:12px;margin:12px 0}label{display:block;margin:10px 0}input,select,button{font:inherit;padding:10px;border-radius:7px;border:1px solid #ccd3dd;max-width:100%}input,select{width:100%}button{background:#1769aa;color:white;cursor:pointer;margin:5px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.question{display:flex;gap:10px;padding:10px;border-bottom:1px solid #ddd}.question input{width:auto}.msg{white-space:pre-wrap;overflow-wrap:anywhere}@media(max-width:600px){.grid{grid-template-columns:1fr}}</style></head><body><main class="wrap"><section class="card"><h1>নতুন পরীক্ষা তৈরি</h1><p>এখানে শুধু নতুন পরীক্ষা তৈরি হবে। পরে পরিবর্তন করবেন পরীক্ষা ব্যবস্থাপনা থেকে।</p><label>পরীক্ষার নাম<input id="examName" maxlength="180"></label><div class="grid"><label>সময় (মিনিট)<input id="duration" type="number" min="1" value="20"></label><label>প্রতি প্রশ্নের নম্বর<input id="marks" type="number" min="0" step=".01" value="1"></label><label>নেগেটিভ মার্ক<input id="negative" type="number" min="0" step=".01" value="0"></label><label>পাস নম্বর<input id="passMark" type="number" min="0" step=".01" value="0"></label></div></section><section class="card"><h2>প্রশ্ন নির্বাচন</h2><div class="grid"><label>ফোল্ডার<select id="folderSelect"><option value="">ফোল্ডার নির্বাচন করুন</option></select></label><label>সেট<select id="setSelect" disabled><option value="">সেট নির্বাচন করুন</option></select></label></div><button id="loadQuestions">প্রশ্ন দেখুন</button><p id="questionCount">প্রশ্নের সেট নির্বাচন করুন।</p><div id="questionList"></div><button id="selectAll">সব নির্বাচন</button> <button id="clearAll">সব অনির্বাচিত</button><p id="questionMessage" class="msg"></p></section><section class="card"><button id="createExam">পরীক্ষা তৈরি করুন</button><p id="createMessage" class="msg"></p><button onclick="location.href='exam-manager.html'">পরীক্ষা ব্যবস্থাপনায় যান</button></section></main><script src="js/supabase.js"></script><script src="js/create-exam.js"></script></body></html>
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>নতুন পরীক্ষা তৈরি</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="css/admin.css">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f5f9;
+      padding: 14px;
+    }
+
+    .wrap {
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .card {
+      background: white;
+      padding: 18px;
+      border-radius: 12px;
+      margin: 12px 0;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0;
+    }
+
+    input, select, button {
+      box-sizing: border-box;
+      width: 100%;
+      font: inherit;
+      padding: 10px;
+      border-radius: 7px;
+      border: 1px solid #ccd3dd;
+      max-width: 100%;
+    }
+
+    button {
+      width: auto;
+      background: #1769aa;
+      color: white;
+      cursor: pointer;
+      margin: 5px 5px 5px 0;
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .question {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      margin: 0;
+    }
+
+    .question input {
+      width: auto;
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+
+    .msg {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .hint {
+      color: #596579;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .filter-title {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="wrap">
+
+    <section class="card">
+      <h1>নতুন পরীক্ষা তৈরি</h1>
+      <p class="hint">
+        পরীক্ষার নাম ও নম্বর নির্ধারণ করে নিচের ক্যাটাগরি, ফোল্ডার,
+        সেট এবং বিষয় ফিল্টার ব্যবহার করে প্রশ্ন নির্বাচন করুন।
+        পরীক্ষা তৈরির পর পরীক্ষা ব্যবস্থাপনা থেকে সেটিংস পরিবর্তন করতে পারবেন।
+      </p>
+
+      <label>
+        পরীক্ষার নাম
+        <input id="examName" maxlength="180" placeholder="পরীক্ষার নাম লিখুন">
+      </label>
+
+      <div class="grid">
+        <label>
+          সময় (মিনিট)
+          <input id="duration" type="number" min="1" value="20">
+        </label>
+
+        <label>
+          প্রতি প্রশ্নের নম্বর
+          <input id="marks" type="number" min="0" step="0.01" value="1">
+        </label>
+
+        <label>
+          নেগেটিভ মার্ক
+          <input id="negative" type="number" min="0" step="0.01" value="0">
+        </label>
+
+        <label>
+          পাস নম্বর
+          <input id="passMark" type="number" min="0" step="0.01" value="0">
+        </label>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>প্রশ্ন নির্বাচন</h2>
+
+      <div class="grid">
+        <label>
+          <span class="filter-title">১. ক্যাটাগরি</span>
+          <select id="categorySelect">
+            <option value="">সব ক্যাটাগরি</option>
+            <option value="যাচাই পরীক্ষা">যাচাই পরীক্ষা</option>
+            <option value="নিয়োগ পরীক্ষা">নিয়োগ পরীক্ষা</option>
+            <option value="সাম্প্রতিক প্রশ্ন">সাম্প্রতিক</option>
+          </select>
+        </label>
+
+        <label>
+          <span class="filter-title">২. ফোল্ডার</span>
+          <select id="folderSelect" disabled>
+            <option value="">আগে ক্যাটাগরি নির্বাচন করুন</option>
+          </select>
+        </label>
+
+        <label>
+          <span class="filter-title">৩. সেট</span>
+          <select id="setSelect" disabled>
+            <option value="">আগে ফোল্ডার নির্বাচন করুন</option>
+          </select>
+        </label>
+
+        <label>
+          <span class="filter-title">বিষয় অনুযায়ী ফিল্টার</span>
+          <select id="subjectSelect">
+            <option value="">সব বিষয়</option>
+          </select>
+        </label>
+      </div>
+
+      <button id="loadQuestions" type="button">প্রশ্ন দেখুন</button>
+
+      <p id="questionCount">প্রথমে ক্যাটাগরি, ফোল্ডার ও সেট নির্বাচন করুন।</p>
+
+      <div id="questionList"></div>
+
+      <button id="selectAll" type="button">দেখানো সব প্রশ্ন নির্বাচন</button>
+      <button id="clearAll" type="button">সব নির্বাচন বাতিল</button>
+
+      <p class="hint">
+        বিষয় ফিল্টার শুধু প্রশ্ন দেখানোর জন্য। ফিল্টার বদলালে
+        আগে নির্বাচিত প্রশ্নগুলো অন্যভাবে নির্বাচন না করা পর্যন্ত
+        নির্বাচিতই থাকবে।
+      </p>
+
+      <p id="questionMessage" class="msg"></p>
+    </section>
+
+    <section class="card">
+      <button id="createExam" type="button">পরীক্ষা তৈরি করুন</button>
+      <p id="createMessage" class="msg"></p>
+
+      <button type="button" onclick="location.href='exam-manager.html'">
+        পরীক্ষা ব্যবস্থাপনায় যান
+      </button>
+    </section>
+
+  </main>
+
+  <script src="js/supabase.js"></script>
+  <script src="js/create-exam.js"></script>
+</body>
+</html>
