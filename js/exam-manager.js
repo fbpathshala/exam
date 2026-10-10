@@ -1,432 +1,395 @@
+(function () {
+  "use strict";
 
-const $ = id => document.getElementById(id);
+  const $ = (id) => document.getElementById(id);
 
-let currentExam = null;
-let poolQuestions = [];
-let selectedIds = new Set();
+  let currentExam = null;
+  let currentSettings = null;
 
-const say = (id, text, bad = false) => {
-  const el = $(id);
-  el.textContent = text;
-  el.style.color = bad ? '#b91c1c' : '#166534';
-};
+  const DEFAULT_THANK_YOU =
+    "পরীক্ষায় অংশগ্রহণ করার জন্য ধন্যবাদ।";
 
-const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({
-  '&': '&amp;',
-  '<': '&lt;',
-  '>': '&gt;',
-  '"': '&quot;',
-  "'": '&#39;'
-}[c]));
+  function showMessage(id, message, success = true) {
+    const el = $(id);
+    if (!el) return;
 
-async function init() {
-  if (!window.db) {
-    say('pageMsg', 'Supabase সংযোগ পাওয়া যায়নি।', true);
-    return;
+    el.textContent = message;
+    el.className = "message " + (success ? "success" : "error");
   }
 
-  const { data, error } = await db.auth.getSession();
+  function getDB() {
+    if (!window.db) {
+      throw new Error(
+        "Supabase সংযোগ পাওয়া যায়নি। js/supabase.js পরীক্ষা করুন।"
+      );
+    }
 
-  if (error || !data?.session) {
-    location.href = 'dashboard.html';
-    return;
+    return window.db;
   }
 
-  await loadExams();
-}
-
-async function loadExams() {
-  const { data, error } = await db
-    .from('exams')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    say('pageMsg', error.message, true);
-    return;
+  function getExamName(exam) {
+    return exam.exam_name || exam.title || exam.name || "";
   }
 
-  if (!data?.length) {
-    $('exams').textContent = 'এখনো কোনো পরীক্ষা তৈরি হয়নি।';
-    return;
+  function numberValue(id, fallback = 0) {
+    const value = Number($(id).value);
+    return Number.isFinite(value) ? value : fallback;
   }
 
-  $('exams').innerHTML = data.map(e => `
-    <article class="card exam-card" data-exam-id="${esc(e.id)}">
-      <div>
-        <div class="exam-title" data-copy="${esc(e.id)}">
-          ${esc(e.exam_name || 'নামহীন পরীক্ষা')}
-        </div>
-        <p>প্রশ্ন: ${Number(e.total_questions) || 0}
-          · স্ট্যাটাস: ${e.status === 'active' ? 'চালু' : 'বন্ধ'}
-        </p>
-      </div>
-
-      <div class="actions">
-        <button data-action="manage" data-id="${esc(e.id)}">
-          ⚙️ ব্যবস্থাপনা
-        </button>
-        <button class="secondary" data-action="map" data-id="${esc(e.id)}">
-          প্রশ্ন যোগ/বিয়োগ
-        </button>
-        <button class="secondary" data-action="status"
-          data-id="${esc(e.id)}" data-status="${esc(e.status)}">
-          ${e.status === 'active' ? 'পরীক্ষা বন্ধ' : 'পরীক্ষা চালু'}
-        </button>
-        <button class="secondary" data-action="rename"
-          data-id="${esc(e.id)}" data-name="${esc(e.exam_name || '')}">
-          নাম পরিবর্তন
-        </button>
-        <a class="btn secondary" href="exam-setting.html?exam=${encodeURIComponent(e.id)}">
-          সেটিংস
-        </a>
-        <a class="btn secondary" href="answer-paper.html?exam=${encodeURIComponent(e.id)}">
-          উত্তরপত্র
-        </a>
-        <a class="btn secondary" href="results.html?exam=${encodeURIComponent(e.id)}">
-          ফলাফল
-        </a>
-        <button class="danger" data-action="delete" data-id="${esc(e.id)}">
-          ডিলিট
-        </button>
-      </div>
-    </article>
-  `).join('');
-
-  $('exams').querySelectorAll('[data-copy]').forEach(el => {
-    el.onclick = () => copyExamLink(el.dataset.copy);
-  });
-
-  $('exams').querySelectorAll('[data-action]').forEach(el => {
-    el.onclick = () => handleAction(el);
-  });
-}
-
-async function copyExamLink(id) {
-  // শিক্ষার্থীদের পরীক্ষার প্রকৃত URL ভিন্ন হলে এখানে ফাইলের নাম বদলাতে হবে।
-  const link = new URL(
-    'exam.html?exam=' + encodeURIComponent(id),
-    location.href
-  ).href;
-
-  try {
-    await navigator.clipboard.writeText(link);
-    say('pageMsg', 'পরীক্ষার লিংক কপি হয়েছে: ' + link);
-  } catch {
-    prompt('পরীক্ষার লিংক কপি করুন:', link);
-  }
-}
-
-async function handleAction(el) {
-  const id = el.dataset.id;
-  const action = el.dataset.action;
-
-  if (action === 'manage') {
-    location.href = 'exam-setting.html?exam=' + encodeURIComponent(id);
-    return;
+  function getSelectedExamId() {
+    return $("examSelect").value;
   }
 
-  if (action === 'map') {
-    await openMapping(id);
-    return;
+  function setFormEnabled(enabled) {
+    [
+      "examName",
+      "duration",
+      "marks",
+      "negative",
+      "passMark",
+      "showResult",
+      "showPosition",
+      "showAnswerPaper",
+      "thankYouMessage",
+      "groupLink",
+      "showGroupLink",
+      "saveSettings"
+    ].forEach((id) => {
+      if ($(id)) $(id).disabled = !enabled;
+    });
   }
 
-  if (action === 'status') {
-    const next = el.dataset.status === 'active' ? 'inactive' : 'active';
-    const { error } = await db.from('exams')
-      .update({ status: next }).eq('id', id);
+  async function loadExams() {
+    const db = getDB();
+    const select = $("examSelect");
 
-    if (error) say('pageMsg', error.message, true);
-    else await loadExams();
-    return;
+    const { data, error } = await db
+      .from("exams")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    select.replaceChildren();
+
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "পরীক্ষা নির্বাচন করুন";
+    select.appendChild(placeholder);
+
+    (data || []).forEach((exam) => {
+      const option = document.createElement("option");
+
+      option.value = String(exam.id);
+      option.textContent =
+        getExamName(exam) || `পরীক্ষা ${exam.id}`;
+
+      select.appendChild(option);
+    });
+
+    if (!data || data.length === 0) {
+      showMessage(
+        "loadMessage",
+        "কোনো পরীক্ষা পাওয়া যায়নি।",
+        false
+      );
+    }
+
+    return data || [];
   }
 
-  if (action === 'rename') {
-    const name = prompt('নতুন পরীক্ষার নাম:', el.dataset.name || '');
-    if (!name?.trim()) return;
+  async function loadExamSettings() {
+    const db = getDB();
+    const examId = getSelectedExamId();
 
-    const { error } = await db.from('exams')
-      .update({ exam_name: name.trim() }).eq('id', id);
-
-    if (error) say('pageMsg', error.message, true);
-    else await loadExams();
-    return;
-  }
-
-  if (action === 'delete') {
-    await deleteExamSafely(id);
-  }
-}
-
-async function deleteExamSafely(id) {
-  if (!confirm(
-    'পরীক্ষাটি মুছতে চান? শিক্ষার্থীর রেকর্ড থাকলে বা রেকর্ড যাচাই করা না গেলে ডিলিট বন্ধ থাকবে।'
-  )) return;
-
-  // কোনো টেবিল যাচাই করতে ব্যর্থ হলেও নিরাপত্তার জন্য ডিলিট বন্ধ থাকবে।
-  for (const table of ['exam_attempts', 'attempt_answers', 'exam_results']) {
-    const { data, error } = await db.from(table)
-      .select('id').eq('exam_id', id).limit(1);
-
-    if (error) {
-      say(
-        'pageMsg',
-        table + ' যাচাই করা যায়নি। নিরাপত্তার জন্য ডিলিট বন্ধ: ' +
-        error.message,
-        true
+    if (!examId) {
+      showMessage(
+        "loadMessage",
+        "প্রথমে একটি পরীক্ষা নির্বাচন করুন।",
+        false
       );
       return;
     }
 
-    if (data?.length) {
-      say(
-        'pageMsg',
-        'শিক্ষার্থীর অংশগ্রহণ/উত্তর/ফলাফলের রেকর্ড আছে। পরীক্ষা ডিলিট করা হয়নি।',
-        true
+    const button = $("loadExamSettings");
+    button.disabled = true;
+
+    try {
+      const { data: exam, error: examError } = await db
+        .from("exams")
+        .select("*")
+        .eq("id", examId)
+        .single();
+
+      if (examError) throw examError;
+
+      const { data: settings, error: settingsError } = await db
+        .from("exam_settings")
+        .select("*")
+        .eq("exam_id", examId)
+        .maybeSingle();
+
+      if (settingsError) throw settingsError;
+
+      currentExam = exam;
+      currentSettings = settings || {};
+
+      fillForm(exam, currentSettings);
+
+      setFormEnabled(true);
+
+      showMessage(
+        "loadMessage",
+        "পরীক্ষার সেটিংস লোড হয়েছে। এখন পরিবর্তন করতে পারবেন।"
       );
-      return;
+    } catch (error) {
+      console.error("Load exam settings error:", error);
+
+      showMessage(
+        "loadMessage",
+        "সেটিংস লোড হয়নি: " +
+          (error.message || "অজানা সমস্যা"),
+        false
+      );
+    } finally {
+      button.disabled = false;
     }
   }
 
-  const { error: questionError } = await db.from('exam_questions')
-    .delete().eq('exam_id', id);
+  function fillForm(exam, settings) {
+    $("examName").value = getExamName(exam);
 
-  if (questionError) {
-    say('pageMsg', questionError.message, true);
-    return;
+    $("duration").value =
+      settings.duration_minutes ??
+      exam.duration ??
+      20;
+
+    $("marks").value =
+      settings.marks_per_question ??
+      exam.marks_per_question ??
+      1;
+
+    $("negative").value =
+      settings.negative_mark ??
+      exam.negative_mark ??
+      0;
+
+    $("passMark").value =
+      settings.pass_mark ??
+      exam.pass_mark ??
+      0;
+
+    $("showResult").checked =
+      settings.show_result !== false;
+
+    $("showPosition").checked =
+      settings.show_rank !== false;
+
+    $("showAnswerPaper").checked =
+      settings.show_answers === true;
+
+    $("thankYouMessage").value =
+      settings.thank_you_message ??
+      DEFAULT_THANK_YOU;
+
+    $("groupLink").value =
+      settings.facebook_group_url ?? "";
+
+    $("showGroupLink").checked =
+      settings.show_group_link === true;
   }
 
-  const { error: settingsError } = await db.from('exam_settings')
-    .delete().eq('exam_id', id);
+  function validateForm() {
+    const name = $("examName").value.trim();
+    const duration = numberValue("duration", NaN);
+    const marks = numberValue("marks", NaN);
+    const negative = numberValue("negative", NaN);
+    const passMark = numberValue("passMark", NaN);
 
-  if (settingsError) {
-    say('pageMsg', settingsError.message, true);
-    return;
-  }
+    if (!name) {
+      throw new Error("পরীক্ষার নাম লিখুন।");
+    }
 
-  const { error } = await db.from('exams').delete().eq('id', id);
+    if (!Number.isFinite(duration) || duration <= 0) {
+      throw new Error("পরীক্ষার সময় সঠিকভাবে লিখুন।");
+    }
 
-  if (error) say('pageMsg', error.message, true);
-  else {
-    say('pageMsg', 'পরীক্ষা মুছে ফেলা হয়েছে।');
-    await loadExams();
-  }
-}
+    if (!Number.isFinite(marks) || marks < 0) {
+      throw new Error("প্রতি প্রশ্নের নম্বর সঠিক নয়।");
+    }
 
-async function openMapping(id) {
-  currentExam = id;
-  selectedIds = new Set();
-  poolQuestions = [];
+    if (!Number.isFinite(negative) || negative < 0) {
+      throw new Error("নেগেটিভ মার্ক সঠিকভাবে লিখুন।");
+    }
 
-  const { data: exam, error } = await db.from('exams')
-    .select('exam_name').eq('id', id).single();
+    if (!Number.isFinite(passMark) || passMark < 0) {
+      throw new Error("পাস নম্বর সঠিকভাবে লিখুন।");
+    }
 
-  if (error) {
-    say('pageMsg', error.message, true);
-    return;
-  }
-
-  $('mappingExamName').textContent = exam.exam_name || '';
-  $('mapping').classList.remove('hidden');
-
-  const { data, error: linkError } = await db.from('exam_questions')
-    .select('question_id').eq('exam_id', id);
-
-  if (linkError) {
-    say('mapMsg', linkError.message, true);
-    return;
-  }
-
-  (data || []).forEach(row => selectedIds.add(String(row.question_id)));
-
-  await loadFolders();
-  await renderSelected();
-  say('mapMsg', 'ফোল্ডার ও সেট নির্বাচন করে প্রশ্ন দেখুন।');
-  $('mapping').scrollIntoView({ behavior: 'smooth' });
-}
-
-async function loadFolders() {
-  const { data, error } = await db.from('question_bank_folders')
-    .select('*').order('name');
-
-  if (error) {
-    say('mapMsg', error.message, true);
-    return;
-  }
-
-  $('folder').innerHTML =
-    '<option value="">ফোল্ডার নির্বাচন</option>' +
-    (data || []).map(f => `
-      <option value="${esc(f.id)}">
-        ${esc(f.name || f.folder_name || f.title || f.id)}
-      </option>
-    `).join('');
-
-  $('set').innerHTML = '<option value="">সেট নির্বাচন</option>';
-  $('folder').onchange = loadSets;
-}
-
-async function loadSets() {
-  const folderId = $('folder').value;
-  $('set').innerHTML = '<option value="">সেট নির্বাচন</option>';
-
-  if (!folderId) return;
-
-  const { data, error } = await db.from('question_bank_sets')
-    .select('*').eq('folder_id', folderId).order('name');
-
-  if (error) {
-    say('mapMsg', error.message, true);
-    return;
-  }
-
-  $('set').innerHTML += (data || []).map(s => `
-    <option value="${esc(s.id)}">
-      ${esc(s.name || s.set_name || s.title || s.id)}
-    </option>
-  `).join('');
-}
-
-async function loadPool() {
-  const setId = $('set').value;
-  if (!setId) return say('mapMsg', 'আগে একটি সেট নির্বাচন করুন।', true);
-
-  const { data, error } = await db.from('questions')
-    .select('*').eq('set_id', setId).order('id');
-
-  if (error) {
-    say('mapMsg', error.message, true);
-    return;
-  }
-
-  poolQuestions = data || [];
-
-  $('pool').innerHTML = poolQuestions.map(q => `
-    <label class="qrow">
-      <input type="checkbox" data-qid="${esc(q.id)}"
-        ${selectedIds.has(String(q.id)) ? 'checked' : ''}>
-      ${esc(q.question_text || q.question || q.question_bn || q.text || ('প্রশ্ন ID ' + q.id))}
-    </label>
-  `).join('') || 'এই সেটে প্রশ্ন পাওয়া যায়নি।';
-
-  $('pool').querySelectorAll('[data-qid]').forEach(box => {
-    box.onchange = () => {
-      if (box.checked) selectedIds.add(String(box.dataset.qid));
-      else selectedIds.delete(String(box.dataset.qid));
-      renderSelected();
+    return {
+      name,
+      duration,
+      marks,
+      negative,
+      passMark
     };
-  });
-
-  say('mapMsg', poolQuestions.length + 'টি প্রশ্ন পাওয়া গেছে।');
-}
-
-async function renderSelected() {
-  const ids = [...selectedIds];
-
-  if (!ids.length) {
-    $('selectedList').textContent = 'কোনো প্রশ্ন নির্বাচিত নেই।';
-    return;
   }
 
-  const questionMap = new Map(
-    poolQuestions.map(q => [String(q.id), q])
-  );
+  async function saveSettings(event) {
+    event.preventDefault();
 
-  const missing = ids.filter(id => !questionMap.has(id));
+    const db = getDB();
+    const examId = getSelectedExamId();
 
-  if (missing.length) {
-    const { data, error } = await db.from('questions')
-      .select('*').in('id', missing);
-
-    if (error) {
-      say('mapMsg', error.message, true);
+    if (!examId || !currentExam || String(currentExam.id) !== String(examId)) {
+      showMessage(
+        "settingsMessage",
+        "প্রথমে পরীক্ষা নির্বাচন করে সেটিংস লোড করুন।",
+        false
+      );
       return;
     }
 
-    (data || []).forEach(q => questionMap.set(String(q.id), q));
-  }
+    const button = $("saveSettings");
+    button.disabled = true;
 
-  $('selectedList').innerHTML = ids.map((id, i) => {
-    const q = questionMap.get(id);
-    const text = q?.question_text || q?.question ||
-      q?.question_bn || q?.text || ('প্রশ্ন ID ' + id);
+    try {
+      const values = validateForm();
 
-    return `<div class="qrow">${i + 1}. ${esc(text)}</div>`;
-  }).join('');
-}
+      const examUpdate = {
+        exam_name: values.name,
+        duration: values.duration,
+        marks_per_question: values.marks,
+        negative_mark: values.negative,
+        pass_mark: values.passMark
+      };
 
-async function saveMapping() {
-  if (!currentExam) return;
+      const { error: examError } = await db
+        .from("exams")
+        .update(examUpdate)
+        .eq("id", examId);
 
-  const ids = [...selectedIds];
-  say('mapMsg', 'প্রশ্নের তালিকা সংরক্ষণ হচ্ছে…');
+      if (examError) throw examError;
 
-  const { error: deleteError } = await db.from('exam_questions')
-    .delete().eq('exam_id', currentExam);
+      const settingsUpdate = {
+        exam_id: examId,
+        duration_minutes: values.duration,
+        marks_per_question: values.marks,
+        negative_mark: values.negative,
+        pass_mark: values.passMark,
 
-  if (deleteError) {
-    say('mapMsg', deleteError.message, true);
-    return;
-  }
+        show_result: $("showResult").checked,
+        show_rank: $("showPosition").checked,
+        show_answers: $("showAnswerPaper").checked,
 
-  if (ids.length) {
-    const rows = ids.map((question_id, index) => ({
-      exam_id: currentExam,
-      question_id,
-      sort_order: index + 1
-    }));
+        thank_you_message:
+          $("thankYouMessage").value.trim() ||
+          DEFAULT_THANK_YOU,
 
-    const { error } = await db.from('exam_questions').insert(rows);
+        facebook_group_url:
+          $("groupLink").value.trim() || null,
 
-    if (error) {
-      say('mapMsg', error.message, true);
-      return;
+        show_group_link: $("showGroupLink").checked
+      };
+
+      const { error: settingsError } = await db
+        .from("exam_settings")
+        .upsert(settingsUpdate, {
+          onConflict: "exam_id"
+        });
+
+      if (settingsError) {
+        throw settingsError;
+      }
+
+      currentExam = {
+        ...currentExam,
+        ...examUpdate
+      };
+
+      currentSettings = {
+        ...currentSettings,
+        ...settingsUpdate
+      };
+
+      await loadExams();
+
+      $("examSelect").value = String(examId);
+
+      showMessage(
+        "settingsMessage",
+        "সেটিংস সফলভাবে সেভ হয়েছে। আগের শিক্ষার্থীদের রেকর্ড পরিবর্তন করা হয়নি।"
+      );
+
+      showMessage(
+        "loadMessage",
+        "পরীক্ষার সেটিংস আপডেট হয়েছে।"
+      );
+    } catch (error) {
+      console.error("Save settings error:", error);
+
+      showMessage(
+        "settingsMessage",
+        "সেটিংস সেভ হয়নি: " +
+          (error.message || "অজানা সমস্যা"),
+        false
+      );
+    } finally {
+      button.disabled = false;
     }
   }
 
-  const { error: updateError } = await db.from('exams')
-    .update({ total_questions: ids.length }).eq('id', currentExam);
+  async function initialize() {
+    setFormEnabled(false);
 
-  if (updateError) {
-    say('mapMsg', updateError.message, true);
-    return;
+    $("loadExamSettings").addEventListener(
+      "click",
+      loadExamSettings
+    );
+
+    $("examSettingsForm").addEventListener(
+      "submit",
+      saveSettings
+    );
+
+    $("examSelect").addEventListener("change", () => {
+      currentExam = null;
+      currentSettings = null;
+
+      $("examSettingsForm").reset();
+      setFormEnabled(false);
+
+      showMessage(
+        "loadMessage",
+        "নির্বাচিত পরীক্ষার সেটিংস লোড করুন।"
+      );
+
+      $("settingsMessage").textContent = "";
+      $("settingsMessage").className = "message";
+    });
+
+    try {
+      await loadExams();
+
+      showMessage(
+        "loadMessage",
+        "পরীক্ষা নির্বাচন করে সেটিংস লোড করুন।"
+      );
+    } catch (error) {
+      console.error("Initialization error:", error);
+
+      showMessage(
+        "loadMessage",
+        "পরীক্ষার তালিকা লোড হয়নি: " +
+          (error.message || "অজানা সমস্যা"),
+        false
+      );
+    }
   }
 
-  const { error: settingsError } = await db.from('exam_settings')
-    .upsert({
-      exam_id: currentExam,
-      total_questions: ids.length
-    }, { onConflict: 'exam_id' });
-
-  if (settingsError) {
-    say('mapMsg', settingsError.message, true);
-    return;
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initialize);
+  } else {
+    initialize();
   }
-
-  say('mapMsg', 'প্রশ্নের তালিকা সংরক্ষণ হয়েছে।');
-  await renderSelected();
-  await loadExams();
-}
-
-$('loadPool').onclick = loadPool;
-
-$('selectAll').onclick = () => {
-  poolQuestions.forEach(q => selectedIds.add(String(q.id)));
-  $('pool').querySelectorAll('[data-qid]').forEach(box => {
-    box.checked = true;
-  });
-  renderSelected();
-};
-
-$('deselectAll').onclick = () => {
-  poolQuestions.forEach(q => selectedIds.delete(String(q.id)));
-  $('pool').querySelectorAll('[data-qid]').forEach(box => {
-    box.checked = false;
-  });
-  renderSelected();
-};
-
-$('saveMap').onclick = saveMapping;
-$('closeMapping').onclick = () => $('mapping').classList.add('hidden');
-
-init();
+})();
