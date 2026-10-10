@@ -1,63 +1,173 @@
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>পরীক্ষা তৈরি</title>
-  <link rel="stylesheet" href="css/admin.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
-<main class="wrap">
-  <section class="card">
-    <h1>➕ পরীক্ষা তৈরি</h1>
-    <p>পরীক্ষার প্রাথমিক তথ্য ও সেটিংস নির্ধারণ করো।</p>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>পরীক্ষা তৈরি ও প্রশ্ন ব্যবস্থাপনা</title>
 
-    <label>পরীক্ষার নাম
-      <input id="examName" placeholder="যেমন: মডেল টেস্ট–৫">
-    </label>
-
-    <label>পরীক্ষার সময় (মিনিট)
-      <input id="duration" type="number" min="1" value="20">
-    </label>
-
-    <label>প্রতি প্রশ্নের নম্বর
-      <input id="marks" type="number" min="0" step="0.25" value="1">
-    </label>
-
-    <label>নেগেটিভ মার্ক
-      <input id="negative" type="number" min="0" step="0.01" value="0">
-    </label>
-
-    <label>পাস নম্বর
-      <input id="passMark" type="number" min="0" step="0.25" value="0">
-    </label>
-
-    <label>পরীক্ষার স্ট্যাটাস
-      <select id="examStatus">
-        <option value="active">চালু</option>
-        <option value="inactive">বন্ধ</option>
-      </select>
-    </label>
-
-    <button id="saveBtn">পরীক্ষা তৈরি করুন</button>
-    <button onclick="location.href='exam-manager.html'">
-      ধাপ ৪: পরীক্ষা ব্যবস্থাপনা
-    </button>
-
-    <p id="msg" role="status"></p>
-  </section>
-</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-.wrap{max-width:700px;margin:25px auto;padding:16px}
-.card{padding:22px;background:#fff;border-radius:12px;box-shadow:0 3px 15px #0001}
-label{display:block;margin:15px 0;font-weight:600}
-input,select{display:block;width:100%;box-sizing:border-box;padding:10px;margin-top:6px;border:1px solid #ccc;border-radius:7px}
-button{padding:11px 16px;margin:5px 3px;border:0;border-radius:7px;background:#1769aa;color:white;cursor:pointer}
-#msg{white-space:pre-wrap}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  padding:12px;
+  font-family:Arial,sans-serif;
+  background:#f1f5f9;
+  color:#172033
+}
+.container{max-width:850px;margin:auto}
+.card{
+  background:white;
+  padding:18px;
+  margin:12px 0;
+  border-radius:12px;
+  box-shadow:0 3px 12px #0001
+}
+h1{font-size:23px}
+label{
+  display:block;
+  font-weight:bold;
+  margin:12px 0 6px
+}
+input,select,button{
+  width:100%;
+  padding:12px;
+  border:1px solid #cbd5e1;
+  border-radius:8px;
+  font-size:16px
+}
+button{
+  border:0;
+  background:#2563eb;
+  color:white;
+  font-weight:bold;
+  margin-top:10px;
+  cursor:pointer
+}
+.secondary{background:#475569}
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px
+}
+.question{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  padding:12px;
+  border:1px solid #e2e8f0;
+  border-radius:8px;
+  margin:8px 0;
+  font-weight:normal
+}
+.question input{width:auto;margin-top:4px}
+.message{
+  padding:10px;
+  background:#f8fafc;
+  border-radius:8px;
+  overflow-wrap:anywhere
+}
+@media(max-width:550px){
+  .grid{grid-template-columns:1fr}
+  .card{padding:14px}
+}
 </style>
+</head>
+
+<body>
+<div class="container">
+
+<div class="card">
+<h1>➕ পরীক্ষা তৈরি</h1>
+
+<label>পরীক্ষার নাম</label>
+<input id="examName" placeholder="পরীক্ষার নাম লিখুন">
+
+<div class="grid">
+<div>
+<label>সময় (মিনিট)</label>
+<input id="duration" type="number" value="20" min="1">
+</div>
+
+<div>
+<label>প্রতি প্রশ্নের নম্বর</label>
+<input id="marks" type="number" value="1" min="0" step="0.01">
+</div>
+
+<div>
+<label>Negative Mark</label>
+<input id="negative" type="number" value="0" min="0" step="0.01">
+</div>
+
+<div>
+<label>পাস নম্বর</label>
+<input id="passMark" type="number" value="0" min="0">
+</div>
+</div>
+
+<button id="createExam">পরীক্ষা তৈরি করুন</button>
+<p id="createMessage" class="message"></p>
+</div>
+
+<div class="card">
+<h2>📝 প্রশ্ন যোগ / বিয়োগ</h2>
+
+<label>পরীক্ষা নির্বাচন করুন</label>
+<select id="examSelect">
+<option value="">পরীক্ষা নির্বাচন করুন</option>
+</select>
+
+<div class="grid">
+<div>
+<label>প্রশ্নব্যাংক ফোল্ডার</label>
+<select id="folderSelect">
+<option value="">ফোল্ডার নির্বাচন করুন</option>
+</select>
+</div>
+
+<div>
+<label>প্রশ্নের সেট</label>
+<select id="setSelect">
+<option value="">সেট নির্বাচন করুন</option>
+</select>
+</div>
+</div>
+
+<button id="loadQuestions" class="secondary">
+প্রশ্ন দেখুন
+</button>
+
+<p id="questionCount" class="message">
+প্রথমে পরীক্ষা ও প্রশ্নের সেট নির্বাচন করুন।
+</p>
+
+<div class="grid">
+<button id="selectAll" class="secondary">
+সব প্রশ্ন নির্বাচন
+</button>
+<button id="clearAll" class="secondary">
+সব অনির্বাচিত করুন
+</button>
+</div>
+
+<div id="questionList"></div>
+
+<button id="saveQuestions">
+প্রশ্নের তালিকা সংরক্ষণ করুন
+</button>
+
+<p id="questionMessage" class="message"></p>
+</div>
+
+<div class="card">
+<button class="secondary"
+onclick="location.href='exam-manager.html'">
+পরীক্ষা পরিচালনায় যান
+</button>
+</div>
+
+</div>
 
 <script src="js/supabase.js"></script>
 <script src="js/create-exam.js"></script>
