@@ -556,9 +556,8 @@
         {count:'exact',head:true}
       ),
 
-      db.from('site_visitors').select(
-        'id',
-        {count:'exact',head:true}
+      db.rpc('count_site_visitors').then(
+        ({data,error}) => ({count:data,error})
       )
 
     ]);
