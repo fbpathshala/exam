@@ -11,6 +11,14 @@ create table if not exists public.question_bank_folders(id bigint generated alwa
 create table if not exists public.question_bank_sets(id bigint generated always as identity primary key,folder_id bigint not null references public.question_bank_folders(id) on delete cascade,set_name text not null,created_at timestamptz not null default now());
 create table if not exists public.exam_questions(exam_id bigint not null references public.exams(id) on delete cascade,question_id bigint not null references public.questions(id) on delete cascade,question_order integer not null default 1,primary key(exam_id,question_id));
 create table if not exists public.exam_settings(exam_id bigint primary key references public.exams(id) on delete cascade,total_questions integer not null default 0,total_marks numeric not null default 0,pass_mark numeric not null default 0,duration_minutes integer not null default 20,marks_per_question numeric not null default 1,negative_mark numeric not null default 0,exam_date date,start_time time,end_date date,end_time time,examiner_name text,syllabus text,show_answers boolean not null default false,multiple_attempts boolean not null default false,device_attempt_protection boolean not null default true,random_questions boolean not null default false,random_options boolean not null default false);
+-- Keep exam_settings compatible with the student result flow and per-exam controls.
+alter table public.exam_settings add column if not exists show_result boolean not null default true;
+alter table public.exam_settings add column if not exists show_rank boolean not null default true;
+alter table public.exam_settings add column if not exists thank_you_message text;
+alter table public.exam_settings add column if not exists facebook_page_url text;
+alter table public.exam_settings add column if not exists facebook_group_url text;
+alter table public.exam_settings add column if not exists question_display_mode text not null default 'all';
+
 alter table public.question_bank_folders enable row level security;
 alter table public.question_bank_sets enable row level security;
 alter table public.questions enable row level security;
