@@ -37,7 +37,7 @@
   height:46px!important;
   padding:0!important;
   font-size:27px!important;
-  background:#111827!important;
+  background:#ffffff20!important;border:1px solid #ffffff50!important;
   color:#fff!important;
   border:0!important;
   border-radius:12px!important;
@@ -65,7 +65,7 @@
   background:#dc2626
 }
 .smart-date{
-  background:linear-gradient(135deg,#0f172a,#1e3a5f);
+  background:linear-gradient(135deg,#142d4e 0%,#1b4169 72%,#0f766e 140%);
   color:#fff;
   border-radius:20px;
   padding:22px;
@@ -171,6 +171,15 @@
     font-size:25px
   }
 }
+
+.quick-feature-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.quick-feature{display:flex;align-items:center;gap:12px;min-width:0;padding:15px;background:#fff;border:1px solid #e1e8f0;border-radius:15px;text-decoration:none;color:#18263a;box-shadow:0 5px 16px rgba(20,45,78,.045);transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
+.quick-feature:hover{transform:translateY(-2px);border-color:#b8cbe1;box-shadow:0 10px 22px rgba(20,45,78,.09)}
+.quick-feature>span:nth-child(2){display:flex;flex-direction:column;gap:3px;min-width:0}.quick-feature b{font-size:14px}.quick-feature small{font-size:12px;color:#64748b}.quick-feature i{font-style:normal;margin-left:auto;color:#94a3b8}
+.quick-feature-icon{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border-radius:12px;font-size:22px;font-weight:700}
+.quick-feature-icon.blue{background:#eaf2ff;color:#2563eb}.quick-feature-icon.teal{background:#e5faf6;color:#0f9488}.quick-feature-icon.violet{background:#f1eaff;color:#7652b5}.quick-feature-icon.amber{background:#fff4dc;color:#b7791f}
+@media(max-width:850px){.quick-feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.quick-feature-grid{grid-template-columns:1fr}.quick-feature{padding:12px}}
 </style>
 </head>
 
@@ -340,6 +349,20 @@
 
     </div>
 
+    <section class="quick-actions" aria-label="দ্রুত ফিচার" style="margin-top:22px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 12px">
+        <div><h2 style="margin:0 0 4px">দ্রুত কাজ</h2><p style="margin:0;color:#64748b;font-size:13px">প্রয়োজনীয় ফিচার এক ক্লিকেই খুলুন</p></div>
+      </div>
+      <div class="quick-feature-grid">
+        <a class="quick-feature" href="create-exam.html"><span class="quick-feature-icon blue">＋</span><span><b>নতুন পরীক্ষা তৈরি</b><small>প্রশ্ন বেছে পরীক্ষা বানান</small></span><i>↗</i></a>
+        <a class="quick-feature" href="exam-manager.html"><span class="quick-feature-icon teal">⚙</span><span><b>পরীক্ষা পরিচালনা</b><small>সেটিংস ও পরীক্ষার লিংক</small></span><i>↗</i></a>
+        <a class="quick-feature" href="question_bank.html"><span class="quick-feature-icon violet">▤</span><span><b>প্রশ্ন ব্যাংক</b><small>প্রশ্ন দেখুন ও সাজান</small></span><i>↗</i></a>
+        <a class="quick-feature" href="question_create.html"><span class="quick-feature-icon amber">✎</span><span><b>প্রশ্ন তৈরি</b><small>নতুন MCQ যোগ করুন</small></span><i>↗</i></a>
+        <a class="quick-feature" href="results.html"><span class="quick-feature-icon teal">▥</span><span><b>ফলাফল পর্যালোচনা</b><small>পরীক্ষার ফলাফল দেখুন</small></span><i>↗</i></a>
+        <a class="quick-feature" href="results-manager.html"><span class="quick-feature-icon blue">☷</span><span><b>ফলাফল ব্যবস্থাপনা</b><small>উত্তরপত্র ও ফলাফল</small></span><i>↗</i></a>
+        <a class="quick-feature" href="exam-list.html"><span class="quick-feature-icon violet">☰</span><span><b>পরীক্ষার তালিকা</b><small>তৈরি করা পরীক্ষা দেখুন</small></span><i>↗</i></a>
+      </div>
+    </section>
     <div id="status" class="status"></div>
 
   </div>
