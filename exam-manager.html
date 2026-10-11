@@ -1,1 +1,47 @@
-<!doctype html><html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>পরীক্ষা ব্যবস্থাপনা</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>body{font-family:Arial,sans-serif;background:#f3f6fa;padding:14px;color:#182230}.wrap{max-width:1000px;margin:auto}.exam,.card{background:#fff;border:1px solid #dde3eb;border-radius:10px;margin:12px 0;padding:12px}.head{display:flex;align-items:center;gap:8px}.name{flex:1;text-align:left;color:#1756a9;background:white}.menu{width:45px}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}button{padding:10px;border:0;border-radius:7px;background:#1769aa;color:white;font:inherit;cursor:pointer}.danger{background:#b42318}.secondary{background:#56677b}.panel{border-top:1px solid #ddd;margin-top:10px;padding-top:10px}.q{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid #eee}.q input{width:auto}.msg{overflow-wrap:anywhere;white-space:pre-wrap}@media(max-width:600px){.buttons{grid-template-columns:1fr}}</style></head><body><main class="wrap"><h1>পরীক্ষা ব্যবস্থাপনা</h1><p>পরীক্ষার নাম চাপলে লিংক কপি হবে। পাশে ☰ চাপলে কাজের বাটন খুলবে।</p><button onclick="location.href='create-exam.html'">＋ নতুন পরীক্ষা তৈরি</button><p id="message" class="msg">লোড হচ্ছে…</p><div id="examList"></div></main><script src="js/supabase.js"></script><script src="js/exam-manager.js"></script></body></html>
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ফেইসবুক পাঠশালা — পরীক্ষা ব্যবস্থাপনা</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .exam,.panel{background:#fff;border:1px solid #dbe3ee;border-radius:12px;margin:12px 0;padding:14px}
+    .head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .name{flex:1;min-width:150px;text-align:left;color:#1756a9;background:#fff}
+    .menu{width:auto;min-width:44px}
+    .buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
+    .panel{border-top:1px solid #dbe3ee;margin-top:10px;padding-top:10px}
+    .q{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid #eee;align-items:center}
+    .q input{width:auto}
+    #message{overflow-wrap:anywhere;white-space:pre-wrap}
+    @media(max-width:600px){.buttons{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header>
+    <b>ফেইসবুক পাঠশালা — অ্যাডমিন</b>
+    <span style="margin-left:auto"></span>
+    <button type="button" class="secondary" onclick="location.href='dashboard.html'">🏠 ড্যাশবোর্ড</button>
+  </header>
+  <nav aria-label="অ্যাডমিন ফিচার">
+    <button type="button" onclick="location.href='question_create.html'">📝 প্রশ্ন তৈরি</button>
+    <button type="button" onclick="location.href='question_bank.html'">🗂️ প্রশ্ন ব্যাংক</button>
+    <button type="button" onclick="location.href='create-exam.html'">➕ পরীক্ষা তৈরি</button>
+    <button type="button" onclick="location.href='exam-manager.html'">⚙️ পরীক্ষা ব্যবস্থাপনা</button>
+    <button type="button" onclick="location.href='results.html'">📊 ফলাফল</button>
+  </nav>
+  <main class="wrap">
+    <section class="card">
+      <h1>পরীক্ষা ব্যবস্থাপনা</h1>
+      <p>পরীক্ষার নাম চাপলে লিংক কপি হবে। পাশে ☰ চাপলে কাজের বাটন খুলবে।</p>
+      <button type="button" onclick="location.href='create-exam.html'">＋ নতুন পরীক্ষা তৈরি</button>
+      <p id="message" class="msg">লোড হচ্ছে…</p>
+    </section>
+    <div id="examList"></div>
+  </main>
+  <script src="js/supabase.js"></script>
+  <script src="js/exam-manager.js"></script>
+</body>
+</html>
