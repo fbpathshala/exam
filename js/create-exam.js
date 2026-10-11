@@ -368,14 +368,29 @@
         "exam-manager.html?exam=" + encodeURIComponent(examId);
 
     } catch (error) {
-      say(
-        "createMessage",
-        examId
-          ? "পরীক্ষার প্রাথমিক রেকর্ড তৈরি হয়েছে, কিন্তু পরবর্তী ধাপে সমস্যা হয়েছে: " +
-            error.message +
-            "। আবার তৈরি করার আগে পরীক্ষা ব্যবস্থাপনায় রেকর্ডটি যাচাই করুন।"
-          : "পরীক্ষা তৈরি করা যায়নি: " + error.message
-      );
+      let cleanupOk = true;
+      if (examId) {
+        for (const table of ["exam_questions", "exam_settings"]) {
+          try {
+            const cleanup = await db().from(table).delete().eq("exam_id", examId);
+            if (cleanup.error) cleanupOk = false;
+          } catch (_) {
+            cleanupOk = false;
+          }
+        }
+        try {
+          const cleanupExam = await db().from("exams").delete().eq("id", examId);
+          if (cleanupExam.error) cleanupOk = false;
+        } catch (_) {
+          cleanupOk = false;
+        }
+      }
+      const detail = !examId
+        ? ""
+        : cleanupOk
+          ? " অসম্পূর্ণ পরীক্ষার রেকর্ড স্বয়ংক্রিয়ভাবে পরিষ্কার করা হয়েছে।"
+          : " অসম্পূর্ণ রেকর্ড পুরোপুরি পরিষ্কার করা যায়নি। Exam ID: " + examId + "।";
+      say("createMessage", "পরীক্ষা তৈরি করা যায়নি: " + error.message + detail);
     } finally {
       button.disabled = false;
     }
