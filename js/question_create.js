@@ -39,9 +39,8 @@ function fillCategorySelect(id, selected=cat) {
 }
 
 function setCategoryUI() {
-  document.querySelectorAll('.cats button').forEach(b => b.classList.remove('active'));
-  $('cat-' + cat)?.classList.add('active');
-  if ($('currentCat')) $('currentCat').textContent = 'বর্তমান Category: ' + CATS[cat];
+  if ($('categorySelect')) $('categorySelect').value = cat;
+  if ($('currentCat')) $('currentCat').textContent = 'নির্বাচিত ক্যাটাগরি: ' + CATS[cat];
   ['questionCategory'].forEach(id => { if ($(id)) $(id).value = cat; });
 }
 
@@ -65,6 +64,7 @@ async function init() {
     $('login')?.classList.add('hidden');
     $('app')?.classList.remove('hidden');
     fillCategorySelect('questionCategory');
+    $('categorySelect')?.addEventListener('change', e => selectCategory(e.target.value));
     await loadSubjects();
     fillCategorySelect('importCategory', cat);
     await selectCategory(cat);
