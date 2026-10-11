@@ -16,7 +16,7 @@ body{margin:0;background:#eee;font-family:Arial,sans-serif;color:#172033}
 .q{break-inside:avoid;margin:0 0 12px}
 .qt{font-weight:bold}
 .opt{padding:0;margin:0}
-.selected{font-weight:700;background:#eef6ff;border-radius:3px}.selected::after{content:" ✓";font-weight:700}
+.selected{font-weight:700;background:#eef6ff;border-radius:3px}.correct{font-weight:700;background:#e9f8ef;border-radius:3px}.selected::after{content:" ✓";font-weight:700}.correct::before{content:"✓ ";font-weight:700;color:#087443}
 .detail,.expl{margin-top:4px;font-size:11px}
 @page{size:A4;margin:0}
 @media(max-width:800px){.paper{width:100%;padding:18px}.questions{column-gap:16px}}
@@ -24,7 +24,7 @@ body{margin:0;background:#eee;font-family:Arial,sans-serif;color:#172033}
 </style>
 </head>
 <body>
-<div class="toolbar"><button onclick="history.back()">← ফিরে যান</button><button onclick="downloadDocx()">📝 DOCX ডাউনলোড</button><button onclick="downloadPDF()">PDF ডাউনলোড</button><button onclick="print()">PDF ডাউনলোড / প্রিন্ট</button></div>
+<div class="toolbar"><button onclick="history.back()">← ফিরে যান</button><button onclick="downloadDocx()">📝 DOCX ডাউনলোড</button><button onclick="downloadPDF()">PDF ডাউনলোড</button><button onclick="window.print()">প্রিন্ট</button></div>
 <p id="status" style="text-align:center">উত্তরপত্র লোড হচ্ছে…</p>
 <main class="paper"><header class="head"><h2 id="title">পরীক্ষার্থীর উত্তরপত্র</h2><div class="meta"><span id="student"></span><span id="score"></span><span id="submitted"></span></div></header><section id="questions" class="questions"></section></main>
 <script src="js/supabase.js"></script>
@@ -56,7 +56,7 @@ async function init(){
   data={exam:er.data,student:sr.data,settings:cr.data||{},attempt:a,questions:answers.map((aa,i)=>{
    const it=itemMap.get(String(aa.exam_question_id)),q=sourceMap.get(String(aa.question_id));
    const base=it||q||{};
-   return {number:i+1,question_text:base.question_text||'প্রশ্নের লেখা পাওয়া যায়নি',option_a:base.option_a||'',option_b:base.option_b||'',option_c:base.option_c||'',option_d:base.option_d||'',selected_option:String(aa.selected_option||'').trim().toUpperCase().charAt(0),is_correct:!!aa.is_correct,marks_awarded:aa.marks_awarded};
+   return {number:i+1,question_text:base.question_text||'প্রশ্নের লেখা পাওয়া যায়নি',option_a:base.option_a||'',option_b:base.option_b||'',option_c:base.option_c||'',option_d:base.option_d||'',correct_answer:String(base.correct_answer||q?.correct_answer||'').trim().toUpperCase().charAt(0),explanation:base.explanation||q?.explanation||'',selected_option:String(aa.selected_option||'').trim().toUpperCase().charAt(0),is_correct:!!aa.is_correct,marks_awarded:aa.marks_awarded,question_marks:base.marks};
   })};
   render();
  }catch(e){$('status').textContent='উত্তরপত্র লোড হয়নি: '+(e.message||e);$('status').style.color='#b42318'}
@@ -70,14 +70,14 @@ function render(){
  $('score').textContent='নম্বর: '+bn(a.score)+' / '+bn(total);
  $('submitted').textContent='জমা: '+(a.submitted_at?new Intl.DateTimeFormat('bn-BD',{dateStyle:'short',timeStyle:'short'}).format(new Date(a.submitted_at)):'—');
  $('questions').innerHTML=d.questions.map(q=>{
-  const opts=['A','B','C','D'].map(k=>{const selected=q.selected_option===k;let cls='opt';if(selected)cls+=' selected';return '<div class="'+cls+'"><b>'+LET[k]+'.</b> '+esc(q['option_'+k.toLowerCase()])+(selected?' ✓':'')+'</div>'}).join('');
-  return '<article class="q"><div class="qt">'+bn(q.number)+'. '+esc(q.question_text)+'</div>'+opts+'</article>';
+  const opts=['A','B','C','D'].map(k=>{const selected=q.selected_option===k,correct=q.correct_answer===k;let cls='opt';if(selected)cls+=' selected';if(correct)cls+=' correct';return '<div class="'+cls+'"><b>'+LET[k]+'.</b> '+esc(q['option_'+k.toLowerCase()])+'</div>'}).join('');
+  const selectedText=q.selected_option?LET[q.selected_option]+'. '+esc(q['option_'+q.selected_option.toLowerCase()]||''):'উত্তর দেওয়া হয়নি';const correctText=q.correct_answer?LET[q.correct_answer]+'. '+esc(q['option_'+q.correct_answer.toLowerCase()]||''):'—';const awarded=q.marks_awarded==null?'—':bn(q.marks_awarded);const exp=q.explanation?'<div class="expl"><b>ব্যাখ্যা:</b> '+esc(q.explanation)+'</div>':'';return '<article class="q"><div class="qt">'+bn(q.number)+'. '+esc(q.question_text)+'</div>'+opts+'<div class="detail"><b>আপনার উত্তর:</b> '+selectedText+'<br><b>সঠিক উত্তর:</b> '+correctText+'<br><b>প্রাপ্ত নম্বর:</b> '+awarded+'</div>'+exp+'</article>';
  }).join('');
  $('status').textContent='উত্তরপত্র প্রস্তুত';
 }
 function print(){window.print()}
 async function loadScript(src){return new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=src;s.onload=resolve;s.onerror=reject;document.head.appendChild(s)})}
 async function downloadPDF(){try{if(!window.html2canvas)await loadScript('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js');if(!window.jspdf)await loadScript('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js');const canvas=await html2canvas(document.querySelector('.paper'),{scale:2,backgroundColor:'#ffffff'});const{jsPDF}=window.jspdf;const pdf=new jsPDF('p','mm','a4');const pageH=Math.floor(canvas.width*297/210);let y=0,n=0;while(y<canvas.height){const h=Math.min(pageH,canvas.height-y),slice=document.createElement('canvas');slice.width=canvas.width;slice.height=h;slice.getContext('2d').drawImage(canvas,0,y,canvas.width,h,0,0,canvas.width,h);if(n)pdf.addPage();pdf.addImage(slice.toDataURL('image/png'),'PNG',0,0,210,h*210/canvas.width);y+=h;n++}pdf.save((document.title||'answer-paper')+'.pdf')}catch(e){alert('PDF তৈরি করা যায়নি: '+e.message)}}
-async function downloadDocx(){try{if(!data)return;const{Document,Packer,Paragraph,TextRun,AlignmentType}=window.docx;const d=data,children=[new Paragraph({text:d.exam.exam_name,heading:'Heading1',alignment:AlignmentType.CENTER}),new Paragraph({text:'পরীক্ষার্থীর উত্তরপত্র',alignment:AlignmentType.CENTER}),new Paragraph({text:'শিক্ষার্থী: '+(d.student.name||'')+' | নম্বর: '+d.attempt.score,alignment:AlignmentType.CENTER})];d.questions.forEach(q=>{children.push(new Paragraph({spacing:{before:140,after:60},children:[new TextRun({text:bn(q.number)+'. '+q.question_text,bold:true})]}));['A','B','C','D'].forEach(k=>{const selected=q.selected_option===k;children.push(new Paragraph({children:[new TextRun({text:LET[k]+'. '+(q['option_'+k.toLowerCase()]||'')+(selected?' ✓':''),bold:selected})]}))});});const doc=new Document({sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:720,right:720,bottom:720,left:720}},columns:{count:2,space:360}},children}]});const blob=await Packer.toBlob(doc),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(document.title||'answer-paper')+'.docx';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}catch(e){alert('DOCX তৈরি করা যায়নি: '+e.message)}}
+async function downloadDocx(){try{if(!data)return;const{Document,Packer,Paragraph,TextRun,AlignmentType}=window.docx;const d=data,children=[new Paragraph({text:d.exam.exam_name,heading:'Heading1',alignment:AlignmentType.CENTER}),new Paragraph({text:'পরীক্ষার্থীর উত্তরপত্র',alignment:AlignmentType.CENTER}),new Paragraph({text:'শিক্ষার্থী: '+(d.student.name||'')+' | নম্বর: '+d.attempt.score,alignment:AlignmentType.CENTER})];d.questions.forEach(q=>{children.push(new Paragraph({spacing:{before:140,after:60},children:[new TextRun({text:bn(q.number)+'. '+q.question_text,bold:true})]}));['A','B','C','D'].forEach(k=>{const selected=q.selected_option===k,correct=q.correct_answer===k;children.push(new Paragraph({children:[new TextRun({text:LET[k]+'. '+(q['option_'+k.toLowerCase()]||'')+(selected?' [আপনার উত্তর]':'')+(correct?' ✓':''),bold:selected||correct})]}));});children.push(new Paragraph({text:'আপনার উত্তর: '+(q.selected_option?LET[q.selected_option]+'. '+(q['option_'+q.selected_option.toLowerCase()]||''):'দেওয়া হয়নি')+' | সঠিক উত্তর: '+(q.correct_answer?LET[q.correct_answer]+'. '+(q['option_'+q.correct_answer.toLowerCase()]||''):'—')+' | প্রাপ্ত নম্বর: '+(q.marks_awarded??'—')}));if(q.explanation)children.push(new Paragraph({text:'ব্যাখ্যা: '+q.explanation}));});const doc=new Document({sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:720,right:720,bottom:720,left:720}},columns:{count:2,space:360}},children}]});const blob=await Packer.toBlob(doc),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(document.title||'answer-paper')+'.docx';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}catch(e){alert('DOCX তৈরি করা যায়নি: '+e.message)}}
 init();
 </script></body></html>
