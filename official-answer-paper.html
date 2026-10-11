@@ -30,7 +30,7 @@ body{margin:0;background:#eee;font-family:Arial,sans-serif;color:#172033}
 <script src="js/supabase.js"></script>
 <script>
 const $=id=>document.getElementById(id),BN='০১২৩৪৫৬৭৮৯',LET={A:'ক',B:'খ',C:'গ',D:'ঘ'};
-const bn=x=>String(x??'').replace(/\\d/g,d=>BN[+d]);
+const bn=x=>String(x??'').replace(/\d/g,d=>BN[+d]);
 const esc=x=>String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 let data=null,settings={};
 function correct(q){const v=String(q.correct_answer??'').trim().toUpperCase();const m=v.match(/[ABCD]/);if(m)return m[0];const bnmap={'ক':'A','খ':'B','গ':'C','ঘ':'D','১':'A','২':'B','৩':'C','৪':'D'};return bnmap[v.charAt(0)]||''}
