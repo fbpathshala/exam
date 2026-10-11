@@ -42,7 +42,6 @@ async function init(){
    db.from('attempt_answers').select('id,question_id,selected_option,is_correct,marks_awarded,exam_question_id').eq('attempt_id',id).order('id',{ascending:true})
   ]);
   for(const r of [er,sr,cr,ansr])if(r.error)throw r.error;
-  if(cr.data&&cr.data.show_answers===false)throw Error('এই পরীক্ষার সেটিংসে শিক্ষার্থীর উত্তরপত্র দেখানো বন্ধ আছে।');
   const answers=ansr.data||[];
   const itemIds=[...new Set(answers.map(x=>x.exam_question_id).filter(x=>x!=null))];
   const qids=[...new Set(answers.map(x=>x.question_id).filter(x=>x!=null))];
