@@ -56,11 +56,11 @@
 <main>
   <div class="card">
     <div class="section-head">
-      <div><h2 style="margin-bottom:4px">১. Folder ও Set Management</h2><p class="section-note">প্রথমে Category ঠিক করুন। তারপর Folder → Set ক্রমে ম্যানেজ করুন।</p></div>
+      <div><h2 style="margin-bottom:4px">১. ক্যাটাগরি, ফোল্ডার ও সেট ব্যবস্থাপনা</h2><p class="section-note">প্রথমে ক্যাটাগরি নির্বাচন করুন। এরপর ফোল্ডার তৈরি করে তার অধীনে প্রশ্ন সেট তৈরি ও পরিচালনা করুন।</p></div>
     </div>
-    <div class="flow"><span>Category</span><i>→</i><span>Folder</span><i>→</i><span>Set</span></div>
+    <div class="flow"><span>ক্যাটাগরি</span><i>→</i><span>ফোল্ডার</span><i>→</i><span>প্রশ্ন সেট</span></div>
     <div class="cats">
-      <button id="cat-recruitment" onclick="selectCategory('recruitment')">নিয়োগ পরীক্ষা</button>
+      <button id="cat-recruitment" onclick="selectCategory('recruitment')">নিয়োগ পরীক্ষা</button>
       <button id="cat-verification_test" onclick="selectCategory('verification_test')">যাচাই পরীক্ষা</button>
       <button id="cat-recent" onclick="selectCategory('recent')">সাম্প্রতিক প্রশ্ন</button>
     </div>
@@ -68,29 +68,29 @@
 
     <div class="manage-grid">
       <div class="manage-box">
-        <h3>📁 ফোল্ডার ম্যানেজমেন্ট</h3>
-        <p>এই Category-এর Folder তৈরি, Rename বা Delete করুন।</p>
-        <label>Folder</label>
+        <h3>📁 ফোল্ডার ব্যবস্থাপনা</h3>
+        <p>নির্বাচিত ক্যাটাগরির ফোল্ডার তৈরি, নাম পরিবর্তন বা মুছে ফেলুন।</p>
+        <label>ফোল্ডার</label>
         <select id="manageFolder"></select>
         <div class="manage-actions">
           <button type="button" onclick="renameSelectedFolder()">✏️ Rename</button>
           <button type="button" class="secondary" onclick="deleteSelectedFolder()">🗑️ Delete</button>
         </div>
-        <div class="grid" style="margin-top:10px"><input id="newFolder" placeholder="নতুন Folder-এর নাম"><button type="button" onclick="createFolder()">＋ Folder তৈরি</button></div>
+        <div class="grid" style="margin-top:10px"><input id="newFolder" placeholder="নতুন ফোল্ডারের নাম"><button type="button" onclick="createFolder()">＋ ফোল্ডার তৈরি</button></div>
       </div>
 
       <div class="manage-box">
-        <h3>📂 সেট ম্যানেজমেন্ট</h3>
-        <p>আগে Folder নির্বাচন করুন, তারপর সেই Folder-এর Set ম্যানেজ করুন।</p>
+        <h3>📂 প্রশ্ন সেট ব্যবস্থাপনা</h3>
+        <p>প্রথমে ফোল্ডার নির্বাচন করুন। এরপর সেই ফোল্ডারের প্রশ্ন সেট পরিচালনা করুন।</p>
         <label>Folder</label>
         <select id="setManageFolder"></select>
-        <label style="margin-top:9px;display:block">Set</label>
+        <label style="margin-top:9px;display:block">প্রশ্ন সেট</label>
         <select id="manageSet"></select>
         <div class="manage-actions">
           <button type="button" onclick="renameSelectedSet()">✏️ Rename</button>
           <button type="button" class="secondary" onclick="deleteSelectedSet()">🗑️ Delete</button>
         </div>
-        <div class="grid" style="margin-top:10px"><input id="newSet" placeholder="নতুন Set-এর নাম"><button type="button" onclick="createSet()">＋ Set তৈরি</button></div>
+        <div class="grid" style="margin-top:10px"><input id="newSet" placeholder="নতুন প্রশ্ন সেটের নাম"><button type="button" onclick="createSet()">＋ প্রশ্ন সেট তৈরি</button></div>
       </div>
     </div>
     <p id="folderMsg" class="msg"></p>
