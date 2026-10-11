@@ -184,13 +184,17 @@ function buildExactStudentReview(){
     const map=(optionMaps[q.id]||["A","B","C","D"]).slice();
     const selected=String(answers[q.id]||"").toUpperCase();
     const correct=String(q.correct_answer||"").toUpperCase();
+    const isCorrect=!!selected&&selected===correct;
+    const questionMarks=Number(q.marks??settings.marks_per_question??1);
+    const negativeMarks=Number(q.negative_mark??settings.negative_mark??0);
+    const marksAwarded=!selected?0:(isCorrect?questionMarks:-negativeMarks);
     return {question_id:q.id,display_order:i,question_text:q.question_text,options:map.map((original,j)=>({
       display_letter:String.fromCharCode(65+j),
       original_letter:original,
       text:q["option_"+original.toLowerCase()]||"",
       selected:original===selected,
       correct:original===correct
-    })),selected_option:selected||null,correct_option:correct||null,is_correct:!!selected&&selected===correct,explanation:q.explanation||""};
+    })),selected_option:selected||null,correct_option:correct||null,is_correct:isCorrect,marks_awarded:marksAwarded,explanation:q.explanation||""};
   });
 }
 
@@ -280,7 +284,7 @@ function renderReview(items,showCorrect=true){
       const classes=o.selected&&!o.correct?"paper-wrong":(showCorrect&&o.correct)?"paper-right":"";
       return `<div class="${classes}"><b>${letter}.</b> ${esc(o.text)}${showCorrect&&o.correct?" ✓":""}</div>`;
     }).join("");
-    div.innerHTML=`<div><b>${bn(i+1)}. ${esc(r.question_text)}</b></div><div class="paper-opts">${optionHtml}</div><div style="margin-top:10px"><b>তোমার উত্তর:</b> ${r.selected_option?letters[(r.options.find(o=>o.original_letter===r.selected_option)||{}).display_letter]+". "+esc((r.options.find(o=>o.original_letter===r.selected_option)||{}).text||""):"দেওয়া হয়নি"}</div>${showCorrect?`<div style="margin-top:5px"><b>সঠিক উত্তর:</b> ${r.correct_option?letters[(r.options.find(o=>o.original_letter===r.correct_option)||{}).display_letter]+". "+esc((r.options.find(o=>o.original_letter===r.correct_option)||{}).text||""):"—"}</div>${r.explanation?`<div style="margin-top:8px"><b>ব্যাখ্যা:</b> ${esc(r.explanation)}</div>`:""}`:""}`;
+    div.innerHTML=`<div><b>${bn(i+1)}. ${esc(r.question_text)}</b> <span class="muted">(${bn(r.marks_awarded??0)} নম্বর)</span></div><div class="paper-opts">${optionHtml}</div><div style="margin-top:10px"><b>তোমার উত্তর:</b> ${r.selected_option?letters[(r.options.find(o=>o.original_letter===r.selected_option)||{}).display_letter]+". "+esc((r.options.find(o=>o.original_letter===r.selected_option)||{}).text||""):"দেওয়া হয়নি"}</div>${showCorrect?`<div style="margin-top:5px"><b>সঠিক উত্তর:</b> ${r.correct_option?letters[(r.options.find(o=>o.original_letter===r.correct_option)||{}).display_letter]+". "+esc((r.options.find(o=>o.original_letter===r.correct_option)||{}).text||""):"—"}</div>${r.explanation?`<div style="margin-top:8px"><b>ব্যাখ্যা:</b> ${esc(r.explanation)}</div>`:""}`:""}`;
     review.appendChild(div);
   });
 }
