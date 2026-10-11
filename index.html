@@ -244,7 +244,7 @@ function renderReview(items){
       const correctBadge=o.correct?" — সঠিক উত্তর ✓":"";
       return `<div class="${classes}"><b>${letter}.</b> ${esc(o.text)}${badge}${correctBadge}</div>`;
     }).join("");
-    div.innerHTML=`<div><b>${bn(i+1)}. ${esc(r.question_text)}</b></div><div class="paper-opts">${optionHtml}</div><div><b>আপনার উত্তর:</b> ${r.selected_option?letters[r.selected_option]+". "+esc((r.options.find(o=>o.original_letter===r.selected_option)||{}).text||""):"দেওয়া হয়নি"} ${r.is_correct?"✓":"✗"}</div><div><b>সঠিক উত্তর:</b> ${r.correct_option?letters[r.correct_option]+". "+esc((r.options.find(o=>o.original_letter===r.correct_option)||{}).text||""):"—"} ✓</div>${r.explanation?`<div style="margin-top:8px"><b>ব্যাখ্যা:</b> ${esc(r.explanation)}</div>`:""}`;
+    div.innerHTML=`<div><b>${bn(i+1)}. ${esc(r.question_text)}</b></div><div class="paper-opts">${optionHtml}</div><div><b>আপনার উত্তর:</b> ${r.selected_option?letters[(r.options.find(o=>o.original_letter===r.selected_option)||{}).display_letter]+". "+esc((r.options.find(o=>o.original_letter===r.selected_option)||{}).text||""):"দেওয়া হয়নি"} ${r.is_correct?"✓":"✗"}</div><div><b>সঠিক উত্তর:</b> ${r.correct_option?letters[(r.options.find(o=>o.original_letter===r.correct_option)||{}).display_letter]+". "+esc((r.options.find(o=>o.original_letter===r.correct_option)||{}).text||""):"—"} ✓</div>${r.explanation?`<div style="margin-top:8px"><b>ব্যাখ্যা:</b> ${esc(r.explanation)}</div>`:""}`;
     review.appendChild(div);
   });
 }
