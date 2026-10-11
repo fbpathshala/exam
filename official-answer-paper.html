@@ -38,18 +38,26 @@ async function init(){
  try{
   const session=await db.auth.getSession();if(!session.data.session){location.href='admin.html';return}
   const id=Number(new URLSearchParams(location.search).get('exam'));if(!id)throw Error('Exam ID পাওয়া যায়নি।');
-  const [er,lr]=await Promise.all([
+  const [er,lr,ir]=await Promise.all([
    db.from('exams').select('id,exam_name').eq('id',id).single(),
-   db.from('exam_questions').select('question_id,question_order').eq('exam_id',id).order('question_order',{ascending:true})
+   db.from('exam_questions').select('question_id,question_order').eq('exam_id',id).order('question_order',{ascending:true}),
+   db.from('exam_question_items').select('id,source_question_id,question_order,question_text,option_a,option_b,option_c,option_d,correct_answer,explanation').eq('exam_id',id).order('question_order',{ascending:true})
   ]);
-  if(er.error)throw er.error;if(lr.error)throw lr.error;
+  if(er.error)throw er.error;if(lr.error)throw lr.error;if(ir.error)throw ir.error;
   const sr=await db.from('exam_settings').select('*').eq('exam_id',id).maybeSingle();if(sr.error)throw sr.error;settings=sr.data||{};
-  const links=lr.data||[];if(!links.length)throw Error('এই পরীক্ষায় কোনো প্রশ্ন নেই।');
-  const ids=links.map(x=>x.question_id);
-  const qr=await db.from('questions').select('id,question_text,option_a,option_b,option_c,option_d,correct_answer,explanation').in('id',ids);
-  if(qr.error)throw qr.error;
-  const map=new Map((qr.data||[]).map(q=>[String(q.id),q]));
-  data={exam:er.data,questions:links.map(x=>map.get(String(x.question_id))).filter(Boolean)};
+  const legacy=lr.data||[],items=ir.data||[];
+  // Use the saved exam snapshot when it is complete; otherwise fall back to the legacy exam_questions mapping.
+  if(items.length && (!legacy.length || items.length>=legacy.length)){
+   data={exam:er.data,questions:items.map(x=>({question_text:x.question_text,option_a:x.option_a,option_b:x.option_b,option_c:x.option_c,option_d:x.option_d,correct_answer:x.correct_answer,explanation:x.explanation,question_order:x.question_order}))};
+  }else{
+   if(!legacy.length)throw Error('এই পরীক্ষায় কোনো প্রশ্ন নেই।');
+   const ids=legacy.map(x=>x.question_id);
+   const qr=await db.from('questions').select('id,question_text,option_a,option_b,option_c,option_d,correct_answer,explanation').in('id',ids);
+   if(qr.error)throw qr.error;
+   const map=new Map((qr.data||[]).map(q=>[String(q.id),q]));
+   data={exam:er.data,questions:legacy.map(x=>map.get(String(x.question_id))).filter(Boolean)};
+  }
+  if(!data.questions.length)throw Error('প্রশ্নের তথ্য পাওয়া যায়নি।');
   render();
  }catch(e){$('status').textContent='সঠিক উত্তরপত্র লোড হয়নি: '+(e.message||e);$('status').style.color='#b42318'}
 }
