@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="bn">
 <head>
+<link rel="stylesheet" href="css/admin.css">
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ফেইসবুক পাঠশালা — পরীক্ষা</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -8,7 +9,7 @@
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f7fb;color:#172033}.top{background:#2563eb;color:#fff;padding:20px}.wrap{max-width:900px;margin:20px auto;padding:0 14px}.card{background:#fff;border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 4px 16px #0001}input,select{padding:12px;border:1px solid #ccd5e1;border-radius:10px;font-size:16px}input{width:100%}.exam{border:1px solid #e2e8f0;border-radius:14px;padding:16px;margin-top:12px}.btn{display:inline-block;background:#2563eb;color:#fff;padding:11px 15px;border-radius:10px;text-decoration:none;font-weight:bold;margin-top:10px}.error{background:#fee2e2;color:#991b1b}.muted{color:#64748b}
 </style>
 <style id="direct-dashboard-navigation">.direct-dashboard-nav{position:fixed;right:16px;bottom:16px;z-index:9999;display:inline-flex;align-items:center;gap:8px;padding:11px 16px;border-radius:999px;background:#1d4ed8;color:#fff!important;text-decoration:none!important;font:700 15px/1.2 Arial,sans-serif;box-shadow:0 5px 18px #0003;border:2px solid #fff}.direct-dashboard-nav:hover{background:#1e40af;transform:translateY(-1px)}@media print{.direct-dashboard-nav{display:none!important}}</style></head>
-<body>
+<body data-fp-theme="premium">
 <header class="top"><b>📚 ফেইসবুক পাঠশালা</b><div>পরীক্ষা</div></header>
 <main class="wrap">
 <section class="card"><h2>📝 পরীক্ষার তালিকা</h2><input id="search" placeholder="পরীক্ষার নাম খুঁজুন" oninput="render()"><br><br><select id="filter" onchange="render()"><option value="all">সব পরীক্ষা</option><option value="active">সক্রিয় পরীক্ষা</option></select></section>
