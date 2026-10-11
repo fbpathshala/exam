@@ -22,9 +22,9 @@ async function loadExam(){
       startPage.classList.add("hidden");
       examListPage.classList.remove("hidden");
       examListStatus.textContent="চলমান পরীক্ষার তালিকা লোড হচ্ছে...";
-      const r=await sb.from("exams").select("id,exam_name,status").eq("status","active").order("id",{ascending:false});
+      const r=await sb.from("exams").select("id,exam_name,status").order("id",{ascending:false});
       if(r.error)throw r.error;
-      const rows=r.data||[];
+      const rows=(r.data||[]).filter(x=>String(x.status||"").trim().toLowerCase()==="active");
       if(!rows.length){
         examListStatus.className="status";
         examListStatus.textContent="এই মুহূর্তে কোনো চলমান পরীক্ষা নেই।";
@@ -40,9 +40,9 @@ async function loadExam(){
     examListPage.classList.add("hidden");
     startPage.classList.remove("hidden");
 
-    let r=await sb.from("exams").select("*").eq("id",id).eq("status","active").maybeSingle();
+    let r=await sb.from("exams").select("*").eq("id",id).maybeSingle();
     if(r.error)throw r.error;
-    if(!r.data)throw Error("কোনো সক্রিয় পরীক্ষা পাওয়া যায়নি।");
+    if(!r.data||String(r.data.status||"").trim().toLowerCase()!=="active")throw Error("এই পরীক্ষা বর্তমানে নিষ্ক্রিয়। পরীক্ষা ব্যবস্থাপনায় Active করুন।");
     exam=r.data;
 
     settings={duration_minutes:20,total_questions:0,total_marks:0,pass_mark:0,marks_per_question:1,negative_mark:0,show_answers:false,random_questions:false,random_options:false,show_result:true,show_rank:true,thank_you_message:"পরীক্ষায় অংশগ্রহণ করার জন্য ধন্যবাদ।",facebook_page_url:"https://www.facebook.com/facebookpathshala",facebook_group_url:"https://www.facebook.com/groups/facebookpathshala",question_display_mode:"all"};
