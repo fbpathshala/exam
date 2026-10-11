@@ -13,7 +13,7 @@
   .flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0 18px}
   .flow span{background:#eef2ff;border:1px solid #c7d2fe;border-radius:999px;padding:7px 11px;font-size:13px;font-weight:600}
   .flow i{font-style:normal;color:#94a3b8}
-  .manage-card{border:1px solid #e2e8f0;background:#fff}
+  .manage-card{border:1px solid #e2e8f0;background:#fff}\n  .category-select-wrap{max-width:460px;margin:0 0 16px}\n  .category-select-wrap label{display:block;margin-bottom:6px;font-weight:700}\n  .category-select-wrap select{width:100%;min-height:46px;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;background:#fff;font-size:15px}
   .manage-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
   .manage-box{border:1px solid #e2e8f0;border-radius:14px;padding:16px;background:#f8fafc}
   .manage-box h3{margin:0 0 5px;font-size:17px}
@@ -59,10 +59,13 @@
       <div><h2 style="margin-bottom:4px">১. ক্যাটাগরি, ফোল্ডার ও সেট ব্যবস্থাপনা</h2><p class="section-note">প্রথমে ক্যাটাগরি নির্বাচন করুন। এরপর ফোল্ডার তৈরি করে তার অধীনে প্রশ্ন সেট তৈরি ও পরিচালনা করুন।</p></div>
     </div>
     <div class="flow"><span>ক্যাটাগরি</span><i>→</i><span>ফোল্ডার</span><i>→</i><span>প্রশ্ন সেট</span></div>
-    <div class="cats">
-      <button id="cat-recruitment" onclick="selectCategory('recruitment')">নিয়োগ পরীক্ষা</button>
-      <button id="cat-verification_test" onclick="selectCategory('verification_test')">যাচাই পরীক্ষা</button>
-      <button id="cat-recent" onclick="selectCategory('recent')">সাম্প্রতিক প্রশ্ন</button>
+    <div class="category-select-wrap">
+      <label for="categorySelect">ক্যাটাগরি নির্বাচন করুন</label>
+      <select id="categorySelect" aria-label="ক্যাটাগরি নির্বাচন করুন">
+        <option value="recruitment">নিয়োগ পরীক্ষা</option>
+        <option value="verification_test">যাচাই পরীক্ষা</option>
+        <option value="recent">সাম্প্রতিক প্রশ্ন</option>
+      </select>
     </div>
     <div id="currentCat" class="notice"></div>
 
