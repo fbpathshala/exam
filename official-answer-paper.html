@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="bn">
 <head>
+<link rel="stylesheet" href="css/admin.css">
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>সঠিক উত্তরপত্র</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -23,7 +24,7 @@ body{margin:0;background:#eee;font-family:Arial,sans-serif;color:#172033}
 @media print{.toolbar,#status{display:none}.paper{margin:0;width:auto;min-height:0;box-shadow:none;padding:15mm}.questions{column-count:2;font-size:11pt}}
 </style>
 <style id="direct-dashboard-navigation">.direct-dashboard-nav{position:fixed;right:16px;bottom:16px;z-index:9999;display:inline-flex;align-items:center;gap:8px;padding:11px 16px;border-radius:999px;background:#1d4ed8;color:#fff!important;text-decoration:none!important;font:700 15px/1.2 Arial,sans-serif;box-shadow:0 5px 18px #0003;border:2px solid #fff}.direct-dashboard-nav:hover{background:#1e40af;transform:translateY(-1px)}@media print{.direct-dashboard-nav{display:none!important}}</style></head>
-<body>
+<body data-fp-theme="premium">
 <div class="toolbar"><button onclick="history.back()">← ফিরে যান</button><button onclick="downloadDocx()">📝 DOCX ডাউনলোড</button><button onclick="downloadPDF()">PDF ডাউনলোড</button><button onclick="window.print()">প্রিন্ট</button></div>
 <p id="status" style="text-align:center">সঠিক উত্তরপত্র লোড হচ্ছে…</p>
 <main class="paper"><header class="head"><h2 id="title">সঠিক উত্তরপত্র</h2><div class="meta"><span id="duration"></span><span id="total"></span><span id="marks"></span></div><p>সঠিক উত্তরে ✓ চিহ্নিত করা হয়েছে।</p></header><section id="questions" class="questions"></section></main>
