@@ -334,6 +334,8 @@
         <small>
           একটি ব্রাউজার/ডিভাইসকে একজন ইউনিক ভিজিটর হিসেবে গণনা করা হয়।
         </small>
+        <button type="button" id="refreshVisitorsBtn" class="btn btn-secondary" style="margin-top:8px;padding:6px 10px" onclick="refreshVisitorCount()">ভিজিটর সংখ্যা রিফ্রেশ</button>
+        <small id="visitorCountStatus" role="status" aria-live="polite"></small>
       </div>
 
     </div>
@@ -532,66 +534,47 @@
     $(id).textContent = bn(value || 0);
   }
 
+  /* Visitor count আলাদাভাবে লোড হবে, যাতে অন্য পরিসংখ্যানের ত্রুটিতে এটি আটকে না যায়। */
+  async function refreshVisitorCount(){
+    const button=$('refreshVisitorsBtn');
+    const note=$('visitorCountStatus');
+    if(button)button.disabled=true;
+    if(note)note.textContent='ভিজিটর সংখ্যা লোড হচ্ছে...';
+    try{
+      const {data,error}=await db.rpc('count_site_visitors');
+      if(error)throw error;
+      const count=Number(data);
+      if(!Number.isFinite(count)||count<0)throw new Error('ভিজিটর সংখ্যা সঠিকভাবে পাওয়া যায়নি।');
+      setNumber('sVisitors',count);
+      if(note)note.textContent='সর্বশেষ আপডেট: '+new Date().toLocaleTimeString('bn-BD');
+    }catch(error){
+      console.error('Visitor count load failed:',error);
+      if(note)note.textContent='ভিজিটর সংখ্যা লোড হয়নি: '+(error.message||'অজানা সমস্যা');
+    }finally{
+      if(button)button.disabled=false;
+    }
+  }
+
   /* Dashboard statistics */
   async function stats(){
-    const [
-      questions,
-      exams,
-      students,
-      visitors
-    ] = await Promise.all([
-
-      db.from('questions').select(
-        'id',
-        {count:'exact',head:true}
-      ),
-
-      db.from('exams').select(
-        'id',
-        {count:'exact',head:true}
-      ),
-
-      db.from('exam_attempts').select(
-        'id',
-        {count:'exact',head:true}
-      ),
-
-      db.rpc('count_site_visitors').then(
-        ({data,error}) => ({count:data,error})
-      )
-
+    const [questions,exams,students] = await Promise.all([
+      db.from('questions').select('id',{count:'exact',head:true}),
+      db.from('exams').select('id',{count:'exact',head:true}),
+      db.from('exam_attempts').select('id',{count:'exact',head:true})
     ]);
 
-    const data = [
-      questions,
-      exams,
-      students,
-      visitors
-    ];
-
-    data.forEach((item,index) => {
+    const data=[questions,exams,students];
+    data.forEach((item,index)=>{
       if(!item.error){
-        setNumber(
-          [
-            'sQuestions',
-            'sExams',
-            'sStudents',
-            'sVisitors'
-          ][index],
-          item.count
-        );
+        setNumber(['sQuestions','sExams','sStudents'][index],item.count);
       }
     });
 
-    const bad = data.find(x => x.error);
-
+    const bad=data.find(x=>x.error);
     if(bad){
-      $('status').innerHTML =
-        '<span class="error">' +
-        'ডেটা লোডে সমস্যা: ' +
-        bad.error.message +
-        '</span>';
+      $('status').innerHTML='<span class="error">ডেটা লোডে সমস্যা: '+bad.error.message+'</span>';
     }
+    await refreshVisitorCount();
   }
 
   /* শুরু */
