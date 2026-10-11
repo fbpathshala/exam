@@ -190,7 +190,34 @@ showResult();
  alert("ফলাফল সংরক্ষণ করতে সমস্যা হয়েছে: "+msg);
 }}
 
-function showResult(){examPage.classList.add("hidden");resultPage.classList.remove("hidden");resultExamTitle.textContent=exam.exam_name||"পরীক্ষার ফলাফল";resultMessage.textContent=settings.thank_you_message||"পরীক্ষায় অংশগ্রহণ করার জন্য ধন্যবাদ।";let d=resultData||{},show=settings.show_result!==false;score.classList.toggle("hidden",!show);document.querySelector("#resultPage .result-grid").classList.toggle("hidden",!show);score.textContent=bn(d.score||0)+" / "+bn(d.total_marks||0);marks.textContent=bn(d.score||0);percentage.textContent=bn(Math.round(d.percentage||0))+"%";rank.textContent=d.rank?bn(d.rank):"—";rankTotal.textContent=d.rank_total?bn(d.rank_total):"—";document.querySelectorAll("#resultPage .result-box")[2]?.classList.toggle("hidden",settings.show_rank===false);document.querySelectorAll("#resultPage .result-box")[3]?.classList.toggle("hidden",settings.show_rank===false);passStatus.textContent=d.pass_mark?((+d.score>=+d.pass_mark?"✅ উত্তীর্ণ":"❌ অনুত্তীর্ণ")+" — পাস নম্বর "+bn(d.pass_mark)):"";if(settings.show_answers===true&&Array.isArray(d.review))renderReview(d.review);socialHighlight.classList.remove("hidden");fbPageLink.href=settings.facebook_page_url||"https://www.facebook.com/facebookpathshala";fbGroupLink.href=settings.facebook_group_url||"https://www.facebook.com/groups/facebookpathshala"}
+function showResult(){
+  examPage.classList.add("hidden");
+  resultPage.classList.remove("hidden");
+  resultExamTitle.textContent=exam.exam_name||"পরীক্ষার ফলাফল";
+  resultMessage.textContent=settings.thank_you_message||"পরীক্ষায় অংশগ্রহণ করার জন্য ধন্যবাদ।";
+  const d=resultData||{};
+  const show=settings.show_result!==false;
+  score.classList.toggle("hidden",!show);
+  document.querySelector("#resultPage .result-grid").classList.toggle("hidden",!show);
+  score.textContent=bn(d.score||0)+" / "+bn(d.total_marks||0);
+  marks.textContent=bn(d.score||0);
+  percentage.textContent=bn(Math.round(d.percentage||0))+"%";
+  rank.textContent=d.rank?bn(d.rank):"—";
+  rankTotal.textContent=d.rank_total?bn(d.rank_total):"—";
+  document.querySelectorAll("#resultPage .result-box")[2]?.classList.toggle("hidden",settings.show_rank===false);
+  document.querySelectorAll("#resultPage .result-box")[3]?.classList.toggle("hidden",settings.show_rank===false);
+  passStatus.textContent=d.pass_mark?((+d.score>=+d.pass_mark?"✅ উত্তীর্ণ":"❌ অনুত্তীর্ণ")+" — পাস নম্বর "+bn(d.pass_mark)):"";
+  passStatus.classList.toggle("hidden",!show);
+  if(settings.show_answers===true&&Array.isArray(d.review)){
+    renderReview(d.review);
+  }else{
+    review.classList.add("hidden");
+    review.replaceChildren();
+  }
+  socialHighlight.classList.remove("hidden");
+  fbPageLink.href=settings.facebook_page_url||"https://www.facebook.com/facebookpathshala";
+  fbGroupLink.href=settings.facebook_group_url||"https://www.facebook.com/groups/facebookpathshala";
+}
 
 function renderReview(items){
   review.classList.remove("hidden");
