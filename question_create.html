@@ -13,6 +13,21 @@
   .flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0 18px}
   .flow span{background:#eef2ff;border:1px solid #c7d2fe;border-radius:999px;padding:7px 11px;font-size:13px;font-weight:600}
   .flow i{font-style:normal;color:#94a3b8}
+  .category-management-card{overflow:hidden;border:1px solid #dbe5f0;background:linear-gradient(145deg,#fff 0%,#f8fbff 100%)}
+  .category-hero{display:flex;align-items:center;gap:16px;padding:4px 0 18px}
+  .category-hero-icon{display:grid;place-items:center;flex:0 0 54px;height:54px;border-radius:16px;background:linear-gradient(145deg,#0f2747,#155e75);color:#fff;font-size:27px;box-shadow:0 7px 18px #0f274726}
+  .category-hero-copy{min-width:0}
+  .category-eyebrow{display:block;margin-bottom:5px;color:#0f766e;font-size:10px;font-weight:800;letter-spacing:1.6px}
+  .category-hero h2{margin:0 0 5px!important;color:#102a43;font-size:clamp(20px,2.4vw,26px);letter-spacing:-.4px}
+  .category-hero p{margin:0;color:#64748b;font-size:14px;line-height:1.6}
+  .category-workflow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 20px;padding:12px 14px;border:1px solid #e2eaf3;border-radius:13px;background:#f8fafc}
+  .workflow-step{display:flex;align-items:center;gap:8px;color:#334155;font-size:13px;font-weight:700}
+  .workflow-number{display:grid;place-items:center;width:27px;height:27px;border-radius:9px;background:#dff5f1;color:#0f766e;font-size:11px;font-weight:800}
+  .workflow-arrow{color:#94a3b8;font-size:24px;line-height:1}
+  .category-select-wrap{max-width:520px;margin:0 0 4px;padding:15px 16px 16px;border:1px solid #dbeafe;border-radius:14px;background:linear-gradient(135deg,#eff6ff,#f0fdfa)}
+  .category-select-wrap label{display:block;margin-bottom:8px;color:#1e3a5f;font-size:14px;font-weight:750}
+  .category-select-wrap select{width:100%;min-height:48px;border:1px solid #b8c9dc;border-radius:10px;padding:10px 12px;background:#fff;color:#0f2747;font-size:15px;font-weight:650;box-shadow:0 2px 5px #0f172a08}
+  .category-select-wrap select:focus{outline:3px solid #14b8a633;border-color:#0f766e}
   .manage-card{border:1px solid #e2e8f0;background:#fff}
   .category-select-wrap{max-width:460px;margin:0 0 16px}\n  .category-select-wrap label{display:block;margin-bottom:6px;font-weight:700}\n  .category-select-wrap select{width:100%;min-height:46px;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;background:#fff;font-size:15px}
   .manage-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
@@ -25,7 +40,7 @@
   .destination strong{display:block;margin-bottom:4px}
   .destination small{color:#475569}
   .inline-actions{display:flex;gap:8px;flex-wrap:wrap}
-  @media(max-width:760px){.manage-grid{grid-template-columns:1fr}.manage-actions{grid-template-columns:1fr 1fr}.flow{gap:5px}.flow span{padding:6px 9px}}
+  @media(max-width:760px){.category-hero{align-items:flex-start;gap:12px}.category-hero-icon{flex-basis:46px;height:46px;border-radius:14px}.category-workflow{gap:7px;padding:10px}.workflow-step{gap:5px;font-size:12px}.workflow-number{width:24px;height:24px}.category-select-wrap{max-width:none;padding:13px}.manage-grid{grid-template-columns:1fr}.manage-actions{grid-template-columns:1fr 1fr}.flow{gap:5px}.flow span{padding:6px 9px}}
 </style>
 <style id="direct-dashboard-navigation">.direct-dashboard-nav{position:fixed;right:16px;bottom:16px;z-index:9999;display:inline-flex;align-items:center;gap:8px;padding:11px 16px;border-radius:999px;background:#1d4ed8;color:#fff!important;text-decoration:none!important;font:700 15px/1.2 Arial,sans-serif;box-shadow:0 5px 18px #0003;border:2px solid #fff}.direct-dashboard-nav:hover{background:#1e40af;transform:translateY(-1px)}@media print{.direct-dashboard-nav{display:none!important}}</style></head>
 <body>
@@ -55,13 +70,24 @@
 </header>
 
 <main>
-  <div class="card">
-    <div class="section-head">
-      <div><h2 style="margin-bottom:4px">১. ক্যাটাগরি, ফোল্ডার ও সেট ব্যবস্থাপনা</h2><p class="section-note">প্রথমে ক্যাটাগরি নির্বাচন করুন। এরপর ফোল্ডার তৈরি করে তার অধীনে প্রশ্ন সেট তৈরি ও পরিচালনা করুন।</p></div>
+  <div class="card category-management-card">
+    <div class="category-hero">
+      <div class="category-hero-icon" aria-hidden="true">▦</div>
+      <div class="category-hero-copy">
+        <span class="category-eyebrow">QUESTION ORGANIZATION</span>
+        <h2>ক্যাটাগরি ও প্রশ্ন সেট</h2>
+        <p>ক্যাটাগরি বেছে নিন, ফোল্ডার সাজান, তারপর প্রশ্ন সেট পরিচালনা করুন।</p>
+      </div>
     </div>
-    <div class="flow"><span>ক্যাটাগরি</span><i>→</i><span>ফোল্ডার</span><i>→</i><span>প্রশ্ন সেট</span></div>
+    <div class="category-workflow" aria-label="ব্যবস্থাপনার ধাপ">
+      <div class="workflow-step"><span class="workflow-number">০১</span><span>ক্যাটাগরি</span></div>
+      <span class="workflow-arrow" aria-hidden="true">›</span>
+      <div class="workflow-step"><span class="workflow-number">০২</span><span>ফোল্ডার</span></div>
+      <span class="workflow-arrow" aria-hidden="true">›</span>
+      <div class="workflow-step"><span class="workflow-number">০৩</span><span>প্রশ্ন সেট</span></div>
+    </div>
     <div class="category-select-wrap">
-      <label for="categorySelect">ক্যাটাগরি নির্বাচন করুন</label>
+      <label for="categorySelect">আপনি কোন ক্যাটাগরিতে কাজ করবেন?</label>
       <select id="categorySelect" aria-label="ক্যাটাগরি নির্বাচন করুন">
         <option value="recruitment">নিয়োগ পরীক্ষা</option>
         <option value="verification_test">যাচাই পরীক্ষা</option>
