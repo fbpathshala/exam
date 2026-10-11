@@ -72,7 +72,7 @@ async function loadExam(){
     if(!r.data||String(r.data.status||"").trim().toLowerCase()!=="active")throw Error("এই পরীক্ষা বর্তমানে নিষ্ক্রিয়। পরীক্ষা ব্যবস্থাপনায় Active করুন।");
     exam=r.data;
 
-    settings={duration_minutes:20,total_questions:0,total_marks:0,pass_mark:0,marks_per_question:1,negative_mark:0,show_answers:false,random_questions:false,random_options:false,show_result:true,show_rank:true,thank_you_message:"পরীক্ষায় অংশগ্রহণ করার জন্য ধন্যবাদ।",facebook_page_url:"https://www.facebook.com/facebookpathshala",facebook_group_url:"https://www.facebook.com/groups/facebookpathshala",question_display_mode:"all"};
+    settings={duration_minutes:20,total_questions:0,total_marks:0,pass_mark:0,marks_per_question:1,negative_mark:0,show_answers:false,random_questions:false,random_options:false,show_result:true,show_rank:true,show_group_link:false,show_page_link:false,thank_you_message:"পরীক্ষায় অংশগ্রহণ করার জন্য ধন্যবাদ।",facebook_page_url:"https://www.facebook.com/facebookpathshala",facebook_group_url:"https://www.facebook.com/groups/facebookpathshala",question_display_mode:"all"};
     let s=await sb.from("exam_settings").select("*").eq("exam_id",exam.id).maybeSingle();
     settings={...settings,...(s.data||{})};
 
@@ -260,9 +260,13 @@ function showResult(){
     review.classList.add("hidden");
     review.replaceChildren();
   }
-  socialHighlight.classList.remove("hidden");
   fbPageLink.href=settings.facebook_page_url||"https://www.facebook.com/facebookpathshala";
   fbGroupLink.href=settings.facebook_group_url||"https://www.facebook.com/groups/facebookpathshala";
+  const showPageLink=settings.show_page_link===true;
+  const showGroupLink=settings.show_group_link===true;
+  fbPageLink.classList.toggle("hidden",!showPageLink);
+  fbGroupLink.classList.toggle("hidden",!showGroupLink);
+  socialHighlight.classList.toggle("hidden",!(showPageLink||showGroupLink));
 }
 
 function renderReview(items){
