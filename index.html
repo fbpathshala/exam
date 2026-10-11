@@ -91,8 +91,15 @@ async function loadExam(){
       .select("id,source_question_id,correct_answer,explanation")
       .eq("exam_id",exam.id);
     if(itemRows.error)throw itemRows.error;
-    const itemById=new Map((itemRows.data||[]).map(x=>[String(x.id),x]));
-    const sourceIds=[...new Set((itemRows.data||[]).map(x=>x.source_question_id).filter(x=>x!=null).map(String))];
+    /* Public question RPC returns questions.id (source question ID), not exam_question_items.id.
+       তাই snapshot fallback source_question_id দিয়ে মিলবে—ভুল করে দুই টেবিলের ID এক ধরে নয়। */
+    const itemsBySourceId=new Map();
+    (itemRows.data||[]).slice().sort((a,b)=>(a.question_order||0)-(b.question_order||0)).forEach(item=>{
+      if(item.source_question_id!=null&&!itemsBySourceId.has(String(item.source_question_id))){
+        itemsBySourceId.set(String(item.source_question_id),item);
+      }
+    });
+    const sourceIds=[...new Set((questions||[]).map(x=>x.id).filter(x=>x!=null).map(String))];
     let sourceRows=[];
     if(sourceIds.length){
       const sr=await sb.from("questions").select("id,correct_answer,explanation").in("id",sourceIds);
@@ -100,11 +107,11 @@ async function loadExam(){
     }
     const sourceById=new Map(sourceRows.map(x=>[String(x.id),x]));
     questions=questions.map(x=>{
-      const item=itemById.get(String(x.id));
-      const source=sourceById.get(String(item?.source_question_id||x.source_question_id||""));
+      const item=itemsBySourceId.get(String(x.id));
+      const source=sourceById.get(String(x.id));
       return {...x,
-        correct_answer:String(x.correct_answer||item?.correct_answer||source?.correct_answer||"").toUpperCase(),
-        explanation:x.explanation||item?.explanation||source?.explanation||""
+        correct_answer:String(x.correct_answer||source?.correct_answer||item?.correct_answer||"").trim().toUpperCase(),
+        explanation:x.explanation||source?.explanation||item?.explanation||""
       };
     });
 
