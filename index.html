@@ -88,7 +88,7 @@ async function loadExam(){
       questions array-তে বসানো হচ্ছে। এতে Result-এ সঠিক উত্তর আর ফাঁকা থাকবে না।
     */
     const itemRows=await sb.from("exam_question_items")
-      .select("id,source_question_id,correct_answer,explanation")
+      .select("id,source_question_id,question_order,correct_answer,explanation")
       .eq("exam_id",exam.id);
     if(itemRows.error)throw itemRows.error;
     /* Public question RPC returns questions.id (source question ID), not exam_question_items.id.
