@@ -72,7 +72,7 @@ async function loadExam(){
     if(!r.data||String(r.data.status||"").trim().toLowerCase()!=="active")throw Error("এই পরীক্ষা বর্তমানে নিষ্ক্রিয়। পরীক্ষা ব্যবস্থাপনায় Active করুন।");
     exam=r.data;
 
-    settings={duration_minutes:20,total_questions:0,total_marks:0,pass_mark:0,marks_per_question:1,negative_mark:0,show_answers:true,random_questions:false,random_options:false,show_result:true,show_rank:true,show_group_link:false,show_page_link:false,thank_you_message:"পরীক্ষায় অংশগ্রহণ করার জন্য ধন্যবাদ।",facebook_page_url:"https://www.facebook.com/facebookpathshala",facebook_group_url:"https://www.facebook.com/groups/facebookpathshala",question_display_mode:"all"};
+    settings={duration_minutes:20,total_questions:0,total_marks:0,pass_mark:0,marks_per_question:1,negative_mark:0,show_answers:true,show_answer_paper:true,random_questions:false,random_options:false,show_result:true,show_rank:true,show_group_link:false,show_page_link:false,thank_you_message:"পরীক্ষায় অংশগ্রহণ করার জন্য ধন্যবাদ।",facebook_page_url:"https://www.facebook.com/facebookpathshala",facebook_group_url:"https://www.facebook.com/groups/facebookpathshala",question_display_mode:"all"};
     let s=await sb.from("exam_settings").select("*").eq("exam_id",exam.id).maybeSingle();
     settings={...settings,...(s.data||{})};
 
@@ -254,8 +254,8 @@ function showResult(){
   document.querySelectorAll("#resultPage .result-box")[3]?.classList.toggle("hidden",settings.show_rank===false);
   passStatus.textContent=d.pass_mark?((+d.score>=+d.pass_mark?"✅ উত্তীর্ণ":"❌ অনুত্তীর্ণ")+" — পাস নম্বর "+bn(d.pass_mark)):"";
   passStatus.classList.toggle("hidden",!show);
-  if(settings.show_answers===true&&Array.isArray(d.review)){
-    renderReview(d.review);
+  if(settings.show_answer_paper!==false&&Array.isArray(d.review)){
+    renderReview(d.review,settings.show_answers===true);
   }else{
     review.classList.add("hidden");
     review.replaceChildren();
@@ -269,18 +269,18 @@ function showResult(){
   socialHighlight.classList.toggle("hidden",!(showPageLink||showGroupLink));
 }
 
-function renderReview(items){
+function renderReview(items,showCorrect=true){
   review.classList.remove("hidden");
-  review.innerHTML='<h3>📋 আপনার উত্তরপত্র ও সঠিক উত্তর</h3><p class="muted"><b>পরীক্ষার সময় আপনি যে প্রশ্নের ক্রম ও অপশন দেখেছিলেন, ঠিক সেই ক্রমেই উত্তরপত্র দেখানো হচ্ছে।</b></p>';
+  review.innerHTML='<h3>📋 আপনার উত্তরপত্র</h3><p class="muted"><b>পরীক্ষার সময় আপনি যে প্রশ্নের ক্রম ও অপশন দেখেছিলেন, ঠিক সেই ক্রমেই উত্তরপত্র দেখানো হচ্ছে।</b></p>';
   items.forEach((r,i)=>{
     let div=document.createElement("div");
     div.className="review-item "+(r.is_correct?"review-correct":"review-wrong");
     const optionHtml=r.options.map(o=>{
       const letter=letters[o.display_letter];
-      const classes=o.selected&&!o.correct?"paper-wrong":o.correct?"paper-right":"";
-      return `<div class="${classes}"><b>${letter}.</b> ${esc(o.text)}</div>`;
+      const classes=o.selected&&!o.correct?"paper-wrong":(showCorrect&&o.correct)?"paper-right":"";
+      return `<div class="${classes}"><b>${letter}.</b> ${esc(o.text)}${showCorrect&&o.correct?" ✓":""}</div>`;
     }).join("");
-    div.innerHTML=`<div><b>${bn(i+1)}. ${esc(r.question_text)}</b></div><div class="paper-opts">${optionHtml}</div><div style="margin-top:10px"><b>তোমার উত্তর:</b> ${r.selected_option?letters[(r.options.find(o=>o.original_letter===r.selected_option)||{}).display_letter]+". "+esc((r.options.find(o=>o.original_letter===r.selected_option)||{}).text||""):"দেওয়া হয়নি"}</div><div style="margin-top:5px"><b>সঠিক উত্তর:</b> ${r.correct_option?letters[(r.options.find(o=>o.original_letter===r.correct_option)||{}).display_letter]+". "+esc((r.options.find(o=>o.original_letter===r.correct_option)||{}).text||""):"—"}</div>${r.explanation?`<div style="margin-top:8px"><b>ব্যাখ্যা:</b> ${esc(r.explanation)}</div>`:""}`;
+    div.innerHTML=`<div><b>${bn(i+1)}. ${esc(r.question_text)}</b></div><div class="paper-opts">${optionHtml}</div><div style="margin-top:10px"><b>তোমার উত্তর:</b> ${r.selected_option?letters[(r.options.find(o=>o.original_letter===r.selected_option)||{}).display_letter]+". "+esc((r.options.find(o=>o.original_letter===r.selected_option)||{}).text||""):"দেওয়া হয়নি"}</div>${showCorrect?`<div style="margin-top:5px"><b>সঠিক উত্তর:</b> ${r.correct_option?letters[(r.options.find(o=>o.original_letter===r.correct_option)||{}).display_letter]+". "+esc((r.options.find(o=>o.original_letter===r.correct_option)||{}).text||""):"—"}</div>${r.explanation?`<div style="margin-top:8px"><b>ব্যাখ্যা:</b> ${esc(r.explanation)}</div>`:""}`:""}`;
     review.appendChild(div);
   });
 }
