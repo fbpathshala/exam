@@ -40,7 +40,6 @@ function fillCategorySelect(id, selected=cat) {
 
 function setCategoryUI() {
   if ($('categorySelect')) $('categorySelect').value = cat;
-  if ($('currentCat')) $('currentCat').textContent = 'নির্বাচিত ক্যাটাগরি: ' + CATS[cat];
   ['questionCategory'].forEach(id => { if ($(id)) $(id).value = cat; });
 }
 
