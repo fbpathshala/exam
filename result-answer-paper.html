@@ -43,6 +43,7 @@ async function init(){
    db.from('exam_questions').select('question_id,question_order').eq('exam_id',id).order('question_order',{ascending:true})
   ]);
   if(er.error)throw er.error;if(lr.error)throw lr.error;
+  const sr=await db.from('exam_settings').select('*').eq('exam_id',id).maybeSingle();if(sr.error)throw sr.error;settings=sr.data||{};
   const links=lr.data||[];if(!links.length)throw Error('এই পরীক্ষায় কোনো প্রশ্ন নেই।');
   const ids=links.map(x=>x.question_id);
   const qr=await db.from('questions').select('id,question_text,question,option_a,option_b,option_c,option_d,option1,option2,option3,option4,correct_answer,explanation').in('id',ids);
@@ -56,7 +57,9 @@ function qtext(q){return q.question_text||q.question||''}
 function opttext(q,k){return q['option_'+k.toLowerCase()]??q['option'+({A:1,B:2,C:3,D:4}[k])]??''}
 function render(){
  $('title').textContent=data.exam.exam_name+' — উত্তরপত্র';document.title=data.exam.exam_name+' — উত্তরপত্র';
- $('duration').textContent='সময়: '+bn(settings.duration_minutes??20)+' মিনিট';\n $('total').textContent='প্রশ্ন: '+bn(data.questions.length);\n $('marks').textContent='পূর্ণমান: '+bn(settings.total_marks??data.questions.length*Number(settings.marks_per_question??1));
+ $('duration').textContent='সময়: '+bn(settings.duration_minutes??20)+' মিনিট';
+ $('total').textContent='প্রশ্ন: '+bn(data.questions.length);
+ $('marks').textContent='পূর্ণমান: '+bn(settings.total_marks??data.questions.length*Number(settings.marks_per_question??1));
  $('questions').innerHTML=data.questions.map((q,i)=>{
   const c=correct(q);
   const opts=['A','B','C','D'].map(k=>'<div class="opt '+(c===k?'correct':'')+'">'+LET[k]+'. '+esc(opttext(q,k))+(c===k?' <b>✓</b>':'')+'</div>').join('');
