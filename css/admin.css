@@ -1,11 +1,11 @@
 /* Facebook Pathshala — shared admin theme
    Full replacement for css/admin.css. Keeps existing class names and feature logic intact. */
-:root{--fp-blue:#1769aa;--fp-blue-dark:#12558d;--fp-bg:#f3f6fb;--fp-text:#172033;--fp-muted:#64748b;--fp-border:#dbe3ee;--fp-card:#fff;--fp-soft:#edf4fb;--fp-radius:14px;--fp-shadow:0 4px 16px rgba(20,45,80,.07)}
+:root{--fp-blue:#142d4e;--fp-blue-dark:#0f2440;--fp-accent:#2563eb;--fp-teal:#14b8a6;--fp-bg:#f4f7fb;--fp-text:#18263a;--fp-muted:#64748b;--fp-border:#e1e8f0;--fp-card:#fff;--fp-soft:#edf4fb;--fp-radius:16px;--fp-shadow:0 8px 24px rgba(20,45,80,.07)}
 *{box-sizing:border-box}
 html{min-height:100%;background:var(--fp-bg)}
 body{margin:0!important;min-height:100vh;background:var(--fp-bg)!important;color:var(--fp-text)!important;font-family:Arial,"Noto Sans Bengali",sans-serif!important;line-height:1.5}
 body,button,input,select,textarea{font-family:Arial,"Noto Sans Bengali",sans-serif}
-header,.dashboard-top{background:var(--fp-blue)!important;color:#fff!important;padding:13px 18px!important;display:flex;gap:14px;align-items:center;position:sticky;top:0;z-index:20;box-shadow:0 3px 12px rgba(12,45,85,.13)}
+header,.dashboard-top{background:var(--fp-blue)!important;color:#fff!important;padding:14px 20px!important;display:flex;gap:14px;align-items:center;position:sticky;top:0;z-index:20;box-shadow:0 3px 12px rgba(12,45,85,.13)}
 header b,.dashboard-brand{font-size:18px;font-weight:800;color:inherit!important}
 header span{margin-left:auto;font-size:13px}
 .dashboard-wrap,.wrap{width:min(1100px,100%);max-width:1100px;margin:0 auto!important;padding:18px!important}
@@ -29,9 +29,9 @@ h1{font-size:clamp(21px,3vw,29px)}h2{font-size:clamp(19px,2.5vw,24px)}h3{font-si
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0}
 input,select,textarea,button{font:inherit;border-radius:9px}
 input,select,textarea{width:100%;padding:10px 12px;border:1px solid #cbd5e1;background:#fff;color:var(--fp-text);margin:5px 0;min-width:0}
-input:focus,select:focus,textarea:focus{outline:2px solid #1769aa30;border-color:var(--fp-blue)}
+input:focus,select:focus,textarea:focus{outline:2px solid #2563eb30;border-color:var(--fp-accent)}
 textarea{min-height:90px;resize:vertical}
-button{width:auto;max-width:100%;padding:10px 14px;border:1px solid transparent;background:var(--fp-blue);color:#fff;font-weight:700;cursor:pointer;margin:4px 3px 4px 0;transition:background .15s ease,transform .15s ease}
+button{width:auto;max-width:100%;padding:10px 14px;border:1px solid transparent;background:var(--fp-accent);color:#fff;font-weight:700;cursor:pointer;margin:4px 3px 4px 0;transition:background .15s ease,transform .15s ease}
 button:hover{background:var(--fp-blue-dark)}button:active{transform:translateY(1px)}
 button.secondary,.secondary{background:#64748b!important;color:#fff!important}
 button.danger,.danger{background:#b91c1c!important;color:#fff!important}
@@ -46,8 +46,20 @@ button.logout,.logout{background:#b91c1c!important;color:#fff!important}
 .small{font-size:12px}.muted{font-size:13px}.link{word-break:break-all;color:var(--fp-blue)}
 table{width:100%;border-collapse:collapse;background:#fff}th,td{padding:10px 12px;border-bottom:1px solid #e5eaf1;text-align:left;vertical-align:top}th{background:#edf4fb;color:#243b53;font-weight:800}tr:last-child td{border-bottom:0}.tableWrap,.table-wrap,.scroll{width:100%;overflow:auto;border:1px solid var(--fp-border);border-radius:10px;background:#fff}
 .center{min-height:100vh;display:grid;place-items:center;padding:16px}.login{width:min(420px,92vw);margin:auto}.login button{width:100%}
-.smart-date{background:linear-gradient(135deg,#1769aa,#124d83)!important;color:#fff!important;border-radius:var(--fp-radius);padding:20px!important;box-shadow:var(--fp-shadow);margin:12px 0 16px}.smart-date *{color:inherit}.smart-pill{display:inline-block;padding:5px 9px;margin:3px;border-radius:999px;background:#ffffff20}.smart-clock{font-size:clamp(25px,5vw,38px);font-weight:800;letter-spacing:1px}
+.smart-date{background:linear-gradient(135deg,#142d4e 0%,#1b4169 72%,#0f766e 140%)!important;color:#fff!important;border-radius:var(--fp-radius);padding:20px!important;box-shadow:var(--fp-shadow);margin:12px 0 16px}.smart-date *{color:inherit}.smart-pill{display:inline-block;padding:5px 9px;margin:3px;border-radius:999px;background:#ffffff20}.smart-clock{font-size:clamp(25px,5vw,38px);font-weight:800;letter-spacing:1px}
 .dashboard-stat .icon{font-size:23px;margin-bottom:8px}
 @media(max-width:850px){.dashboard-cards,.cards,.statgrid,.statGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.dashboard-wrap,.wrap{padding:12px!important}.dashboard-top{margin:0 -12px 14px!important;width:calc(100% + 24px)}}
 @media(max-width:600px){.grid,.dashboard-cards,.cards,.statgrid,.statGrid{grid-template-columns:1fr}.dashboard-top,header{padding:11px 12px!important}.dashboard-brand,header b{font-size:16px}.tabs,.cats{display:grid;grid-template-columns:1fr}.tabs button,.cats button{width:100%}.card{padding:13px!important}.smart-date{padding:15px!important}th,td{padding:8px;font-size:13px}.admin-menu-panel{right:0}}
 @media print{body{background:#fff!important}.dashboard-top,header,nav,.admin-menu,.noPrint{display:none!important}.card,.dashboard-stat,.stat{box-shadow:none!important}}
+
+/* Premium unified palette refinements */
+.card,.dashboard-stat,.stat,.examrow,.q{transition:box-shadow .18s ease,border-color .18s ease}
+.card:hover,.dashboard-stat:hover{border-color:#c9d8ea!important;box-shadow:0 12px 28px rgba(20,45,78,.09)!important}
+.dashboard-stat .icon{display:inline-grid;place-items:center;width:44px;height:44px;border-radius:13px;background:#eaf2ff;color:#2563eb}
+.dashboard-stat:nth-child(2) .icon{background:#e6faf6;color:#0f9488}.dashboard-stat:nth-child(3) .icon{background:#fff5df;color:#b7791f}.dashboard-stat:nth-child(4) .icon{background:#f0eaff;color:#7652b5}
+.dashboard-stat b,.stat b{color:#142d4e!important}
+input:focus,select:focus,textarea:focus{outline:3px solid #2563eb20;border-color:#2563eb}
+button{border-radius:10px;box-shadow:0 2px 4px rgba(20,45,78,.06)}
+button.secondary,.secondary{background:#e8eef6!important;color:#243b53!important;border-color:#d8e2ee!important}
+.notice,.hint{background:#eef6ff;color:#174a82;border-color:#d8e8fb}
+@media(max-width:600px){.direct-dashboard-nav{right:12px!important;bottom:12px!important}}
