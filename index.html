@@ -9,6 +9,7 @@ function eid(){let x=new URLSearchParams(location.search).get("exam");return x&&
 function status(t,c="status"){let e=document.getElementById("startStatus");e.className=c;e.textContent=t}
 function dhaka(){return new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Dhaka"}).format(new Date())}
 function device(){let k="mcq_exam_device_token_v1",t=localStorage.getItem(k);if(!t){t=crypto.randomUUID?crypto.randomUUID():"d-"+Date.now();localStorage.setItem(k,t)}return t}
+async function registerSiteVisitor(){try{const keyName="fbpathshala_site_visitor_key_v1";let key=localStorage.getItem(keyName);if(!key){key=crypto.randomUUID?crypto.randomUUID():"visitor-"+Date.now()+"-"+Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2);localStorage.setItem(keyName,key)}const r=await sb.rpc("register_site_visitor",{p_visitor_key:key});if(r.error)console.warn("Visitor registration failed:",r.error.message)}catch(e){console.warn("Visitor registration unavailable:",e)}}
 function fmtDate(v){if(!v)return"নির্ধারিত নেই";let[y,m,d]=String(v).slice(0,10).split("-");return bn(d)+"/"+bn(m)+"/"+bn(y)}
 function fmtTime(v){if(!v)return"—";let[h,m]=String(v).slice(0,5).split(":").map(Number);return bn((h%12)||12)+":"+bn(String(m).padStart(2,"0"))+" "+(h<12?"AM":"PM")}
 function fmtRange(a,b){return a||b?(a?fmtTime(a):"শুরু নির্ধারিত নেই")+" → "+(b?fmtTime(b):"শেষ সময় নেই"):"নির্ধারিত নেই"}
@@ -248,5 +249,6 @@ function renderReview(items){
     review.appendChild(div);
   });
 }
+registerSiteVisitor();
 loadExam();
 </script></body></html>
