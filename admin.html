@@ -463,6 +463,26 @@ table td{color:#243b53}
       <label><input id="randomO" type="checkbox"> Random Options</label>
     </div>
 
+    <h3>ফলাফল ও উত্তরপত্র সেটিংস</h3>
+    <div class="checks">
+      <label><input id="showResult" type="checkbox" checked> জমার পর নম্বর ও ফলাফল দেখাবে</label>
+      <label><input id="showRank" type="checkbox" checked> মেধাক্রম দেখাবে</label>
+      <label><input id="showAnswerPaper" type="checkbox" checked> উত্তরপত্র দেখাবে</label>
+      <label><input id="showGroupLink" type="checkbox"> Facebook Group লিংক দেখাবে</label>
+      <label><input id="showPageLink" type="checkbox"> Facebook Page লিংক দেখাবে</label>
+    </div>
+    <label for="thankYouMessage">পরীক্ষা শেষে বার্তা</label>
+    <textarea id="thankYouMessage" placeholder="পরীক্ষায় অংশগ্রহণ করার জন্য ধন্যবাদ।"></textarea>
+    <div class="grid">
+      <div><label for="facebookPageUrl">Facebook Page URL</label><input id="facebookPageUrl" type="url" placeholder="https://www.facebook.com/..."></div>
+      <div><label for="facebookGroupUrl">Facebook Group URL</label><input id="facebookGroupUrl" type="url" placeholder="https://www.facebook.com/groups/..."></div>
+    </div>
+    <label for="questionDisplayMode">প্রশ্ন দেখানোর ধরন</label>
+    <select id="questionDisplayMode">
+      <option value="all">সব প্রশ্ন একসঙ্গে</option>
+      <option value="single">একবারে একটি প্রশ্ন</option>
+    </select>
+
     <div class="grid">
       <input id="startDate" type="date">
       <input id="startTime" type="time">
