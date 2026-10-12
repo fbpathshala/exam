@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin তালিকা — ফেইসবুক পাঠশালা</title>
+<link rel="stylesheet" href="css/admin.css?v=20261012-contrast1">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js?v=20261012-shared-auth2"></script>
+<style>
+body{background:#f4f7fb;color:#102a43}main{max-width:1000px;margin:24px auto;padding:16px}.card{background:#fff;border-radius:16px;padding:22px;box-shadow:0 8px 28px #102a4312;overflow-x:auto}h1{margin-top:0;font-size:24px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}a.button,button{display:inline-block;border:0;border-radius:9px;padding:11px 15px;background:#075985;color:#fff;font-weight:700;text-decoration:none;cursor:pointer}.muted{color:#486581;line-height:1.6}#msg{white-space:pre-wrap;line-height:1.6;margin-top:14px}.error{color:#b42318}.success{color:#067647}table{width:100%;border-collapse:collapse;min-width:720px}th,td{text-align:left;padding:11px;border-bottom:1px solid #e5e7eb;vertical-align:top}th{background:#f1f5f9}td{color:#243b53}.role{font-weight:700}.yes{color:#067647;font-weight:700}.no{color:#64748b}@media(max-width:600px){main{padding:10px}.card{padding:14px}h1{font-size:21px}}
+</style>
+</head>
+<body>
+<main><div class="card">
+<div class="actions"><a class="button" href="admin.html#dashboard">← মূল Admin Dashboard</a><a class="button" href="admin-users.html">＋ নতুন Admin যোগ</a><button id="refresh">তালিকা Refresh</button></div>
+<h1>👥 Admin তালিকা</h1>
+<p class="muted">এই তালিকায় Super Admin এবং অনুমতি-রেকর্ড থাকা Admin অ্যাকাউন্টগুলো দেখানো হবে। নিরাপত্তার জন্য তালিকাটি শুধু Super Admin দেখতে পারবেন।</p>
+<div id="msg" role="status" aria-live="polite">Admin তালিকা লোড হচ্ছে…</div>
+<div id="tableWrap"></div>
+</div></main>
+<script>
+const msg=document.getElementById("msg");
+const wrap=document.getElementById("tableWrap");
+const bn=n=>String(n??"").replace(/\d/g,d=>"০১২৩৪৫৬৭৮৯"[d]);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function permission(v){return v?'<span class="yes">হ্যাঁ</span>':'<span class="no">না</span>'}
+async function loadAdmins(){
+  msg.className="";msg.textContent="Admin তালিকা লোড হচ্ছে…";wrap.innerHTML="";
+  try{
+    const {data:sessionData,error:sessionError}=await db.auth.getSession();
+    if(sessionError||!sessionData.session){msg.className="error";msg.textContent="আগে Admin Panel-এ লগইন করুন।";return;}
+    if((sessionData.session.user.email||"").toLowerCase()!=="engbayzidmostofa@gmail.com"){msg.className="error";msg.textContent="শুধু Super Admin এই তালিকা দেখতে পারবেন।";return;}
+    const {data,error}=await db.functions.invoke("list-admin-users",{body:{}});
+    if(error){
+      let detail=error.message||"তালিকা লোড করা যায়নি।";
+      try{if(error.context&&typeof error.context.json==="function"){const body=await error.context.json();if(body?.error)detail=body.error;}}catch(_){}
+      throw new Error(detail);
+    }
+    if(!data?.success)throw new Error(data?.error||"Admin তালিকা পাওয়া যায়নি।");
+    const admins=data.admins||[];
+    if(!admins.length){msg.textContent="এখনো কোনো Admin পাওয়া যায়নি।";return;}
+    wrap.innerHTML='<table><thead><tr><th>নাম</th><th>ইমেইল</th><th>Role</th><th>প্রশ্ন ব্যাংক</th><th>পরীক্ষা</th><th>ফলাফল</th><th>Admin অনুমতি</th></tr></thead><tbody>'+
+      admins.map(a=>'<tr><td>'+esc(a.full_name||"নাম দেওয়া নেই")+'</td><td>'+esc(a.email)+'</td><td class="role">'+(a.role_name==="super_admin"?"Super Admin":"Admin")+'</td><td>'+permission(a.can_manage_questions)+'</td><td>'+permission(a.can_manage_exams)+'</td><td>'+permission(a.can_review_results)+'</td><td>'+permission(a.can_manage_users)+'</td></tr>').join("")+
+      '</tbody></table>';
+    msg.className="success";msg.textContent="মোট "+bn(admins.length)+" জন Admin পাওয়া গেছে।";
+  }catch(e){msg.className="error";msg.textContent=e.message||"Admin তালিকা লোড করা যায়নি।";}
+}
+document.getElementById("refresh").addEventListener("click",loadAdmins);
+loadAdmins();
+</script>
+</body>
+</html>
