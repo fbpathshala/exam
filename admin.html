@@ -157,6 +157,15 @@
   grid-template-columns:repeat(4,minmax(0,1fr));
   gap:14px
 }
+.feature-dashboard-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:14px 0 22px}
+.feature-dashboard-card{display:flex;flex-direction:column;align-items:flex-start;gap:9px;width:100%;min-height:160px;padding:20px;margin:0;text-align:left;white-space:normal;color:#102a43!important;background:#fff!important;border:1px solid #dbe5ef!important;border-radius:18px;box-shadow:0 8px 22px rgba(15,23,42,.07);transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}
+.feature-dashboard-card:hover{transform:translateY(-2px);border-color:#93b4d5!important;box-shadow:0 12px 28px rgba(15,23,42,.12)}
+.feature-dashboard-card .feature-picture{display:grid;place-items:center;width:54px;height:54px;border-radius:15px;background:#eaf2ff;font-size:30px}
+.feature-dashboard-card strong{font-size:17px;color:#102a43!important}
+.feature-dashboard-card small{font-size:12px;line-height:1.5;color:#52677d!important}
+.exam-feature-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:800px){.feature-dashboard-grid,.exam-feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.feature-dashboard-grid,.exam-feature-grid{grid-template-columns:1fr}.feature-dashboard-card{min-height:130px;padding:16px}}
 
 .dashboard-stat{
   position:relative;
@@ -273,10 +282,8 @@ table td{color:#243b53}
     <button type="button" class="admin-menu-btn" id="adminMenuBtn" aria-label="মেনু">⋮</button>
     <div class="admin-menu-panel hidden" id="adminMenuPanel">
       <button type="button" onclick="showPage('dashboard');closeAdminMenu()">🏠 ড্যাশবোর্ড</button>
-      <button type="button" onclick="showPage('bank');closeAdminMenu()">🗂️ প্রশ্ন ব্যাংক</button>
-      <button type="button" onclick="showPage('exam');closeAdminMenu()">📋 পরীক্ষা পরিচালনা</button>
+      <button type="button" onclick="showPage('exam-system');closeAdminMenu()">📋 এক্সাম সিস্টেম</button>
       <button type="button" onclick="showPage('materials');closeAdminMenu()">📚 স্টাডি ম্যাটেরিয়াল</button>
-      <button type="button" onclick="location.href='results.html'">📊 ফলাফল পর্যালোচনা</button>
       <button type="button" class="logout" onclick="logout()">🚪 লগ আউট</button>
     </div>
   </div>
@@ -317,6 +324,43 @@ table td{color:#243b53}
       <b id="sVisitors">—</b>
       <span>মোট ভিজিটর</span>
       <small>Visitor tracking এখনো যুক্ত করা হয়নি</small>
+    </div>
+  </div>
+
+  <h2 style="margin:22px 0 12px">প্রধান ফিচারসমূহ</h2>
+  <div class="feature-dashboard-grid">
+    <button type="button" class="feature-dashboard-card" onclick="showPage('exam-system')">
+      <span class="feature-picture">📋</span><strong>এক্সাম সিস্টেম</strong><small>প্রশ্ন ব্যাংক, পরীক্ষা, সেটিংস ও ফলাফল</small>
+    </button>
+    <button type="button" class="feature-dashboard-card" onclick="showPage('materials')">
+      <span class="feature-picture">📚</span><strong>স্টাডি ম্যাটেরিয়াল</strong><small>PDF, ছবি ও লেখাভিত্তিক নোট</small>
+    </button>
+  </div>
+</section>
+
+<section id="exam-system" class="page hidden">
+  <div class="card">
+    <h2>📋 এক্সাম সিস্টেম</h2>
+    <p>পরীক্ষা ব্যবস্থাপনার জন্য প্রয়োজনীয় একটি সেকশন নির্বাচন করুন।</p>
+    <div class="feature-dashboard-grid exam-feature-grid">
+      <button type="button" class="feature-dashboard-card" onclick="showPage('bank')">
+        <span class="feature-picture">🗂️</span><strong>প্রশ্ন ব্যাংক</strong><small>প্রশ্ন, ক্যাটাগরি, ফোল্ডার ও সেট পরিচালনা</small>
+      </button>
+      <button type="button" class="feature-dashboard-card" onclick="openExamSection('examCreateCard')">
+        <span class="feature-picture">📝</span><strong>পরীক্ষা তৈরি ও পরিচালনা</strong><small>নতুন পরীক্ষা তৈরি এবং পরীক্ষার তালিকা</small>
+      </button>
+      <button type="button" class="feature-dashboard-card" onclick="openExamSection('examSettingsCard')">
+        <span class="feature-picture">⚙️</span><strong>পরীক্ষার সেটিংস</strong><small>সময়, নম্বর, সিলেবাস ও পরীক্ষার নিয়ম</small>
+      </button>
+      <button type="button" class="feature-dashboard-card" onclick="openExamSection('examMappingCard')">
+        <span class="feature-picture">🧩</span><strong>প্রশ্ন যুক্ত করা</strong><small>Question Bank থেকে পরীক্ষায় প্রশ্ন নির্বাচন</small>
+      </button>
+      <button type="button" class="feature-dashboard-card" onclick="location.href='results.html'">
+        <span class="feature-picture">📊</span><strong>ফলাফল পর্যালোচনা</strong><small>শিক্ষার্থীদের পরীক্ষার ফলাফল</small>
+      </button>
+    </div>
+    <div class="bank-actions">
+      <button type="button" class="secondary" onclick="showPage('dashboard')">← ড্যাশবোর্ডে ফিরুন</button>
     </div>
   </div>
 </section>
@@ -437,8 +481,8 @@ table td{color:#243b53}
 </section>
 <section id="exam" class="page hidden">
 
-  <div class="card">
-    <h2>Exam Management</h2>
+  <div class="card" id="examCreateCard">
+    <h2>পরীক্ষা তৈরি ও পরিচালনা</h2>
 
     <div class="grid">
       <input id="examName" placeholder="পরীক্ষার নাম">
@@ -452,8 +496,8 @@ table td{color:#243b53}
     <p id="examMsg" class="msg"></p>
   </div>
 
-  <div class="card">
-    <h2>Exam Settings</h2>
+  <div class="card" id="examSettingsCard">
+    <h2>পরীক্ষার সেটিংস</h2>
 
     <select id="examSelect" onchange="loadSettings()"></select>
 
@@ -497,8 +541,8 @@ table td{color:#243b53}
     <p id="settingsMsg" class="msg"></p>
   </div>
 
-  <div class="card">
-    <h2>Exam-এ Question Bank থেকে প্রশ্ন নিন</h2>
+  <div class="card" id="examMappingCard">
+    <h2>Question Bank থেকে পরীক্ষায় প্রশ্ন যুক্ত করুন</h2>
 
     <select id="mapExam"></select>
 
@@ -512,8 +556,8 @@ table td{color:#243b53}
     <p id="mapMsg" class="msg"></p>
   </div>
 
-  <div class="card">
-    <h2>Exam List / Link</h2>
+  <div class="card" id="examListCard">
+    <h2>পরীক্ষার তালিকা ও লিংক</h2>
 
     <a href="results.html" target="_blank" class="result-link">
       📊 Result দেখুন
@@ -880,6 +924,16 @@ table td{color:#243b53}
 
 <!-- Exam card menu script: must load after existing admin scripts -->
 <script src="js/exam-card-menu.js"></script>
+
+<script id="feature-dashboard-navigation">
+window.openExamSection=function(targetId){
+  if(typeof window.showPage==='function') window.showPage('exam');
+  window.setTimeout(function(){
+    const target=document.getElementById(targetId);
+    if(target) target.scrollIntoView({behavior:'smooth',block:'start'});
+  },80);
+};
+</script>
 
 <script id="study-material-admin">
 (function(){
