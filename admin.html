@@ -253,6 +253,7 @@ table td{color:#243b53}
       <button type="button" onclick="showPage('bank');closeAdminMenu()">🗂️ প্রশ্ন ব্যাংক</button>
       <button type="button" onclick="showPage('exam');closeAdminMenu()">📋 পরীক্ষা পরিচালনা</button>
       <button type="button" onclick="location.href='results.html'">📊 ফলাফল পর্যালোচনা</button>
+      <button type="button" id="permissionMenuButton" class="hidden" onclick="showPage('permissions');closeAdminMenu()">🔐 Admin অনুমতি</button>
       <button type="button" class="logout" onclick="logout()">🚪 লগ আউট</button>
     </div>
   </div>
@@ -498,6 +499,22 @@ table td{color:#243b53}
     <div id="exams"></div>
   </div>
 
+</section>
+
+
+<section id="permissions" class="page hidden">
+  <div class="card">
+    <h2>🔐 Admin Role ও Permission</h2>
+    <p>এখান থেকে ছোট ভাইয়ের অ্যাক্সেস বাড়ানো বা কমানো যাবে। নতুন Admin যোগ করার ব্যবস্থা নেই।</p>
+    <p id="permissionAccount" class="notice">অনুমতি যাচাই হচ্ছে...</p>
+    <div id="permissionEditor" class="hidden">
+      <label><input type="checkbox" id="permQuestions"> প্রশ্ন ও প্রশ্নব্যাংক পরিচালনা</label><br>
+      <label><input type="checkbox" id="permExams"> পরীক্ষা তৈরি ও পরিচালনা</label><br>
+      <label><input type="checkbox" id="permResults"> ফলাফল পর্যালোচনা</label><br>
+      <button type="button" onclick="saveAdminPermissions()">অনুমতি সংরক্ষণ করুন</button>
+      <p id="permissionMsg" class="msg"></p>
+    </div>
+  </div>
 </section>
 
 </main>
