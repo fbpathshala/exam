@@ -267,10 +267,12 @@ function showResult(){
   fbPageLink.href=settings.facebook_page_url||"https://www.facebook.com/facebookpathshala";
   fbGroupLink.href=settings.facebook_group_url||"https://www.facebook.com/groups/facebookpathshala";
   const showPageLink=settings.show_page_link===true;
-  const showGroupLink=settings.show_group_link!==false;
+  /* ধন্যবাদ বার্তা ও Facebook গ্রুপ লিংক সব পরীক্ষার ফলাফলে সবসময় দেখাবে।
+     এটি শুধু ফলাফল পেজের প্রদর্শন বদলায়; Supabase-এর ফলাফল/শিক্ষার্থী রেকর্ডে কোনো পরিবর্তন করে না। */
+  const showGroupLink=true;
   fbPageLink.classList.toggle("hidden",!showPageLink);
   fbGroupLink.classList.toggle("hidden",!showGroupLink);
-  socialHighlight.classList.toggle("hidden",!(showPageLink||showGroupLink));
+  socialHighlight.classList.remove("hidden");
 }
 
 function renderReview(items,showCorrect=true){
