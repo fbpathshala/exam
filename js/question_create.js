@@ -65,7 +65,7 @@ async function init() {
     fillCategorySelect('questionCategory');
     $('categorySelect')?.addEventListener('change', e => selectCategory(e.target.value));
     await loadSubjects();
-    fillCategorySelect('importCategory', 'verification_test');
+    fillCategorySelect('importCategory');
     setCategoryUI();
     await loadFolders();
     await loadImportFolders();
@@ -133,10 +133,16 @@ async function loadSets(preferredSetId=null) {
 }
 
 async function loadImportFolders(preferredFolderId=null) {
-  const categoryKey = $('importCategory')?.value || cat;
+  const categoryKey = $('importCategory')?.value || '';
   const categoryLabel = CATS[categoryKey];
   const el = $('importFolder');
   if (!el) return;
+  if (!categoryKey || !categoryLabel) {
+    el.innerHTML = '<option value="">আগে ক্যাটাগরি নির্বাচন করুন</option>';
+    const setEl = $('importSet');
+    if (setEl) setEl.innerHTML = '<option value="">Set নির্বাচন করুন</option>';
+    return;
+  }
   try {
     const {data,error} = await client().from('question_bank_folders').select('id,folder_name').eq('sub_category', categoryLabel).order('folder_name');
     if (error) throw error;
@@ -311,7 +317,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   $('manageSet')?.addEventListener('change',()=>{if($('questionSet'))$('questionSet').value=$('manageSet').value;});
   $('questionSet')?.addEventListener('change',()=>{if($('manageSet'))$('manageSet').value=$('questionSet').value;});
   $('questionCategory')?.addEventListener('change',e=>selectCategory(e.target.value));
-  fillCategorySelect('importCategory', cat);
+  fillCategorySelect('importCategory');
   $('importCategory')?.addEventListener('change',e=>loadImportFolders());
   $('importFolder')?.addEventListener('change',()=>loadImportSets());
   init();
