@@ -2192,7 +2192,7 @@ async function loadExams() {
 
           const url =
             new URL(
-              '../index.html',
+              'index.html',
               location.href
             ).href +
             '?exam=' +
@@ -2278,7 +2278,7 @@ async function copyLink(id) {
 
   const base =
     new URL(
-      '../index.html',
+      'index.html',
       location.href
     ).href +
     '?exam=' +
