@@ -283,6 +283,9 @@ table td{color:#243b53}
     <div class="admin-menu-panel hidden" id="adminMenuPanel">
       <button type="button" onclick="showPage('dashboard');closeAdminMenu()">🏠 ড্যাশবোর্ড</button>
       <button type="button" onclick="showPage('exam-system');closeAdminMenu()">📋 এক্সাম সিস্টেম</button>
+      <button type="button" onclick="showPage('bank');closeAdminMenu()">🗂️ প্রশ্ন ব্যাংক</button>
+      <button type="button" onclick="showPage('exam');closeAdminMenu()">📝 পরীক্ষা পরিচালনা</button>
+      <button type="button" onclick="location.href='results.html'">📊 ফলাফল পর্যালোচনা</button>
       <button type="button" onclick="showPage('materials');closeAdminMenu()">📚 স্টাডি ম্যাটেরিয়াল</button>
       <button type="button" class="logout" onclick="logout()">🚪 লগ আউট</button>
     </div>
@@ -330,7 +333,16 @@ table td{color:#243b53}
   <h2 style="margin:22px 0 12px">প্রধান ফিচারসমূহ</h2>
   <div class="feature-dashboard-grid">
     <button type="button" class="feature-dashboard-card" onclick="showPage('exam-system')">
-      <span class="feature-picture">📋</span><strong>এক্সাম সিস্টেম</strong><small>প্রশ্ন ব্যাংক, পরীক্ষা, সেটিংস ও ফলাফল</small>
+      <span class="feature-picture">📋</span><strong>এক্সাম সিস্টেম</strong><small>পরীক্ষা ব্যবস্থাপনার সব সেকশন এক জায়গায়</small>
+    </button>
+    <button type="button" class="feature-dashboard-card" onclick="showPage('bank')">
+      <span class="feature-picture">🗂️</span><strong>প্রশ্ন ব্যাংক</strong><small>ক্যাটাগরি, ফোল্ডার ও প্রশ্নের সেট</small>
+    </button>
+    <button type="button" class="feature-dashboard-card" onclick="showPage('exam')">
+      <span class="feature-picture">📝</span><strong>পরীক্ষা পরিচালনা</strong><small>পরীক্ষা তৈরি, সেটিংস ও প্রশ্ন যুক্ত করা</small>
+    </button>
+    <button type="button" class="feature-dashboard-card" onclick="location.href='results.html'">
+      <span class="feature-picture">📊</span><strong>ফলাফল পর্যালোচনা</strong><small>পরীক্ষার ফলাফল ও শিক্ষার্থীদের তথ্য</small>
     </button>
     <button type="button" class="feature-dashboard-card" onclick="showPage('materials')">
       <span class="feature-picture">📚</span><strong>স্টাডি ম্যাটেরিয়াল</strong><small>PDF, ছবি ও লেখাভিত্তিক নোট</small>
