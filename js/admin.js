@@ -2403,6 +2403,42 @@ async function loadSettings() {
     $('showAnswers').checked =
       !!s.show_answers;
 
+  if ($('showResult'))
+    $('showResult').checked =
+      s.show_result !== false;
+
+  if ($('showRank'))
+    $('showRank').checked =
+      s.show_rank !== false;
+
+  if ($('showAnswerPaper'))
+    $('showAnswerPaper').checked =
+      s.show_answer_paper !== false;
+
+  if ($('showGroupLink'))
+    $('showGroupLink').checked =
+      !!s.show_group_link;
+
+  if ($('showPageLink'))
+    $('showPageLink').checked =
+      !!s.show_page_link;
+
+  if ($('thankYouMessage'))
+    $('thankYouMessage').value =
+      s.thank_you_message ?? 'পরীক্ষায় অংশগ্রহণ করার জন্য ধন্যবাদ।';
+
+  if ($('facebookPageUrl'))
+    $('facebookPageUrl').value =
+      s.facebook_page_url ?? '';
+
+  if ($('facebookGroupUrl'))
+    $('facebookGroupUrl').value =
+      s.facebook_group_url ?? '';
+
+  if ($('questionDisplayMode'))
+    $('questionDisplayMode').value =
+      s.question_display_mode === 'single' ? 'single' : 'all';
+
   if ($('multiple'))
     $('multiple').checked =
       !!s.multiple_attempts;
@@ -2497,6 +2533,38 @@ async function saveSettings() {
     show_answers:
       $('showAnswers')?.checked ||
       false,
+
+    show_result:
+      $('showResult')?.checked !== false,
+
+    show_rank:
+      $('showRank')?.checked !== false,
+
+    show_answer_paper:
+      $('showAnswerPaper')?.checked !== false,
+
+    show_group_link:
+      $('showGroupLink')?.checked ||
+      false,
+
+    show_page_link:
+      $('showPageLink')?.checked ||
+      false,
+
+    thank_you_message:
+      $('thankYouMessage')?.value.trim() ||
+      'পরীক্ষায় অংশগ্রহণ করার জন্য ধন্যবাদ।',
+
+    facebook_page_url:
+      $('facebookPageUrl')?.value.trim() ||
+      null,
+
+    facebook_group_url:
+      $('facebookGroupUrl')?.value.trim() ||
+      null,
+
+    question_display_mode:
+      $('questionDisplayMode')?.value === 'single' ? 'single' : 'all',
 
     multiple_attempts:
       $('multiple')?.checked ||
