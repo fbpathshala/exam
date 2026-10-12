@@ -37,7 +37,9 @@
   align-items:center;
   justify-content:space-between;
   gap:12px;
-  margin-bottom:16px
+  /* This header is outside the padded main container: prevent overflow */
+  width:100%!important;
+  margin:0 0 16px!important;
 }
 
 .dashboard-brand h1{
