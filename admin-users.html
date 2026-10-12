@@ -3,61 +3,116 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin User যোগ — ফেইসবুক পাঠশালা</title>
+<title>নতুন Admin তৈরি — ফেইসবুক পাঠশালা</title>
 <link rel="stylesheet" href="css/admin.css?v=20261012-contrast1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js?v=20261012-shared-auth2"></script>
 <style>
-body{background:#f4f7fb;color:#102a43}main{max-width:760px;margin:28px auto;padding:16px}.card{background:#fff;border-radius:16px;padding:24px;box-shadow:0 8px 28px #102a4312}h1{font-size:24px;margin-top:0}.hint{color:#486581;line-height:1.6}.field{margin:16px 0}.field label{display:block;font-weight:700;margin-bottom:7px}.field input[type=email]{width:100%;box-sizing:border-box;padding:12px;border:1px solid #bcccdc;border-radius:9px;font-size:16px}.perms{display:grid;gap:12px;margin:18px 0}.perms label{display:flex;gap:10px;align-items:center}.perms input{width:18px;height:18px}button,.back{display:inline-block;border:0;border-radius:9px;padding:12px 16px;background:#075985;color:white;font-weight:700;cursor:pointer;text-decoration:none}button:disabled{opacity:.6;cursor:wait}#msg{margin-top:14px;white-space:pre-wrap}.error{color:#b42318}.success{color:#067647}.warning{background:#fff7e6;border:1px solid #f5d08a;border-radius:10px;padding:12px;margin:16px 0}
+body{background:#f4f7fb;color:#102a43}
+main{max-width:760px;margin:28px auto;padding:16px}
+.card{background:#fff;border-radius:16px;padding:24px;box-shadow:0 8px 28px #102a4312}
+h1{font-size:24px;margin-top:0}
+.hint{color:#486581;line-height:1.6}
+.field{margin:16px 0}
+.field label{display:block;font-weight:700;margin-bottom:7px}
+.field input{width:100%;box-sizing:border-box;padding:12px;border:1px solid #bcccdc;border-radius:9px;font-size:16px}
+.perms{display:grid;gap:12px;margin:18px 0}
+.perms label{display:flex;gap:10px;align-items:center}
+.perms input{width:18px;height:18px}
+button,.back{display:inline-block;border:0;border-radius:9px;padding:12px 16px;background:#075985;color:white;font-weight:700;cursor:pointer;text-decoration:none}
+button:disabled{opacity:.6;cursor:wait}
+#msg{margin-top:14px;white-space:pre-wrap;line-height:1.6}
+.error{color:#b42318}
+.success{color:#067647}
+.warning{background:#fff7e6;border:1px solid #f5d08a;border-radius:10px;padding:12px;margin:16px 0;line-height:1.6}
 </style>
 </head>
 <body>
 <main>
 <div class="card">
-<a class="back" href="admin.html">← Admin Dashboard</a>
-<h1>নতুন Admin যোগ করুন</h1>
-<p class="hint">শুধু আগে থেকেই Supabase Authentication-এ থাকা ইমেইল যোগ করা যাবে। নতুন Admin-এর জন্য প্রয়োজনীয় অনুমতিগুলো নির্বাচন করুন। তোমার Super Admin অ্যাকাউন্ট পরিবর্তন করা যাবে না।</p>
-<div class="warning">ইমেইলটি আগে Supabase-এ নিবন্ধিত থাকতে হবে এবং ওই ব্যবহারকারীকে সঠিক অ্যাকাউন্ট দিয়ে লগইন করতে হবে। এখানে পাসওয়ার্ড চাওয়া হয় না।</div>
+<a class="back" href="admin.html#dashboard">← মূল Admin Dashboard</a>
+<h1>নতুন Admin তৈরি করুন</h1>
+<p class="hint">এখান থেকে নতুন Admin-এর নাম, ইমেইল ও পাসওয়ার্ড আপনি নিজেই তৈরি করতে পারবেন। শুধু Super Admin এই সুবিধা ব্যবহার করতে পারবেন।</p>
+<div class="warning">পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে। নতুন Admin-কে ইমেইল ও পাসওয়ার্ড নিরাপদভাবে জানিয়ে দিন। এই পেজে Supabase-এর গোপন Service Role Key ব্যবহার করা হয় না; অ্যাকাউন্ট তৈরি সার্ভার-সাইড Edge Function দিয়ে হয়।</div>
 <form id="addForm">
-<div class="field"><label for="adminEmail">বিদ্যমান অ্যাকাউন্টের ইমেইল</label><input id="adminEmail" type="email" autocomplete="off" required placeholder="example@gmail.com"></div>
+<div class="field"><label for="adminName">নতুন Admin-এর নাম</label><input id="adminName" type="text" autocomplete="name" required maxlength="100" placeholder="নাম লিখুন"></div>
+<div class="field"><label for="adminEmail">নতুন Admin-এর ইমেইল</label><input id="adminEmail" type="email" autocomplete="off" required maxlength="254" placeholder="example@gmail.com"></div>
+<div class="field"><label for="adminPassword">নতুন Admin-এর পাসওয়ার্ড</label><input id="adminPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="কমপক্ষে ৮ অক্ষর"></div>
+<div class="field"><label for="confirmPassword">পাসওয়ার্ড আবার লিখুন</label><input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="একই পাসওয়ার্ড আবার লিখুন"></div>
 <div class="perms">
 <label><input id="questions" type="checkbox"> প্রশ্ন ব্যাংক পরিচালনা</label>
 <label><input id="exams" type="checkbox"> পরীক্ষা পরিচালনা</label>
 <label><input id="results" type="checkbox"> ফলাফল পর্যালোচনা</label>
 <label><input id="users" type="checkbox"> অন্য Admin-এর অনুমতি পরিচালনা</label>
 </div>
-<button id="saveBtn" type="submit">Admin যোগ করুন</button>
+<button id="saveBtn" type="submit">নতুন Admin তৈরি করুন</button>
 </form>
-<p id="msg" role="status"></p>
+<p id="msg" role="status" aria-live="polite"></p>
 </div>
 </main>
 <script>
 const msgEl=document.getElementById('msg');
+const form=document.getElementById('addForm');
+const btn=document.getElementById('saveBtn');
 function showMessage(text,kind){msgEl.textContent=text;msgEl.className=kind||'';}
 async function checkOwner(){
- const {data,error}=await db.auth.getSession();
- if(error||!data.session){showMessage('আগে Admin Panel-এ লগইন করুন, তারপর এই পেজ খুলুন।','error');document.getElementById('addForm').hidden=true;return false;}
- if((data.session.user.email||'').toLowerCase()!=='engbayzidmostofa@gmail.com'){showMessage('শুধু Super Admin এই পেজ ব্যবহার করতে পারবেন।','error');document.getElementById('addForm').hidden=true;return false;}
- return true;
-}
-document.getElementById('addForm').addEventListener('submit',async e=>{
- e.preventDefault();
- if(!(await checkOwner()))return;
- const email=document.getElementById('adminEmail').value.trim().toLowerCase();
- const btn=document.getElementById('saveBtn');btn.disabled=true;showMessage('অ্যাকাউন্ট যাচাই ও Admin যোগ হচ্ছে…','');
  try{
-  const {data,error}=await db.rpc('add_existing_admin_by_email',{
-   target_email:email,
-   allow_questions:document.getElementById('questions').checked,
-   allow_exams:document.getElementById('exams').checked,
-   allow_results:document.getElementById('results').checked,
-   allow_user_management:document.getElementById('users').checked
+  const {data,error}=await db.auth.getSession();
+  if(error||!data.session){
+   showMessage('আগে মূল Admin Panel-এ লগইন করুন, তারপর এই পেজ খুলুন।','error');
+   form.hidden=true;
+   return false;
+  }
+  if((data.session.user.email||'').toLowerCase()!=='engbayzidmostofa@gmail.com'){
+   showMessage('শুধু Super Admin এই পেজ ব্যবহার করতে পারবেন।','error');
+   form.hidden=true;
+   return false;
+  }
+  return true;
+ }catch(err){
+  showMessage('লগইন যাচাই করা যায়নি। আবার লগইন করে চেষ্টা করুন।','error');
+  form.hidden=true;
+  return false;
+ }
+}
+form.addEventListener('submit',async e=>{
+ e.preventDefault();
+ if(btn.disabled)return;
+ if(!(await checkOwner()))return;
+ const full_name=document.getElementById('adminName').value.trim();
+ const email=document.getElementById('adminEmail').value.trim().toLowerCase();
+ const password=document.getElementById('adminPassword').value;
+ const confirmPassword=document.getElementById('confirmPassword').value;
+ if(password.length<8){showMessage('পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে।','error');return;}
+ if(password!==confirmPassword){showMessage('দুটি পাসওয়ার্ড মিলছে না।','error');return;}
+ if(email==='engbayzidmostofa@gmail.com'){showMessage('Super Admin-এর ইমেইল দিয়ে নতুন Admin তৈরি করা যাবে না।','error');return;}
+ btn.disabled=true;
+ showMessage('নতুন অ্যাকাউন্ট তৈরি ও অনুমতি সংরক্ষণ হচ্ছে…','');
+ try{
+  const {data,error}=await db.functions.invoke('create-admin-user',{
+   body:{
+    full_name,
+    email,
+    password,
+    allow_questions:document.getElementById('questions').checked,
+    allow_exams:document.getElementById('exams').checked,
+    allow_results:document.getElementById('results').checked,
+    allow_user_management:document.getElementById('users').checked
+   }
   });
-  if(error)throw error;
-  showMessage('সফলভাবে Admin যোগ/আপডেট হয়েছে: '+email+'\nনির্বাচিত অনুমতি সংরক্ষিত হয়েছে।','success');
-  document.getElementById('addForm').reset();
- }catch(err){showMessage(err.message||'Admin যোগ করা যায়নি।','error');}
- finally{btn.disabled=false;}
+  if(error){
+   let details=error.message||'Edge Function অনুরোধ ব্যর্থ হয়েছে।';
+   try{if(error.context&&typeof error.context.json==='function'){const body=await error.context.json();if(body&&body.error)details=body.error;}}catch(_){}
+   throw new Error(details);
+  }
+  if(!data||data.success!==true)throw new Error(data?.error||'নতুন Admin তৈরি নিশ্চিত করা যায়নি।');
+  showMessage('✅ নতুন Admin সফলভাবে তৈরি হয়েছে।\nনাম: '+(data.user?.full_name||full_name)+'\nইমেইল: '+(data.user?.email||email)+'\nনির্বাচিত অনুমতিগুলো সংরক্ষিত হয়েছে।','success');
+  form.reset();
+ }catch(err){
+  showMessage(err.message||'নতুন Admin তৈরি করা যায়নি।','error');
+ }finally{
+  btn.disabled=false;
+ }
 });
 checkOwner();
 </script>
