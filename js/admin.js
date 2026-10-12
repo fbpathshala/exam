@@ -90,73 +90,6 @@ function showPage(page) {
 }
 
 
-
-/* =========================
-   ADMIN PERMISSIONS
-========================= */
-const OWNER_EMAIL = 'engbayzidmostofa@gmail.com';
-const SECOND_ADMIN_ID = '4b4a294d-2f81-47e7-b77c-7d2f6bf2a3ef';
-let currentPermissions = null;
-let isOwnerAdmin = false;
-
-async function loadAdminPermissions(sessionUser) {
-  isOwnerAdmin = (sessionUser?.email || '').toLowerCase() === OWNER_EMAIL;
-  const menuButton = $('permissionMenuButton');
-  if (menuButton) menuButton.classList.toggle('hidden', !isOwnerAdmin);
-
-  const { data, error } = await db
-    .from('admin_user_permissions')
-    .select('user_id,role_name,can_manage_questions,can_manage_exams,can_review_results,can_manage_users')
-    .eq('user_id', sessionUser.id)
-    .maybeSingle();
-
-  if (error || !data) {
-    $('app')?.classList.add('hidden');
-    $('login')?.classList.remove('hidden');
-    return msg('loginMsg', 'Admin অনুমতি যাচাই করা যায়নি। নিরাপত্তার জন্য প্রবেশ বন্ধ করা হয়েছে। ' + (error?.message || ''), true);
-  }
-  currentPermissions = data;
-  const q = data.role_name === 'super_admin' || data.can_manage_questions;
-  const e = data.role_name === 'super_admin' || data.can_manage_exams;
-  const r = data.role_name === 'super_admin' || data.can_review_results;
-  document.querySelectorAll('[data-permission="questions"]').forEach(el => el.classList.toggle('hidden', !q));
-  document.querySelectorAll('[data-permission="exams"]').forEach(el => el.classList.toggle('hidden', !e));
-  document.querySelectorAll('[data-permission="results"]').forEach(el => el.classList.toggle('hidden', !r));
-  if ($('permissionEditor')) $('permissionEditor').classList.toggle('hidden', !isOwnerAdmin);
-  if ($('permissionAccount')) $('permissionAccount').textContent = isOwnerAdmin
-    ? 'আপনি Super Admin। নিচে দ্বিতীয় Admin-এর অনুমতি পরিবর্তন করতে পারবেন।'
-    : 'আপনার অনুমতি: ' + [q ? 'প্রশ্ন পরিচালনা' : '', e ? 'পরীক্ষা পরিচালনা' : '', r ? 'ফলাফল পর্যালোচনা' : ''].filter(Boolean).join(' • ');
-  if (isOwnerAdmin) {
-    const target = await db.from('admin_user_permissions')
-      .select('can_manage_questions,can_manage_exams,can_review_results')
-      .eq('user_id', SECOND_ADMIN_ID).maybeSingle();
-    if (target.error || !target.data) {
-      msg('permissionMsg', 'দ্বিতীয় Admin-এর অনুমতি লোড হয়নি: ' + (target.error?.message || 'রেকর্ড পাওয়া যায়নি'), true);
-    } else {
-      $('permQuestions').checked = !!target.data.can_manage_questions;
-      $('permExams').checked = !!target.data.can_manage_exams;
-      $('permResults').checked = !!target.data.can_review_results;
-    }
-  }
-}
-
-async function saveAdminPermissions() {
-  if (!isOwnerAdmin) return msg('permissionMsg', 'শুধু Super Admin এই পরিবর্তন করতে পারবেন।', true);
-  msg('permissionMsg', 'অনুমতি সংরক্ষণ হচ্ছে...');
-  const { error } = await db.from('admin_user_permissions').update({
-    role_name: 'custom',
-    can_manage_questions: $('permQuestions').checked,
-    can_manage_exams: $('permExams').checked,
-    can_review_results: $('permResults').checked,
-    can_manage_users: false,
-    updated_at: new Date().toISOString()
-  }).eq('user_id', SECOND_ADMIN_ID);
-  if (error) return msg('permissionMsg', 'সংরক্ষণ হয়নি: ' + error.message, true);
-  msg('permissionMsg', 'অনুমতি সংরক্ষিত হয়েছে। পরিবর্তন কার্যকর করতে ছোট ভাইকে লগআউট করে আবার লগইন করতে হবে।');
-}
-
-/* Gate top-level navigation and page operations based on current permissions. */
-
 /* =========================
    INIT
 ========================= */
@@ -191,9 +124,6 @@ async function init() {
 
   $('login')?.classList.add('hidden');
   $('app')?.classList.remove('hidden');
-
-  await loadAdminPermissions(data.session.user);
-  if ($('app')?.classList.contains('hidden')) return;
 
   if ($('userEmail')) {
     $('userEmail').textContent =
