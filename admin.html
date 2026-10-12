@@ -275,6 +275,7 @@ table td{color:#243b53}
       <button type="button" onclick="showPage('dashboard');closeAdminMenu()">🏠 ড্যাশবোর্ড</button>
       <button type="button" onclick="showPage('bank');closeAdminMenu()">🗂️ প্রশ্ন ব্যাংক</button>
       <button type="button" onclick="showPage('exam');closeAdminMenu()">📋 পরীক্ষা পরিচালনা</button>
+      <button type="button" onclick="showPage('materials');closeAdminMenu()">📚 স্টাডি ম্যাটেরিয়াল</button>
       <button type="button" onclick="location.href='results.html'">📊 ফলাফল পর্যালোচনা</button>
       <button type="button" class="logout" onclick="logout()">🚪 লগ আউট</button>
     </div>
@@ -521,6 +522,29 @@ table td{color:#243b53}
     <div id="exams"></div>
   </div>
 
+</section>
+
+<section id="materials" class="page hidden">
+  <div class="card">
+    <h2>📚 স্টাডি ম্যাটেরিয়াল পরিচালনা</h2>
+    <p>PDF, JPG/PNG ফাইল অথবা সাধারণ লেখা যোগ করুন। প্রকাশিত আইটেম মূল ওয়েবসাইটে দেখা যাবে।</p>
+    <input id="materialId" type="hidden">
+    <label>শিরোনাম</label><input id="materialTitle" maxlength="180" placeholder="যেমন: বাংলা ব্যাকরণ নোট">
+    <label>বিবরণ (ঐচ্ছিক)</label><textarea id="materialDescription" rows="2" placeholder="সংক্ষিপ্ত বিবরণ"></textarea>
+    <label>ধরন</label>
+    <select id="materialType" onchange="materialTypeChanged()">
+      <option value="text">সাধারণ লেখা</option>
+      <option value="pdf">PDF ফাইল</option>
+      <option value="image">JPG / PNG ছবি</option>
+    </select>
+    <div id="materialTextWrap"><label>লেখার বিষয়বস্তু</label><textarea id="materialText" rows="7" placeholder="এখানে স্টাডি নোট লিখুন..."></textarea></div>
+    <div id="materialFileWrap" class="hidden"><label>ফাইল নির্বাচন করুন</label><input id="materialFile" type="file" accept="application/pdf,image/jpeg,image/png"><small>সর্বোচ্চ ২০ MB। PDF অথবা JPG/PNG। নতুন ফাইল দিলে আগের ফাইলটি প্রতিস্থাপিত হবে।</small></div>
+    <label>বিভাগ (ঐচ্ছিক)</label><input id="materialCategory" maxlength="100" placeholder="যেমন: বাংলা, ইংরেজি, গণিত">
+    <label><input id="materialPublished" type="checkbox" checked style="width:auto"> প্রকাশিত (শিক্ষার্থীরা দেখতে পাবে)</label>
+    <div class="bank-actions"><button type="button" onclick="saveStudyMaterial()">💾 সংরক্ষণ</button><button type="button" class="secondary" onclick="resetStudyMaterialForm()">নতুন আইটেম</button><button type="button" class="secondary" onclick="loadStudyMaterialsAdmin()">↻ তালিকা রিফ্রেশ</button></div>
+    <p id="materialMsg" class="msg" aria-live="polite"></p>
+  </div>
+  <div class="card"><h2>সংরক্ষিত স্টাডি ম্যাটেরিয়াল</h2><div id="materialsAdminList">তালিকা লোড হচ্ছে...</div></div>
 </section>
 
 </main>
@@ -856,6 +880,61 @@ table td{color:#243b53}
 
 <!-- Exam card menu script: must load after existing admin scripts -->
 <script src="js/exam-card-menu.js"></script>
+
+<script id="study-material-admin">
+(function(){
+ const $m=id=>document.getElementById(id);
+ const escm=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const say=(s,bad=false)=>{const e=$m('materialMsg');if(e){e.textContent=s;e.style.color=bad?'#b91c1c':'#166534'}};
+ window.materialTypeChanged=function(){
+   const t=$m('materialType').value;
+   $m('materialTextWrap').classList.toggle('hidden',t!=='text');
+   $m('materialFileWrap').classList.toggle('hidden',t==='text');
+   $m('materialFile').accept=t==='pdf'?'application/pdf':t==='image'?'.jpg,.jpeg,.png,image/jpeg,image/png':'application/pdf,image/jpeg,image/png';
+ };
+ window.resetStudyMaterialForm=function(){
+   $m('materialId').value='';$m('materialTitle').value='';$m('materialDescription').value='';
+   $m('materialType').value='text';$m('materialText').value='';$m('materialFile').value='';
+   $m('materialCategory').value='';$m('materialPublished').checked=true;materialTypeChanged();say('');
+ };
+ window.loadStudyMaterialsAdmin=async function(){
+   const host=$m('materialsAdminList');if(!host)return;
+   host.textContent='লোড হচ্ছে...';
+   const {data,error}=await db.from('study_materials').select('*').order('display_order',{ascending:true}).order('created_at',{ascending:false});
+   if(error){host.textContent='লোড করা যায়নি: '+error.message;return}
+   if(!data?.length){host.textContent='এখনো কোনো স্টাডি ম্যাটেরিয়াল যোগ করা হয়নি।';return}
+   host.innerHTML=data.map(x=>'<article style="border:1px solid #dbe3ed;border-radius:12px;padding:14px;margin:10px 0;background:#fff"><b>'+escm(x.title)+'</b><div style="margin:6px 0;color:#475569">'+escm(x.category||'বিভাগ নেই')+' · '+(x.published?'প্রকাশিত':'খসড়া')+' · '+escm(x.material_type)+'</div><div>'+escm(x.description||'')+'</div>'+(x.material_type==='text'?'<p>'+escm((x.content_text||'').slice(0,180))+'</p>':(x.file_path?'<p><a href="'+escm(x.file_path)+'" target="_blank" rel="noopener">ফাইল দেখুন</a></p>':''))+'<div class="bank-actions"><button type="button" data-edit="'+x.id+'">✏️ সম্পাদনা</button><button type="button" class="secondary" data-pub="'+x.id+'">'+(x.published?'আড়াল করুন':'প্রকাশ করুন')+'</button><button type="button" class="secondary" data-del="'+x.id+'">🗑️ মুছুন</button></div></article>').join('');
+   host.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>editStudyMaterial(data.find(x=>String(x.id)===b.dataset.edit)));
+   host.querySelectorAll('[data-pub]').forEach(b=>b.onclick=async()=>{const x=data.find(v=>String(v.id)===b.dataset.pub);const r=await db.from('study_materials').update({published:!x.published,updated_at:new Date().toISOString()}).eq('id',x.id);if(r.error)say(r.error.message,true);else{say('প্রকাশনার অবস্থা পরিবর্তন হয়েছে');loadStudyMaterialsAdmin()}});
+   host.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{const x=data.find(v=>String(v.id)===b.dataset.del);if(!confirm('“'+x.title+'” স্থায়ীভাবে মুছে ফেলবেন?'))return;const r=await db.from('study_materials').delete().eq('id',x.id);if(r.error){say(r.error.message,true);return}if(x.file_name)await db.storage.from('study-materials').remove([x.file_name]);say('আইটেম মুছে ফেলা হয়েছে');loadStudyMaterialsAdmin()});
+ };
+ function editStudyMaterial(x){if(!x)return;$m('materialId').value=x.id;$m('materialTitle').value=x.title||'';$m('materialDescription').value=x.description||'';$m('materialType').value=x.material_type||'text';$m('materialText').value=x.content_text||'';$m('materialCategory').value=x.category||'';$m('materialPublished').checked=!!x.published;$m('materialFile').value='';materialTypeChanged();say(x.file_path?'বর্তমান ফাইল রাখা হয়েছে। বদলাতে নতুন ফাইল নির্বাচন করুন।':'সম্পাদনার জন্য তথ্য লোড হয়েছে।');$m('materialTitle').scrollIntoView({behavior:'smooth',block:'center'})}
+ window.saveStudyMaterial=async function(){
+   const id=$m('materialId').value,title=$m('materialTitle').value.trim(),type=$m('materialType').value,file=$m('materialFile').files[0];
+   if(!title){say('শিরোনাম লিখুন।',true);return}
+   if(type==='text'&&!$m('materialText').value.trim()){say('লেখার বিষয়বস্তু লিখুন।',true);return}
+   if(type!=='text'&&!id&&!file){say('PDF/JPG/PNG ফাইল নির্বাচন করুন।',true);return}
+   if(file){const valid=type==='pdf'?file.type==='application/pdf':(file.type==='image/jpeg'||file.type==='image/png');if(!valid){say('নির্বাচিত ধরন অনুযায়ী PDF অথবা JPG/PNG ফাইল দিন।',true);return}if(file.size>20*1024*1024){say('ফাইল ২০ MB-এর চেয়ে বড়।',true);return}}
+   say('সংরক্ষণ হচ্ছে...');
+   let old=null;
+   if(id){const q=await db.from('study_materials').select('file_name').eq('id',Number(id)).maybeSingle();if(q.error){say(q.error.message,true);return}old=q.data}
+   let filePath=old?.file_name||null,publicUrl=null;
+   if(file){
+     const ext=file.name.split('.').pop().toLowerCase();const path=Date.now()+'-'+Math.random().toString(36).slice(2,10)+'.'+ext;
+     const up=await db.storage.from('study-materials').upload(path,file,{upsert:false,contentType:file.type});
+     if(up.error){say('ফাইল আপলোড হয়নি: '+up.error.message,true);return}
+     filePath=path;publicUrl=db.storage.from('study-materials').getPublicUrl(path).data.publicUrl;
+   } else if(old?.file_name){publicUrl=db.storage.from('study-materials').getPublicUrl(old.file_name).data.publicUrl}
+   const row={title,description:$m('materialDescription').value.trim()||null,material_type:type,file_path:type==='text'?null:publicUrl,file_name:type==='text'?null:filePath,content_text:type==='text'?$m('materialText').value.trim():null,category:$m('materialCategory').value.trim()||null,published:$m('materialPublished').checked,updated_at:new Date().toISOString()};
+   const res=id?await db.from('study_materials').update(row).eq('id',Number(id)):await db.from('study_materials').insert(row);
+   if(res.error){if(filePath&&file)await db.storage.from('study-materials').remove([filePath]);say('সংরক্ষণ হয়নি: '+res.error.message,true);return}
+   if(file&&old?.file_name)await db.storage.from('study-materials').remove([old.file_name]);
+   say('✅ স্টাডি ম্যাটেরিয়াল সংরক্ষণ হয়েছে।');resetStudyMaterialForm();loadStudyMaterialsAdmin();
+ };
+ const origShow=window.showPage;
+ if(typeof origShow==='function'){window.showPage=function(p){origShow(p);if(p==='materials')loadStudyMaterialsAdmin()}}
+})();
+</script>
 
 <a class="direct-dashboard-nav" href="admin.html#dashboard" aria-label="মূল Admin Control-এ ফিরে যান">🏠 মূল Admin Control</a><script id="site-copy-deterrent-script">(function(){function editable(t){return !!(t&&t.closest&&t.closest('input,textarea,select,[contenteditable="true"],[contenteditable=""]'))}document.addEventListener('contextmenu',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('selectstart',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('copy',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('cut',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('keydown',function(e){if(editable(e.target))return;var k=(e.key||'').toLowerCase();if((e.ctrlKey||e.metaKey)&&['c','x','u','s','p'].includes(k)){e.preventDefault();e.stopPropagation()}if(e.key==='PrintScreen'){e.preventDefault()}} ,true)})();</script></body>
 </html>
