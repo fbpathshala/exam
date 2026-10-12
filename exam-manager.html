@@ -4,12 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>ফেইসবুক পাঠশালা — পরীক্ষা ব্যবস্থাপনা</title>
-  <link rel="stylesheet" href="css/admin.css?v=20261012-contrast1">
+  <link rel="stylesheet" href="css/admin.css?v=20261013-exam-name-contrast">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     .exam,.panel{background:#fff;border:1px solid #dbe3ee;border-radius:12px;margin:12px 0;padding:14px}
     .head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-    .name{flex:1;min-width:150px;text-align:left;color:#1756a9;background:#fff}
+    /* The global admin contrast guard makes all buttons white; override it for exam-name buttons. */
+    button.name,.name{flex:1;min-width:150px;text-align:left;color:#1756a9!important;background:#fff!important;border:1px solid #dbe3ee!important}
+    button.name:hover,.name:hover{color:#0f3d78!important;background:#f1f7ff!important}
     .menu{width:auto;min-width:44px}
     .buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
     .panel{border-top:1px solid #dbe3ee;margin-top:10px;padding-top:10px}
