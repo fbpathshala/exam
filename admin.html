@@ -283,9 +283,6 @@ table td{color:#243b53}
     <div class="admin-menu-panel hidden" id="adminMenuPanel">
       <button type="button" onclick="showPage('dashboard');closeAdminMenu()">🏠 ড্যাশবোর্ড</button>
       <button type="button" onclick="showPage('exam-system');closeAdminMenu()">📋 এক্সাম সিস্টেম</button>
-      <button type="button" onclick="showPage('bank');closeAdminMenu()">🗂️ প্রশ্ন ব্যাংক</button>
-      <button type="button" onclick="showPage('exam');closeAdminMenu()">📝 পরীক্ষা পরিচালনা</button>
-      <button type="button" onclick="location.href='results.html'">📊 ফলাফল পর্যালোচনা</button>
       <button type="button" onclick="showPage('materials');closeAdminMenu()">📚 স্টাডি ম্যাটেরিয়াল</button>
       <button type="button" class="logout" onclick="logout()">🚪 লগ আউট</button>
     </div>
@@ -336,20 +333,20 @@ table td{color:#243b53}
     <h2>📋 এক্সাম সিস্টেম</h2>
     <p>পরীক্ষা ব্যবস্থাপনার জন্য প্রয়োজনীয় একটি সেকশন নির্বাচন করুন।</p>
     <div class="feature-dashboard-grid exam-feature-grid">
-      <button type="button" class="feature-dashboard-card" onclick="showPage('bank')">
-        <span class="feature-picture">🗂️</span><strong>প্রশ্ন ব্যাংক</strong><small>প্রশ্ন, ক্যাটাগরি, ফোল্ডার ও সেট পরিচালনা</small>
+      <button type="button" class="feature-dashboard-card" onclick="openExamSection('manualBox')">
+        <span class="feature-picture">✍️</span><strong>প্রশ্ন তৈরি</strong><small>নতুন MCQ প্রশ্ন তৈরি ও সংরক্ষণ</small>
+      </button>
+      <button type="button" class="feature-dashboard-card" onclick="openExamSection('questionBankCard')">
+        <span class="feature-picture">🗂️</span><strong>প্রশ্ন ব্যাংক</strong><small>সংরক্ষিত প্রশ্ন খোঁজা ও ব্যবস্থাপনা</small>
       </button>
       <button type="button" class="feature-dashboard-card" onclick="openExamSection('examCreateCard')">
-        <span class="feature-picture">📝</span><strong>পরীক্ষা তৈরি ও পরিচালনা</strong><small>নতুন পরীক্ষা তৈরি এবং পরীক্ষার তালিকা</small>
+        <span class="feature-picture">📝</span><strong>পরীক্ষা তৈরি</strong><small>নতুন পরীক্ষা তৈরি ও সংরক্ষণ</small>
       </button>
       <button type="button" class="feature-dashboard-card" onclick="openExamSection('examSettingsCard')">
-        <span class="feature-picture">⚙️</span><strong>পরীক্ষার সেটিংস</strong><small>সময়, নম্বর, সিলেবাস ও পরীক্ষার নিয়ম</small>
-      </button>
-      <button type="button" class="feature-dashboard-card" onclick="openExamSection('examMappingCard')">
-        <span class="feature-picture">🧩</span><strong>প্রশ্ন যুক্ত করা</strong><small>Question Bank থেকে পরীক্ষায় প্রশ্ন নির্বাচন</small>
+        <span class="feature-picture">⚙️</span><strong>পরীক্ষা পরিচালনা</strong><small>পরীক্ষার তালিকা, সেটিংস ও পরিচালনা</small>
       </button>
       <button type="button" class="feature-dashboard-card" onclick="location.href='results.html'">
-        <span class="feature-picture">📊</span><strong>ফলাফল পর্যালোচনা</strong><small>শিক্ষার্থীদের পরীক্ষার ফলাফল</small>
+        <span class="feature-picture">📊</span><strong>ফলাফল পর্যালোচনা</strong><small>শিক্ষার্থীদের ফলাফল ও উত্তরপত্র</small>
       </button>
     </div>
     <div class="bank-actions">
@@ -458,7 +455,7 @@ table td{color:#243b53}
     <p id="qmsg" class="msg"></p>
   </div>
 
-  <div class="card">
+  <div class="card" id="questionBankCard">
     <h2>৩. Question Bank</h2>
     <div class="grid">
       <select id="filterFolder"></select>
@@ -920,7 +917,8 @@ table td{color:#243b53}
 
 <script id="feature-dashboard-navigation">
 window.openExamSection=function(targetId){
-  if(typeof window.showPage==='function') window.showPage('exam');
+  const bankTargets=['manualBox','questionBankCard'];
+  if(typeof window.showPage==='function') window.showPage(bankTargets.includes(targetId)?'bank':'exam');
   window.setTimeout(function(){
     const target=document.getElementById(targetId);
     if(target) target.scrollIntoView({behavior:'smooth',block:'start'});
