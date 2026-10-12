@@ -720,7 +720,7 @@ html,body{background:var(--dash-bg)!important}
         access_token:data.session.access_token,
         refresh_token:data.session.refresh_token
       }));
-      location.href='results-manager.html';
+      location.href='results-manager.html?v=20261012-sessionfix3';
     }catch(error){
       $('status').textContent='ফলাফল পেজ খোলা যায়নি: '+(error.message||String(error));
     }
