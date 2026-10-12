@@ -4,7 +4,7 @@ const CATS = {
   recent: 'সাম্প্রতিক প্রশ্ন'
 };
 
-let cat = 'verification_test';
+let cat = '';
 let subjects = [];
 let pendingImportRows = [];
 
@@ -34,8 +34,8 @@ function setupMenu() {
 function fillCategorySelect(id, selected=cat) {
   const el = $(id);
   if (!el) return;
-  el.innerHTML = Object.entries(CATS).map(([key,label]) => `<option value="${key}">${esc(label)}</option>`).join('');
-  el.value = selected;
+  el.innerHTML = '<option value="">ক্যাটাগরি নির্বাচন করুন</option>' + Object.entries(CATS).map(([key,label]) => `<option value="${key}">${esc(label)}</option>`).join('');
+  el.value = selected || '';
 }
 
 function setCategoryUI() {
@@ -65,8 +65,9 @@ async function init() {
     fillCategorySelect('questionCategory');
     $('categorySelect')?.addEventListener('change', e => selectCategory(e.target.value));
     await loadSubjects();
-    fillCategorySelect('importCategory', cat);
-    await selectCategory(cat);
+    fillCategorySelect('importCategory', 'verification_test');
+    setCategoryUI();
+    await loadFolders();
     await loadImportFolders();
   } catch (e) { msg('loginMsg', e.message || 'পেজ প্রস্তুত করতে সমস্যা হয়েছে।', true); }
 }
@@ -88,6 +89,13 @@ async function selectCategory(c) {
 
 async function loadFolders(preferredFolderId=null) {
   try {
+    if (!cat || !CATS[cat]) {
+      for (const id of ['manageFolder','setManageFolder','questionFolder']) {
+        if ($(id)) $(id).innerHTML = '<option value="">ফোল্ডার নির্বাচন করুন</option>';
+      }
+      await loadSets();
+      return;
+    }
     const {data,error} = await client().from('question_bank_folders').select('id,folder_name').eq('sub_category', CATS[cat]).order('folder_name');
     if (error) throw error;
     const rows = data || [];
@@ -160,6 +168,7 @@ function syncFolderSelection(sourceId) {
 }
 
 async function createFolder() {
+  if (!cat || !CATS[cat]) return msg('folderMsg','আগে ক্যাটাগরি নির্বাচন করুন।',true);
   const name = $('newFolder')?.value.trim();
   if (!name) return msg('folderMsg','নতুন Folder-এর নাম দিন।',true);
   try {
