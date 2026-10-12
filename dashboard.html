@@ -320,7 +320,7 @@ html,body{background:var(--dash-bg)!important}
 
           <!-- ৫. ফলাফল পর্যালোচনা -->
           <button
-            onclick="location.href='results-manager.html'"
+            onclick="openResultsWithSession()"
           >
             📊 ফলাফল পর্যালোচনা
           </button>
@@ -703,6 +703,28 @@ html,body{background:var(--dash-bg)!important}
         .add('hidden');
     }
   });
+
+  /* ফলাফল পেজে একই লগইন সেশন নির্ভরযোগ্যভাবে পৌঁছে দেওয়া */
+  window.openResultsWithSession = async function(){
+    try{
+      const {data,error}=await db.auth.getSession();
+      if(error)throw error;
+      if(!data.session){
+        $('status').textContent='Admin Session পাওয়া যায়নি। আগে লগইন করুন।';
+        $('login').classList.remove('hidden');
+        $('app').classList.add('hidden');
+        return;
+      }
+      /* Same-tab, temporary bridge; tokens are never placed in the URL. */
+      sessionStorage.setItem('fbpathshala_admin_session_bridge',JSON.stringify({
+        access_token:data.session.access_token,
+        refresh_token:data.session.refresh_token
+      }));
+      location.href='results-manager.html';
+    }catch(error){
+      $('status').textContent='ফলাফল পেজ খোলা যায়নি: '+(error.message||String(error));
+    }
+  };
 
   /* Start */
   init();
