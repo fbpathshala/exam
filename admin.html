@@ -250,9 +250,9 @@ table td{color:#243b53}
     <button type="button" class="admin-menu-btn" id="adminMenuBtn" aria-label="মেনু">⋮</button>
     <div class="admin-menu-panel hidden" id="adminMenuPanel">
       <button type="button" onclick="showPage('dashboard');closeAdminMenu()">🏠 ড্যাশবোর্ড</button>
-      <button type="button" onclick="showPage('bank');closeAdminMenu()">🗂️ প্রশ্ন ব্যাংক</button>
-      <button type="button" onclick="showPage('exam');closeAdminMenu()">📋 পরীক্ষা পরিচালনা</button>
-      <button type="button" onclick="location.href='results.html'">📊 ফলাফল পর্যালোচনা</button>
+      <button type="button" data-permission="questions" onclick="showPage('bank');closeAdminMenu()">🗂️ প্রশ্ন ব্যাংক</button>
+      <button type="button" data-permission="exams" onclick="showPage('exam');closeAdminMenu()">📋 পরীক্ষা পরিচালনা</button>
+      <button type="button" data-permission="results" onclick="location.href='results.html'">📊 ফলাফল পর্যালোচনা</button>
       <button type="button" id="permissionMenuButton" class="hidden" onclick="showPage('permissions');closeAdminMenu()">🔐 Admin অনুমতি</button>
       <button type="button" class="logout" onclick="logout()">🚪 লগ আউট</button>
     </div>
@@ -298,7 +298,7 @@ table td{color:#243b53}
   </div>
 </section>
 
-<section id="bank" class="page hidden">
+<section id="bank" class="page hidden" data-permission="questions">
   <div class="card">
     <h2>১. Category → Folder → Set</h2>
 
@@ -412,7 +412,7 @@ table td{color:#243b53}
     <div id="questions"></div>
   </div>
 </section>
-<section id="exam" class="page hidden">
+<section id="exam" class="page hidden" data-permission="exams">
 
   <div class="card">
     <h2>Exam Management</h2>
