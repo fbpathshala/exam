@@ -244,7 +244,7 @@ function showResult(){
   examPage.classList.add("hidden");
   resultPage.classList.remove("hidden");
   resultExamTitle.textContent=exam.exam_name||"পরীক্ষার ফলাফল";
-  resultMessage.textContent=settings.thank_you_message||"পরীক্ষায় অংশগ্রহণ করার জন্য ধন্যবাদ।";
+  resultMessage.textContent=String(settings.thank_you_message||"").trim()||"পরীক্ষায় অংশগ্রহণ করার জন্য ধন্যবাদ।";resultMessage.style.display="block";
   const d=resultData||{};
   const show=settings.show_result!==false;
   score.classList.toggle("hidden",!show);
@@ -267,7 +267,7 @@ function showResult(){
   fbPageLink.href=settings.facebook_page_url||"https://www.facebook.com/facebookpathshala";
   fbGroupLink.href=settings.facebook_group_url||"https://www.facebook.com/groups/facebookpathshala";
   const showPageLink=settings.show_page_link===true;
-  const showGroupLink=settings.show_group_link===true;
+  const showGroupLink=true;
   fbPageLink.classList.toggle("hidden",!showPageLink);
   fbGroupLink.classList.toggle("hidden",!showGroupLink);
   socialHighlight.classList.toggle("hidden",!(showPageLink||showGroupLink));
