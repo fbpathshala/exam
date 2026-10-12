@@ -239,7 +239,7 @@ html,body{background:var(--dash-bg)!important}
 .admin-menu-panel button:active{transform:translateY(1px)}
 @media(max-width:480px){.admin-menu-panel{right:0;top:54px}.admin-menu-panel button{min-height:48px;font-size:14px!important}}
 </style>
-</head>
+<style id="site-copy-deterrent">html,body{ -webkit-user-select:none!important; user-select:none!important; -webkit-touch-callout:none!important}input,textarea,select,[contenteditable="true"],[contenteditable=""],.allow-copy{ -webkit-user-select:text!important; user-select:text!important; -webkit-touch-callout:default!important} @media print{body{display:none!important}}</style></head>
 
 <body>
 
@@ -732,5 +732,5 @@ html,body{background:var(--dash-bg)!important}
 })();
 </script>
 
-</body>
+<script id="site-copy-deterrent-script">(function(){function editable(t){return !!(t&&t.closest&&t.closest('input,textarea,select,[contenteditable="true"],[contenteditable=""]'))}document.addEventListener('contextmenu',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('selectstart',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('copy',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('cut',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('keydown',function(e){if(editable(e.target))return;var k=(e.key||'').toLowerCase();if((e.ctrlKey||e.metaKey)&&['c','x','u','s','p'].includes(k)){e.preventDefault();e.stopPropagation()}if(e.key==='PrintScreen'){e.preventDefault()}} ,true)})();</script></body>
 </html>
