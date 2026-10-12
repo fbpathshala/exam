@@ -95,16 +95,9 @@ async function loadFolders(preferredFolderId=null) {
     for (const id of ['manageFolder','setManageFolder','questionFolder']) {
       const el = $(id);
       if (!el) continue;
-      const previous = el.value;
       el.innerHTML = '<option value="">Folder নির্বাচন করুন</option>' + rows.map(x => `<option value="${x.id}">${esc(x.folder_name)}</option>`).join('');
-      const wanted = preferredFolderId ?? previous;
-      if (wanted && rows.some(x => String(x.id) === String(wanted))) el.value = String(wanted);
+      if (preferredFolderId && rows.some(x => String(x.id) === String(preferredFolderId))) el.value = String(preferredFolderId);
     }
-
-    const qFolder = $('questionFolder')?.value || $('manageFolder')?.value || $('setManageFolder')?.value || '';
-    if ($('questionFolder') && qFolder) $('questionFolder').value = String(qFolder);
-    if ($('setManageFolder') && qFolder) $('setManageFolder').value = String(qFolder);
-    if ($('manageFolder') && qFolder) $('manageFolder').value = String(qFolder);
 
     await loadSets();
   } catch (e) { msg('folderMsg', e.message || 'Folder লোড করতে সমস্যা হয়েছে।', true); }
@@ -143,10 +136,8 @@ async function loadImportFolders(preferredFolderId=null) {
     const {data,error} = await client().from('question_bank_folders').select('id,folder_name').eq('sub_category', categoryLabel).order('folder_name');
     if (error) throw error;
     const rows = data || [];
-    const previous = el.value;
     el.innerHTML = '<option value="">Folder নির্বাচন করুন</option>' + rows.map(x => `<option value="${x.id}">${esc(x.folder_name)}</option>`).join('');
-    const wanted = preferredFolderId ?? previous;
-    if (wanted && rows.some(x => String(x.id) === String(wanted))) el.value = String(wanted);
+    if (preferredFolderId && rows.some(x => String(x.id) === String(preferredFolderId))) el.value = String(preferredFolderId);
     await loadImportSets();
   } catch(e) { msg('importMsg', e.message || 'CSV/Excel-এর Folder লোড করতে সমস্যা হয়েছে।', true); }
 }
@@ -160,10 +151,8 @@ async function loadImportSets(preferredSetId=null) {
     const {data,error} = await client().from('question_bank_sets').select('id,set_name').eq('folder_id', Number(folderId)).order('set_name');
     if (error) throw error;
     const rows = data || [];
-    const previous = el.value;
     el.innerHTML = '<option value="">Set নির্বাচন করুন</option>' + rows.map(x => `<option value="${x.id}">${esc(x.set_name)}</option>`).join('');
-    const wanted = preferredSetId ?? previous;
-    if (wanted && rows.some(x => String(x.id) === String(wanted))) el.value = String(wanted);
+    if (preferredSetId && rows.some(x => String(x.id) === String(preferredSetId))) el.value = String(preferredSetId);
   } catch(e) { msg('importMsg', e.message || 'CSV/Excel-এর Set লোড করতে সমস্যা হয়েছে।', true); }
 }
 
