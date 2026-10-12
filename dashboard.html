@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ফেইসবুক পাঠশালা — ড্যাশবোর্ড</title>
 
-<link rel="stylesheet" href="css/admin.css?v=20261012-1">
+<link rel="stylesheet" href="css/admin.css?v=20261012-menu1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -211,6 +211,18 @@ html,body{background:var(--dash-bg)!important}
 @media(max-width:800px){.dashboard-wrap{padding:16px!important}.dashboard-cards{gap:12px}.dashboard-stat{min-height:150px}}
 @media(max-width:480px){.dashboard-wrap{padding:12px!important}.dashboard-top{padding:15px!important;border-radius:14px!important}.smart-date{padding:19px!important}.dashboard-stat{padding:15px!important}.dashboard-stat b{font-size:27px}}
 
+
+/* Three-line menu: high contrast, clear spacing and reliable tap targets */
+.admin-menu{position:relative;z-index:500}
+.admin-menu-btn{display:inline-flex!important;align-items:center!important;justify-content:center!important;color:#fff!important;background:#ffffff18!important;border:1px solid #ffffff70!important;font-size:29px!important;line-height:1!important}
+.admin-menu-btn:hover,.admin-menu-btn:focus-visible{background:#ffffff2b!important;outline:3px solid #5eead4!important;outline-offset:2px}
+.admin-menu-panel{width:min(320px,calc(100vw - 28px))!important;max-height:calc(100vh - 110px);overflow-y:auto;background:#fff!important;border:1px solid #cbd5e1!important;border-radius:16px!important;padding:9px!important;box-shadow:0 18px 45px rgba(8,25,45,.28)!important;z-index:99999!important}
+.admin-menu-panel button{display:flex!important;align-items:center!important;gap:10px!important;width:100%!important;min-height:46px!important;margin:4px 0!important;padding:12px 13px!important;border:1px solid transparent!important;border-radius:10px!important;background:#f1f5f9!important;color:#102a43!important;text-align:left!important;font-size:15px!important;font-weight:700!important;line-height:1.45!important;white-space:normal!important;overflow-wrap:anywhere!important;box-shadow:none!important;cursor:pointer}
+.admin-menu-panel button:hover,.admin-menu-panel button:focus-visible{background:#dff7f2!important;border-color:#99e4d7!important;color:#064e46!important;outline:2px solid #0f766e!important;outline-offset:1px}
+.admin-menu-panel button.logout,.admin-menu-panel button#logoutBtn{background:#b42318!important;color:#fff!important;border-color:#991b1b!important}
+.admin-menu-panel button.logout:hover,.admin-menu-panel button#logoutBtn:hover{background:#8f1d14!important;color:#fff!important}
+.admin-menu-panel button:active{transform:translateY(1px)}
+@media(max-width:480px){.admin-menu-panel{right:0;top:54px}.admin-menu-panel button{min-height:48px;font-size:14px!important}}
 </style>
 </head>
 
