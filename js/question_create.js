@@ -118,12 +118,9 @@ async function loadSets(preferredSetId=null) {
     for (const id of ['manageSet','questionSet']) {
       const el = $(id);
       if (!el) continue;
-      const previous = el.value;
       el.innerHTML = '<option value="">Set নির্বাচন করুন</option>' + rows.map(x => `<option value="${x.id}">${esc(x.set_name)}</option>`).join('');
-      const wanted = preferredSetId ?? previous;
-      if (wanted && rows.some(x => String(x.id) === String(wanted))) el.value = String(wanted);
+      if (preferredSetId && rows.some(x => String(x.id) === String(preferredSetId))) el.value = String(preferredSetId);
     }
-    if ($('questionSet') && !$('questionSet').value && $('manageSet')?.value) $('questionSet').value = $('manageSet').value;
   } catch (e) { msg('folderMsg', e.message || 'Set লোড করতে সমস্যা হয়েছে।', true); }
 }
 
