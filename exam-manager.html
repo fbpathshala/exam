@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>ফেইসবুক পাঠশালা — পরীক্ষা ব্যবস্থাপনা</title>
-  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="css/admin.css?v=20261012-contrast1">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     .exam,.panel{background:#fff;border:1px solid #dbe3ee;border-radius:12px;margin:12px 0;padding:14px}
@@ -18,7 +18,22 @@
     #message{overflow-wrap:anywhere;white-space:pre-wrap}
     @media(max-width:600px){.buttons{grid-template-columns:1fr}}
   </style>
-<style id="direct-dashboard-navigation">.direct-dashboard-nav{position:fixed;right:16px;bottom:16px;z-index:9999;display:inline-flex;align-items:center;gap:8px;padding:11px 16px;border-radius:999px;background:#1d4ed8;color:#fff!important;text-decoration:none!important;font:700 15px/1.2 Arial,sans-serif;box-shadow:0 5px 18px #0003;border:2px solid #fff}.direct-dashboard-nav:hover{background:#1e40af;transform:translateY(-1px)}@media print{.direct-dashboard-nav{display:none!important}}</style></head>
+<style id="direct-dashboard-navigation">.direct-dashboard-nav{position:fixed;right:16px;bottom:16px;z-index:9999;display:inline-flex;align-items:center;gap:8px;padding:11px 16px;border-radius:999px;background:#1d4ed8;color:#fff!important;text-decoration:none!important;font:700 15px/1.2 Arial,sans-serif;box-shadow:0 5px 18px #0003;border:2px solid #fff}.direct-dashboard-nav:hover{background:#1e40af;transform:translateY(-1px)}@media print{.direct-dashboard-nav{display:none!important}}</style><style id="premium-contrast-guard">
+/* Premium admin theme: preserve strong readable contrast */
+:root{color-scheme:light;--admin-ink:#102a43;--admin-muted:#334e68;--admin-navy:#102a43;--admin-teal:#0f766e}
+html,body{color:#102a43}
+p,small,label,legend,figcaption,.muted,.msg,.hint,.description,.qb-source,.qb-explanation{color:#334e68}
+h1,h2,h3,h4,h5,h6,strong,b,th{color:#102a43}
+input,select,textarea{color:#102a43!important;background:#fff!important;border-color:#b8c8d8!important}
+input::placeholder,textarea::placeholder{color:#52677d!important;opacity:1}
+button,.btn,.direct-dashboard-nav{color:#fff!important}
+button.secondary,.secondary,button.cancel,.btn-secondary{color:#173f5f!important;background:#e8f1f8!important;border-color:#c2d5e6!important}
+a{color:#075985}
+a:hover{color:#0f766e}
+.card,.panel,.exam,.wrap{color:#102a43}
+table td{color:#243b53}
+@media(max-width:760px){body{color:#102a43}}
+</style></head>
 <body>
   <header>
     <b>ফেইসবুক পাঠশালা — অ্যাডমিন</b>
