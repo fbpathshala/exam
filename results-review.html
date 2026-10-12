@@ -27,6 +27,15 @@ table td{color:#243b53}
  </div></div></main></div>
 <div id="access" class="card login"><h2>Admin Session পাওয়া যাচ্ছে না</h2><p>আলাদা লগইন নেই। এই ব্রাউজারে Admin Control-এর সেশন পাওয়া যাচ্ছে না। প্রথমে মূল Admin Control খুলে লগইন অবস্থা যাচাই করুন, তারপর সেখানকার “ফলাফল পর্যালোচনা” মেনু চাপুন।</p><p id="sessionDiagnostic" class="muted">নতুন সেশন যাচাই চালু হচ্ছে...</p><button class="secondary" onclick="location.href='dashboard.html'">← মূল ড্যাশবোর্ড-এ ফিরুন</button></div>
 <div id="detailOverlay" class="overlay hidden"><div class="modal"><div class="modalHeader"><div><h2 id="detailTitle">Attempt বিস্তারিত</h2><div id="detailInfo" class="muted"></div></div><button class="secondary" onclick="closeDetail()">✕ বন্ধ</button></div><div id="detailBody"></div></div></div><script>
+(function(){
+  var d=document.getElementById('sessionDiagnostic');
+  if(d)d.textContent='নতুন পেজ লোড হয়েছে; JavaScript পরীক্ষা চলছে...';
+  window.addEventListener('error',function(e){
+    if(d)d.textContent='JavaScript ত্রুটি: '+(e.message||'অজানা ত্রুটি');
+  });
+})();
+</script>
+<script>
 const BN='০১২৩৪৫৬৭৮৯',LET={A:'ক',B:'খ',C:'গ',D:'ঘ'};const bn=x=>String(x??'').replace(/\d/g,d=>BN[d]);const esc=x=>String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));let currentRows=[],examMeta=null,questionMap={},absentStudents=[];
 function openReviewSection(key){const names={exam:'পরীক্ষার সামগ্রিক বিশ্লেষণ',overall:'সম্মিলিত মেধাতালিকা',student:'পরীক্ষার্থীভিত্তিক বিশ্লেষণ',custom:'কাস্টম রেজাল্ট ও রেজাল্ট শিট',answers:'উত্তরপত্র ও বিস্তারিত রিপোর্ট',export:'রিপোর্ট ও ডেটা এক্সপোর্ট'};document.querySelectorAll('.reviewSections button').forEach(b=>b.classList.toggle('active',b.getAttribute('onclick')===`openReviewSection('${key}')`));const panel=document.getElementById('reviewExam');panel.classList.toggle('hidden',key!=='exam');document.getElementById('sectionNotice').textContent=key==='exam'?'এই বিভাগে একটি নির্দিষ্ট পরীক্ষার ফলাফল, মেধাক্রম, প্রশ্নভিত্তিক ফলাফল ও অনুপস্থিতির তথ্য থাকবে।':names[key]+' বিভাগটি চূড়ান্ত পরিকল্পনায় অন্তর্ভুক্ত। এর ডেটা-ভিত্তিক কার্যকারিতা পরবর্তী ধাপে যুক্ত করা হবে; এখনো সম্পূর্ণ চালু নয়।';if(key==='exam'){document.getElementById('reviewExam').scrollIntoView({behavior:'smooth',block:'start'});}}
 function setMsg(t,e=false){const x=document.getElementById('msg');x.textContent=t;x.className='msg '+(e?'error':'success')}
