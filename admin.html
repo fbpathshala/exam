@@ -249,6 +249,7 @@ table td{color:#243b53}
   <div class="admin-menu">
     <button type="button" class="admin-menu-btn" id="adminMenuBtn" aria-label="মেনু">☰</button>
     <div class="admin-menu-panel hidden" id="adminMenuPanel">
+      <button type="button" onclick="showPage('dashboard');closeAdminMenu()">🏠 ড্যাশবোর্ডে ফিরুন</button>
       <button type="button" onclick="showPage('bank');closeAdminMenu();document.getElementById('manualBox')?.scrollIntoView({behavior:'smooth',block:'start'})">✍️ প্রশ্ন তৈরি</button>
       <button type="button" onclick="showPage('bank');closeAdminMenu()">🗂️ প্রশ্ন ব্যাংক</button>
       <button type="button" onclick="showPage('exam');closeAdminMenu();document.getElementById('examName')?.focus()">➕ পরীক্ষা তৈরি</button>
