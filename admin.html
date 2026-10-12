@@ -223,7 +223,30 @@ a:hover{color:#0f766e}
 .card,.panel,.exam,.wrap{color:#102a43}
 table td{color:#243b53}
 @media(max-width:760px){body{color:#102a43}}
-</style></head>
+</style>
+<style id="exam-list-visibility-fix">
+/* Ensure exam titles and links remain readable in the exam list */
+#exams .examrow{
+  background:#ffffff!important;
+  color:#102a43!important;
+  border:1px solid #cbd5e1!important;
+}
+#exams .examrow b,
+#exams .examrow span,
+#exams .examrow p{
+  color:#102a43!important;
+}
+#exams .examrow .link{
+  color:#075985!important;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+#exams .examrow button{
+  color:#ffffff!important;
+}
+</style>
+
+</head>
 
 <body>
 
