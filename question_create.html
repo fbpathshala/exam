@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ফেইসবুক পাঠশালা — প্রশ্ন তৈরি</title>
-<link rel="stylesheet" href="css/admin.css">
+<link rel="stylesheet" href="css/admin.css?v=20261012-2">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <style>
@@ -42,7 +42,40 @@
   .inline-actions{display:flex;gap:8px;flex-wrap:wrap}
   @media(max-width:760px){.category-hero{align-items:flex-start;gap:12px}.category-hero-icon{flex-basis:46px;height:46px;border-radius:14px}.category-workflow{gap:7px;padding:10px}.workflow-step{gap:5px;font-size:12px}.workflow-number{width:24px;height:24px}.category-select-wrap{max-width:none;padding:13px}.manage-grid{grid-template-columns:1fr}.manage-actions{grid-template-columns:1fr 1fr}.flow{gap:5px}.flow span{padding:6px 9px}}
 </style>
-<style id="direct-dashboard-navigation">.direct-dashboard-nav{position:fixed;right:16px;bottom:16px;z-index:9999;display:inline-flex;align-items:center;gap:8px;padding:11px 16px;border-radius:999px;background:#1d4ed8;color:#fff!important;text-decoration:none!important;font:700 15px/1.2 Arial,sans-serif;box-shadow:0 5px 18px #0003;border:2px solid #fff}.direct-dashboard-nav:hover{background:#1e40af;transform:translateY(-1px)}@media print{.direct-dashboard-nav{display:none!important}}</style></head>
+<style id="direct-dashboard-navigation">.direct-dashboard-nav{position:fixed;right:16px;bottom:16px;z-index:9999;display:inline-flex;align-items:center;gap:8px;padding:11px 16px;border-radius:999px;background:#1d4ed8;color:#fff!important;text-decoration:none!important;font:700 15px/1.2 Arial,sans-serif;box-shadow:0 5px 18px #0003;border:2px solid #fff}.direct-dashboard-nav:hover{background:#1e40af;transform:translateY(-1px)}@media print{.direct-dashboard-nav{display:none!important}}</style>
+<style id="premium-question-create-skin">
+:root{--qc-navy:#102a43;--qc-navy-2:#173f5f;--qc-teal:#0f9488;--qc-bg:#f3f7fb;--qc-border:#e0e8f1}
+html,body{background:var(--qc-bg)!important;color:#243b53}
+#app{max-width:1220px;margin:0 auto;padding:18px 22px 34px}
+.dashboard-top{margin:0 0 22px!important;padding:18px 22px!important;border-radius:18px;background:linear-gradient(115deg,#102a43 0%,#173f5f 68%,#0f766e 125%)!important;box-shadow:0 12px 28px rgba(16,42,67,.16)!important}
+.dashboard-brand h1{color:#fff!important;font-size:clamp(22px,3vw,28px);letter-spacing:-.35px}
+.dashboard-brand p{color:#c8d8e7!important;font-size:13px;letter-spacing:.3px}
+.admin-menu-btn{border-radius:13px!important;box-shadow:none!important}
+.admin-menu-panel{top:58px!important;border-radius:15px!important;box-shadow:0 16px 40px rgba(16,42,67,.18)!important}
+main{display:grid;gap:18px}
+.card{border:1px solid var(--qc-border)!important;border-radius:18px!important;box-shadow:0 7px 22px rgba(16,42,67,.055)!important;padding:clamp(16px,2.5vw,24px)!important}
+.card h2{color:var(--qc-navy)}
+.category-management-card{background:linear-gradient(145deg,#fff 0%,#f8fbff 100%)!important}
+.category-hero-icon{background:linear-gradient(145deg,#102a43,#0f766e)!important}
+.category-workflow{background:#f4f8fc!important;border-color:#e0e8f1!important}
+.workflow-number{background:#dff5f1!important;color:#0f766e!important}
+.category-select-wrap{background:linear-gradient(135deg,#eff6ff,#f0fdfa)!important;border-color:#d4e5f5!important}
+.manage-box{border-color:#e0e8f1!important;background:#f8fafc!important;border-radius:14px!important}
+.destination{background:linear-gradient(110deg,#eff6ff,#effcf9)!important;border-color:#d7e9f2!important}
+input,select,textarea{border:1px solid #cbd8e5!important;border-radius:10px!important;background:#fff!important;color:#102a43!important;min-height:43px}
+textarea{min-height:110px}
+input:focus,select:focus,textarea:focus{outline:3px solid #14b8a633!important;border-color:#0f9488!important}
+button{border-radius:10px!important;background:linear-gradient(110deg,#173f5f,#0f766e)!important;box-shadow:0 3px 9px rgba(16,42,67,.09)}
+button:hover{filter:brightness(1.06)}
+button.secondary{background:#e8f1f8!important;color:#173f5f!important;border:1px solid #cbdceb!important;box-shadow:none!important}
+.msg{color:#486581}
+#login .card.login{border:1px solid var(--qc-border)!important;border-radius:20px!important;padding:28px!important;box-shadow:0 18px 48px rgba(16,42,67,.12)!important}
+.login h1{color:#102a43!important}.login h2{color:#0f766e!important}
+.login input{min-height:46px}.login button{min-height:46px}
+.direct-dashboard-nav{background:linear-gradient(110deg,#173f5f,#0f766e)!important;border:2px solid #fff!important;box-shadow:0 8px 24px rgba(16,42,67,.24)!important}
+@media(max-width:760px){#app{padding:12px 12px 28px}.dashboard-top{padding:15px!important;border-radius:14px!important}.card{border-radius:15px!important}.manage-grid{grid-template-columns:1fr}}
+</style>
+</head>
 <body>
 <div id="login" class="center">
   <div class="card login">
