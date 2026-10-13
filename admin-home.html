@@ -4,70 +4,79 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#102a43">
-<title>ফেইসবুক পাঠশালা — কেন্দ্রীয় অ্যাডমিন হোমপেজ</title>
+<title>ফেইসবুক পাঠশালা — কেন্দ্রীয় অ্যাডমিন</title>
 <style>
-:root{color-scheme:light;--ink:#102a43;--muted:#52677d;--line:#dbe5ef;--blue:#1d4ed8}
+:root{color-scheme:light;--ink:#14283f;--muted:#607086;--line:#e1e8f0;--blue:#2458d3;--bg:#f5f7fb}
 *{box-sizing:border-box}
-body{margin:0;background:#f3f7fb;color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans Bengali",sans-serif}
-header{background:linear-gradient(130deg,#102a43,#164e63);color:white;padding:28px 20px}
-.wrap{width:min(1050px,100% - 32px);margin:auto}
-.brand{display:flex;align-items:center;gap:15px}
-.logo{display:grid;place-items:center;width:54px;height:54px;border-radius:16px;background:#ffffff20;font-size:29px}
-h1{font-size:clamp(22px,4vw,32px);margin:0;color:white}
-header p{margin:8px 0 0;color:#dbeafe}
-main{padding:26px 0 44px}
-.intro{margin:0 0 20px;color:var(--muted);line-height:1.7}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans Bengali",sans-serif}
+header{background:linear-gradient(120deg,#102a43 0%,#164e63 100%);color:#fff;padding:30px 20px 34px}
+.wrap{width:min(1080px,calc(100% - 32px));margin:auto}
+.topline{display:flex;align-items:center;gap:15px}
+.logo{display:grid;place-items:center;flex:0 0 56px;height:56px;border-radius:17px;background:#ffffff1c;font-size:29px}
+h1{font-size:clamp(23px,4vw,32px);margin:0;color:#fff;letter-spacing:.1px}
+header p{margin:7px 0 0;color:#dbeafe;font-size:15px}
+main{padding:27px 0 44px}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:16px}
+h2{margin:0;font-size:21px}
+.section-head p{margin:5px 0 0;color:var(--muted);line-height:1.6}
+.tag{font-size:12px;color:#52677d;background:#e9eef5;border-radius:999px;padding:7px 10px;white-space:nowrap}
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-.card{display:flex;flex-direction:column;align-items:flex-start;gap:10px;background:white;border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 8px 24px #102a430b;min-height:205px}
-.card .icon{display:grid;place-items:center;width:52px;height:52px;background:#eaf2ff;border-radius:15px;font-size:28px}
-h2{margin:0;font-size:20px}
-.card p{margin:0;color:var(--muted);line-height:1.65;flex:1}
-a.action,span.soon{display:inline-flex;align-items:center;justify-content:center;border-radius:10px;padding:11px 15px;font-weight:750;text-decoration:none}
-a.action{background:var(--blue);color:white}
-a.action:hover{background:#1e40af}
-span.soon{background:#eef2f7;color:#52677d;font-size:13px}
-.note{margin-top:18px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;color:var(--muted);background:#fff;font-size:14px;line-height:1.7}
-footer{text-align:center;color:#64748b;font-size:12px;padding:0 16px 24px}
-@media(max-width:620px){.grid{grid-template-columns:1fr}.card{min-height:185px}header{padding:23px 16px}.wrap{width:min(100% - 24px,1050px)}}
+.card{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:11px;background:#fff;border:1px solid var(--line);border-radius:17px;padding:21px;min-height:224px;box-shadow:0 5px 18px #102a4307}
+.card.active{border-color:#b8cafa;box-shadow:0 8px 24px #2458d30d}
+.card-top{display:flex;align-items:center;gap:13px;width:100%}
+.icon{display:grid;place-items:center;flex:0 0 49px;width:49px;height:49px;background:#edf3ff;border-radius:14px;font-size:26px}
+h3{font-size:19px;margin:0}
+.status{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#176747;background:#e9f7ef;border-radius:999px;padding:5px 9px;margin-top:5px}
+.status:before{content:"";width:6px;height:6px;border-radius:50%;background:#199764}
+.status.pending{color:#6a7482;background:#f0f2f6}
+.status.pending:before{background:#9aa5b3}
+.card p{margin:0;color:var(--muted);line-height:1.7;font-size:14px;flex:1}
+a.action{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--blue);color:#fff;border-radius:10px;padding:11px 14px;font-size:14px;font-weight:750;text-decoration:none}
+a.action:hover{background:#1d46b0}
+a.action.muted{background:#eef2f8;color:#40536b;cursor:default}
+.lower{margin-top:20px;background:#fff;border:1px solid var(--line);border-radius:15px;padding:17px 19px}
+.lower-title{font-weight:750;margin-bottom:5px}
+.lower p{margin:0;color:var(--muted);font-size:14px;line-height:1.75}
+footer{text-align:center;color:#7b8797;font-size:12px;padding:0 16px 24px}
+@media(max-width:620px){.grid{grid-template-columns:1fr}.card{min-height:205px}header{padding:24px 16px 28px}.wrap{width:calc(100% - 24px)}.section-head{align-items:flex-start;flex-direction:column}.tag{white-space:normal}}
 </style>
 </head>
 <body>
 <header><div class="wrap">
-  <div class="brand"><div class="logo" aria-hidden="true">🏫</div><div>
+  <div class="topline"><div class="logo" aria-hidden="true">🏫</div><div>
     <h1>ফেইসবুক পাঠশালা</h1>
     <p>কেন্দ্রীয় অ্যাডমিন হোমপেজ</p>
   </div></div>
 </div></header>
 <main class="wrap">
-  <p class="intro">একটি জায়গা থেকে আলাদা আলাদা ফিচারের ড্যাশবোর্ডে প্রবেশ করুন। প্রতিটি সিস্টেমের প্রশ্ন, কনটেন্ট ও পরিচালনা আলাদা থাকবে।</p>
+  <div class="section-head">
+    <div><h2>আপনার ড্যাশবোর্ড</h2><p>যে কাজটি করতে চান, সংশ্লিষ্ট সিস্টেমটি বেছে নিন। প্রতিটি মডিউল আলাদাভাবে পরিচালিত হবে।</p></div>
+    <span class="tag">অ্যাডমিন নেভিগেশন</span>
+  </div>
   <div class="grid">
-    <section class="card">
-      <div class="icon" aria-hidden="true">📝</div>
-      <h2>এক্সাম সিস্টেম</h2>
-      <p>বর্তমান MCQ পরীক্ষা, প্রশ্ন ব্যাংক, পরীক্ষা পরিচালনা এবং ফলাফল ব্যবস্থাপনা।</p>
-      <a class="action" href="admin.html">এক্সাম অ্যাডমিন খুলুন ↗</a>
+    <section class="card active">
+      <div class="card-top"><div class="icon" aria-hidden="true">📝</div><div><h3>এক্সাম সিস্টেম</h3><span class="status">বর্তমান সিস্টেম</span></div></div>
+      <p>চাকরির প্রস্তুতির MCQ প্রশ্নব্যাংক, পরীক্ষা তৈরি, পরীক্ষা পরিচালনা এবং ফলাফল ব্যবস্থাপনা।</p>
+      <a class="action" href="admin.html">এক্সাম ড্যাশবোর্ড খুলুন <span aria-hidden="true">↗</span></a>
     </section>
     <section class="card">
-      <div class="icon" aria-hidden="true">📚</div>
-      <h2>স্টাডি মেটেরিয়াল</h2>
-      <p>জব প্রস্তুতির নোট, ডকুমেন্ট ও পড়ার উপকরণের আলাদা ড্যাশবোর্ড।</p>
-      <span class="soon">আলাদা ড্যাশবোর্ড তৈরি বাকি</span>
+      <div class="card-top"><div class="icon" aria-hidden="true">📚</div><div><h3>স্টাডি মেটেরিয়াল</h3><span class="status pending">শুরু করা বাকি</span></div></div>
+      <p>চাকরির প্রস্তুতির নোট, PDF, ডকুমেন্ট এবং অন্যান্য পড়ার উপকরণ গুছিয়ে রাখার আলাদা ব্যবস্থা।</p>
+      <span class="action muted">ড্যাশবোর্ড পরে যুক্ত হবে</span>
     </section>
     <section class="card">
-      <div class="icon" aria-hidden="true">🎓</div>
-      <h2>একাডেমিক কেয়ার</h2>
-      <p>একাডেমিক MCQ প্রশ্ন ব্যাংক, পরীক্ষা এবং শিক্ষার্থীদের রিসোর্সের স্বতন্ত্র ব্যবস্থা।</p>
-      <span class="soon">আলাদা রিপোজিটরি ও ড্যাশবোর্ড তৈরি বাকি</span>
+      <div class="card-top"><div class="icon" aria-hidden="true">🎓</div><div><h3>একাডেমিক কেয়ার</h3><span class="status pending">শুরু করা বাকি</span></div></div>
+      <p>স্কুল-কলেজের পড়াশোনা, একাডেমিক MCQ প্রশ্নব্যাংক, পরীক্ষা, নোট এবং শিক্ষাসামগ্রীর স্বতন্ত্র সিস্টেম।</p>
+      <span class="action muted">আলাদা সিস্টেম তৈরি হবে</span>
     </section>
     <section class="card">
-      <div class="icon" aria-hidden="true">📌</div>
-      <h2>গুরুত্বপূর্ণ পোস্ট ও লিঙ্ক</h2>
-      <p>নিজস্ব পোস্ট লেখা বা পোস্টের লিঙ্ক যোগ করা এবং Facebook গ্রুপ ও পেজে সরাসরি যাওয়ার ব্যবস্থা।</p>
-      <span class="soon">আলাদা মডিউল তৈরি বাকি</span>
+      <div class="card-top"><div class="icon" aria-hidden="true">📌</div><div><h3>গুরুত্বপূর্ণ পোস্ট ও লিংক</h3><span class="status pending">শুরু করা বাকি</span></div></div>
+      <p>নিজে পোস্ট লেখা, অন্য পোস্টের লিংক সংরক্ষণ এবং Facebook গ্রুপ ও পেজের সরাসরি লিংক সাজিয়ে রাখা।</p>
+      <span class="action muted">মডিউল পরে যুক্ত হবে</span>
     </section>
   </div>
-  <div class="note"><strong>কাঠামোগত সিদ্ধান্ত:</strong> এই হোমপেজটি শুধু কেন্দ্রীয় প্রবেশদ্বার। এক্সাম সিস্টেম, স্টাডি মেটেরিয়াল, একাডেমিক কেয়ার ও গুরুত্বপূর্ণ পোস্টের ডেটা/প্রশ্ন ব্যাংক একে অপরের সঙ্গে মিশবে না। ভবিষ্যতের ড্যাশবোর্ডগুলোর লিঙ্ক সংশ্লিষ্ট রিপোজিটরি তৈরি হলে এখানে যুক্ত হবে।</div>
+  <aside class="lower"><div class="lower-title">সিস্টেমগুলো আলাদা থাকবে</div><p>এই পেজটি শুধু কেন্দ্রীয় প্রবেশদ্বার। প্রতিটি ড্যাশবোর্ডের প্রশ্নব্যাংক, কনটেন্ট ও পরিচালনা আলাদা থাকবে—একটির তথ্য অন্যটির সঙ্গে মিশবে না। নতুন মডিউল তৈরি হলে তার লিংক এখানেই যোগ করা হবে।</p></aside>
 </main>
-<footer>ফেইসবুক পাঠশালা • কেন্দ্রীয় অ্যাডমিন</footer>
+<footer>ফেইসবুক পাঠশালা · কেন্দ্রীয় অ্যাডমিন</footer>
 </body>
 </html>
