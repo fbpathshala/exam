@@ -60,7 +60,9 @@ async function login() {
     return msg('loginMsg', error.message, true);
   }
 
-  await init();
+  // Keep the Supabase session, then send the admin to the central home.
+  // Clicking the Exam card will reopen this admin panel with the saved session.
+  location.href = 'https://fbpathshala.github.io/home.html';
 }
 
 async function logout() {
