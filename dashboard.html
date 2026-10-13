@@ -258,6 +258,9 @@ html,body{background:var(--dash-bg)!important}
 .sub-dashboard-footer a:hover{text-decoration:underline}
 @media(max-width:760px){.sub-dashboard-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.sub-dashboard-actions{padding:17px}}
 @media(max-width:480px){.sub-dashboard-grid{grid-template-columns:1fr}.sub-dashboard-card{min-height:140px}.sub-dashboard-heading{flex-direction:column}.sub-dashboard-heading h2{font-size:20px}}
+.dashboard-return-row{display:flex;justify-content:flex-end;margin-top:18px}
+.dashboard-return-link{display:inline-flex;align-items:center;padding:9px 13px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:#173f5f!important;text-decoration:none;font-size:13px;font-weight:700}
+.dashboard-return-link:hover{background:#eaf2f8}
 </style>
 <style id="site-copy-deterrent">html,body{ -webkit-user-select:none!important; user-select:none!important; -webkit-touch-callout:none!important}input,textarea,select,[contenteditable="true"],[contenteditable=""],.allow-copy{ -webkit-user-select:text!important; user-select:text!important; -webkit-touch-callout:default!important} @media print{body{display:none!important}}</style></head>
 
@@ -335,7 +338,7 @@ html,body{background:var(--dash-bg)!important}
           <button
             onclick="location.href='exam-manager.html'"
           >
-            ⚙️ পরীক্ষা সেটিংস ও ব্যবস্থাপনা
+            ⚙️ পরীক্ষা পরিচালনা
           </button>
 
           <!-- ৫. ফলাফল পর্যালোচনা -->
@@ -343,21 +346,6 @@ html,body{background:var(--dash-bg)!important}
             onclick="openResultsWithSession()"
           >
             📊 ফলাফল পর্যালোচনা
-          </button>
-
-          <!-- কেন্দ্রীয় হোমে ফেরা -->
-          <button
-            onclick="location.href='admin-home.html'"
-          >
-            🏠 কেন্দ্রীয় অ্যাডমিন হোম
-          </button>
-
-          <!-- ৬. লগ আউট -->
-          <button
-            class="logout"
-            id="logoutBtn"
-          >
-            🚪 লগ আউট
           </button>
 
         </div>
@@ -434,23 +422,9 @@ html,body{background:var(--dash-bg)!important}
 
     </div>
 
-    <section class="sub-dashboard-actions" aria-labelledby="subDashTitle">
-      <div class="sub-dashboard-heading">
-        <div>
-          <h2 id="subDashTitle">এক্সাম পরিচালনার কাজ</h2>
-          <p>এখান থেকে সরাসরি প্রয়োজনীয় কাজ নির্বাচন করুন। এটি মূল পরিসংখ্যান পেজ থেকে আলাদা কাজের ড্যাশবোর্ড।</p>
-        </div>
-        <span class="sub-dashboard-badge">সাব ড্যাশবোর্ড</span>
-      </div>
-      <div class="sub-dashboard-grid">
-        <a class="sub-dashboard-card" href="question_create.html"><span class="sub-dash-icon">✍️</span><strong>প্রশ্ন তৈরি</strong><small>নতুন MCQ প্রশ্ন তৈরি ও সংরক্ষণ</small><span class="sub-dash-open">খুলুন ↗</span></a>
-        <a class="sub-dashboard-card" href="question_bank.html"><span class="sub-dash-icon">🗂️</span><strong>প্রশ্ন ব্যাংক</strong><small>সংরক্ষিত প্রশ্ন খোঁজা ও সম্পাদনা</small><span class="sub-dash-open">খুলুন ↗</span></a>
-        <a class="sub-dashboard-card" href="create-exam.html"><span class="sub-dash-icon">📝</span><strong>পরীক্ষা তৈরি</strong><small>নতুন পরীক্ষা তৈরি ও প্রকাশ</small><span class="sub-dash-open">খুলুন ↗</span></a>
-        <a class="sub-dashboard-card" href="exam-manager.html"><span class="sub-dash-icon">⚙️</span><strong>পরীক্ষা পরিচালনা</strong><small>পরীক্ষার সেটিংস ও লিংক ব্যবস্থাপনা</small><span class="sub-dash-open">খুলুন ↗</span></a>
-        <a class="sub-dashboard-card" href="#" onclick="event.preventDefault();openResultsWithSession()"><span class="sub-dash-icon">📊</span><strong>ফলাফল পর্যালোচনা</strong><small>শিক্ষার্থীদের ফলাফল ও উত্তরপত্র</small><span class="sub-dash-open">খুলুন ↗</span></a>
-      </div>
-      <div class="sub-dashboard-footer"><a href="admin-home.html">🏠 কেন্দ্রীয় অ্যাডমিন হোম</a><span>›</span><a href="admin.html">মূল অ্যাডমিন ড্যাশবোর্ড</a></div>
-    </section>
+    <div class="dashboard-return-row"><a class="dashboard-return-link" href="https://fbpathshala.github.io/home.html">← কেন্দ্রীয় হোমপেজে ফিরুন</a></div>
+
+
 
     <div id="status" class="status"></div>
 
@@ -723,12 +697,6 @@ html,body{background:var(--dash-bg)!important}
     }
 
     init();
-  };
-
-  /* Logout */
-  $('logoutBtn').onclick = async function(){
-    await db.auth.signOut();
-    location.reload();
   };
 
   /* Three-line Menu */
