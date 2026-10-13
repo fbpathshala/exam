@@ -117,10 +117,9 @@ async function init() {
   }
 
   if (!data.session) {
-
-    $('login')?.classList.remove('hidden');
-    $('app')?.classList.add('hidden');
-
+    // Centralized authentication: keep the existing exam dashboard intact,
+    // but require the administrator to sign in from the central home page.
+    location.replace('https://fbpathshala.github.io/home.html');
     return;
   }
 
