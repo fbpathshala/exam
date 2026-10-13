@@ -239,6 +239,26 @@ html,body{background:var(--dash-bg)!important}
 .admin-menu-panel button:active{transform:translateY(1px)}
 @media(max-width:480px){.admin-menu-panel{right:0;top:54px}.admin-menu-panel button{min-height:48px;font-size:14px!important}}
 </style>
+<style id="sub-dashboard-consistent-pattern">
+/* Consistent sub-dashboard layout and navigation */
+.sub-dashboard-actions{margin-top:22px;background:#fff;border:1px solid #dbe5ef;border-radius:20px;padding:22px;box-shadow:0 8px 24px rgba(16,42,67,.06)}
+.sub-dashboard-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px}
+.sub-dashboard-heading h2{margin:0;color:#102a43;font-size:22px}
+.sub-dashboard-heading p{margin:6px 0 0;color:#52677d;font-size:14px;line-height:1.65}
+.sub-dashboard-badge{flex-shrink:0;background:#e5f4f1;color:#0f766e;border-radius:999px;padding:7px 11px;font-size:12px;font-weight:800}
+.sub-dashboard-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.sub-dashboard-card{display:flex;flex-direction:column;align-items:flex-start;gap:9px;min-height:170px;padding:17px;border:1px solid #dbe5ef;border-radius:15px;background:#fff;text-decoration:none!important;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}
+.sub-dashboard-card:hover{transform:translateY(-2px);border-color:#94b4d2;box-shadow:0 9px 20px rgba(16,42,67,.09)}
+.sub-dash-icon{display:grid;place-items:center;width:45px;height:45px;border-radius:13px;background:#edf3ff;font-size:24px}
+.sub-dashboard-card strong{font-size:16px;color:#102a43}
+.sub-dashboard-card small{font-size:13px;line-height:1.6;color:#52677d;flex:1}
+.sub-dash-open{font-size:13px;font-weight:800;color:#2458d3}
+.sub-dashboard-footer{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:18px;padding-top:15px;border-top:1px solid #e1e8f0;font-size:13px;color:#8190a2}
+.sub-dashboard-footer a{font-weight:800;color:#2458d3;text-decoration:none}
+.sub-dashboard-footer a:hover{text-decoration:underline}
+@media(max-width:760px){.sub-dashboard-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.sub-dashboard-actions{padding:17px}}
+@media(max-width:480px){.sub-dashboard-grid{grid-template-columns:1fr}.sub-dashboard-card{min-height:140px}.sub-dashboard-heading{flex-direction:column}.sub-dashboard-heading h2{font-size:20px}}
+</style>
 <style id="site-copy-deterrent">html,body{ -webkit-user-select:none!important; user-select:none!important; -webkit-touch-callout:none!important}input,textarea,select,[contenteditable="true"],[contenteditable=""],.allow-copy{ -webkit-user-select:text!important; user-select:text!important; -webkit-touch-callout:default!important} @media print{body{display:none!important}}</style></head>
 
 <body>
@@ -325,6 +345,13 @@ html,body{background:var(--dash-bg)!important}
             📊 ফলাফল পর্যালোচনা
           </button>
 
+          <!-- কেন্দ্রীয় হোমে ফেরা -->
+          <button
+            onclick="location.href='admin-home.html'"
+          >
+            🏠 কেন্দ্রীয় অ্যাডমিন হোম
+          </button>
+
           <!-- ৬. লগ আউট -->
           <button
             class="logout"
@@ -406,6 +433,24 @@ html,body{background:var(--dash-bg)!important}
       </div>
 
     </div>
+
+    <section class="sub-dashboard-actions" aria-labelledby="subDashTitle">
+      <div class="sub-dashboard-heading">
+        <div>
+          <h2 id="subDashTitle">এক্সাম পরিচালনার কাজ</h2>
+          <p>এখান থেকে সরাসরি প্রয়োজনীয় কাজ নির্বাচন করুন। এটি মূল পরিসংখ্যান পেজ থেকে আলাদা কাজের ড্যাশবোর্ড।</p>
+        </div>
+        <span class="sub-dashboard-badge">সাব ড্যাশবোর্ড</span>
+      </div>
+      <div class="sub-dashboard-grid">
+        <a class="sub-dashboard-card" href="question_create.html"><span class="sub-dash-icon">✍️</span><strong>প্রশ্ন তৈরি</strong><small>নতুন MCQ প্রশ্ন তৈরি ও সংরক্ষণ</small><span class="sub-dash-open">খুলুন ↗</span></a>
+        <a class="sub-dashboard-card" href="question_bank.html"><span class="sub-dash-icon">🗂️</span><strong>প্রশ্ন ব্যাংক</strong><small>সংরক্ষিত প্রশ্ন খোঁজা ও সম্পাদনা</small><span class="sub-dash-open">খুলুন ↗</span></a>
+        <a class="sub-dashboard-card" href="create-exam.html"><span class="sub-dash-icon">📝</span><strong>পরীক্ষা তৈরি</strong><small>নতুন পরীক্ষা তৈরি ও প্রকাশ</small><span class="sub-dash-open">খুলুন ↗</span></a>
+        <a class="sub-dashboard-card" href="exam-manager.html"><span class="sub-dash-icon">⚙️</span><strong>পরীক্ষা পরিচালনা</strong><small>পরীক্ষার সেটিংস ও লিংক ব্যবস্থাপনা</small><span class="sub-dash-open">খুলুন ↗</span></a>
+        <a class="sub-dashboard-card" href="#" onclick="event.preventDefault();openResultsWithSession()"><span class="sub-dash-icon">📊</span><strong>ফলাফল পর্যালোচনা</strong><small>শিক্ষার্থীদের ফলাফল ও উত্তরপত্র</small><span class="sub-dash-open">খুলুন ↗</span></a>
+      </div>
+      <div class="sub-dashboard-footer"><a href="admin-home.html">🏠 কেন্দ্রীয় অ্যাডমিন হোম</a><span>›</span><a href="admin.html">মূল অ্যাডমিন ড্যাশবোর্ড</a></div>
+    </section>
 
     <div id="status" class="status"></div>
 
