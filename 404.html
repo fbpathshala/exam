@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>পরীক্ষার লিংক খোঁজা হচ্ছে — FbPathshala</title>
+  <style>
+    :root { color-scheme: light; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 20px; box-sizing: border-box; font-family: system-ui, sans-serif; background: #f4f7fb; color: #172033; }
+    main { width: min(100%, 440px); box-sizing: border-box; padding: 28px; border-radius: 16px; background: white; box-shadow: 0 8px 30px #17203312; text-align: center; }
+    h1 { font-size: 1.35rem; margin: 0 0 12px; }
+    p { line-height: 1.65; color: #4b5563; }
+    a { display: inline-block; margin-top: 8px; padding: 11px 18px; border-radius: 9px; background: #1459c7; color: white; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1 id="title">পরীক্ষার লিংক খোঁজা হচ্ছে…</h1>
+    <p id="message">একটু অপেক্ষা করুন।</p>
+    <a id="home" href="/exam/">পরীক্ষার পাতায় যান</a>
+  </main>
+  <script>
+    (function () {
+      // GitHub Pages project site path is /exam/. A short link looks like /exam/e/29.
+      var match = window.location.pathname.match(/^\/exam\/e\/(\d+)\/?$/);
+      if (match) {
+        var id = match[1];
+        window.location.replace('/exam/index.html?exam=' + encodeURIComponent(id));
+        return;
+      }
+
+      document.getElementById('title').textContent = 'পরীক্ষার লিংকটি সঠিক নয়';
+      document.getElementById('message').textContent =
+        'লিংকটি অসম্পূর্ণ বা ভুল হতে পারে। পরীক্ষার আয়োজকের কাছ থেকে সঠিক লিংকটি নিন।';
+    }());
+  </script>
+</body>
+</html>
