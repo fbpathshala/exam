@@ -134,7 +134,12 @@ async function init() {
   await loadBank();
   await loadExams();
 
-  showPage('dashboard');
+  const section = new URLSearchParams(location.search).get('section');
+  if (section === 'exam-system' || section === 'materials' || section === 'dashboard') {
+    showPage(section);
+  } else {
+    showPage('dashboard');
+  }
 }
 
 
