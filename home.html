@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ফেইসবুক পাঠশালা — Central Admin Home</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f4f7fb;color:#102a43}
+.wrap{max-width:980px;margin:auto;padding:28px 18px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:28px}.brand h1{margin:0;font-size:25px}.brand p{margin:5px 0 0;color:#64748b}.logout{border:0;border-radius:10px;padding:10px 14px;background:#dc2626;color:#fff;font-weight:700;cursor:pointer}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.card{display:block;text-decoration:none;color:inherit;background:#fff;border:1px solid #dbe5ef;border-radius:20px;padding:22px;min-height:170px;box-shadow:0 8px 24px rgba(15,23,42,.06);transition:.15s}.card:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(15,23,42,.1);border-color:#93b4d5}.icon{font-size:38px}.card h2{margin:12px 0 6px;font-size:20px}.card p{margin:0;color:#52677d;line-height:1.55}.badge{display:inline-block;margin-top:14px;padding:5px 9px;border-radius:999px;background:#eaf2ff;color:#2456a6;font-size:12px;font-weight:700}.login{max-width:430px;margin:90px auto;background:#fff;padding:26px;border-radius:20px;border:1px solid #dbe5ef;box-shadow:0 12px 35px rgba(15,23,42,.08)}input{width:100%;padding:12px;margin:7px 0;border:1px solid #b8c8d8;border-radius:10px;font-size:15px}.login button{width:100%;padding:12px;margin-top:8px;border:0;border-radius:10px;background:#1d4ed8;color:#fff;font-weight:800;cursor:pointer}.msg{color:#b91c1c;min-height:20px}@media(max-width:650px){.grid{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<div id="login" class="login">
+  <h1>ফেইসবুক পাঠশালা</h1>
+  <p>Central Admin Home</p>
+  <input id="email" type="email" placeholder="Admin Email">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+  <p id="msg" class="msg"></p>
+</div>
+
+<div id="app" class="wrap" hidden>
+  <header class="top">
+    <div class="brand"><h1>ফেইসবুক পাঠশালা</h1><p>Central Admin Home — সব ফিচারের ড্যাশবোর্ড এক জায়গা থেকে</p></div>
+    <button class="logout" onclick="logout()">লগ আউট</button>
+  </header>
+  <main class="grid">
+    <a class="card" href="admin.html?section=exam-system">
+      <div class="icon">📋</div><h2>এক্সাম সিস্টেম</h2>
+      <p>বর্তমান সন্তোষজনক Exam Dashboard-এ সরাসরি যান। এর ভেতরের প্রশ্ন তৈরি, প্রশ্ন ব্যাংক, পরীক্ষা তৈরি, পরিচালনা ও ফলাফল পর্যালোচনার কাজ আগের মতোই থাকবে।</p>
+      <span class="badge">বর্তমান ড্যাশবোর্ড</span>
+    </a>
+    <a class="card" href="admin.html?section=materials">
+      <div class="icon">📚</div><h2>স্টাডি ম্যাটেরিয়াল</h2>
+      <p>বর্তমান স্টাডি ম্যাটেরিয়াল ব্যবস্থাপনায় যান। আলাদা ড্যাশবোর্ড/রিপোজিটরিতে নেওয়ার পর এটিই তার প্রবেশপথ থাকবে।</p>
+      <span class="badge">বর্তমান ফিচার</span>
+    </a>
+    <div class="card">
+      <div class="icon">🎓</div><h2>একাডেমিক কেয়ার</h2>
+      <p>আলাদা রিপোজিটরি ও আলাদা ড্যাশবোর্ডের জন্য প্রস্তুত জায়গা। এর MCQ/প্রশ্ন ব্যাংক Exam System-এর সঙ্গে মেশানো হবে না।</p>
+      <span class="badge">পরবর্তী ধাপ</span>
+    </div>
+    <div class="card">
+      <div class="icon">📌</div><h2>গুরুত্বপূর্ণ পোস্ট</h2>
+      <p>নিজের পোস্ট লেখা বা অন্য পোস্টের লিংক সংরক্ষণ ও প্রকাশের আলাদা ফিচার হিসেবে পরে যুক্ত করা হবে।</p>
+      <span class="badge">পরবর্তী ধাপ</span>
+    </div>
+    <div class="card">
+      <div class="icon">👥</div><h2>Facebook Group</h2>
+      <p>ক্লিক করলে সরাসরি নির্ধারিত Facebook Group-এ যাওয়ার লিংক থাকবে।</p>
+      <span class="badge">লিংক ফিচার</span>
+    </div>
+    <div class="card">
+      <div class="icon">📘</div><h2>Facebook Page</h2>
+      <p>ক্লিক করলে সরাসরি নির্ধারিত Facebook Page-এ যাওয়ার লিংক থাকবে।</p>
+      <span class="badge">লিংক ফিচার</span>
+    </div>
+  </main>
+</div>
+
+<script src="js/supabase.js?v=20261012-shared-auth2"></script>
+<script>
+async function login(){
+  const msg=document.getElementById('msg'); msg.textContent='Login হচ্ছে...';
+  const email=document.getElementById('email').value.trim(), password=document.getElementById('password').value;
+  if(!email||!password){msg.textContent='Email ও Password দিন।';return}
+  const {error}=await db.auth.signInWithPassword({email,password});
+  if(error){msg.textContent=error.message;return}
+  showApp();
+}
+async function showApp(){
+  const {data}=await db.auth.getSession();
+  if(!data.session){document.getElementById('login').hidden=false;document.getElementById('app').hidden=true;return}
+  document.getElementById('login').hidden=true;document.getElementById('app').hidden=false;
+}
+async function logout(){await db.auth.signOut();location.reload()}
+showApp();
+</script>
+</body>
+</html>
