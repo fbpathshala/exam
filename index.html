@@ -268,13 +268,16 @@ function showResult(){
   fbPageLink.href=settings.facebook_page_url||"https://www.facebook.com/facebookpathshala";
   fbGroupLink.href=settings.facebook_group_url||"https://www.facebook.com/groups/facebookpathshala";
   const showPageLink=settings.show_page_link===true;
-  /* ধন্যবাদ বার্তা ও Facebook গ্রুপ লিংক সব পরীক্ষার ফলাফলে সবসময় দেখাবে।
-     এটি শুধু ফলাফল পেজের প্রদর্শন বদলায়; Supabase-এর ফলাফল/শিক্ষার্থী রেকর্ডে কোনো পরিবর্তন করে না। */
-  const showGroupLink=true;
+  const showGroupLink=settings.show_group_link!==false;
   fbPageLink.classList.toggle("hidden",!showPageLink);
+  fbPageLink.hidden=!showPageLink;
   fbGroupLink.classList.toggle("hidden",!showGroupLink);
-  socialHighlight.classList.remove("hidden");socialHighlight.hidden=false;socialHighlight.style.display="block";socialHighlight.style.visibility="visible";
-  fbGroupLink.hidden=false;fbGroupLink.classList.remove("hidden");fbGroupLink.style.display="block";fbGroupLink.style.visibility="visible";
+  fbGroupLink.hidden=!showGroupLink;
+  const showSocialLinks=showPageLink||showGroupLink;
+  socialHighlight.classList.toggle("hidden",!showSocialLinks);
+  socialHighlight.hidden=!showSocialLinks;
+  socialHighlight.style.display=showSocialLinks?"block":"none";
+  socialHighlight.style.visibility=showSocialLinks?"visible":"hidden";
   fbGroupLink.textContent="👥 ফেসবুক গ্রুপে যোগ দিন";
   fbGroupLink.setAttribute("aria-label","ফেসবুক পাঠশালার Facebook গ্রুপে যোগ দিন");
 }
