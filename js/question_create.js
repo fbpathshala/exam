@@ -36,6 +36,7 @@ function fillCategorySelect(id, selected=cat) {
 
 function setCategoryUI() {
   if ($('categorySelect')) $('categorySelect').value = cat;
+  if ($('categorySelectManage')) $('categorySelectManage').value = cat;
   ['questionCategory'].forEach(id => { if ($(id)) $(id).value = cat; });
 }
 
@@ -43,7 +44,7 @@ async function loadCategories(selected=cat) {
   const {data,error}=await client().from('question_bank_categories').select('id,name').order('name');
   if(error){msg('categoryMsg',error.message,true);return;}
   CATS=Object.fromEntries((data||[]).map(x=>[x.name,x.name]));
-  for(const id of ['categorySelect','questionCategory','importCategory']) fillCategorySelect(id,selected);
+  for(const id of ['categorySelect','categorySelectManage','questionCategory','importCategory']) fillCategorySelect(id,selected);
   if(!CATS[cat])cat='';
   setCategoryUI();
 }
@@ -116,8 +117,7 @@ async function init() {
     await loadCategories();
     fillCategorySelect('questionCategory');
     $('categorySelect')?.addEventListener('change', e => selectCategory(e.target.value));
-    $('renameCategoryBtn')?.addEventListener('click', renameSelectedCategory);
-    $('deleteCategoryBtn')?.addEventListener('click', deleteSelectedCategory);
+    $('categorySelectManage')?.addEventListener('change', e => selectCategory(e.target.value));
     $('createCategoryBtn')?.addEventListener('click', createCategory);
     await loadSubjects();
     fillCategorySelect('importCategory');
