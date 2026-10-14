@@ -135,6 +135,19 @@ button.secondary{background:#e8f1f8!important;color:#173f5f!important;border:1px
       </select>
     </div>
 
+    <div class="manage-box" style="margin-bottom:18px">
+      <h3>🏷️ ক্যাটাগরি ব্যবস্থাপনা</h3>
+      <p>নতুন ক্যাটাগরি তৈরি করুন, নির্বাচিত ক্যাটাগরির নাম পরিবর্তন করুন অথবা খালি ক্যাটাগরি মুছে ফেলুন। নাম বদলালে প্রশ্নের Source-এও নতুন নাম দেখাবে।</p>
+      <div class="grid">
+        <div><label for="newCategoryName">নতুন ক্যাটাগরির নাম</label><input id="newCategoryName" maxlength="120" placeholder="যেমন: বিসিএস প্রস্তুতি"></div>
+        <div style="display:flex;align-items:end"><button id="createCategoryBtn" type="button">＋ ক্যাটাগরি তৈরি</button></div>
+      </div>
+      <div class="manage-actions">
+        <button id="renameCategoryBtn" type="button" class="secondary">✏️ নির্বাচিত ক্যাটাগরির নাম বদলান</button>
+        <button id="deleteCategoryBtn" type="button" class="secondary">🗑️ নির্বাচিত ক্যাটাগরি মুছুন</button>
+      </div>
+      <p id="categoryMsg" class="msg" role="status" aria-live="polite"></p>
+    </div>
     <div class="manage-grid">
       <div class="manage-box">
         <h3>📁 ফোল্ডার ব্যবস্থাপনা</h3>
@@ -204,7 +217,7 @@ button.secondary{background:#e8f1f8!important;color:#173f5f!important;border:1px
 </main>
 </div>
 <script src="js/supabase.js?v=20261008-1"></script>
-<script src="js/question_create.js?v=20261012-4"></script>
+<script src="js/question_create.js?v=20261014-1"></script>
 <a class="direct-dashboard-nav" href="dashboard.html" aria-label="ড্যাশবোর্ডে ফিরে যান">🏠 ড্যাশবোর্ড</a><script id="site-copy-deterrent-script">(function(){function editable(t){return !!(t&&t.closest&&t.closest('input,textarea,select,[contenteditable="true"],[contenteditable=""]'))}document.addEventListener('contextmenu',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('selectstart',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('copy',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('cut',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('keydown',function(e){if(editable(e.target))return;var k=(e.key||'').toLowerCase();if((e.ctrlKey||e.metaKey)&&['c','x','u','s','p'].includes(k)){e.preventDefault();e.stopPropagation()}if(e.key==='PrintScreen')e.preventDefault()},true)})();</script><a class="central-home-nav" href="https://fbpathshala.github.io/home.html" aria-label="কেন্দ্রীয় হোমপেজে ফিরে যান">⌂ কেন্দ্রীয় হোমপেজ</a>
 <a class="central-section-nav" href="https://fbpathshala.github.io/home.html?section=job" aria-label="Job Care বিভাগের মেনুতে ফিরে যান">↩ Job Care মেনু</a></body>
 </html>
