@@ -18,6 +18,9 @@ alter table public.exam_settings add column if not exists thank_you_message text
 alter table public.exam_settings add column if not exists facebook_page_url text;
 alter table public.exam_settings add column if not exists facebook_group_url text;
 alter table public.exam_settings add column if not exists question_display_mode text not null default 'all';
+alter table public.exam_settings add column if not exists show_answer_paper boolean not null default true;
+alter table public.exam_settings add column if not exists show_page_link boolean not null default false;
+alter table public.exam_settings add column if not exists show_group_link boolean not null default true;
 
 alter table public.question_bank_folders enable row level security;
 alter table public.question_bank_sets enable row level security;
