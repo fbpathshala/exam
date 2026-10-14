@@ -1,8 +1,4 @@
-const CATS = {
-  recruitment: 'নিয়োগ পরীক্ষা',
-  verification_test: 'যাচাই পরীক্ষা',
-  recent: 'সাম্প্রতিক প্রশ্ন'
-};
+let CATS = {};
 
 let cat = '';
 let subjects = [];
@@ -43,6 +39,61 @@ function setCategoryUI() {
   ['questionCategory'].forEach(id => { if ($(id)) $(id).value = cat; });
 }
 
+async function loadCategories(selected=cat) {
+  const {data,error}=await client().from('question_bank_categories').select('id,name').order('name');
+  if(error){msg('categoryMsg',error.message,true);return;}
+  CATS=Object.fromEntries((data||[]).map(x=>[x.name,x.name]));
+  for(const id of ['categorySelect','questionCategory','importCategory']) fillCategorySelect(id,selected);
+  if(!CATS[cat])cat='';
+  setCategoryUI();
+}
+async function createCategory(){
+  const name=$('newCategoryName')?.value.trim();
+  if(!name)return msg('categoryMsg','নতুন ক্যাটাগরির নাম লিখুন।',true);
+  const {data,error}=await client().from('question_bank_categories').insert({name}).select('id,name').single();
+  if(error)return msg('categoryMsg',error.message,true);
+  $('newCategoryName').value='';
+  cat=data.name;
+  await loadCategories(cat);
+  await loadFolders();
+  await loadImportFolders();
+  msg('categoryMsg','✅ নতুন ক্যাটাগরি তৈরি হয়েছে।');
+}
+async function renameSelectedCategory(){
+  const oldName=cat||$('categorySelect')?.value;
+  if(!oldName)return msg('categoryMsg','আগে ক্যাটাগরি নির্বাচন করুন।',true);
+  const name=prompt('নতুন ক্যাটাগরির নাম লিখুন:',oldName);
+  if(name===null)return;
+  const value=name.trim();
+  if(!value)return msg('categoryMsg','ক্যাটাগরির নাম খালি রাখা যাবে না।',true);
+  if(value===oldName)return;
+  const {error}=await client().from('question_bank_categories').update({name:value}).eq('name',oldName);
+  if(error)return msg('categoryMsg',error.message,true);
+  cat=value;
+  await loadCategories(value);
+  await loadFolders();
+  await loadImportFolders();
+  msg('categoryMsg','✅ ক্যাটাগরির নাম পরিবর্তন হয়েছে। প্রশ্নের Source-এও নতুন নাম দেখাবে।');
+}
+async function deleteSelectedCategory(){
+  const name=cat||$('categorySelect')?.value;
+  if(!name)return msg('categoryMsg','আগে ক্যাটাগরি নির্বাচন করুন।',true);
+  const [folders,questions]=await Promise.all([
+    client().from('question_bank_folders').select('id',{count:'exact',head:true}).eq('sub_category',name),
+    client().from('questions').select('id',{count:'exact',head:true}).eq('category',name)
+  ]);
+  if(folders.error||questions.error)return msg('categoryMsg',(folders.error||questions.error).message,true);
+  if((folders.count||0)||(questions.count||0))return msg('categoryMsg',`❌ এই ক্যাটাগরিতে ফোল্ডার ${bn(folders.count||0)}টি এবং প্রশ্ন ${bn(questions.count||0)}টি আছে। আগে সেগুলো অন্য ক্যাটাগরিতে সরান। কোনো রেকর্ড মুছে ফেলা হয়নি।`,true);
+  if(!confirm(`“${name}” ক্যাটাগরি মুছে ফেলবেন?`))return;
+  const {error}=await client().from('question_bank_categories').delete().eq('name',name);
+  if(error)return msg('categoryMsg',error.message,true);
+  cat='';
+  await loadCategories('');
+  await loadFolders();
+  await loadImportFolders();
+  msg('categoryMsg','✅ ক্যাটাগরি মুছে ফেলা হয়েছে।');
+}
+
 async function login() {
   try {
     msg('loginMsg','Login হচ্ছে...');
@@ -62,8 +113,12 @@ async function init() {
     if (!data.session) return;
     $('login')?.classList.add('hidden');
     $('app')?.classList.remove('hidden');
+    await loadCategories();
     fillCategorySelect('questionCategory');
     $('categorySelect')?.addEventListener('change', e => selectCategory(e.target.value));
+    $('renameCategoryBtn')?.addEventListener('click', renameSelectedCategory);
+    $('deleteCategoryBtn')?.addEventListener('click', deleteSelectedCategory);
+    $('createCategoryBtn')?.addEventListener('click', createCategory);
     await loadSubjects();
     fillCategorySelect('importCategory');
     setCategoryUI();
