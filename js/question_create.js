@@ -333,7 +333,9 @@ async function deleteSelectedSet() {
 
 function norm(value) { return String(value ?? '').replace(/\uFEFF/g,'').replace(/\u00A0/g,' ').trim().replace(/\s+/g,' ').replace(/[‐‑‒–—−]/g,'-').toLowerCase(); }
 function normalizeCategory(value) {
-  const aliases = {'নিয়োগ পরীক্ষা':'নিয়োগ পরীক্ষা','নিয়োগ':'নিয়োগ পরীক্ষা','নিয়োগ পরীক্ষা':'নিয়োগ পরীক্ষা','নিয়োগ':'নিয়োগ পরীক্ষা','recruitment':'নিয়োগ পরীক্ষা','recruitment exam':'নিয়োগ পরীক্ষা','যাচাই পরীক্ষা':'যাচাই পরীক্ষা','যাচাই':'যাচাই পরীক্ষা','verification':'যাচাই পরীক্ষা','verification test':'যাচাই পরীক্ষা','সাম্প্রতিক প্রশ্ন':'সাম্প্রতিক প্রশ্ন','সাম্প্রতিক':'সাম্প্রতিক প্রশ্ন','recent':'সাম্প্রতিক প্রশ্ন','recent questions':'সাম্প্রতিক প্রশ্ন'};
+  const dynamic=Object.keys(CATS).find(name=>norm(name)===norm(value));
+  if(dynamic)return dynamic;
+  const aliases = {'নিয়োগ পরীক্ষা':'নিয়োগ পরীক্ষা','নিয়োগ':'নিয়োগ পরীক্ষা','নিয়োগ পরীক্ষা':'নিয়োগ পরীক্ষা','নিয়োগ':'নিয়োগ পরীক্ষা','recruitment':'নিয়োগ পরীক্ষা','recruitment exam':'নিয়োগ পরীক্ষা','যাচাই পরীক্ষা':'যাচাই পরীক্ষা','যাচাই':'যাচাই পরীক্ষা','verification':'যাচাই পরীক্ষা','verification test':'যাচাই পরীক্ষা','সাম্প্রতিক প্রশ্ন':'সাম্প্রতিক প্রশ্নোত্তর','সাম্প্রতিক':'সাম্প্রতিক প্রশ্নোত্তর','recent':'সাম্প্রতিক প্রশ্নোত্তর','recent questions':'সাম্প্রতিক প্রশ্নোত্তর'};
   return aliases[norm(value)] || null;
 }
 function normalizeHeader(value) { return norm(value).replace(/[\s\-]+/g,'_'); }
