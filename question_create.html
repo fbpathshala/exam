@@ -30,7 +30,7 @@
   .category-select-wrap select:focus{outline:3px solid #14b8a633;border-color:#0f766e}
   .manage-card{border:1px solid #e2e8f0;background:#fff}
   .category-select-wrap{max-width:460px;margin:0 0 16px}\n  .category-select-wrap label{display:block;margin-bottom:6px;font-weight:700}\n  .category-select-wrap select{width:100%;min-height:46px;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;background:#fff;font-size:15px}
-  .manage-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .manage-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
   .manage-box{border:1px solid #e2e8f0;border-radius:14px;padding:16px;background:#f8fafc}
   .manage-box h3{margin:0 0 5px;font-size:17px}
   .manage-box p{margin:0 0 12px;color:#64748b;font-size:13px}
@@ -40,7 +40,7 @@
   .destination strong{display:block;margin-bottom:4px}
   .destination small{color:#475569}
   .inline-actions{display:flex;gap:8px;flex-wrap:wrap}
-  @media(max-width:760px){.category-hero{align-items:flex-start;gap:12px}.category-hero-icon{flex-basis:46px;height:46px;border-radius:14px}.category-workflow{gap:7px;padding:10px}.workflow-step{gap:5px;font-size:12px}.workflow-number{width:24px;height:24px}.category-select-wrap{max-width:none;padding:13px}.manage-grid{grid-template-columns:1fr}.manage-actions{grid-template-columns:1fr 1fr}.flow{gap:5px}.flow span{padding:6px 9px}}
+  @media(max-width:980px){.manage-grid{grid-template-columns:1fr 1fr}}@media(max-width:760px){.category-hero{align-items:flex-start;gap:12px}.category-hero-icon{flex-basis:46px;height:46px;border-radius:14px}.category-workflow{gap:7px;padding:10px}.workflow-step{gap:5px;font-size:12px}.workflow-number{width:24px;height:24px}.category-select-wrap{max-width:none;padding:13px}.manage-grid{grid-template-columns:1fr}.manage-actions{grid-template-columns:1fr 1fr}.flow{gap:5px}.flow span{padding:6px 9px}}
 </style>
 <style id="direct-dashboard-navigation">.direct-dashboard-nav{position:fixed;right:16px;bottom:16px;z-index:9999;display:inline-flex;align-items:center;gap:8px;padding:11px 16px;border-radius:999px;background:#1d4ed8;color:#fff!important;text-decoration:none!important;font:700 15px/1.2 Arial,sans-serif;box-shadow:0 5px 18px #0003;border:2px solid #fff}.direct-dashboard-nav:hover{background:#1e40af;transform:translateY(-1px)}@media print{.direct-dashboard-nav{display:none!important}}</style>
 <style id="premium-question-create-skin">
@@ -135,20 +135,19 @@ button.secondary{background:#e8f1f8!important;color:#173f5f!important;border:1px
       </select>
     </div>
 
-    <div class="manage-box" style="margin-bottom:18px">
-      <h3>🏷️ ক্যাটাগরি ব্যবস্থাপনা</h3>
-      <p>নতুন ক্যাটাগরি তৈরি করুন, নির্বাচিত ক্যাটাগরির নাম পরিবর্তন করুন অথবা খালি ক্যাটাগরি মুছে ফেলুন। নাম বদলালে প্রশ্নের Source-এও নতুন নাম দেখাবে।</p>
-      <div class="grid">
-        <div><label for="newCategoryName">নতুন ক্যাটাগরির নাম</label><input id="newCategoryName" maxlength="120" placeholder="যেমন: বিসিএস প্রস্তুতি"></div>
-        <div style="display:flex;align-items:end"><button id="createCategoryBtn" type="button">＋ ক্যাটাগরি তৈরি</button></div>
-      </div>
-      <div class="manage-actions">
-        <button id="renameCategoryBtn" type="button" class="secondary">✏️ নির্বাচিত ক্যাটাগরির নাম বদলান</button>
-        <button id="deleteCategoryBtn" type="button" class="secondary">🗑️ নির্বাচিত ক্যাটাগরি মুছুন</button>
-      </div>
-      <p id="categoryMsg" class="msg" role="status" aria-live="polite"></p>
-    </div>
     <div class="manage-grid">
+      <div class="manage-box">
+        <h3>🏷️ ক্যাটাগরি ব্যবস্থাপনা</h3>
+        <p>ক্যাটাগরি তৈরি, নাম পরিবর্তন বা খালি ক্যাটাগরি মুছুন। নাম বদলালে প্রশ্নের Source-এও নতুন নাম দেখাবে।</p>
+        <label for="categorySelect">ক্যাটাগরি</label>
+        <select id="categorySelectManage" aria-label="ব্যবস্থাপনার ক্যাটাগরি"></select>
+        <div class="manage-actions">
+          <button type="button" onclick="renameSelectedCategory()">✏️ Rename</button>
+          <button type="button" class="secondary" onclick="deleteSelectedCategory()">🗑️ Delete</button>
+        </div>
+        <div class="grid" style="margin-top:10px"><input id="newCategoryName" maxlength="120" placeholder="নতুন ক্যাটাগরির নাম"><button id="createCategoryBtn" type="button">＋ ক্যাটাগরি তৈরি</button></div>
+        <p id="categoryMsg" class="msg" role="status" aria-live="polite"></p>
+      </div>
       <div class="manage-box">
         <h3>📁 ফোল্ডার ব্যবস্থাপনা</h3>
         <p>নির্বাচিত ক্যাটাগরির ফোল্ডার তৈরি, নাম পরিবর্তন বা মুছে ফেলুন।</p>
