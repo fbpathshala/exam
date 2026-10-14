@@ -260,7 +260,7 @@ function showResult(){
   passStatus.textContent=d.pass_mark?((+d.score>=+d.pass_mark?"✅ উত্তীর্ণ":"❌ অনুত্তীর্ণ")+" — পাস নম্বর "+bn(d.pass_mark)):"";
   passStatus.classList.toggle("hidden",!show);
   if(settings.show_answer_paper!==false&&Array.isArray(d.review)){
-    renderReview(d.review,settings.show_answers===true);
+    renderReview(d.review,settings.show_answers===true,show);
   }else{
     review.classList.add("hidden");
     review.replaceChildren();
@@ -282,18 +282,19 @@ function showResult(){
   fbGroupLink.setAttribute("aria-label","ফেসবুক পাঠশালার Facebook গ্রুপে যোগ দিন");
 }
 
-function renderReview(items,showCorrect=true){
+function renderReview(items,showCorrect=true,showMarks=true){
   review.classList.remove("hidden");
   review.innerHTML='<h3>📋 আপনার উত্তরপত্র</h3><p class="muted"><b>পরীক্ষার সময় আপনি যে প্রশ্নের ক্রম ও অপশন দেখেছিলেন, ঠিক সেই ক্রমেই উত্তরপত্র দেখানো হচ্ছে।</b></p>';
   items.forEach((r,i)=>{
     let div=document.createElement("div");
-    div.className="review-item "+(r.is_correct?"review-correct":"review-wrong");
+    div.className="review-item"+(showCorrect?(r.is_correct?" review-correct":" review-wrong"):"");
     const optionHtml=r.options.map(o=>{
       const letter=letters[o.display_letter];
-      const classes=o.selected&&!o.correct?"paper-wrong":(showCorrect&&o.correct)?"paper-right":"";
+      const classes=showCorrect?(o.selected&&!o.correct?"paper-wrong":o.correct?"paper-right":""):"";
       return `<div class="${classes}"><b>${letter}.</b> ${esc(o.text)}${showCorrect&&o.correct?" ✓":""}</div>`;
     }).join("");
-    div.innerHTML=`<div><b>${bn(i+1)}. ${esc(r.question_text)}</b> <span class="muted">(${bn(r.marks_awarded??0)} নম্বর)</span></div><div class="paper-opts">${optionHtml}</div><div style="margin-top:10px"><b>তোমার উত্তর:</b> ${r.selected_option?letters[(r.options.find(o=>o.original_letter===r.selected_option)||{}).display_letter]+". "+esc((r.options.find(o=>o.original_letter===r.selected_option)||{}).text||""):"দেওয়া হয়নি"}</div>${showCorrect?`<div style="margin-top:5px"><b>সঠিক উত্তর:</b> ${r.correct_option?letters[(r.options.find(o=>o.original_letter===r.correct_option)||{}).display_letter]+". "+esc((r.options.find(o=>o.original_letter===r.correct_option)||{}).text||""):"—"}</div>${r.explanation?`<div style="margin-top:8px"><b>ব্যাখ্যা:</b> ${esc(r.explanation)}</div>`:""}`:""}`;
+    const markLabel=showMarks?` <span class="muted">(${bn(r.marks_awarded??0)} নম্বর)</span>`:"";
+    div.innerHTML=`<div><b>${bn(i+1)}. ${esc(r.question_text)}</b>${markLabel}</div><div class="paper-opts">${optionHtml}</div><div style="margin-top:10px"><b>তোমার উত্তর:</b> ${r.selected_option?letters[(r.options.find(o=>o.original_letter===r.selected_option)||{}).display_letter]+". "+esc((r.options.find(o=>o.original_letter===r.selected_option)||{}).text||""):"দেওয়া হয়নি"}</div>${showCorrect?`<div style="margin-top:5px"><b>সঠিক উত্তর:</b> ${r.correct_option?letters[(r.options.find(o=>o.original_letter===r.correct_option)||{}).display_letter]+". "+esc((r.options.find(o=>o.original_letter===r.correct_option)||{}).text||""):"—"}</div>${r.explanation?`<div style="margin-top:8px"><b>ব্যাখ্যা:</b> ${esc(r.explanation)}</div>`:""}`:""}`;
     review.appendChild(div);
   });
 }
