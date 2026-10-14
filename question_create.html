@@ -75,7 +75,13 @@ button.secondary{background:#e8f1f8!important;color:#173f5f!important;border:1px
 .direct-dashboard-nav{background:linear-gradient(110deg,#173f5f,#0f766e)!important;border:2px solid #fff!important;box-shadow:0 8px 24px rgba(16,42,67,.24)!important}
 @media(max-width:760px){#app{padding:12px 12px 28px}.dashboard-top{padding:15px!important;border-radius:14px!important}.card{border-radius:15px!important}.manage-grid{grid-template-columns:1fr}}
 </style>
-<style id="site-copy-deterrent">html,body{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important}input,textarea,select,[contenteditable="true"],[contenteditable=""]{-webkit-user-select:text!important;user-select:text!important;-webkit-touch-callout:default!important}@media print{body{display:none!important}}</style></head>
+<style id="site-copy-deterrent">html,body{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important}input,textarea,select,[contenteditable="true"],[contenteditable=""]{-webkit-user-select:text!important;user-select:text!important;-webkit-touch-callout:default!important}@media print{body{display:none!important}}</style><style id="central-home-navigation">
+.central-home-nav{position:fixed;left:16px;bottom:16px;z-index:9999;display:inline-flex;align-items:center;gap:8px;padding:11px 15px;border-radius:999px;background:#0f766e;color:#fff!important;text-decoration:none!important;font:700 14px/1.2 Arial,sans-serif;box-shadow:0 5px 18px #0003;border:2px solid #fff}
+.central-home-nav:hover{background:#115e59;transform:translateY(-1px)}
+@media(max-width:480px){.central-home-nav{left:8px;bottom:8px;padding:10px 11px;font-size:12px}}
+@media print{.central-home-nav,.direct-dashboard-nav{display:none!important}}
+</style>
+</head>
 <body>
 <div id="login" class="center">
   <div class="card login">
@@ -199,5 +205,6 @@ button.secondary{background:#e8f1f8!important;color:#173f5f!important;border:1px
 </div>
 <script src="js/supabase.js?v=20261008-1"></script>
 <script src="js/question_create.js?v=20261012-4"></script>
-<a class="direct-dashboard-nav" href="dashboard.html" aria-label="ড্যাশবোর্ডে ফিরে যান">🏠 ড্যাশবোর্ড</a><script id="site-copy-deterrent-script">(function(){function editable(t){return !!(t&&t.closest&&t.closest('input,textarea,select,[contenteditable="true"],[contenteditable=""]'))}document.addEventListener('contextmenu',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('selectstart',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('copy',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('cut',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('keydown',function(e){if(editable(e.target))return;var k=(e.key||'').toLowerCase();if((e.ctrlKey||e.metaKey)&&['c','x','u','s','p'].includes(k)){e.preventDefault();e.stopPropagation()}if(e.key==='PrintScreen')e.preventDefault()},true)})();</script></body>
+<a class="direct-dashboard-nav" href="dashboard.html" aria-label="ড্যাশবোর্ডে ফিরে যান">🏠 ড্যাশবোর্ড</a><script id="site-copy-deterrent-script">(function(){function editable(t){return !!(t&&t.closest&&t.closest('input,textarea,select,[contenteditable="true"],[contenteditable=""]'))}document.addEventListener('contextmenu',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('selectstart',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('copy',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('cut',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('keydown',function(e){if(editable(e.target))return;var k=(e.key||'').toLowerCase();if((e.ctrlKey||e.metaKey)&&['c','x','u','s','p'].includes(k)){e.preventDefault();e.stopPropagation()}if(e.key==='PrintScreen')e.preventDefault()},true)})();</script><a class="central-home-nav" href="https://fbpathshala.github.io/home.html" aria-label="কেন্দ্রীয় হোমপেজে ফিরে যান">⌂ কেন্দ্রীয় হোমপেজ</a>
+</body>
 </html>
