@@ -3,119 +3,44 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ফেইসবুক পাঠশালা — কমন অ্যাডমিন হোমপেজ</title>
+<meta name="theme-color" content="#123b4a">
+<title>ফেইসবুক পাঠশালা — কেন্দ্রীয় হোমপেজ</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f4f7fb;color:#102a43}
-.wrap{max-width:980px;margin:auto;padding:28px 18px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:28px}.brand h1{margin:0;font-size:25px}.brand p{margin:5px 0 0;color:#64748b}.logout{border:0;border-radius:10px;padding:10px 14px;background:#dc2626;color:#fff;font-weight:700;cursor:pointer}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.card{display:block;text-decoration:none;color:inherit;background:#fff;border:1px solid #dbe5ef;border-radius:20px;padding:22px;min-height:170px;box-shadow:0 8px 24px rgba(15,23,42,.06);transition:.15s}.card:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(15,23,42,.1);border-color:#93b4d5}.icon{font-size:38px}.card h2{margin:12px 0 6px;font-size:20px}.card p{margin:0;color:#52677d;line-height:1.55}.badge{display:inline-block;margin-top:14px;padding:5px 9px;border-radius:999px;background:#eaf2ff;color:#2456a6;font-size:12px;font-weight:700}.login{max-width:430px;margin:90px auto;background:#fff;padding:26px;border-radius:20px;border:1px solid #dbe5ef;box-shadow:0 12px 35px rgba(15,23,42,.08)}input{width:100%;padding:12px;margin:7px 0;border:1px solid #b8c8d8;border-radius:10px;font-size:15px}.login button{width:100%;padding:12px;margin-top:8px;border:0;border-radius:10px;background:#1d4ed8;color:#fff;font-weight:800;cursor:pointer}.msg{color:#b91c1c;min-height:20px}@media(max-width:650px){.grid{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
-
-.menu-toggle{display:none;border:0;border-radius:12px;padding:12px 15px;background:#123b4a;color:white;font-size:22px;cursor:pointer;margin-bottom:14px}
-.layout{display:grid;grid-template-columns:235px minmax(0,1fr);gap:22px;align-items:start}
-.side-menu{position:sticky;top:18px;background:#123b4a;color:#fff;padding:18px 13px;border-radius:18px;box-shadow:0 10px 28px rgba(15,23,42,.1)}
-.menu-brand{display:flex;gap:10px;align-items:center;padding:8px 10px 18px;font-size:17px}.side-menu a{display:block;color:#e8f5f7;text-decoration:none;padding:12px 13px;border-radius:10px;margin:3px 0;font-weight:650}.side-menu a:hover{background:#23576a}
-.content-area{min-width:0}.welcome{background:linear-gradient(125deg,#123b4a,#0f766e);color:#fff;padding:clamp(22px,4vw,38px);border-radius:22px;margin-bottom:18px}.eyebrow{font-size:11px;letter-spacing:1.5px;font-weight:800;color:#b9f4e8}.welcome h2{font-size:clamp(26px,4vw,38px);margin:12px 0}.welcome p{line-height:1.8;color:#e0f2f1;margin:0;max-width:760px}
-.feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.feature{display:flex;flex-direction:column;align-items:flex-start;min-height:185px;text-decoration:none;color:inherit;background:#fff;border:1px solid #dbe5ef;border-radius:17px;padding:19px;box-shadow:0 5px 18px rgba(15,23,42,.04);transition:transform .15s,border-color .15s}.feature:hover{transform:translateY(-2px);border-color:#7aa6b8}.feature-icon{font-size:27px}.feature-title{font-size:18px;font-weight:800;margin:10px 0 6px}.feature-desc{font-size:14px;color:#52677d;line-height:1.65;flex:1}.feature-link{font-size:13px;color:#0f766e;font-weight:800;margin-top:14px}.design-note{font-size:13px;line-height:1.7;color:#64748b;margin:17px 2px}
-.layout{display:block}.side-menu,.menu-toggle{display:none!important}
-.top{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:14px 18px;background:#123b4a;color:#fff;border-radius:16px;margin-bottom:22px;flex-wrap:wrap}
-.brand h1{margin:0;font-size:23px;color:#fff}.brand p{margin:4px 0 0;color:#d5e7eb;font-size:13px}
-.main-nav{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex:1;flex-wrap:wrap}
-.nav-drop{position:relative}.nav-drop summary{list-style:none;cursor:pointer;padding:10px 11px;border-radius:9px;font-weight:750;font-size:14px;white-space:nowrap;color:#f2fbfd}.nav-drop summary::-webkit-details-marker{display:none}.nav-drop summary:hover,.nav-drop[open] summary{background:#23576a}
-.nav-drop summary .chev{opacity:.8;margin-left:4px}.nav-menu{position:absolute;z-index:50;top:calc(100% + 5px);left:0;min-width:220px;background:#fff;color:#183447;border:1px solid #dbe5ef;border-radius:12px;padding:7px;box-shadow:0 12px 30px #0b253522}
-.nav-menu a{display:block;text-decoration:none;color:#183447;padding:10px 11px;border-radius:8px;font-size:14px;font-weight:650}.nav-menu a:hover{background:#eaf5f6;color:#0f766e}
-.logout{white-space:nowrap}
-@media(max-width:800px){.top{align-items:flex-start;flex-direction:column}.main-nav{justify-content:flex-start;width:100%}.nav-menu{position:static;box-shadow:none;margin-top:4px}.nav-drop{flex:0 0 auto}.feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:520px){.feature-grid{grid-template-columns:1fr}.feature{min-height:155px}.wrap{padding:12px 10px}.welcome{border-radius:17px}.top{padding:14px}.brand h1{font-size:21px}.main-nav{gap:3px}.nav-drop summary{font-size:13px;padding:9px 8px}.logout{padding:9px 11px}}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Noto Sans Bengali",sans-serif;background:#f3f7fa;color:#173447}button,input{font:inherit}button,a{-webkit-tap-highlight-color:transparent}.login{max-width:390px;margin:9vh auto;padding:28px 22px;background:#fff;border:1px solid #dce6ec;border-radius:18px;box-shadow:0 12px 34px #123b4a12}.login h1{margin:0 0 6px;color:#155e75}.login p{color:#667987;line-height:1.6}.login input{width:100%;padding:12px;margin:7px 0;border:1px solid #ccd9e0;border-radius:10px}.login button{width:100%;padding:12px;border:0;border-radius:10px;background:#155e75;color:white;font-weight:750}.msg{font-size:.9rem;color:#b42318} [hidden]{display:none!important}
+header{height:72px;background:#fff;border-bottom:1px solid #dce6ec;display:flex;align-items:center;justify-content:space-between;padding:0 max(18px,calc((100vw - 1080px)/2));position:relative;z-index:5}.brand{font-weight:850;font-size:1.1rem;color:#155e75}.menu-button{width:46px;height:44px;border:1px solid #dce6ec;border-radius:12px;background:#fff;color:#155e75;font-size:1.65rem;line-height:1;cursor:pointer}.menu{position:absolute;right:max(14px,calc((100vw - 1080px)/2));top:62px;width:min(330px,calc(100vw - 28px));padding:8px;background:#fff;border:1px solid #dce6ec;border-radius:16px;box-shadow:0 18px 50px #123b4a22}.menu a,.menu button{display:flex;align-items:center;width:100%;min-height:48px;padding:12px 14px;border:0;border-radius:10px;background:transparent;text-align:left;text-decoration:none;color:#173447;font-weight:700;cursor:pointer}.menu a:hover,.menu button:hover{background:#eef6f8}.menu .logout{color:#b42318}main{max-width:1080px;margin:auto;padding:clamp(28px,7vw,76px) 20px 70px}.welcome{padding:clamp(25px,5vw,48px);border-radius:22px;background:linear-gradient(125deg,#155e75,#0f766e);color:#fff}.welcome .eyebrow{font-size:.78rem;font-weight:800;letter-spacing:.08em;color:#d2f7f1}.welcome h1{font-size:clamp(1.8rem,5vw,2.7rem);line-height:1.3;margin:12px 0}.welcome p{line-height:1.85;max-width:700px;margin:0;color:#e4fffb}footer{text-align:center;padding:22px;color:#667987;font-size:.88rem}@media(max-width:520px){header{height:64px}.menu{top:56px}.welcome{border-radius:16px}}
 </style>
 </head>
 <body>
 <div id="login" class="login">
-  <h1>ফেইসবুক পাঠশালা</h1>
-  <p>Central Admin Home</p>
-  <input id="email" type="email" placeholder="Admin Email">
-  <input id="password" type="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-  <p id="msg" class="msg"></p>
+<h1>ফেইসবুক পাঠশালা</h1><p>কেন্দ্রীয় অ্যাডমিন প্যানেলে প্রবেশ করতে লগইন করুন।</p>
+<form id="loginForm"><input id="email" type="email" autocomplete="username" placeholder="Admin Email" required><input id="password" type="password" autocomplete="current-password" placeholder="Password" required><button type="submit">Login</button></form><p id="msg" class="msg" role="status"></p>
 </div>
-
-<div id="app" class="wrap" hidden>
-  <header class="top">
-    <div class="brand"><h1>ফেইসবুক পাঠশালা</h1><p>শিক্ষা ও পরীক্ষা ব্যবস্থাপনা</p></div>
-    <nav class="main-nav" aria-label="প্রধান নেভিগেশন">
-      <details class="nav-drop"><summary>🧭 Job Care <span class="chev">⌄</span></summary><div class="nav-menu">
-        <a href="https://fbpathshala.github.io/exam/question_create.html">✍️ প্রশ্ন তৈরি</a>
-        <a href="https://fbpathshala.github.io/exam/question-bank-select.html">🗂️ প্রশ্ন ব্যাংক</a>
-        <a href="https://fbpathshala.github.io/exam/create-exam.html">🧾 পরীক্ষা তৈরি</a>
-        <a href="https://fbpathshala.github.io/exam/exam-manager.html">🎛️ পরীক্ষা পরিচালনা</a>
-        <a href="https://fbpathshala.github.io/exam/results-review.html">📊 ফলাফল পর্যালোচনা</a>
-      </div></details>
-      <details class="nav-drop"><summary>🎓 Academic Care <span class="chev">⌄</span></summary><div class="nav-menu">
-        <a href="https://fbpathshala.github.io/academic/admin.html">✍️ প্রশ্ন তৈরি ও অ্যাডমিন</a>
-        <a href="https://fbpathshala.github.io/academic/question-bank.html">🗂️ প্রশ্ন ব্যাংক</a>
-        <a href="https://fbpathshala.github.io/academic/index.html">🎓 Academic Care হোম</a>
-      </div></details>
-      <details class="nav-drop"><summary>📚 Study Material <span class="chev">⌄</span></summary><div class="nav-menu">
-        <a href="https://fbpathshala.github.io/exam/study-materials.html">🧭 Job Care ম্যাটেরিয়াল</a>
-        <a href="https://fbpathshala.github.io/academic/index.html">🎓 Academic Care ম্যাটেরিয়াল</a>
-      </div></details>
-      <details class="nav-drop"><summary>📌 গুরুত্বপূর্ণ তথ্য ও লিংক <span class="chev">⌄</span></summary><div class="nav-menu">
-        <a href="https://fbpathshala.github.io/exam/admin.html">📌 গুরুত্বপূর্ণ তথ্য পরিচালনা</a>
-        <a href="https://fbpathshala.github.io/exam/">🌐 Job Care সাইট</a>
-        <a href="https://fbpathshala.github.io/academic/">🎓 Academic Care সাইট</a>
-      </div></details>
-      <details class="nav-drop"><summary>👥 Facebook Pathshala <span class="chev">⌄</span></summary><div class="nav-menu">
-        <a href="https://www.facebook.com/" target="_blank" rel="noopener">👥 Facebook খুলুন</a>
-      </div></details>
-    </nav>
-    <button class="logout" onclick="logout()">🚪 Log Out</button>
-  </header>
-  <div class="layout">
-    <section class="content-area">
-      <section class="welcome">
-        <span class="eyebrow">CENTRAL ADMIN WORKSPACE</span>
-        <h2>সব কাজ, এক জায়গায়</h2>
-        <p>একটি কমন অ্যাডমিন সিস্টেম থেকে প্রশ্ন, পরীক্ষা, ফলাফল ও শিক্ষাসামগ্রী পরিচালনা করুন। প্রয়োজনমতো প্রতিটি ফিচারের ভেতরে গন্তব্য নির্বাচন করা হবে—হোমপেজে আলাদা Job Care বা Academic Care সেকশন থাকবে না।</p>
-      </section>
-      <section class="feature-grid" aria-label="ব্যবস্থাপনা ফিচার">
-        <a class="feature" id="question-create" href="https://fbpathshala.github.io/exam/question_create.html"><span class="feature-icon">✍️</span><span class="feature-title">প্রশ্ন তৈরি</span><span class="feature-desc">ক্যাটাগরি, ফোল্ডার, সেট; ম্যানুয়াল MCQ, CSV/Excel ও CQ।</span><span class="feature-link">সেকশন খুলুন ↗</span></a>
-        <a class="feature" id="question-bank" href="https://fbpathshala.github.io/exam/question-bank-select.html"><span class="feature-icon">🗂️</span><span class="feature-title">প্রশ্ন ব্যাংক</span><span class="feature-desc">সেকশন, ক্যাটাগরি, ফোল্ডার, সেট ও বিষয় অনুযায়ী প্রশ্ন খুঁজুন।</span><span class="feature-link">সেকশন খুলুন ↗</span></a>
-        <a class="feature" id="exam-create" href="https://fbpathshala.github.io/exam/create-exam.html"><span class="feature-icon">🧾</span><span class="feature-title">পরীক্ষা তৈরি</span><span class="feature-desc">পরীক্ষার প্রশ্ন, সময়, নম্বর ও প্রকাশনার সেটিংস।</span><span class="feature-link">সেকশন খুলুন ↗</span></a>
-        <a class="feature" id="exam-manage" href="https://fbpathshala.github.io/exam/exam-manager.html"><span class="feature-icon">🎛️</span><span class="feature-title">পরীক্ষা পরিচালনা</span><span class="feature-desc">পরীক্ষা নির্বাচন করে বর্তমান পরিচালনা-বাটন ব্যবহার করুন।</span><span class="feature-link">সেকশন খুলুন ↗</span></a>
-        <a class="feature" id="results" href="https://fbpathshala.github.io/exam/results-review.html"><span class="feature-icon">📊</span><span class="feature-title">ফলাফল পর্যালোচনা</span><span class="feature-desc">নির্দিষ্ট পরীক্ষা নির্বাচন করে ফলাফল ও শিক্ষার্থীর রেকর্ড দেখুন।</span><span class="feature-link">সেকশন খুলুন ↗</span></a>
-        <a class="feature" id="materials" href="https://fbpathshala.github.io/exam/study-materials.html"><span class="feature-icon">📚</span><span class="feature-title">স্টাডি ম্যাটেরিয়াল</span><span class="feature-desc">পড়ার উপকরণ যোগ, পরিচালনা ও প্রকাশ করুন।</span><span class="feature-link">সেকশন খুলুন ↗</span></a>
-        <a class="feature" id="important-info" href="https://fbpathshala.github.io/exam/admin.html"><span class="feature-icon">📌</span><span class="feature-title">গুরুত্বপূর্ণ তথ্য</span><span class="feature-desc">গুরুত্বপূর্ণ পোস্ট ও প্রয়োজনীয় তথ্য পরিচালনার প্রবেশপথ।</span><span class="feature-link">সেকশন খুলুন ↗</span></a>
-        <a class="feature external-feature" href="https://www.facebook.com/" target="_blank" rel="noopener"><span class="feature-icon">🌐</span><span class="feature-title">Facebook লিংক</span><span class="feature-desc">নির্ধারিত গ্রুপ ও পেজের লিংক পরে এখানে যুক্ত করা যাবে।</span><span class="feature-link">Facebook খুলুন ↗</span></a>
-      </section>
-      <p class="design-note">নোট: এটি কমন হোমপেজের নকশা ও নেভিগেশন। ফিচারগুলোর ভেতরে ড্রপডাউন-ভিত্তিক Job Care / Academic Care নির্বাচন এবং প্রতিটি সেকশনের পূর্ণ কার্যকারিতা পরের ধাপে একে একে যুক্ত ও যাচাই করতে হবে।</p>
-    </section>
-  </div>
+<div id="app" hidden>
+<header><div class="brand">🎓 ফেইসবুক পাঠশালা</div><button id="menuButton" class="menu-button" type="button" aria-label="মেনু খুলুন" aria-expanded="false" aria-controls="mainMenu">☰</button>
+<nav id="mainMenu" class="menu" aria-label="প্রধান মেনু" hidden>
+<a href="https://fbpathshala.github.io/exam/question_create.html">Job Care · Exam System</a>
+<a href="https://fbpathshala.github.io/academic/">Academic Care</a>
+<a href="https://fbpathshala.github.io/exam/study-materials.html">Study Material</a>
+<a href="https://fbpathshala.github.io/exam/admin.html">গুরুত্বপূর্ণ তথ্য ও লিংক</a>
+<a href="https://www.facebook.com/facebookpathshala" target="_blank" rel="noopener noreferrer">Facebook Pathshala ↗</a>
+<button class="logout" id="logoutButton" type="button">Log Out</button>
+</nav></header>
+<main><section class="welcome"><span class="eyebrow">CENTRAL WORKSPACE</span><h1>সব কাজ, এক জায়গায়</h1><p>ফেইসবুক পাঠশালার কেন্দ্রীয় হোমপেজে স্বাগতম। প্রয়োজনীয় বিভাগ খুলতে উপরের ☰ মেনু ব্যবহার করুন।</p></section></main>
+<footer>ফেইসবুক পাঠশালা · শিক্ষা সবার জন্য</footer>
 </div>
-
 <script src="js/supabase.js?v=20261012-shared-auth2"></script>
 <script>
-async function login(){
-  const msg=document.getElementById('msg'); msg.textContent='Login হচ্ছে...';
-  const email=document.getElementById('email').value.trim(), password=document.getElementById('password').value;
-  if(!email||!password){msg.textContent='Email ও Password দিন।';return}
-  const {error}=await db.auth.signInWithPassword({email,password});
-  if(error){msg.textContent=error.message;return}
-  showApp();
-}
-async function showApp(){
-  const {data}=await db.auth.getSession();
-  if(!data.session){document.getElementById('login').hidden=false;document.getElementById('app').hidden=true;return}
-  document.getElementById('login').hidden=true;document.getElementById('app').hidden=false;
-}
+async function showApp(){const {data,error}=await db.auth.getSession();if(error){document.getElementById('msg').textContent=error.message;return}const loggedIn=!!data.session;document.getElementById('login').hidden=loggedIn;document.getElementById('app').hidden=!loggedIn}
+document.getElementById('loginForm').addEventListener('submit',async function(e){e.preventDefault();const msg=document.getElementById('msg');msg.textContent='Login হচ্ছে…';const email=document.getElementById('email').value.trim(),password=document.getElementById('password').value;const {error}=await db.auth.signInWithPassword({email,password});if(error){msg.textContent=error.message;return}msg.textContent='';await showApp()});
 async function logout(){await db.auth.signOut();location.reload()}
+document.getElementById('logoutButton').addEventListener('click',logout);
+const menu=document.getElementById('mainMenu'),menuButton=document.getElementById('menuButton');
+function closeMenu(){menu.hidden=true;menuButton.setAttribute('aria-expanded','false')}
+menuButton.addEventListener('click',function(){menu.hidden=!menu.hidden;menuButton.setAttribute('aria-expanded',String(!menu.hidden))});
+document.addEventListener('click',function(e){if(!e.target.closest('header'))closeMenu()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeMenu()});
 showApp();
-document.querySelectorAll('.nav-drop').forEach(function(drop){
-  drop.addEventListener('toggle',function(){
-    if(drop.open) document.querySelectorAll('.nav-drop').forEach(function(other){if(other!==drop)other.open=false;});
-  });
-});
-document.addEventListener('click',function(event){
-  if(!event.target.closest('.main-nav'))document.querySelectorAll('.nav-drop').forEach(function(drop){drop.open=false;});
-});
 </script>
 </body>
 </html>
