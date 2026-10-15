@@ -4,32 +4,27 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#102a43">
-<title>প্রশ্ন ব্যাংক নির্বাচন — ফেসবুক পাঠশালা</title>
+<title>প্রশ্ন ব্যাংক</title>
 <style>
-:root{font-family:system-ui,-apple-system,"Noto Sans Bengali",sans-serif;color:#102a43;background:#f3f7fb;--line:#dbe5ef;--muted:#52677d}
-*{box-sizing:border-box}body{margin:0;min-height:100vh}
-header{background:linear-gradient(125deg,#102a43,#0f766e);color:#fff;padding:34px 20px}
-header div,main{width:min(920px,100%);margin:auto}
-header h1{margin:0 0 8px;font-size:clamp(25px,4vw,34px)}header p{margin:0;line-height:1.7;color:#e1f5f2}
-main{padding:30px 20px 50px}.intro{text-align:center;margin:0 auto 24px;max-width:640px}.intro h2{margin:0 0 8px}.intro p{color:var(--muted);line-height:1.7;margin:0}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
-.card{display:flex;flex-direction:column;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:18px;padding:25px;box-shadow:0 8px 24px #102a4308;min-height:270px}
-.icon{font-size:38px}.card h3{font-size:22px;margin:14px 0 8px}.card p{color:var(--muted);line-height:1.75;margin:0 0 22px;flex:1}
-a.button{display:inline-block;text-decoration:none;background:#155e75;color:#fff;padding:12px 17px;border-radius:10px;font-weight:800}
-.card.job a.button{background:#2458d3}.card.academic a.button{background:#0f766e}
-footer{text-align:center;padding:0 20px 26px;color:#64748b;font-size:13px}
-@media(max-width:620px){.grid{grid-template-columns:1fr}.card{min-height:0;padding:22px}header{padding:28px 18px}main{padding:24px 16px 36px}}
+:root{font-family:system-ui,-apple-system,"Noto Sans Bengali",sans-serif;color:#102a43;background:#f3f7fb;--line:#dbe5ef}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;flex-direction:column}
+header{background:linear-gradient(125deg,#102a43,#0f766e);color:#fff;padding:28px 20px}
+header h1{width:min(760px,100%);margin:0 auto;font-size:clamp(24px,4vw,32px)}
+main{width:min(760px,100%);margin:auto;padding:28px 20px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.card{display:flex;align-items:center;justify-content:center;gap:14px;min-height:150px;padding:22px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 6px 20px #102a4308;text-decoration:none;color:#102a43;font-size:clamp(19px,3vw,23px);font-weight:800}
+.card:focus-visible{outline:3px solid #0f766e;outline-offset:3px}.card.job{border-bottom:4px solid #2458d3}.card.academic{border-bottom:4px solid #0f766e}
+.icon{font-size:34px}
+@media(max-width:520px){main{padding:20px 14px}.grid{grid-template-columns:1fr}.card{min-height:105px}}
 </style>
 </head>
 <body>
-<header><div><h1>🗂️ প্রশ্ন ব্যাংক</h1><p>প্রথমে গন্তব্য সেকশন নির্বাচন করুন। এরপর সেই সেকশনের নিজস্ব প্রশ্ন ও বর্তমান ফিল্টারিং ব্যবস্থা ব্যবহার করুন।</p></div></header>
+<header><h1>🗂️ প্রশ্ন ব্যাংক</h1></header>
 <main>
-<section class="intro"><h2>কোন প্রশ্ন ব্যাংক খুলবেন?</h2><p>দুই সেকশনের প্রশ্ন আলাদাভাবে রাখা হয়েছে। একটি সেকশনে প্রবেশ করলে অন্য সেকশনের প্রশ্ন সেখানে দেখানো হবে না।</p></section>
-<section class="grid" aria-label="প্রশ্ন ব্যাংকের সেকশন">
-<article class="card job"><div class="icon" aria-hidden="true">💼</div><h3>Job Care</h3><p>Job Care-এর সব প্রশ্ন দেখুন। বর্তমান ক্যাটাগরি, ফোল্ডার, সেট ও বিষয়ভিত্তিক ফিল্টারিং ব্যবস্থা আগের মতোই কাজ করবে।</p><a class="button" href="question_bank.html">Job Care প্রশ্ন ব্যাংক খুলুন →</a></article>
-<article class="card academic"><div class="icon" aria-hidden="true">🎓</div><h3>Academic Care</h3><p>Academic Care-এর প্রশ্ন ব্যাংকে প্রবেশ করুন। সেখানে বিদ্যমান প্রশ্ন তালিকা ও ফিল্টারিং ব্যবস্থা ব্যবহার করা যাবে।</p><a class="button" href="https://fbpathshala.github.io/academic/question-bank.html">Academic Care প্রশ্ন ব্যাংক খুলুন →</a></article>
-</section>
+<nav class="grid" aria-label="প্রশ্ন ব্যাংক নির্বাচন">
+<a class="card job" href="question_bank.html"><span class="icon" aria-hidden="true">💼</span><span>Job Care</span></a>
+<a class="card academic" href="https://fbpathshala.github.io/academic/question-bank.html"><span class="icon" aria-hidden="true">🎓</span><span>Academic Care</span></a>
+</nav>
 </main>
-<footer>ফেসবুক পাঠশালা · কমন অ্যাডমিন নেভিগেশন</footer>
 </body>
 </html>
