@@ -16,8 +16,16 @@
 .menu-brand{display:flex;gap:10px;align-items:center;padding:8px 10px 18px;font-size:17px}.side-menu a{display:block;color:#e8f5f7;text-decoration:none;padding:12px 13px;border-radius:10px;margin:3px 0;font-weight:650}.side-menu a:hover{background:#23576a}
 .content-area{min-width:0}.welcome{background:linear-gradient(125deg,#123b4a,#0f766e);color:#fff;padding:clamp(22px,4vw,38px);border-radius:22px;margin-bottom:18px}.eyebrow{font-size:11px;letter-spacing:1.5px;font-weight:800;color:#b9f4e8}.welcome h2{font-size:clamp(26px,4vw,38px);margin:12px 0}.welcome p{line-height:1.8;color:#e0f2f1;margin:0;max-width:760px}
 .feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.feature{display:flex;flex-direction:column;align-items:flex-start;min-height:185px;text-decoration:none;color:inherit;background:#fff;border:1px solid #dbe5ef;border-radius:17px;padding:19px;box-shadow:0 5px 18px rgba(15,23,42,.04);transition:transform .15s,border-color .15s}.feature:hover{transform:translateY(-2px);border-color:#7aa6b8}.feature-icon{font-size:27px}.feature-title{font-size:18px;font-weight:800;margin:10px 0 6px}.feature-desc{font-size:14px;color:#52677d;line-height:1.65;flex:1}.feature-link{font-size:13px;color:#0f766e;font-weight:800;margin-top:14px}.design-note{font-size:13px;line-height:1.7;color:#64748b;margin:17px 2px}
-@media(max-width:800px){.layout{grid-template-columns:1fr}.menu-toggle{display:inline-flex;align-items:center;gap:8px}.side-menu{display:none;position:static}.side-menu.open{display:block}.feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:520px){.feature-grid{grid-template-columns:1fr}.feature{min-height:155px}.wrap{padding:18px 13px}.welcome{border-radius:17px}}
+.layout{display:block}.side-menu,.menu-toggle{display:none!important}
+.top{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:14px 18px;background:#123b4a;color:#fff;border-radius:16px;margin-bottom:22px;flex-wrap:wrap}
+.brand h1{margin:0;font-size:23px;color:#fff}.brand p{margin:4px 0 0;color:#d5e7eb;font-size:13px}
+.main-nav{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex:1;flex-wrap:wrap}
+.nav-drop{position:relative}.nav-drop summary{list-style:none;cursor:pointer;padding:10px 11px;border-radius:9px;font-weight:750;font-size:14px;white-space:nowrap;color:#f2fbfd}.nav-drop summary::-webkit-details-marker{display:none}.nav-drop summary:hover,.nav-drop[open] summary{background:#23576a}
+.nav-drop summary .chev{opacity:.8;margin-left:4px}.nav-menu{position:absolute;z-index:50;top:calc(100% + 5px);left:0;min-width:220px;background:#fff;color:#183447;border:1px solid #dbe5ef;border-radius:12px;padding:7px;box-shadow:0 12px 30px #0b253522}
+.nav-menu a{display:block;text-decoration:none;color:#183447;padding:10px 11px;border-radius:8px;font-size:14px;font-weight:650}.nav-menu a:hover{background:#eaf5f6;color:#0f766e}
+.logout{white-space:nowrap}
+@media(max-width:800px){.top{align-items:flex-start;flex-direction:column}.main-nav{justify-content:flex-start;width:100%}.nav-menu{position:static;box-shadow:none;margin-top:4px}.nav-drop{flex:0 0 auto}.feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.feature-grid{grid-template-columns:1fr}.feature{min-height:155px}.wrap{padding:12px 10px}.welcome{border-radius:17px}.top{padding:14px}.brand h1{font-size:21px}.main-nav{gap:3px}.nav-drop summary{font-size:13px;padding:9px 8px}.logout{padding:9px 11px}}
 </style>
 </head>
 <body>
@@ -32,21 +40,36 @@
 
 <div id="app" class="wrap" hidden>
   <header class="top">
-    <div class="brand"><h1>ফেইসবুক পাঠশালা</h1><p>Central Admin Home — সব ফিচারের ড্যাশবোর্ড এক জায়গা থেকে</p></div>
-    <button class="logout" onclick="logout()">লগ আউট</button>
+    <div class="brand"><h1>ফেইসবুক পাঠশালা</h1><p>শিক্ষা ও পরীক্ষা ব্যবস্থাপনা</p></div>
+    <nav class="main-nav" aria-label="প্রধান নেভিগেশন">
+      <details class="nav-drop"><summary>🧭 Job Care <span class="chev">⌄</span></summary><div class="nav-menu">
+        <a href="https://fbpathshala.github.io/exam/question_create.html">✍️ প্রশ্ন তৈরি</a>
+        <a href="https://fbpathshala.github.io/exam/question-bank-select.html">🗂️ প্রশ্ন ব্যাংক</a>
+        <a href="https://fbpathshala.github.io/exam/create-exam.html">🧾 পরীক্ষা তৈরি</a>
+        <a href="https://fbpathshala.github.io/exam/exam-manager.html">🎛️ পরীক্ষা পরিচালনা</a>
+        <a href="https://fbpathshala.github.io/exam/results-review.html">📊 ফলাফল পর্যালোচনা</a>
+      </div></details>
+      <details class="nav-drop"><summary>🎓 Academic Care <span class="chev">⌄</span></summary><div class="nav-menu">
+        <a href="https://fbpathshala.github.io/academic/admin.html">✍️ প্রশ্ন তৈরি ও অ্যাডমিন</a>
+        <a href="https://fbpathshala.github.io/academic/question-bank.html">🗂️ প্রশ্ন ব্যাংক</a>
+        <a href="https://fbpathshala.github.io/academic/index.html">🎓 Academic Care হোম</a>
+      </div></details>
+      <details class="nav-drop"><summary>📚 Study Material <span class="chev">⌄</span></summary><div class="nav-menu">
+        <a href="https://fbpathshala.github.io/exam/study-materials.html">🧭 Job Care ম্যাটেরিয়াল</a>
+        <a href="https://fbpathshala.github.io/academic/index.html">🎓 Academic Care ম্যাটেরিয়াল</a>
+      </div></details>
+      <details class="nav-drop"><summary>📌 গুরুত্বপূর্ণ তথ্য ও লিংক <span class="chev">⌄</span></summary><div class="nav-menu">
+        <a href="https://fbpathshala.github.io/exam/admin.html">📌 গুরুত্বপূর্ণ তথ্য পরিচালনা</a>
+        <a href="https://fbpathshala.github.io/exam/">🌐 Job Care সাইট</a>
+        <a href="https://fbpathshala.github.io/academic/">🎓 Academic Care সাইট</a>
+      </div></details>
+      <details class="nav-drop"><summary>👥 Facebook Pathshala <span class="chev">⌄</span></summary><div class="nav-menu">
+        <a href="https://www.facebook.com/" target="_blank" rel="noopener">👥 Facebook খুলুন</a>
+      </div></details>
+    </nav>
+    <button class="logout" onclick="logout()">🚪 Log Out</button>
   </header>
-  <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="sideMenu" aria-label="মেনু খুলুন">☰</button>
   <div class="layout">
-    <aside id="sideMenu" class="side-menu" aria-label="প্রধান মেনু">
-      <div class="menu-brand">☰ <strong>প্রধান মেনু</strong></div>
-      <a href="#question-create">প্রশ্ন তৈরি</a>
-      <a href="#question-bank">প্রশ্ন ব্যাংক</a>
-      <a href="#exam-create">পরীক্ষা তৈরি</a>
-      <a href="#exam-manage">পরীক্ষা পরিচালনা</a>
-      <a href="#results">ফলাফল পর্যালোচনা</a>
-      <a href="#materials">স্টাডি ম্যাটেরিয়াল</a>
-      <a href="#important-info">গুরুত্বপূর্ণ তথ্য</a>
-    </aside>
     <section class="content-area">
       <section class="welcome">
         <span class="eyebrow">CENTRAL ADMIN WORKSPACE</span>
@@ -85,16 +108,13 @@ async function showApp(){
 }
 async function logout(){await db.auth.signOut();location.reload()}
 showApp();
-document.getElementById('menuToggle').addEventListener('click',function(){
-  const menu=document.getElementById('sideMenu');
-  const opened=menu.classList.toggle('open');
-  this.setAttribute('aria-expanded',String(opened));
-});
-document.querySelectorAll('.side-menu a').forEach(function(link){
-  link.addEventListener('click',function(){
-    document.getElementById('sideMenu').classList.remove('open');
-    document.getElementById('menuToggle').setAttribute('aria-expanded','false');
+document.querySelectorAll('.nav-drop').forEach(function(drop){
+  drop.addEventListener('toggle',function(){
+    if(drop.open) document.querySelectorAll('.nav-drop').forEach(function(other){if(other!==drop)other.open=false;});
   });
+});
+document.addEventListener('click',function(event){
+  if(!event.target.closest('.main-nav'))document.querySelectorAll('.nav-drop').forEach(function(drop){drop.open=false;});
 });
 </script>
 </body>
