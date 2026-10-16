@@ -163,13 +163,13 @@ async function loadFolders(preferredFolderId=null) {
     }
 
     await loadSets();
-  } catch (e) { msg('folderMsg', e.message || 'Folder লোড করতে সমস্যা হয়েছে।', true); }
+  } catch (e) { msg('folderMsg', e.message || 'সাব-ক্যাটাগরি লোড করতে সমস্যা হয়েছে।', true); }
 }
 
 async function loadSets(preferredSetId=null) {
-  const qFolder = $('questionFolder')?.value || '';
-  const manageFolder = $('setManageFolder')?.value || '';
-  const folderId = qFolder || manageFolder;
+  const qসাব-ক্যাটাগরি = $('questionFolder')?.value || '';
+  const manageসাব-ক্যাটাগরি = $('setManageFolder')?.value || '';
+  const folderId = qসাব-ক্যাটাগরি || manageFolder;
   try {
     if (!folderId) {
       ['manageSet','questionSet'].forEach(id => { if ($(id)) $(id).innerHTML = '<option value="">Set নির্বাচন করুন</option>'; });
@@ -263,10 +263,10 @@ async function renameSelectedFolder() {
   const id = $('manageFolder')?.value;
   if (!id) return msg('folderMsg','আগে সাব-ক্যাটাগরি নির্বাচন করুন।',true);
   const old = $('manageFolder').selectedOptions[0]?.textContent || '';
-  const name = prompt('নতুন Folder-এর নাম লিখুন:', old);
+  const name = prompt('নতুন সাব-ক্যাটাগরির নাম লিখুন:', old);
   if (name === null) return;
   const value = name.trim();
-  if (!value) return msg('folderMsg','Folder-এর নাম খালি রাখা যাবে না।',true);
+  if (!value) return msg('folderMsg','সাব-ক্যাটাগরির নাম খালি রাখা যাবে না।',true);
   if (value === old) return;
   try {
     msg('folderMsg','সাব-ক্যাটাগরির নাম পরিবর্তন হচ্ছে...');
@@ -285,7 +285,7 @@ async function deleteSelectedFolder() {
     const check = await client().from('question_bank_sets').select('id',{count:'exact',head:true}).eq('folder_id',Number(id));
     if (check.error) throw check.error;
     const count = check.count || 0;
-    if (count) return msg('folderMsg',`❌ "${name}" সাব-ক্যাটাগরির মধ্যে ${bn(count)}টি Set আছে। আগে সব Set সরাতে হবে; নিরাপত্তার জন্য Folder Delete করা যাবে না।`,true);
+    if (count) return msg('folderMsg',`❌ "${name}" সাব-ক্যাটাগরির মধ্যে ${bn(count)}টি Set আছে। আগে সব Set সরাতে হবে; নিরাপত্তার জন্য সাব-ক্যাটাগরি Delete করা যাবে না।`,true);
     if (!confirm(`"${name}" সাব-ক্যাটাগরি মুছে ফেলবেন?`)) return;
     msg('folderMsg','সাব-ক্যাটাগরি মুছে ফেলা হচ্ছে...');
     const {error} = await client().from('question_bank_folders').delete().eq('id',Number(id));
