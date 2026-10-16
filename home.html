@@ -8,7 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Noto Sans Bengali",sans-serif;background:#f3f7fa;color:#173447}button,input{font:inherit}button,a{-webkit-tap-highlight-color:transparent}.login{max-width:390px;margin:9vh auto;padding:28px 22px;background:#fff;border:1px solid #dce6ec;border-radius:18px;box-shadow:0 12px 34px #123b4a12}.login h1{margin:0 0 6px;color:#155e75}.login p{color:#667987;line-height:1.6}.login input{width:100%;padding:12px;margin:7px 0;border:1px solid #ccd9e0;border-radius:10px}.login button{width:100%;padding:12px;border:0;border-radius:10px;background:#155e75;color:white;font-weight:750}.msg{font-size:.9rem;color:#b42318} [hidden]{display:none!important}
-header{height:72px;background:#fff;border-bottom:1px solid #dce6ec;display:flex;align-items:center;justify-content:space-between;padding:0 max(18px,calc((100vw - 1080px)/2));position:relative;z-index:5}.brand{font-weight:850;font-size:1.1rem;color:#155e75}.menu-button{width:46px;height:44px;border:1px solid #dce6ec;border-radius:12px;background:#fff;color:#155e75;font-size:1.65rem;line-height:1;cursor:pointer}.menu{position:absolute;right:max(14px,calc((100vw - 1080px)/2));top:62px;width:min(330px,calc(100vw - 28px));padding:8px;background:#fff;border:1px solid #dce6ec;border-radius:16px;box-shadow:0 18px 50px #123b4a22}.menu a,.menu button{display:flex;align-items:center;width:100%;min-height:48px;padding:12px 14px;border:0;border-radius:10px;background:transparent;text-align:left;text-decoration:none;color:#173447;font-weight:700;cursor:pointer}.menu a:hover,.menu button:hover{background:#eef6f8}.menu .logout{color:#b42318}main{max-width:1080px;margin:auto;padding:clamp(28px,7vw,76px) 20px 70px}.welcome{padding:clamp(25px,5vw,48px);border-radius:22px;background:linear-gradient(125deg,#155e75,#0f766e);color:#fff}.welcome .eyebrow{font-size:.78rem;font-weight:800;letter-spacing:.08em;color:#d2f7f1}.welcome h1{font-size:clamp(1.8rem,5vw,2.7rem);line-height:1.3;margin:12px 0}.welcome p{line-height:1.85;max-width:700px;margin:0;color:#e4fffb}footer{text-align:center;padding:22px;color:#667987;font-size:.88rem}@media(max-width:520px){header{height:64px}.menu{top:56px}.welcome{border-radius:16px}}
+header{height:72px;background:#fff;border-bottom:1px solid #dce6ec;display:flex;align-items:center;justify-content:space-between;padding:0 max(18px,calc((100vw - 1080px)/2));position:relative;z-index:5}.brand{font-weight:850;font-size:1.1rem;color:#155e75}.menu-button{width:46px;height:44px;border:1px solid #dce6ec;border-radius:12px;background:#fff;color:#155e75;font-size:1.65rem;line-height:1;cursor:pointer}.menu{position:absolute;right:max(14px,calc((100vw - 1080px)/2));top:62px;width:min(330px,calc(100vw - 28px));padding:8px;background:#fff;border:1px solid #dce6ec;border-radius:16px;box-shadow:0 18px 50px #123b4a22}.menu-label{padding:10px 14px 5px;color:#667987;font-size:.78rem;font-weight:850;border-top:1px solid #e7eef2;margin-top:4px}.menu-label:first-child{border-top:0;margin-top:0}.menu{max-height:calc(100vh - 78px);overflow-y:auto}.menu a,.menu button{display:flex;align-items:center;width:100%;min-height:48px;padding:12px 14px;border:0;border-radius:10px;background:transparent;text-align:left;text-decoration:none;color:#173447;font-weight:700;cursor:pointer}.menu a:hover,.menu button:hover{background:#eef6f8}.menu .logout{color:#b42318}main{max-width:1080px;margin:auto;padding:clamp(28px,7vw,76px) 20px 70px}.welcome{padding:clamp(25px,5vw,48px);border-radius:22px;background:linear-gradient(125deg,#155e75,#0f766e);color:#fff}.welcome .eyebrow{font-size:.78rem;font-weight:800;letter-spacing:.08em;color:#d2f7f1}.welcome h1{font-size:clamp(1.8rem,5vw,2.7rem);line-height:1.3;margin:12px 0}.welcome p{line-height:1.85;max-width:700px;margin:0;color:#e4fffb}footer{text-align:center;padding:22px;color:#667987;font-size:.88rem}@media(max-width:520px){header{height:64px}.menu{top:56px}.welcome{border-radius:16px}}
 </style>
 </head>
 <body>
@@ -19,8 +19,20 @@ header{height:72px;background:#fff;border-bottom:1px solid #dce6ec;display:flex;
 <div id="app" hidden>
 <header><div class="brand">🎓 ফেইসবুক পাঠশালা</div><button id="menuButton" class="menu-button" type="button" aria-label="মেনু খুলুন" aria-expanded="false" aria-controls="mainMenu">☰</button>
 <nav id="mainMenu" class="menu" aria-label="প্রধান মেনু" hidden>
-<a href="https://fbpathshala.github.io/exam/control-center.html">কেন্দ্রীয় অ্যাডমিন প্যানেল — দশটি সেকশন</a>
-<a href="https://fbpathshala.github.io/exam/study-materials.html">স্টাডি ম্যাটেরিয়ালস দেখুন</a>
+<div class="menu-label">প্রধান বিভাগ</div>
+<a href="https://fbpathshala.github.io/exam/question-bank-select.html">Job Care</a>
+<a href="https://fbpathshala.github.io/academic/">Academic Care</a>
+<div class="menu-label">কেন্দ্রীয় অ্যাডমিনের সব সেকশন</div>
+<a href="https://fbpathshala.github.io/exam/control-center.html?section=management">১. ব্যবস্থাপনা</a>
+<a href="https://fbpathshala.github.io/exam/control-center.html?section=question-create">২. প্রশ্ন তৈরি</a>
+<a href="https://fbpathshala.github.io/exam/control-center.html?section=question-bank">৩. প্রশ্ন ব্যাংক</a>
+<a href="https://fbpathshala.github.io/exam/control-center.html?section=exam-create">৪. পরীক্ষা তৈরি</a>
+<a href="https://fbpathshala.github.io/exam/control-center.html?section=exam-manage">৫. পরীক্ষা পরিচালনা</a>
+<a href="https://fbpathshala.github.io/exam/control-center.html?section=results">৬. ফলাফল পর্যালোচনা</a>
+<a href="https://fbpathshala.github.io/exam/control-center.html?section=materials">৭. স্টাডি ম্যাটেরিয়ালস</a>
+<a href="https://fbpathshala.github.io/exam/control-center.html?section=important-links">৮. গুরুত্বপূর্ণ তথ্য ও পোস্ট লিংক</a>
+<a href="https://fbpathshala.github.io/exam/control-center.html?section=breaking-news">৯. ব্রেকিং নিউজ</a>
+<a href="https://fbpathshala.github.io/exam/control-center.html?section=social-links">১০. ফেইসবুক পাঠশালা লিংক</a>
 <a href="https://www.facebook.com/facebookpathshala" target="_blank" rel="noopener noreferrer">Facebook Pathshala ↗</a>
 <button class="logout" id="logoutButton" type="button">Log Out</button>
 </nav></header>
