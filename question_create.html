@@ -95,7 +95,7 @@ button.secondary{background:#e8f1f8!important;color:#173f5f!important;border:1px
 
 <div id="app" class="hidden">
 <header class="dashboard-top">
-  <div class="dashboard-brand"><h1>ফেইসবুক পাঠশালা</h1><p>প্রশ্ন তৈরি</p></div>
+  <div class="dashboard-brand"><h1>ফেইসবুক পাঠশালা</h1><p>বিভাগ: Job Care · প্রশ্ন তৈরি</p></div>
   <div class="admin-menu">
     <button type="button" class="admin-menu-btn" id="adminMenuBtn">☰</button>
     <div class="admin-menu-panel hidden" id="adminMenuPanel">
@@ -114,14 +114,14 @@ button.secondary{background:#e8f1f8!important;color:#173f5f!important;border:1px
       <div class="category-hero-icon" aria-hidden="true">▦</div>
       <div class="category-hero-copy">
         <span class="category-eyebrow">QUESTION ORGANIZATION</span>
-        <h2>ক্যাটাগরি ও প্রশ্ন সেট</h2>
-        <p>ক্যাটাগরি বেছে নিন, ফোল্ডার সাজান, তারপর প্রশ্ন সেট পরিচালনা করুন।</p>
+        <h2>Job Care ব্যবস্থাপনা</h2>
+        <p>Job Care-এর ক্যাটাগরি, সাব-ক্যাটাগরি ও সেট এখানে পরিচালনা করুন। বিভাগটি নির্দিষ্ট; এখানে বিভাগ যোগ বা পরিবর্তনের অপশন নেই।</p>
       </div>
     </div>
     <div class="category-workflow" aria-label="ব্যবস্থাপনার ধাপ">
       <div class="workflow-step"><span class="workflow-number">০১</span><span>ক্যাটাগরি</span></div>
       <span class="workflow-arrow" aria-hidden="true">›</span>
-      <div class="workflow-step"><span class="workflow-number">০২</span><span>ফোল্ডার</span></div>
+      <div class="workflow-step"><span class="workflow-number">০২</span><span>সাব-ক্যাটাগরি</span></div>
       <span class="workflow-arrow" aria-hidden="true">›</span>
       <div class="workflow-step"><span class="workflow-number">০৩</span><span>প্রশ্ন সেট</span></div>
     </div>
@@ -149,20 +149,20 @@ button.secondary{background:#e8f1f8!important;color:#173f5f!important;border:1px
         <p id="categoryMsg" class="msg" role="status" aria-live="polite"></p>
       </section>
       <section class="manage-box category-management-item">
-        <h3>📁 ফোল্ডার ব্যবস্থাপনা</h3>
-        <p>ক্যাটাগরি নির্বাচন করে ফোল্ডার যোগ, নাম পরিবর্তন বা মুছুন।</p>
-        <div class="field"><label for="manageFolder">ফোল্ডার নির্বাচন</label><select id="manageFolder"><option value="">ফোল্ডার নির্বাচন</option></select></div>
+        <h3>📁 সাব-ক্যাটাগরি ব্যবস্থাপনা</h3>
+        <p>ক্যাটাগরি নির্বাচন করে সাব-ক্যাটাগরি যোগ, নাম পরিবর্তন বা মুছুন।</p>
+        <div class="field"><label for="manageFolder">সাব-ক্যাটাগরি নির্বাচন</label><select id="manageFolder"><option value="">সাব-ক্যাটাগরি নির্বাচন</option></select></div>
         <div class="manage-actions">
           <button type="button" class="secondary" onclick="renameSelectedFolder()">✏️ Rename</button>
           <button type="button" class="secondary" onclick="deleteSelectedFolder()">🗑️ Delete</button>
         </div>
-        <div class="field" style="margin-top:12px"><label for="newFolder">নতুন ফোল্ডারের নাম</label><input id="newFolder" placeholder="ফোল্ডারের নাম"></div>
-        <button type="button" style="margin-top:10px" onclick="createFolder()">＋ ফোল্ডার যোগ</button>
+        <div class="field" style="margin-top:12px"><label for="newFolder">নতুন সাব-ক্যাটাগরির নাম</label><input id="newFolder" placeholder="সাব-ক্যাটাগরির নাম"></div>
+        <button type="button" style="margin-top:10px" onclick="createFolder()">＋ সাব-ক্যাটাগরি যোগ</button>
       </section>
       <section class="manage-box category-management-item">
         <h3>📂 সেট ব্যবস্থাপনা</h3>
-        <p>ফোল্ডার নির্বাচন করে সেট যোগ, নাম পরিবর্তন বা মুছুন।</p>
-        <div class="field"><label for="setManageFolder">ফোল্ডার নির্বাচন</label><select id="setManageFolder"><option value="">ফোল্ডার নির্বাচন</option></select></div>
+        <p>সাব-ক্যাটাগরি নির্বাচন করে সেট যোগ, নাম পরিবর্তন বা মুছুন।</p>
+        <div class="field"><label for="setManageFolder">সাব-ক্যাটাগরি নির্বাচন</label><select id="setManageFolder"><option value="">সাব-ক্যাটাগরি নির্বাচন</option></select></div>
         <div class="field" style="margin-top:10px"><label for="manageSet">সেট নির্বাচন</label><select id="manageSet"><option value="">সেট নির্বাচন</option></select></div>
         <div class="manage-actions">
           <button type="button" class="secondary" onclick="renameSelectedSet()">✏️ Rename</button>
@@ -176,14 +176,14 @@ button.secondary{background:#e8f1f8!important;color:#173f5f!important;border:1px
   </div>
 
   <div class="card">
-    <div class="section-head"><div><h2 style="margin-bottom:4px">২. নতুন প্রশ্ন এড</h2><p class="section-note">প্রশ্নটি কোন Category → Folder → Set-এ যাবে, তা এখান থেকে নির্ধারণ করুন।</p></div></div>
-    <div class="destination"><strong>প্রশ্নের গন্তব্য</strong><small>Category → Folder → Set</small></div>
+    <div class="section-head"><div><h2 style="margin-bottom:4px">২. নতুন প্রশ্ন এড</h2><p class="section-note">প্রশ্নটি কোন ক্যাটাগরি → সাব-ক্যাটাগরি → সেট-এ যাবে, তা এখান থেকে নির্ধারণ করুন।</p></div></div>
+    <div class="destination"><strong>প্রশ্নের গন্তব্য</strong><small>ক্যাটাগরি → সাব-ক্যাটাগরি → সেট</small></div>
     <div class="grid">
-      <div><label>Category</label><select id="questionCategory"></select></div>
-      <div><label>Folder</label><select id="questionFolder"></select></div>
+      <div><label>ক্যাটাগরি</label><select id="questionCategory"></select></div>
+      <div><label>সাব-ক্যাটাগরি</label><select id="questionFolder"></select></div>
     </div>
     <div class="grid">
-      <div><label>Set</label><select id="questionSet"></select></div>
+      <div><label>সেট</label><select id="questionSet"></select></div>
       <div><label>বিষয়</label><select id="subject"></select></div>
     </div>
     <div class="grid"><div><label>প্রশ্নের ধরন</label><select id="questionType" onchange="syncQuestionType()"><option value="mcq">MCQ — বহুনির্বাচনী</option><option value="cq">CQ — লিখিত</option></select></div><div><label>প্রশ্ন নম্বর</label><input id="questionNumber" type="number"></div></div>
@@ -201,15 +201,15 @@ button.secondary{background:#e8f1f8!important;color:#173f5f!important;border:1px
   </div>
 
   <div class="card">
-    <div class="section-head"><div><h2 style="margin-bottom:4px">৩. CSV / Excel Upload</h2><p class="section-note">নির্বাচিত Category → Folder → Set-এ একসাথে অনেক প্রশ্ন Import করুন।</p></div></div>
+    <div class="section-head"><div><h2 style="margin-bottom:4px">৩. CSV / Excel Upload</h2><p class="section-note">নির্বাচিত ক্যাটাগরি → সাব-ক্যাটাগরি → সেট-এ একসাথে অনেক প্রশ্ন যোগ করুন।</p></div></div>
     <p class="muted">Required: question, option_a, option_b, option_c, option_d, correct_answer. Optional: question_number, subject, explanation, category.</p>
-    <div class="destination"><strong>প্রশ্নের গন্তব্য</strong><small>CSV/Excel-এর সব প্রশ্ন এই নির্বাচিত Category → Folder → Set-এ যাবে।</small></div>
+    <div class="destination"><strong>প্রশ্নের গন্তব্য</strong><small>CSV/Excel-এর সব প্রশ্ন এই নির্বাচিত ক্যাটাগরি → সাব-ক্যাটাগরি → সেট-এ যাবে।</small></div>
     <div class="grid">
-      <div><label>Category</label><select id="importCategory"></select></div>
-      <div><label>Folder</label><select id="importFolder"></select></div>
+      <div><label>ক্যাটাগরি</label><select id="importCategory"></select></div>
+      <div><label>সাব-ক্যাটাগরি</label><select id="importFolder"></select></div>
     </div>
     <div class="grid" style="margin-bottom:10px">
-      <div><label>Set</label><select id="importSet"></select></div><div></div>
+      <div><label>সেট</label><select id="importSet"></select></div><div></div>
     </div>
     <div class="inline-actions"><button type="button" class="secondary" onclick="template()">Template ডাউনলোড</button><input id="importFile" type="file" accept=".csv,.xlsx,.xls"></div>
     <button type="button" onclick="previewImport()">Preview</button>
