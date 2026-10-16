@@ -116,5 +116,6 @@ async function deleteItem(){
 }
 $("section").onchange=buildLevels;$("level").onchange=()=>loadAll().catch(e=>say(e.message,true));$("addBtn").onclick=()=>addItem().catch(e=>say(e.message,true));$("renameBtn").onclick=()=>renameItem().catch(e=>say(e.message,true));$("deleteBtn").onclick=()=>deleteItem();$("refreshBtn").onclick=()=>loadAll().catch(e=>say(e.message,true));$("logoutBtn").onclick=async()=>{await sb.auth.signOut();location.reload()};$("loginBtn").onclick=async()=>{const {error}=await sb.auth.signInWithPassword({email:$("email").value.trim(),password:$("password").value});if(error){$("loginMsg").textContent="লগইন হয়নি: "+error.message;return}await start()};
 async function start(){const {data:{session}}=await sb.auth.getSession();if(!session){$("login").classList.remove("hidden");$("app").classList.add("hidden");return}$("login").classList.add("hidden");$("app").classList.remove("hidden");buildLevels()}
+const initialSection=new URLSearchParams(location.search).get("section");if(initialSection==="academic")$("section").value="academic";
 start();
 </script></body></html>
