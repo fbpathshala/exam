@@ -186,10 +186,16 @@ button.secondary{background:#e8f1f8!important;color:#173f5f!important;border:1px
       <div><label>Set</label><select id="questionSet"></select></div>
       <div><label>বিষয়</label><select id="subject"></select></div>
     </div>
-    <div class="grid"><div><label>প্রশ্ন নম্বর</label><input id="questionNumber" type="number"></div><div></div></div>
-    <textarea id="question" placeholder="প্রশ্ন"></textarea>
-    <div class="grid"><input id="optionA" placeholder="ক. অপশন"><input id="optionB" placeholder="খ. অপশন"><input id="optionC" placeholder="গ. অপশন"><input id="optionD" placeholder="ঘ. অপশন"></div>
-    <div class="grid"><select id="correctAnswer"><option value="">সঠিক উত্তর</option><option value="A">ক</option><option value="B">খ</option><option value="C">গ</option><option value="D">ঘ</option></select><input id="explanation" placeholder="ব্যাখ্যা (ঐচ্ছিক)"></div>
+    <div class="grid"><div><label>প্রশ্নের ধরন</label><select id="questionType" onchange="syncQuestionType()"><option value="mcq">MCQ — বহুনির্বাচনী</option><option value="cq">CQ — লিখিত</option></select></div><div><label>প্রশ্ন নম্বর</label><input id="questionNumber" type="number"></div></div>
+    <textarea id="question" placeholder="প্রশ্ন লিখুন"></textarea>
+    <div id="mcqFields">
+      <div class="grid"><input id="optionA" placeholder="ক. অপশন"><input id="optionB" placeholder="খ. অপশন"><input id="optionC" placeholder="গ. অপশন"><input id="optionD" placeholder="ঘ. অপশন"></div>
+      <div class="grid"><select id="correctAnswer"><option value="">সঠিক উত্তর</option><option value="A">ক</option><option value="B">খ</option><option value="C">গ</option><option value="D">ঘ</option></select><input id="explanation" placeholder="ব্যাখ্যা (ঐচ্ছিক)"></div>
+    </div>
+    <div id="cqFields" class="hidden">
+      <textarea id="referenceAnswer" placeholder="CQ-এর নমুনা/রেফারেন্স উত্তর (ঐচ্ছিক)"></textarea>
+      <input id="cqExplanation" placeholder="ব্যাখ্যা/শিক্ষকের নোট (ঐচ্ছিক)">
+    </div>
     <button type="button" onclick="addManual()">প্রশ্ন Question Bank-এ যোগ করুন</button>
     <p id="manualMsg" class="msg"></p>
   </div>
@@ -214,7 +220,7 @@ button.secondary{background:#e8f1f8!important;color:#173f5f!important;border:1px
 </main>
 </div>
 <script src="js/supabase.js?v=20261008-1"></script>
-<script src="js/question_create.js?v=20261014-1"></script>
+<script src="js/question_create.js?v=20261016-cq1"></script>
 <a class="direct-dashboard-nav" href="dashboard.html" aria-label="ড্যাশবোর্ডে ফিরে যান">🏠 ড্যাশবোর্ড</a><script id="site-copy-deterrent-script">(function(){function editable(t){return !!(t&&t.closest&&t.closest('input,textarea,select,[contenteditable="true"],[contenteditable=""]'))}document.addEventListener('contextmenu',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('selectstart',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('copy',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('cut',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('keydown',function(e){if(editable(e.target))return;var k=(e.key||'').toLowerCase();if((e.ctrlKey||e.metaKey)&&['c','x','u','s','p'].includes(k)){e.preventDefault();e.stopPropagation()}if(e.key==='PrintScreen')e.preventDefault()},true)})();</script><a class="central-home-nav" href="https://fbpathshala.github.io/home.html" aria-label="কেন্দ্রীয় হোমপেজে ফিরে যান">⌂ কেন্দ্রীয় হোমপেজ</a>
 <a class="central-section-nav" href="https://fbpathshala.github.io/home.html?section=job" aria-label="Job Care বিভাগের মেনুতে ফিরে যান">↩ Job Care মেনু</a></body>
 </html>
