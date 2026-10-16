@@ -72,7 +72,7 @@ function draw(){
 function drawItems(){
  const c=hierarchy(),l=level(),parent=parentId();
  let items=(cache[l]||[]).map(x=>({...x,name:x[c.nameCols[l]]}));
- if(l>0){const col=c.parents[l];items=items.filter(x=>String(x[col]??"")===String(parent??""))}
+ if(l>0){const col=c.parents[l];if(!($("section").value==="job"&&l===1))items=items.filter(x=>String(x[col]??"")===String(parent??""))}
  if($("section").value==="job"&&l===1){const cat=cache[0].find(x=>String(x.id)===String(parent));items=items.filter(x=>x.category_id?String(x.category_id)===String(parent):x.sub_category===cat?.name)}
  if($("section").value==="academic"&&l===3){items=items.filter(x=>x.chapter_id?String(x.chapter_id)===String(parent):String(x.folder_id)===String($("parent_1")?.value||""))}
  currentItems=items;opts($("itemSelect"),items,"-- "+c.labels[l]+" নির্বাচন --");
