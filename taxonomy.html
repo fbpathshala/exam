@@ -58,12 +58,12 @@ async function loadAll(){
  draw();
 }
 function draw(){
- const c=hierarchy();const l=level();$("flow").textContent=c.labels.join("  ›  ");$("itemLabel").textContent=c.labels[l]+" নির্বাচন";$("newLabel").textContent="নতুন "+c.labels[l]+"-এর নাম";$("newName").placeholder=c.labels[l]+"-এর নাম লিখুন";
+ const c=hierarchy();const l=level();const previous={};for(let k=0;k<l;k++)previous[k]=$("parent_"+k)?.value||"";$("flow").textContent=c.labels.join("  ›  ");$("itemLabel").textContent=c.labels[l]+" নির্বাচন";$("newLabel").textContent="নতুন "+c.labels[l]+"-এর নাম";$("newName").placeholder=c.labels[l]+"-এর নাম লিখুন";
  const parent=$("parentFields");parent.innerHTML="";
  for(let i=0;i<l;i++){
   const wrap=document.createElement("div");wrap.className="field";const label=document.createElement("label");label.htmlFor="parent_"+i;label.textContent=c.labels[i]+" নির্বাচন";const sel=document.createElement("select");sel.id="parent_"+i;sel.dataset.parentLevel=i;wrap.append(label,sel);parent.append(wrap);
   const items=(cache[i]||[]).filter(x=>i===0||String(x[c.parents[i]]||"")===String($("parent_"+(i-1))?.value||"")).map(x=>({...x,name:x[c.nameCols[i]]}));
-  opts(sel,items,"-- "+c.labels[i]+" নির্বাচন --");
+  opts(sel,items,"-- "+c.labels[i]+" নির্বাচন --");if(previous[i]&&Array.from(sel.options).some(o=>o.value===previous[i]))sel.value=previous[i];
   if(i>0){const prev=$("parent_"+(i-1));if(prev)sel.disabled=!prev.value}
   sel.onchange=()=>{for(let j=i+1;j<l;j++){const child=$("parent_"+j);if(child){child.value="";child.disabled=true}}draw()};
  }
