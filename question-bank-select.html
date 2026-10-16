@@ -21,10 +21,9 @@ main{width:min(760px,100%);margin:auto;padding:28px 20px}
 <body>
 <header><h1>🗂️ প্রশ্ন ব্যাংক</h1></header>
 <main>
-<nav class="grid" aria-label="প্রশ্ন ব্যাংক নির্বাচন">
-<a class="card job" href="question-bank-type.html?care=job"><span class="icon" aria-hidden="true">💼</span><span>Job Care</span></a>
-<a class="card academic" href="question-bank-type.html?care=academic"><span class="icon" aria-hidden="true">🎓</span><span>Academic Care</span></a>
-</nav>
+<nav id="questionBankCategories" class="grid" aria-label="প্রশ্ন ব্যাংক নির্বাচন"></nav>
+<script src="js/categories.js?v=20261016-1"></script>
+<script>FBPathshalaCategories.renderCards(document.getElementById("questionBankCategories"));</script>
 </main>
 </body>
 </html>
