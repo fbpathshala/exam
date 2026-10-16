@@ -167,9 +167,9 @@ async function loadFolders(preferredFolderId=null) {
 }
 
 async function loadSets(preferredSetId=null) {
-  const qসাব-ক্যাটাগরি = $('questionFolder')?.value || '';
-  const manageসাব-ক্যাটাগরি = $('setManageFolder')?.value || '';
-  const folderId = qসাব-ক্যাটাগরি || manageFolder;
+  const qFolder = $('questionFolder')?.value || '';
+  const manageFolder = $('setManageFolder')?.value || '';
+  const folderId = qFolder || manageFolder;
   try {
     if (!folderId) {
       ['manageSet','questionSet'].forEach(id => { if ($(id)) $(id).innerHTML = '<option value="">Set নির্বাচন করুন</option>'; });
