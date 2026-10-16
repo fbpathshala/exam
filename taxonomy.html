@@ -29,10 +29,10 @@ const sb=window.db;
 const $=id=>document.getElementById(id);
 const cfg={
  job:{
-  labels:["ক্যাটাগরি","সাব-ক্যাটাগরি","সেট"],
-  tables:["question_bank_categories","question_bank_folders","question_bank_sets"],
-  nameCols:["name","folder_name","set_name"],
-  parents:[null,"category_id","folder_id"]
+  labels:["ক্যাটাগরি","সাব-ক্যাটাগরি","সেট","বিষয়"],
+  tables:["question_bank_categories","question_bank_folders","question_bank_sets","subjects"],
+  nameCols:["name","folder_name","set_name","name"],
+  parents:[null,"category_id","folder_id",null]
  },
  academic:{
   labels:["শ্রেণি","বিষয়","অধ্যায়","সেট"],
@@ -52,7 +52,7 @@ async function query(table,cols="id"){const {data,error}=await sb.from(table).se
 async function loadAll(){
  const c=hierarchy();cache={};
  for(let i=0;i<c.tables.length;i++){
-  const cols=i===1&&$("section").value==="job"?"id,category_id,sub_category,folder_name":i===1&&$("section").value==="academic"?"id,category_id,folder_name":i===2&&$("section").value==="academic"?"id,folder_id,chapter_name":i===c.tables.length-1?(i===2?"id,folder_id,set_name":"id,folder_id,chapter_id,set_name"):"id,"+c.nameCols[i]+(c.parents[i]?", "+c.parents[i]:"");
+  const cols=$( "section" ).value==="job"&&i===1?"id,category_id,sub_category,folder_name":$( "section" ).value==="job"&&i===3?"id,name":i===1&&$("section").value==="academic"?"id,category_id,folder_name":i===2&&$("section").value==="academic"?"id,folder_id,chapter_name":i===c.tables.length-1?(i===2?"id,folder_id,set_name":"id,folder_id,chapter_id,set_name"):"id,"+c.nameCols[i]+(c.parents[i]?", "+c.parents[i]:"");
   cache[i]=await query(c.tables[i],cols);
  }
  draw();
@@ -86,7 +86,8 @@ async function hasChildrenOrQuestions(id){
  if(section==="job"){
   if(l===0)return (await getCount("question_bank_folders","category_id",id))>0 || (await getCount("question_bank_folders","sub_category",(cache[0].find(x=>String(x.id)===String(id))||{}).name))>0;
   if(l===1)return (await getCount("question_bank_sets","folder_id",id))>0 || (await getCount("questions","folder_id",id))>0;
-  return (await getCount("questions","set_id",id))>0;
+  if(l===2)return (await getCount("questions","set_id",id))>0;
+  return (await getCount("questions","subject_id",id))>0;
  }
  if(l===0)return (await getCount("academic_care_folders","category_id",id))>0 || (await getCount("academic_care_questions","category_id",id))>0 || (await getCount("academic_care_question_bank_items","category_id",id))>0;
  if(l===1)return (await getCount("academic_care_chapters","folder_id",id))>0 || (await getCount("academic_care_sets","folder_id",id))>0 || (await getCount("academic_care_questions","folder_id",id))>0 || (await getCount("academic_care_question_bank_items","folder_id",id))>0;
@@ -95,7 +96,7 @@ async function hasChildrenOrQuestions(id){
 }
 async function addItem(){
  const c=hierarchy(),l=level(),name=$("newName").value.trim();if(!name){say("আগে নাম লিখুন।",true);return}
- if(l>0&&!parentId()){say("আগে উপরের স্তর নির্বাচন করুন।",true);return}
+ if(l>0&&c.parents[l]&&!parentId()){say("আগে উপরের স্তর নির্বাচন করুন।",true);return}
  const row={[c.nameCols[l]]:name};if(l>0)row[c.parents[l]]=Number(parentId());
  if($("section").value==="job"&&l===1){const p=cache[0].find(x=>String(x.id)===String(parentId()));row.category_id=Number(parentId());row.sub_category=p?.name||""}
  if($("section").value==="academic"&&l===3){row.folder_id=Number($("parent_1").value);row.chapter_id=Number(parentId())}
