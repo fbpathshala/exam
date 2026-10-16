@@ -19,8 +19,7 @@ header{height:72px;background:#fff;border-bottom:1px solid #dce6ec;display:flex;
 <div id="app" hidden>
 <header><div class="brand">🎓 ফেইসবুক পাঠশালা</div><button id="menuButton" class="menu-button" type="button" aria-label="মেনু খুলুন" aria-expanded="false" aria-controls="mainMenu">☰</button>
 <nav id="mainMenu" class="menu" aria-label="প্রধান মেনু" hidden>
-<a href="https://fbpathshala.github.io/exam/">Job Care · Exam System</a>
-<a href="https://fbpathshala.github.io/academic/">Academic Care</a>
+<div id="categoryNavigation"></div>
 <a href="https://fbpathshala.github.io/exam/study-materials.html">Study Material</a>
 <a href="https://fbpathshala.github.io/exam/admin.html">গুরুত্বপূর্ণ তথ্য ও লিংক</a>
 <a href="https://www.facebook.com/facebookpathshala" target="_blank" rel="noopener noreferrer">Facebook Pathshala ↗</a>
@@ -29,8 +28,10 @@ header{height:72px;background:#fff;border-bottom:1px solid #dce6ec;display:flex;
 <main><section class="welcome"><span class="eyebrow">CENTRAL WORKSPACE</span><h1>সব কাজ, এক জায়গায়</h1><p>ফেইসবুক পাঠশালার কেন্দ্রীয় হোমপেজে স্বাগতম। প্রয়োজনীয় বিভাগ খুলতে উপরের ☰ মেনু ব্যবহার করুন।</p></section></main>
 <footer>ফেইসবুক পাঠশালা · শিক্ষা সবার জন্য</footer>
 </div>
+<script src="js/categories.js?v=20261016-1"></script>
 <script src="js/supabase.js?v=20261012-shared-auth2"></script>
 <script>
+FBPathshalaCategories.renderNavigation(document.getElementById("categoryNavigation"));
 async function showApp(){const {data,error}=await db.auth.getSession();if(error){document.getElementById('msg').textContent=error.message;return}const loggedIn=!!data.session;document.getElementById('login').hidden=loggedIn;document.getElementById('app').hidden=!loggedIn}
 document.getElementById('loginForm').addEventListener('submit',async function(e){e.preventDefault();const msg=document.getElementById('msg');msg.textContent='Login হচ্ছে…';const email=document.getElementById('email').value.trim(),password=document.getElementById('password').value;const {error}=await db.auth.signInWithPassword({email,password});if(error){msg.textContent=error.message;return}msg.textContent='';await showApp()});
 async function logout(){await db.auth.signOut();location.reload()}
