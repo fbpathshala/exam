@@ -89,7 +89,7 @@ async function hasChildrenOrQuestions(id){
   return (await getCount("questions","set_id",id))>0;
  }
  if(l===0)return (await getCount("academic_care_folders","category_id",id))>0 || (await getCount("academic_care_questions","category_id",id))>0 || (await getCount("academic_care_question_bank_items","category_id",id))>0;
- if(l===1)return (await getCount("academic_care_chapters","folder_id",id))>0 || (await getCount("academic_care_questions","folder_id",id))>0 || (await getCount("academic_care_question_bank_items","folder_id",id))>0;
+ if(l===1)return (await getCount("academic_care_chapters","folder_id",id))>0 || (await getCount("academic_care_sets","folder_id",id))>0 || (await getCount("academic_care_questions","folder_id",id))>0 || (await getCount("academic_care_question_bank_items","folder_id",id))>0;
  if(l===2)return (await getCount("academic_care_sets","chapter_id",id))>0 || (await getCount("academic_care_questions","chapter_id",id))>0 || (await getCount("academic_care_question_bank_items","chapter_id",id))>0;
  return (await getCount("academic_care_questions","set_id",id))>0 || (await getCount("academic_care_question_bank_items","set_id",id))>0;
 }
