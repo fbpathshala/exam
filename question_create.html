@@ -151,18 +151,18 @@ button.secondary{background:#e8f1f8!important;color:#173f5f!important;border:1px
       <section class="manage-box category-management-item">
         <h3>📁 সাব-ক্যাটাগরি ব্যবস্থাপনা</h3>
         <p>ক্যাটাগরি নির্বাচন করে সাব-ক্যাটাগরি যোগ, নাম পরিবর্তন বা মুছুন।</p>
-        <div class="field"><label for="manageFolder">সাব-ক্যাটাগরি নির্বাচন</label><select id="manageFolder"><option value="">ফোল্ডার নির্বাচন</option></select></div>
+        <div class="field"><label for="manageFolder">সাব-ক্যাটাগরি নির্বাচন</label><select id="manageFolder"><option value="">সাব-ক্যাটাগরি নির্বাচন</option></select></div>
         <div class="manage-actions">
           <button type="button" class="secondary" onclick="renameSelectedFolder()">✏️ Rename</button>
           <button type="button" class="secondary" onclick="deleteSelectedFolder()">🗑️ Delete</button>
         </div>
         <div class="field" style="margin-top:12px"><label for="newFolder">নতুন সাব-ক্যাটাগরির নাম</label><input id="newFolder" placeholder="সাব-ক্যাটাগরির নাম"></div>
-        <button type="button" style="margin-top:10px" onclick="createFolder()" >＋ সাব-ক্যাটাগরি যোগ</button>
+        <button type="button" style="margin-top:10px" onclick="createFolder()">＋ সাব-ক্যাটাগরি যোগ</button>
       </section>
       <section class="manage-box category-management-item">
         <h3>📂 সেট ব্যবস্থাপনা</h3>
         <p>সাব-ক্যাটাগরি নির্বাচন করে সেট যোগ, নাম পরিবর্তন বা মুছুন।</p>
-        <div class="field"><label for="setManageFolder">সাব-ক্যাটাগরি নির্বাচন</label><select id="setManageFolder"><option value="">ফোল্ডার নির্বাচন</option></select></div>
+        <div class="field"><label for="setManageFolder">সাব-ক্যাটাগরি নির্বাচন</label><select id="setManageFolder"><option value="">সাব-ক্যাটাগরি নির্বাচন</option></select></div>
         <div class="field" style="margin-top:10px"><label for="manageSet">সেট নির্বাচন</label><select id="manageSet"><option value="">সেট নির্বাচন</option></select></div>
         <div class="manage-actions">
           <button type="button" class="secondary" onclick="renameSelectedSet()">✏️ Rename</button>
@@ -179,11 +179,11 @@ button.secondary{background:#e8f1f8!important;color:#173f5f!important;border:1px
     <div class="section-head"><div><h2 style="margin-bottom:4px">২. নতুন প্রশ্ন এড</h2><p class="section-note">প্রশ্নটি কোন ক্যাটাগরি → সাব-ক্যাটাগরি → সেট-এ যাবে, তা এখান থেকে নির্ধারণ করুন।</p></div></div>
     <div class="destination"><strong>প্রশ্নের গন্তব্য</strong><small>ক্যাটাগরি → সাব-ক্যাটাগরি → সেট</small></div>
     <div class="grid">
-      <div><label>Category</label><select id="questionCategory"></select></div>
+      <div><label>ক্যাটাগরি</label><select id="questionCategory"></select></div>
       <div><label>সাব-ক্যাটাগরি</label><select id="questionFolder"></select></div>
     </div>
     <div class="grid">
-      <div><label>Set</label><select id="questionSet"></select></div>
+      <div><label>সেট</label><select id="questionSet"></select></div>
       <div><label>বিষয়</label><select id="subject"></select></div>
     </div>
     <div class="grid"><div><label>প্রশ্নের ধরন</label><select id="questionType" onchange="syncQuestionType()"><option value="mcq">MCQ — বহুনির্বাচনী</option><option value="cq">CQ — লিখিত</option></select></div><div><label>প্রশ্ন নম্বর</label><input id="questionNumber" type="number"></div></div>
@@ -201,15 +201,15 @@ button.secondary{background:#e8f1f8!important;color:#173f5f!important;border:1px
   </div>
 
   <div class="card">
-    <div class="section-head"><div><h2 style="margin-bottom:4px">৩. CSV / Excel Upload</h2><p class="section-note">নির্বাচিত Category → Folder → Set-এ একসাথে অনেক প্রশ্ন Import করুন।</p></div></div>
+    <div class="section-head"><div><h2 style="margin-bottom:4px">৩. CSV / Excel Upload</h2><p class="section-note">নির্বাচিত ক্যাটাগরি → সাব-ক্যাটাগরি → সেট-এ একসাথে অনেক প্রশ্ন যোগ করুন।</p></div></div>
     <p class="muted">Required: question, option_a, option_b, option_c, option_d, correct_answer. Optional: question_number, subject, explanation, category.</p>
     <div class="destination"><strong>প্রশ্নের গন্তব্য</strong><small>CSV/Excel-এর সব প্রশ্ন এই নির্বাচিত ক্যাটাগরি → সাব-ক্যাটাগরি → সেট-এ যাবে।</small></div>
     <div class="grid">
-      <div><label>Category</label><select id="importCategory"></select></div>
-      <div><label>Folder</label><select id="importFolder"></select></div>
+      <div><label>ক্যাটাগরি</label><select id="importCategory"></select></div>
+      <div><label>সাব-ক্যাটাগরি</label><select id="importFolder"></select></div>
     </div>
     <div class="grid" style="margin-bottom:10px">
-      <div><label>Set</label><select id="importSet"></select></div><div></div>
+      <div><label>সেট</label><select id="importSet"></select></div><div></div>
     </div>
     <div class="inline-actions"><button type="button" class="secondary" onclick="template()">Template ডাউনলোড</button><input id="importFile" type="file" accept=".csv,.xlsx,.xls"></div>
     <button type="button" onclick="previewImport()">Preview</button>
