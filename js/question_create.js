@@ -84,7 +84,7 @@ async function deleteSelectedCategory(){
     client().from('questions').select('id',{count:'exact',head:true}).eq('category',name)
   ]);
   if(folders.error||questions.error)return msg('categoryMsg',(folders.error||questions.error).message,true);
-  if((folders.count||0)||(questions.count||0))return msg('categoryMsg',`❌ এই ক্যাটাগরিতে ফোল্ডার ${bn(folders.count||0)}টি এবং প্রশ্ন ${bn(questions.count||0)}টি আছে। আগে সেগুলো অন্য ক্যাটাগরিতে সরান। কোনো রেকর্ড মুছে ফেলা হয়নি।`,true);
+  if((folders.count||0)||(questions.count||0))return msg('categoryMsg',`❌ এই ক্যাটাগরিতে সাব-ক্যাটাগরি ${bn(folders.count||0)}টি এবং প্রশ্ন ${bn(questions.count||0)}টি আছে। আগে সেগুলো অন্য ক্যাটাগরিতে সরান। কোনো রেকর্ড মুছে ফেলা হয়নি।`,true);
   if(!confirm(`“${name}” ক্যাটাগরি মুছে ফেলবেন?`))return;
   const {error}=await client().from('question_bank_categories').delete().eq('name',name);
   if(error)return msg('categoryMsg',error.message,true);
@@ -146,7 +146,7 @@ async function loadFolders(preferredFolderId=null) {
   try {
     if (!cat || !CATS[cat]) {
       for (const id of ['manageFolder','setManageFolder','questionFolder']) {
-        if ($(id)) $(id).innerHTML = '<option value="">ফোল্ডার নির্বাচন করুন</option>';
+        if ($(id)) $(id).innerHTML = '<option value="">সাব-ক্যাটাগরি নির্বাচন</option>';
       }
       await loadSets();
       return;
