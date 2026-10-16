@@ -158,7 +158,7 @@ async function loadFolders(preferredFolderId=null) {
     for (const id of ['manageFolder','setManageFolder','questionFolder']) {
       const el = $(id);
       if (!el) continue;
-      el.innerHTML = '<option value="">Folder নির্বাচন করুন</option>' + rows.map(x => `<option value="${x.id}">${esc(x.folder_name)}</option>`).join('');
+      el.innerHTML = '<option value="">সাব-ক্যাটাগরি নির্বাচন করুন</option>' + rows.map(x => `<option value="${x.id}">${esc(x.folder_name)}</option>`).join('');
       if (preferredFolderId && rows.some(x => String(x.id) === String(preferredFolderId))) el.value = String(preferredFolderId);
     }
 
@@ -202,10 +202,10 @@ async function loadImportFolders(preferredFolderId=null) {
     const {data,error} = await client().from('question_bank_folders').select('id,folder_name').eq('sub_category', categoryLabel).order('folder_name');
     if (error) throw error;
     const rows = data || [];
-    el.innerHTML = '<option value="">Folder নির্বাচন করুন</option>' + rows.map(x => `<option value="${x.id}">${esc(x.folder_name)}</option>`).join('');
+    el.innerHTML = '<option value="">সাব-ক্যাটাগরি নির্বাচন করুন</option>' + rows.map(x => `<option value="${x.id}">${esc(x.folder_name)}</option>`).join('');
     if (preferredFolderId && rows.some(x => String(x.id) === String(preferredFolderId))) el.value = String(preferredFolderId);
     await loadImportSets();
-  } catch(e) { msg('importMsg', e.message || 'CSV/Excel-এর Folder লোড করতে সমস্যা হয়েছে।', true); }
+  } catch(e) { msg('importMsg', e.message || 'CSV/Excel-এর সাব-ক্যাটাগরি লোড করতে সমস্যা হয়েছে।', true); }
 }
 
 async function loadImportSets(preferredSetId=null) {
@@ -231,21 +231,21 @@ function syncFolderSelection(sourceId) {
 async function createFolder() {
   if (!cat || !CATS[cat]) return msg('folderMsg','আগে ক্যাটাগরি নির্বাচন করুন।',true);
   const name = $('newFolder')?.value.trim();
-  if (!name) return msg('folderMsg','নতুন Folder-এর নাম দিন।',true);
+  if (!name) return msg('folderMsg','নতুন সাব-ক্যাটাগরির নাম দিন।',true);
   try {
-    msg('folderMsg','Folder তৈরি হচ্ছে...');
+    msg('folderMsg','সাব-ক্যাটাগরি তৈরি হচ্ছে...');
     const {data,error} = await client().from('question_bank_folders').insert({sub_category:CATS[cat],folder_name:name}).select('id').single();
     if (error) throw error;
     $('newFolder').value = '';
     await loadFolders(data?.id);
-    msg('folderMsg','✅ Folder সফলভাবে তৈরি হয়েছে।');
+    msg('folderMsg','✅ সাব-ক্যাটাগরি সফলভাবে তৈরি হয়েছে।');
   } catch(e) { msg('folderMsg',e.message,true); }
 }
 
 async function createSet() {
   const folderId = $('setManageFolder')?.value || $('questionFolder')?.value;
   const name = $('newSet')?.value.trim();
-  if (!folderId) return msg('folderMsg','আগে Folder নির্বাচন করুন।',true);
+  if (!folderId) return msg('folderMsg','আগে সাব-ক্যাটাগরি নির্বাচন করুন।',true);
   if (!name) return msg('folderMsg','নতুন Set-এর নাম দিন।',true);
   try {
     msg('folderMsg','Set তৈরি হচ্ছে...');
@@ -261,7 +261,7 @@ async function createSet() {
 
 async function renameSelectedFolder() {
   const id = $('manageFolder')?.value;
-  if (!id) return msg('folderMsg','আগে Folder নির্বাচন করুন।',true);
+  if (!id) return msg('folderMsg','আগে সাব-ক্যাটাগরি নির্বাচন করুন।',true);
   const old = $('manageFolder').selectedOptions[0]?.textContent || '';
   const name = prompt('নতুন Folder-এর নাম লিখুন:', old);
   if (name === null) return;
@@ -269,29 +269,29 @@ async function renameSelectedFolder() {
   if (!value) return msg('folderMsg','Folder-এর নাম খালি রাখা যাবে না।',true);
   if (value === old) return;
   try {
-    msg('folderMsg','Folder Rename হচ্ছে...');
+    msg('folderMsg','সাব-ক্যাটাগরির নাম পরিবর্তন হচ্ছে...');
     const {error} = await client().from('question_bank_folders').update({folder_name:value}).eq('id',Number(id));
     if (error) throw error;
     await loadFolders(id);
-    msg('folderMsg','✅ Folder-এর নাম পরিবর্তন হয়েছে।');
+    msg('folderMsg','✅ সাব-ক্যাটাগরির নাম পরিবর্তন হয়েছে।');
   } catch(e) { msg('folderMsg',e.message,true); }
 }
 
 async function deleteSelectedFolder() {
   const id = $('manageFolder')?.value;
-  if (!id) return msg('folderMsg','আগে Folder নির্বাচন করুন।',true);
-  const name = $('manageFolder').selectedOptions[0]?.textContent || 'এই Folder';
+  if (!id) return msg('folderMsg','আগে সাব-ক্যাটাগরি নির্বাচন করুন।',true);
+  const name = $('manageFolder').selectedOptions[0]?.textContent || 'এই সাব-ক্যাটাগরি';
   try {
     const check = await client().from('question_bank_sets').select('id',{count:'exact',head:true}).eq('folder_id',Number(id));
     if (check.error) throw check.error;
     const count = check.count || 0;
-    if (count) return msg('folderMsg',`❌ "${name}" Folder-এর মধ্যে ${bn(count)}টি Set আছে। আগে সব Set সরাতে হবে; নিরাপত্তার জন্য Folder Delete করা যাবে না।`,true);
-    if (!confirm(`"${name}" Folder Delete করবেন?`)) return;
-    msg('folderMsg','Folder Delete হচ্ছে...');
+    if (count) return msg('folderMsg',`❌ "${name}" সাব-ক্যাটাগরির মধ্যে ${bn(count)}টি Set আছে। আগে সব Set সরাতে হবে; নিরাপত্তার জন্য Folder Delete করা যাবে না।`,true);
+    if (!confirm(`"${name}" সাব-ক্যাটাগরি মুছে ফেলবেন?`)) return;
+    msg('folderMsg','সাব-ক্যাটাগরি মুছে ফেলা হচ্ছে...');
     const {error} = await client().from('question_bank_folders').delete().eq('id',Number(id));
     if (error) throw error;
     await loadFolders();
-    msg('folderMsg','✅ Folder Delete হয়েছে।');
+    msg('folderMsg','✅ সাব-ক্যাটাগরি মুছে ফেলা হয়েছে।');
   } catch(e) { msg('folderMsg',e.message,true); }
 }
 
@@ -360,13 +360,13 @@ async function template(){const headers=['question','option_a','option_b','optio
 async function readWorkbook(file){await ensureXLSX();const buffer=await file.arrayBuffer();const wb=XLSX.read(buffer,{type:'array',raw:false,cellText:true,cellDates:false});if(!wb.SheetNames?.length)throw new Error('Excel/CSV ফাইলে কোনো Sheet পাওয়া যায়নি।');const sheet=wb.Sheets[wb.SheetNames[0]];if(!sheet)throw new Error('Excel/CSV ফাইলে কোনো Sheet পাওয়া যায়নি।');const rows=XLSX.utils.sheet_to_json(sheet,{defval:'',raw:false});validateHeaders(rows);return remapRows(rows);}
 function showImportButton(show){const el=$('importBtn');if(!el)return;el.disabled=!show;el.classList.toggle('hidden',!show);}
 function renderPreview(rows,failed=[]){const box=$('importPreview');if(!box)return;const parts=[`<b>মোট Row: ${bn(rows.length)}</b>`];if(failed.length){parts.push('<div style="margin-top:10px"><b>যেসব Row-তে সমস্যা:</b></div>');parts.push(failed.slice(0,100).map(x=>`<div class="q">${esc(x)}</div>`).join(''));}const sample=rows.slice(0,5);if(sample.length){parts.push('<div style="margin-top:10px"><b>Preview:</b></div>');parts.push(sample.map((r,i)=>`<div class="q"><b>Row ${bn(i+2)}</b><br>${esc(r.question||'(question খালি)')}</div>`).join(''));}box.innerHTML=parts.join('');}
-async function previewImport(){const file=$('importFile')?.files?.[0];if(!file)return msg('importMsg','আগে CSV/Excel ফাইল নির্বাচন করুন।',true);if(!$('importCategory')?.value||!$('importFolder')?.value||!$('importSet')?.value)return msg('importMsg','আগে প্রশ্নের গন্তব্য Category → Folder → Set নির্বাচন করুন।',true);showImportButton(false);msg('importMsg','ফাইল যাচাই করা হচ্ছে...');try{const rows=await readWorkbook(file);const failed=validateRows(rows);pendingImportRows=rows.filter((_,i)=>!failed.some(x=>x.rowIndex===i));renderPreview(rows,failed.map(x=>`Row ${x.rowNo}: ${x.message}`));if(!pendingImportRows.length)return msg('importMsg','কোনো valid Row পাওয়া যায়নি।',true);showImportButton(true);msg('importMsg',`মোট ${bn(rows.length)}টি Row | Valid ${bn(pendingImportRows.length)} | Invalid ${bn(rows.length-pendingImportRows.length)}${failed.length?' — Invalid Row বাদ থাকবে।':''}`,failed.length>0);}catch(err){pendingImportRows=[];if($('importPreview'))$('importPreview').innerHTML='';msg('importMsg',err.message||'ফাইল যাচাই করতে সমস্যা হয়েছে।',true);}}
+async function previewImport(){const file=$('importFile')?.files?.[0];if(!file)return msg('importMsg','আগে CSV/Excel ফাইল নির্বাচন করুন।',true);if(!$('importCategory')?.value||!$('importFolder')?.value||!$('importSet')?.value)return msg('importMsg','আগে প্রশ্নের গন্তব্য Category → সাব-ক্যাটাগরি → সেট নির্বাচন করুন।',true);showImportButton(false);msg('importMsg','ফাইল যাচাই করা হচ্ছে...');try{const rows=await readWorkbook(file);const failed=validateRows(rows);pendingImportRows=rows.filter((_,i)=>!failed.some(x=>x.rowIndex===i));renderPreview(rows,failed.map(x=>`Row ${x.rowNo}: ${x.message}`));if(!pendingImportRows.length)return msg('importMsg','কোনো valid Row পাওয়া যায়নি।',true);showImportButton(true);msg('importMsg',`মোট ${bn(rows.length)}টি Row | Valid ${bn(pendingImportRows.length)} | Invalid ${bn(rows.length-pendingImportRows.length)}${failed.length?' — Invalid Row বাদ থাকবে।':''}`,failed.length>0);}catch(err){pendingImportRows=[];if($('importPreview'))$('importPreview').innerHTML='';msg('importMsg',err.message||'ফাইল যাচাই করতে সমস্যা হয়েছে।',true);}}
 function validateRows(rows){const failed=[];rows.forEach((row,i)=>{const rowNo=i+2;const missing=[];if(!row.question)missing.push('question');if(!row.option_a)missing.push('option_a');if(!row.option_b)missing.push('option_b');if(!row.option_c)missing.push('option_c');if(!row.option_d)missing.push('option_d');if(!row.correct_answer)missing.push('correct_answer');if(missing.length)failed.push({rowIndex:i,rowNo,message:`Required field খালি — ${missing.join(', ')}`});const correct=String(row.correct_answer||'').trim().toUpperCase();if(correct&&!['A','B','C','D'].includes(correct))failed.push({rowIndex:i,rowNo,message:'correct_answer অবশ্যই A, B, C অথবা D হতে হবে।'});if(String(row.question_number??'').trim()!==''){const n=Number(String(row.question_number).trim());if(!Number.isFinite(n)||n<=0||!Number.isInteger(n))failed.push({rowIndex:i,rowNo,message:'question_number অবশ্যই ০-এর চেয়ে বড় পূর্ণসংখ্যা হতে হবে।'});}if(String(row.category??'').trim()&&!normalizeCategory(row.category))failed.push({rowIndex:i,rowNo,message:`category "${row.category}" পরিচিত Category নয়।`});if(String(row.subject??'').trim()){const found=subjects.find(s=>norm(s.name)===norm(row.subject));if(!found)failed.push({rowIndex:i,rowNo,message:`subject "${row.subject}" পাওয়া যায়নি।`});}});return failed.filter((x,i,a)=>a.findIndex(y=>y.rowIndex===x.rowIndex)===i);}
-async function importRows(){const file=$('importFile')?.files?.[0];if(!file)return msg('importMsg','আগে CSV/Excel ফাইল নির্বাচন করুন।',true);const categoryKey=$('importCategory')?.value||'',folderId=$('importFolder')?.value,setId=$('importSet')?.value;if(!categoryKey||!folderId||!setId)return msg('importMsg','আগে প্রশ্নের গন্তব্য Category → Folder → Set নির্বাচন করুন।',true);let rows=pendingImportRows;if(!rows.length){try{rows=await readWorkbook(file);}catch(err){return msg('importMsg',err.message||'ফাইল পড়তে সমস্যা হয়েছে।',true);}const failed=validateRows(rows);rows=rows.filter((_,i)=>!failed.some(x=>x.rowIndex===i));}if(!rows.length)return msg('importMsg','কোনো valid প্রশ্ন পাওয়া যায়নি।',true);showImportButton(false);msg('importMsg','Database-এ প্রশ্ন যোগ হচ্ছে...');const payload=rows.map(row=>{let questionNumber=null;if(String(row.question_number??'').trim()!=='')questionNumber=Number(row.question_number);let subjectId=null;if(String(row.subject??'').trim()){const found=subjects.find(s=>norm(s.name)===norm(row.subject));subjectId=found?.id??null;}return{folder_id:Number(folderId),set_id:Number(setId),subject_id:subjectId,category:CATS[categoryKey],question_number:questionNumber,question_text:String(row.question??'').trim(),option_a:String(row.option_a??'').trim(),option_b:String(row.option_b??'').trim(),option_c:String(row.option_c??'').trim(),option_d:String(row.option_d??'').trim(),correct_answer:String(row.correct_answer??'').trim().toUpperCase(),explanation:String(row.explanation??'').trim()||null};});const {error}=await client().from('questions').insert(payload);pendingImportRows=[];if(error){if($('importPreview'))$('importPreview').innerHTML=`<div class="q">${esc(error.message)}</div>`;return msg('importMsg',`Database-এ কোনো প্রশ্ন যোগ হয়নি। ${error.message}`,true);}if($('importPreview'))$('importPreview').innerHTML='';if($('importFile'))$('importFile').value='';msg('importMsg',`সফলভাবে ${bn(payload.length)}টি প্রশ্ন যোগ হয়েছে।`);}
+async function importRows(){const file=$('importFile')?.files?.[0];if(!file)return msg('importMsg','আগে CSV/Excel ফাইল নির্বাচন করুন।',true);const categoryKey=$('importCategory')?.value||'',folderId=$('importFolder')?.value,setId=$('importSet')?.value;if(!categoryKey||!folderId||!setId)return msg('importMsg','আগে প্রশ্নের গন্তব্য Category → সাব-ক্যাটাগরি → সেট নির্বাচন করুন।',true);let rows=pendingImportRows;if(!rows.length){try{rows=await readWorkbook(file);}catch(err){return msg('importMsg',err.message||'ফাইল পড়তে সমস্যা হয়েছে।',true);}const failed=validateRows(rows);rows=rows.filter((_,i)=>!failed.some(x=>x.rowIndex===i));}if(!rows.length)return msg('importMsg','কোনো valid প্রশ্ন পাওয়া যায়নি।',true);showImportButton(false);msg('importMsg','Database-এ প্রশ্ন যোগ হচ্ছে...');const payload=rows.map(row=>{let questionNumber=null;if(String(row.question_number??'').trim()!=='')questionNumber=Number(row.question_number);let subjectId=null;if(String(row.subject??'').trim()){const found=subjects.find(s=>norm(s.name)===norm(row.subject));subjectId=found?.id??null;}return{folder_id:Number(folderId),set_id:Number(setId),subject_id:subjectId,category:CATS[categoryKey],question_number:questionNumber,question_text:String(row.question??'').trim(),option_a:String(row.option_a??'').trim(),option_b:String(row.option_b??'').trim(),option_c:String(row.option_c??'').trim(),option_d:String(row.option_d??'').trim(),correct_answer:String(row.correct_answer??'').trim().toUpperCase(),explanation:String(row.explanation??'').trim()||null};});const {error}=await client().from('questions').insert(payload);pendingImportRows=[];if(error){if($('importPreview'))$('importPreview').innerHTML=`<div class="q">${esc(error.message)}</div>`;return msg('importMsg',`Database-এ কোনো প্রশ্ন যোগ হয়নি। ${error.message}`,true);}if($('importPreview'))$('importPreview').innerHTML='';if($('importFile'))$('importFile').value='';msg('importMsg',`সফলভাবে ${bn(payload.length)}টি প্রশ্ন যোগ হয়েছে।`);}
 function syncQuestionType(){const type=$('questionType')?.value||'mcq';$('mcqFields')?.classList.toggle('hidden',type!=='mcq');$('cqFields')?.classList.toggle('hidden',type!=='cq');}
 async function addManual(){
  const folderId=$('questionFolder')?.value,setId=$('questionSet')?.value,type=$('questionType')?.value||'mcq';
- if(!folderId||!setId)return msg('manualMsg','আগে প্রশ্নের Folder এবং Set নির্বাচন করুন।',true);
+ if(!folderId||!setId)return msg('manualMsg','আগে প্রশ্নের সাব-ক্যাটাগরি এবং সেট নির্বাচন করুন।',true);
  const question=$('question')?.value.trim(),qnoRaw=$('questionNumber')?.value.trim()||'',subjectId=$('subject')?.value||null;
  if(!question)return msg('manualMsg','প্রশ্ন লিখুন।',true);
  if(!subjectId)return msg('manualMsg','প্রশ্নের বিষয় নির্বাচন করুন।',true);
