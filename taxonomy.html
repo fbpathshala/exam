@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>প্রশ্ন ব্যাংক কাঠামো ব্যবস্থাপনা</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<style>
+:root{font-family:system-ui,-apple-system,"Noto Sans Bengali",sans-serif;color:#163047;background:#f3f7fb}
+*{box-sizing:border-box}body{margin:0;padding:16px}.wrap{max-width:1000px;margin:auto}.top,.panel{background:#fff;border:1px solid #dbe5ef;border-radius:16px;padding:18px;margin:0 0 16px;box-shadow:0 5px 18px #102a4308}.top{background:linear-gradient(120deg,#102a43,#0f766e);color:#fff}.top h1{margin:0 0 6px;font-size:24px}.top p{margin:0;color:#d7e8f0}.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field{display:flex;flex-direction:column;gap:6px;margin:10px 0}.field label{font-weight:700;font-size:14px}select,input{width:100%;min-height:44px;padding:9px 11px;border:1px solid #bdccda;border-radius:9px;background:#fff;font:inherit;color:#163047}button{min-height:42px;padding:9px 13px;border:0;border-radius:9px;background:#0f766e;color:#fff;font-weight:700;font:inherit;cursor:pointer}button.secondary{background:#e8f0f7;color:#163047;border:1px solid #cbd8e5}button.danger{background:#b42318}.actions{display:flex;flex-wrap:wrap;gap:8px}.status{min-height:24px;margin:10px 0 0;color:#0f766e;font-weight:650}.hidden{display:none!important}.flow{font-size:14px;color:#52687a;margin:4px 0 14px}.hint{font-size:13px;color:#64748b;line-height:1.6}.login{max-width:430px;margin:8vh auto}.login input{margin:7px 0}.login button{width:100%;margin-top:8px}@media(max-width:650px){body{padding:10px}.row{grid-template-columns:1fr}.top,.panel{padding:14px}.top h1{font-size:21px}}
+</style>
+</head>
+<body><div class="wrap">
+<section id="login" class="panel login"><h2>অ্যাডমিন লগইন</h2><p class="hint">প্রশ্ন ব্যাংকের কাঠামো পরিচালনার জন্য অ্যাডমিন অ্যাকাউন্ট দিয়ে লগইন করুন।</p><input id="email" type="email" autocomplete="username" placeholder="Admin Email"><input id="password" type="password" autocomplete="current-password" placeholder="Password"><button id="loginBtn">লগইন</button><p id="loginMsg" class="status"></p></section>
+<div id="app" class="hidden">
+<header class="top"><h1>প্রশ্ন ব্যাংক কাঠামো ব্যবস্থাপনা</h1><p>ক্যাটাগরি/শ্রেণি → সাব-ক্যাটাগরি/বিষয় → অধ্যায় → সেট</p></header>
+<section class="panel">
+<div class="row"><div class="field"><label for="section">ব্যবস্থাপনার বিভাগ</label><select id="section"><option value="job">Job Care</option><option value="academic">Academic Care</option></select></div><div class="field"><label for="level">যে স্তর পরিচালনা করবেন</label><select id="level"></select></div></div>
+<div id="parentFields" class="row"></div>
+<div class="flow" id="flow"></div>
+<div class="field"><label id="itemLabel" for="itemSelect">আইটেম নির্বাচন</label><select id="itemSelect"></select></div>
+<div class="field"><label id="newLabel" for="newName">নতুন নাম</label><input id="newName" maxlength="160" placeholder="নাম লিখুন"></div>
+<div class="actions"><button id="addBtn">＋ যোগ করুন</button><button id="renameBtn" class="secondary">নাম পরিবর্তন</button><button id="deleteBtn" class="danger">নিরাপদে মুছুন</button><button id="refreshBtn" class="secondary">রিফ্রেশ</button><button id="logoutBtn" class="secondary">লগআউট</button></div>
+<p id="status" class="status" role="status" aria-live="polite"></p>
+<p class="hint">নিরাপত্তা: কোনো স্তরের নিচে সেট/প্রশ্ন থাকলে সেটি মুছতে দেওয়া হবে না। নাম পরিবর্তনে আইডি একই থাকে। বিদ্যমান প্রশ্ন ও শিক্ষার্থীর রেকর্ড মুছে ফেলা হবে না। Job Care-এর প্রতিটি প্রশ্নের বিষয় নির্বাচন আলাদা এবং এই কাঠামো থেকে পৃথক।</p>
+</section></div></div>
+<script>
+const sb=window.db;
+const $=id=>document.getElementById(id);
+const cfg={
+ job:{
+  labels:["ক্যাটাগরি","সাব-ক্যাটাগরি","সেট"],
+  tables:["question_bank_categories","question_bank_folders","question_bank_sets"],
+  nameCols:["name","folder_name","set_name"],
+  parents:[null,"category_id","folder_id"]
+ },
+ academic:{
+  labels:["শ্রেণি","বিষয়","অধ্যায়","সেট"],
+  tables:["academic_care_categories","academic_care_folders","academic_care_chapters","academic_care_sets"],
+  nameCols:["name","folder_name","chapter_name","set_name"],
+  parents:[null,"category_id","folder_id","chapter_id"]
+ }
+};
+let cache={};
+let currentItems=[];
+function say(msg,bad=false){$("status").textContent=msg;$("status").style.color=bad?"#b42318":"#0f766e"}
+function opts(sel,items,placeholder){sel.innerHTML="";const o=document.createElement("option");o.value="";o.textContent=placeholder;sel.append(o);for(const x of items){const op=document.createElement("option");op.value=x.id;op.textContent=x.name;sel.append(op)}}
+function hierarchy(){return cfg[$("section").value]}
+function level(){return Number($("level").value||0)}
+function parentId(){const p=level()-1;return p<0?null:$("parent_"+p)?.value||null}
+async function query(table,cols="id"){const {data,error}=await sb.from(table).select(cols).order("id");if(error)throw error;return data||[]}
+async function loadAll(){
+ const c=hierarchy();cache={};
+ for(let i=0;i<c.tables.length;i++){
+  const cols=i===1&&$("section").value==="job"?"id,category_id,sub_category,folder_name":i===1&&$("section").value==="academic"?"id,category_id,folder_name":i===2&&$("section").value==="academic"?"id,folder_id,chapter_name":i===c.tables.length-1?(i===2?"id,folder_id,set_name":"id,folder_id,chapter_id,set_name"):"id,"+c.nameCols[i]+(c.parents[i]?", "+c.parents[i]:"");
+  cache[i]=await query(c.tables[i],cols);
+ }
+ draw();
+}
+function draw(){
+ const c=hierarchy();const l=level();$("flow").textContent=c.labels.join("  ›  ");$("itemLabel").textContent=c.labels[l]+" নির্বাচন";$("newLabel").textContent="নতুন "+c.labels[l]+"-এর নাম";$("newName").placeholder=c.labels[l]+"-এর নাম লিখুন";
+ const parent=$("parentFields");parent.innerHTML="";
+ for(let i=0;i<l;i++){
+  const wrap=document.createElement("div");wrap.className="field";const label=document.createElement("label");label.htmlFor="parent_"+i;label.textContent=c.labels[i]+" নির্বাচন";const sel=document.createElement("select");sel.id="parent_"+i;sel.dataset.parentLevel=i;wrap.append(label,sel);parent.append(wrap);
+  const items=(cache[i]||[]).filter(x=>i===0||String(x[c.parents[i]]||"")===String($("parent_"+(i-1))?.value||""));
+  opts(sel,items,"-- "+c.labels[i]+" নির্বাচন --");
+  if(i>0){const prev=$("parent_"+(i-1));if(prev)sel.disabled=!prev.value}
+  sel.onchange=()=>{for(let j=i+1;j<l;j++){const child=$("parent_"+j);if(child){child.value="";child.disabled=true}}drawItems()};
+ }
+ drawItems();
+}
+function drawItems(){
+ const c=hierarchy(),l=level(),parent=parentId();
+ let items=(cache[l]||[]).map(x=>({...x,name:x[c.nameCols[l]]}));
+ if(l>0){const col=c.parents[l];items=items.filter(x=>String(x[col]??"")===String(parent??""))}
+ if($("section").value==="job"&&l===1){const cat=cache[0].find(x=>String(x.id)===String(parent));items=items.filter(x=>x.category_id?String(x.category_id)===String(parent):x.sub_category===cat?.name)}
+ if($("section").value==="academic"&&l===3){items=items.filter(x=>x.chapter_id?String(x.chapter_id)===String(parent):String(x.folder_id)===String($("parent_1")?.value||""))}
+ currentItems=items;opts($("itemSelect"),items,"-- "+c.labels[l]+" নির্বাচন --");
+ const chosen=$("itemSelect").value;if(chosen)$("itemSelect").value=chosen;
+ $("addBtn").textContent="＋ "+c.labels[l]+" যোগ করুন";$("renameBtn").textContent="✏️ নাম পরিবর্তন";$("deleteBtn").textContent="🗑️ নিরাপদে মুছুন";
+}
+function buildLevels(){const c=hierarchy();opts($("level"),c.labels.map((name,id)=>({id,name})), "স্তর নির্বাচন");$("level").value="0";loadAll().catch(e=>say("তথ্য লোড হয়নি: "+e.message,true))}
+async function getCount(table,col,id){const {count,error}=await sb.from(table).select("id",{count:"exact",head:true}).eq(col,id);if(error)throw error;return count||0}
+async function hasChildrenOrQuestions(id){
+ const section=$("section").value,l=level();
+ if(section==="job"){
+  if(l===0)return (await getCount("question_bank_folders","category_id",id))>0 || (await getCount("question_bank_folders","sub_category",(cache[0].find(x=>String(x.id)===String(id))||{}).name))>0;
+  if(l===1)return (await getCount("question_bank_sets","folder_id",id))>0 || (await getCount("questions","folder_id",id))>0;
+  return (await getCount("questions","set_id",id))>0;
+ }
+ if(l===0)return (await getCount("academic_care_folders","category_id",id))>0 || (await getCount("academic_care_questions","category_id",id))>0 || (await getCount("academic_care_question_bank_items","category_id",id))>0;
+ if(l===1)return (await getCount("academic_care_chapters","folder_id",id))>0 || (await getCount("academic_care_questions","folder_id",id))>0 || (await getCount("academic_care_question_bank_items","folder_id",id))>0;
+ if(l===2)return (await getCount("academic_care_sets","chapter_id",id))>0 || (await getCount("academic_care_questions","chapter_id",id))>0 || (await getCount("academic_care_question_bank_items","chapter_id",id))>0;
+ return (await getCount("academic_care_questions","set_id",id))>0 || (await getCount("academic_care_question_bank_items","set_id",id))>0;
+}
+async function addItem(){
+ const c=hierarchy(),l=level(),name=$("newName").value.trim();if(!name){say("আগে নাম লিখুন।",true);return}
+ if(l>0&&!parentId()){say("আগে উপরের স্তর নির্বাচন করুন।",true);return}
+ const row={[c.nameCols[l]]:name};if(l>0)row[c.parents[l]]=Number(parentId());
+ if($("section").value==="job"&&l===1){const p=cache[0].find(x=>String(x.id)===String(parentId()));row.category_id=Number(parentId());row.sub_category=p?.name||""}
+ if($("section").value==="academic"&&l===3){row.folder_id=Number($("parent_1").value);row.chapter_id=Number(parentId())}
+ const {error}=await sb.from(c.tables[l]).insert(row);if(error){say("যোগ হয়নি: "+error.message,true);return}
+ $("newName").value="";await loadAll();say(c.labels[l]+" যোগ হয়েছে।");
+}
+async function renameItem(){
+ const c=hierarchy(),l=level(),id=$("itemSelect").value,name=$("newName").value.trim();if(!id||!name){say("নাম পরিবর্তনের জন্য আইটেম নির্বাচন করে নতুন নাম লিখুন।",true);return}
+ const old=currentItems.find(x=>String(x.id)===String(id));const {error}=await sb.from(c.tables[l]).update({[c.nameCols[l]]:name}).eq("id",id);if(error){say("নাম পরিবর্তন হয়নি: "+error.message,true);return}
+ if($("section").value==="job"&&l===0&&old?.name){const {error:e}=await sb.from("question_bank_folders").update({sub_category:name}).eq("category_id",id);if(e){say("ক্যাটাগরির নাম বদলেছে, কিন্তু পুরোনো নামের সহায়ক তথ্য আপডেট হয়নি: "+e.message,true);await loadAll();return}}
+ $("newName").value="";await loadAll();say("নাম পরিবর্তন হয়েছে। আইডি ও সংশ্লিষ্ট রেকর্ড অক্ষত আছে।");
+}
+async function deleteItem(){
+ const c=hierarchy(),l=level(),id=$("itemSelect").value;if(!id){say("আগে একটি আইটেম নির্বাচন করুন।",true);return}
+ try{if(await hasChildrenOrQuestions(id)){say("এই আইটেমের অধীনে সেট/প্রশ্ন আছে। রেকর্ডের নিরাপত্তার জন্য এখন মুছতে দেওয়া হচ্ছে না। আগে সংশ্লিষ্ট আইটেমগুলো সরাতে হবে।",true);return}}catch(e){say("সম্পর্কিত রেকর্ড যাচাই হয়নি, তাই নিরাপত্তার জন্য মুছিনি: "+e.message,true);return}
+ if(!confirm("নির্বাচিত "+c.labels[l]+" মুছবেন? এই কাজটি ফিরিয়ে আনা যাবে না।"))return;
+ const {error}=await sb.from(c.tables[l]).delete().eq("id",id);if(error){say("মুছতে সমস্যা: "+error.message,true);return}await loadAll();say(c.labels[l]+" মুছে ফেলা হয়েছে। কোনো প্রশ্ন বা শিক্ষার্থী রেকর্ড মুছে ফেলা হয়নি।");
+}
+$("section").onchange=buildLevels;$("level").onchange=()=>loadAll().catch(e=>say(e.message,true));$("addBtn").onclick=()=>addItem().catch(e=>say(e.message,true));$("renameBtn").onclick=()=>renameItem().catch(e=>say(e.message,true));$("deleteBtn").onclick=()=>deleteItem();$("refreshBtn").onclick=()=>loadAll().catch(e=>say(e.message,true));$("logoutBtn").onclick=async()=>{await sb.auth.signOut();location.reload()};$("loginBtn").onclick=async()=>{const {error}=await sb.auth.signInWithPassword({email:$("email").value.trim(),password:$("password").value});if(error){$("loginMsg").textContent="লগইন হয়নি: "+error.message;return}await start()};
+async function start(){const {data:{session}}=await sb.auth.getSession();if(!session){$("login").classList.remove("hidden");$("app").classList.add("hidden");return}$("login").classList.add("hidden");$("app").classList.remove("hidden");buildLevels()}
+start();
+</script></body></html>
