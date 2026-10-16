@@ -43,6 +43,7 @@
   @media(max-width:1000px){.manage-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:650px){.manage-grid{grid-template-columns:1fr}}@media(max-width:760px){.category-hero{align-items:flex-start;gap:12px}.category-hero-icon{flex-basis:46px;height:46px;border-radius:14px}.category-workflow{gap:7px;padding:10px}.workflow-step{gap:5px;font-size:12px}.workflow-number{width:24px;height:24px}.category-select-wrap{max-width:none;padding:13px}.manage-grid{grid-template-columns:1fr}.manage-actions{grid-template-columns:1fr 1fr}.flow{gap:5px}.flow span{padding:6px 9px}}
 </style>
 <style id="direct-dashboard-navigation">.direct-dashboard-nav{position:fixed;right:16px;bottom:16px;z-index:9999;display:inline-flex;align-items:center;gap:8px;padding:11px 16px;border-radius:999px;background:#1d4ed8;color:#fff!important;text-decoration:none!important;font:700 15px/1.2 Arial,sans-serif;box-shadow:0 5px 18px #0003;border:2px solid #fff}.direct-dashboard-nav:hover{background:#1e40af;transform:translateY(-1px)}@media print{.direct-dashboard-nav{display:none!important}}</style>
+<style id="central-embedded-mode">body.embedded .dashboard-top,body.embedded .direct-dashboard-nav,body.embedded .central-home-nav,body.embedded .central-section-nav,body.embedded .taxonomy-manager-link,body.embedded .admin-menu{display:none!important}body.embedded #app{max-width:none!important;margin:0!important;padding:12px!important}body.embedded main{margin-top:0!important}body.embedded .category-hero{padding-top:0!important}@media(max-width:760px){body.embedded #app{padding:8px!important}}</style>
 <style id="premium-question-create-skin">
 :root{--qc-navy:#102a43;--qc-navy-2:#173f5f;--qc-teal:#0f9488;--qc-bg:#f3f7fb;--qc-border:#e0e8f1}
 html,body{background:var(--qc-bg)!important;color:#243b53}
@@ -83,6 +84,7 @@ button.secondary{background:#e8f1f8!important;color:#173f5f!important;border:1px
 </style>
 <style id="central-section-nav-style">.central-section-nav{position:fixed;right:16px;bottom:68px;z-index:9999;display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:#0f766e;color:#fff!important;text-decoration:none!important;font:700 13px/1.2 Arial,sans-serif;box-shadow:0 5px 18px #0003;border:2px solid #fff}.central-section-nav:hover{background:#115e59}@media(max-width:520px){.central-section-nav{right:10px;bottom:64px;font-size:12px;padding:9px 11px}}@media print{.central-section-nav{display:none!important}}</style></head>
 <body>
+<script>if(new URLSearchParams(location.search).get("embedded")==="1")document.body.classList.add("embedded");</script>
 <div id="login" class="center">
   <div class="card login">
     <h1>ফেইসবুক পাঠশালা</h1><h2>প্রশ্ন তৈরি</h2>
