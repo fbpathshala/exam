@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#102a43">
+<title>প্রশ্ন ব্যাংকের ধরন — Facebook Pathshala</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Noto Sans Bengali",sans-serif;color:#102a43;background:#f3f7fb;--line:#dbe5ef}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;flex-direction:column}
+header{background:linear-gradient(125deg,#102a43,#0f766e);color:#fff;padding:25px 20px}
+header .wrap,main{width:min(760px,calc(100% - 32px));margin:auto}
+h1{margin:0;font-size:clamp(23px,4vw,31px)}header p{margin:8px 0 0;color:#d9f4f1}
+main{padding:28px 0 40px;flex:1}.back{display:inline-block;margin-bottom:18px;color:#2458d3;text-decoration:none;font-weight:700}
+.intro{margin:0 0 18px;color:#52677d;line-height:1.7}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.card{display:flex;flex-direction:column;align-items:flex-start;gap:10px;min-height:170px;padding:22px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 6px 20px #102a4308;text-decoration:none;color:#102a43}
+.card strong{font-size:21px}.card span{font-size:14px;line-height:1.65;color:#52677d}.card b{margin-top:auto;display:inline-flex;padding:9px 12px;border-radius:9px;background:#e8f1ff;color:#2458d3}
+.card.cq{border-bottom:4px solid #0f766e}.card.mcq{border-bottom:4px solid #2458d3}
+.note{margin-top:18px;padding:13px 15px;background:#fff8e7;border:1px solid #f1dfa8;border-radius:12px;color:#715b26;line-height:1.65;font-size:14px}
+@media(max-width:520px){main{padding-top:20px}.grid{grid-template-columns:1fr}.card{min-height:135px}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><h1 id="heading">🗂️ প্রশ্ন ব্যাংক</h1><p>প্রথমে প্রশ্নের ধরন নির্বাচন করুন</p></div></header>
+<main>
+<a class="back" id="backLink" href="question-bank-select.html">← কেয়ার নির্বাচন</a>
+<p class="intro" id="intro">MCQ ও CQ প্রশ্নের তালিকা আলাদা করে দেখার জন্য নিচের ধরন নির্বাচন করুন।</p>
+<nav class="grid" aria-label="প্রশ্নের ধরন">
+<a class="card mcq" id="mcqLink" href="question_bank.html?type=mcq"><strong>📝 MCQ প্রশ্ন</strong><span>চারটি অপশন, সঠিক উত্তর ও ব্যাখ্যাসহ বহুনির্বাচনী প্রশ্ন।</span><b>MCQ প্রশ্ন ব্যাংক খুলুন ↗</b></a>
+<a class="card cq" id="cqLink" href="question_bank.html?type=cq"><strong>✍️ CQ প্রশ্ন</strong><span>সংক্ষিপ্ত, অঙ্ক বা লিখিত উত্তরধর্মী প্রশ্ন। প্রশ্নের সঙ্গে উত্তর ব্যাংকে থাকবে।</span><b>CQ প্রশ্ন ব্যাংক খুলুন ↗</b></a>
+</nav>
+<div class="note" id="note" hidden></div>
+</main>
+<script>
+const p=new URLSearchParams(location.search),care=p.get("care")==="academic"?"academic":"job";
+const heading=document.getElementById("heading"),back=document.getElementById("backLink"),mcq=document.getElementById("mcqLink"),cq=document.getElementById("cqLink"),note=document.getElementById("note");
+if(care==="academic"){
+ heading.textContent="🎓 Academic Care — প্রশ্ন ব্যাংক";
+ back.href="https://fbpathshala.github.io/exam/question-bank-select.html";
+ mcq.href="https://fbpathshala.github.io/academic/question-bank.html?type=mcq";
+ cq.href="https://fbpathshala.github.io/academic/question-bank.html?type=cq";
+}else{
+ heading.textContent="💼 Job Care — প্রশ্ন ব্যাংক";
+ back.href="question-bank-select.html";
+ mcq.href="question_bank.html?type=mcq";
+ cq.href="question_bank.html?type=cq";
+ note.hidden=false;
+ note.textContent="নোট: Job Care-এর বর্তমান প্রশ্ন ব্যাংকে MCQ-ই চালু আছে। CQ-কে আলাদা করে সংরক্ষণ ও ফিল্টার করার কাজ বাকি; তাই CQ-তে চাপ দিলে এখনো সম্পূর্ণ CQ তালিকা পাওয়া নিশ্চিত নয়।";
+}
+</script>
+</body>
+</html>
