@@ -80,14 +80,14 @@ function cleanEmbeddedSection(){
       style.textContent=`
         .dashboard-top,.admin-menu,.direct-dashboard-nav,.central-home-nav,.central-section-nav,
         .taxonomy-manager-link{display:none!important}
-        a[href*="home.html"],a[href*="index.html"],a[href*="control-center.html"]{display:none!important}
-        .return-home-wrap:has(a[href*="home.html"]),.return-home:has(+ a[href*="home.html"]){display:none!important}
       `;
       doc.head.appendChild(style);
     }
     doc.querySelectorAll('a[href*="home.html"],a[href*="index.html"],a[href*="control-center.html"]').forEach(a=>{
+      if(a.closest(".return-home-wrap,.central-section-return")) return;
       const parent=a.parentElement;
-      if(parent && /^(P|NAV)$/.test(parent.tagName) && parent.querySelectorAll("a").length===1 && !parent.textContent.replace(a.textContent,"").trim()) parent.style.display="none";
+      if(parent && /^(P|NAV|DIV)$/.test(parent.tagName) && parent.querySelectorAll("a").length===1 && !parent.textContent.replace(a.textContent,"").trim()) parent.style.display="none";
+      else a.style.display="none";
     });
   }catch(_){}
 }
