@@ -77,6 +77,30 @@ let activeManagementLevel=0;
 const managementLevels={job:[{level:0,label:"ক্যাটাগরি ব্যবস্থাপনা"},{level:1,label:"সাব ক্যাটাগরি ব্যবস্থাপনা"},{level:2,label:"সেট ব্যবস্থাপনা"},{level:3,label:"বিষয় ব্যবস্থাপনা",view:"subjects"}],academic:[{level:0,label:"শ্রেণি ব্যবস্থাপনা"},{level:1,label:"বিষয় ব্যবস্থাপনা"},{level:2,label:"অধ্যায় ব্যবস্থাপনা"},{level:3,label:"সেট ব্যবস্থাপনা"}]};
 function renderManagementOptions(){const box=document.getElementById("managementOptions"),care=document.getElementById("care").value;box.innerHTML="";if(active!=="management"||!care){box.hidden=true;return}box.hidden=false;managementLevels[care].forEach(item=>{const b=document.createElement("button");b.type="button";b.textContent=item.label;b.dataset.managementLevel=String(item.level);b.classList.toggle("active",item.level===activeManagementLevel);b.addEventListener("click",()=>{activeManagementLevel=item.level;renderManagementOptions();document.getElementById("sectionNote").textContent="নির্বাচিত ব্যবস্থাপনা: "+item.label;document.getElementById("workspace").src=item.view==="subjects"?"taxonomy.html?section=job&view=subjects":"taxonomy.html?section="+care+"&level="+item.level});box.append(b)})}
 function render(){if(active==="question-create"){const care=document.getElementById("care").value;location.replace("question_create.html"+(care?"?division="+encodeURIComponent(care):""));return}const r=routes[active];document.getElementById("sectionTitle").textContent=r.title;const careLabel=document.querySelector("label[for=care]");const careSelect=document.getElementById("care");careLabel.hidden=!!r.universal;careSelect.hidden=!!r.universal;if(active==="management"&&careSelect.value&&!managementLevels[careSelect.value].some(x=>x.level===activeManagementLevel))activeManagementLevel=0;const workspace=document.getElementById("workspace");renderManagementOptions();if(r.universal){document.getElementById("sectionNote").textContent=r.note;workspace.src=r.url}else if(!careSelect.value){document.getElementById("sectionNote").textContent="কাজ শুরু করতে আগে বিভাগ নির্বাচন করুন। বিভাগ নির্বাচন না করা পর্যন্ত কোনো বিভাগের তথ্য লোড হবে না।";workspace.removeAttribute("src");workspace.src="about:blank"}else if(active==="management"){const list=managementLevels[careSelect.value];const item=list.find(x=>x.level===activeManagementLevel);document.getElementById("sectionNote").textContent="নিচ থেকে প্রয়োজনীয় ব্যবস্থাপনা নির্বাচন করুন: "+item.label;workspace.src=item.view==="subjects"?"taxonomy.html?section=job&view=subjects":"taxonomy.html?section="+careSelect.value+"&level="+activeManagementLevel}else{document.getElementById("sectionNote").textContent=r.note;workspace.src=r[careSelect.value]}document.querySelectorAll("[data-section]").forEach(b=>b.classList.toggle("active",b.dataset.section===active));}
+// Keep embedded section pages free of legacy home/menu navigation.
+const workspaceFrame=document.getElementById("workspace");
+function cleanEmbeddedSection(){
+  try{
+    const doc=workspaceFrame.contentDocument;
+    if(!doc)return;
+    if(!doc.getElementById("central-legacy-navigation-cleanup")){
+      const style=doc.createElement("style");
+      style.id="central-legacy-navigation-cleanup";
+      style.textContent=`
+        .dashboard-top,.admin-menu,.direct-dashboard-nav,.central-home-nav,.central-section-nav,
+        .taxonomy-manager-link{display:none!important}
+        a[href*="home.html"],a[href*="index.html"],a[href*="control-center.html"]{display:none!important}
+        .return-home-wrap:has(a[href*="home.html"]),.return-home:has(+ a[href*="home.html"]){display:none!important}
+      `;
+      doc.head.appendChild(style);
+    }
+    doc.querySelectorAll('a[href*="home.html"],a[href*="index.html"],a[href*="control-center.html"]').forEach(a=>{
+      const parent=a.parentElement;
+      if(parent && /^(P|NAV)$/.test(parent.tagName) && parent.querySelectorAll("a").length===1 && !parent.textContent.replace(a.textContent,"").trim()) parent.style.display="none";
+    });
+  }catch(_){}
+}
+workspaceFrame.addEventListener("load",cleanEmbeddedSection);
 document.getElementById("nav").addEventListener("click",e=>{const b=e.target.closest("[data-section]");if(!b)return;active=b.dataset.section;document.getElementById("nav").classList.remove("open");document.getElementById("nav").hidden=true;document.getElementById("menuToggle").setAttribute("aria-expanded","false");render()});
 document.getElementById("menuToggle").addEventListener("click",()=>{const nav=document.getElementById("nav");const opened=nav.hidden;nav.hidden=!opened;nav.classList.toggle("open",opened);document.getElementById("menuToggle").setAttribute("aria-expanded",String(opened))});
 document.getElementById("care").addEventListener("change",()=>{activeManagementLevel=0;render()});
