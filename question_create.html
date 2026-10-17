@@ -93,6 +93,37 @@ button.secondary{background:#e8f1f8!important;color:#173f5f!important;border:1px
 .direct-dashboard-nav{background:linear-gradient(110deg,#173f5f,#0f766e)!important;border:2px solid #fff!important;box-shadow:0 8px 24px rgba(16,42,67,.24)!important}
 @media(max-width:760px){#app{padding:12px 12px 28px}.dashboard-top{padding:15px!important;border-radius:14px!important}.card{border-radius:15px!important}.manage-grid{grid-template-columns:1fr}}
 </style>
+<style id="question-create-mobile-layout">
+/* Mobile-first layout for question creation */
+@media(max-width:600px){
+  body{overflow-x:hidden!important}
+  #app{width:100%!important;max-width:100%!important;padding:8px 10px 24px!important}
+  .dashboard-top{position:relative!important;top:auto!important;width:100%!important;margin:0 0 12px!important;padding:12px!important;display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:10px!important}
+  .dashboard-brand{flex:1 1 100%!important;min-width:0!important}
+  .dashboard-brand label{display:block!important;margin-top:2px!important;font-size:13px!important}
+  .dashboard-brand select{width:100%!important;min-width:0!important;min-height:48px!important}
+  .return-home{flex:1 1 auto!important;width:auto!important;min-height:46px!important;padding:10px!important;font-size:13px!important;order:2!important}
+  .admin-menu{margin-left:0!important;flex:0 0 auto!important;order:3!important}
+  .admin-menu-btn{min-width:48px!important;min-height:46px!important}
+  main{padding:0!important;gap:12px!important}
+  .card{padding:14px!important;margin-bottom:0!important}
+  .card h2{font-size:20px!important;line-height:1.35!important}
+  .section-note{font-size:13px!important;line-height:1.55!important;margin-bottom:12px!important}
+  .grid{grid-template-columns:minmax(0,1fr)!important;gap:8px!important}
+  input,select,textarea{font-size:16px!important;min-height:46px!important}
+  textarea{min-height:115px!important}
+  .inline-actions{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:8px!important}
+  .inline-actions button,.inline-actions input{width:100%!important;min-width:0!important;margin:0!important}
+  .card>button{width:100%!important;min-height:46px!important;margin:6px 0!important}
+  .card .msg{overflow-wrap:anywhere}
+}
+@media(min-width:601px) and (max-width:800px){
+  #app{padding:12px!important}
+  .dashboard-top{flex-wrap:wrap!important}
+  .dashboard-brand{min-width:0!important}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+</style>
 <style id="site-copy-deterrent">html,body{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important}input,textarea,select,[contenteditable="true"],[contenteditable=""]{-webkit-user-select:text!important;user-select:text!important;-webkit-touch-callout:default!important}@media print{body{display:none!important}}</style>
 </head>
 <body>
