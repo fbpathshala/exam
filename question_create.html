@@ -93,6 +93,12 @@ button.secondary{background:#e8f1f8!important;color:#173f5f!important;border:1px
 .direct-dashboard-nav{background:linear-gradient(110deg,#173f5f,#0f766e)!important;border:2px solid #fff!important;box-shadow:0 8px 24px rgba(16,42,67,.24)!important}
 @media(max-width:760px){#app{padding:12px 12px 28px}.dashboard-top{padding:15px!important;border-radius:14px!important}.card{border-radius:15px!important}.manage-grid{grid-template-columns:1fr}}
 </style>
+<style id="question-create-return-bottom">
+.return-home-wrap{display:flex;justify-content:flex-start;margin:4px 0 18px}
+.return-home{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 15px;border:1px solid #cbdceb;border-radius:10px;color:#173f5f;text-decoration:none;font-weight:750;font-size:14px;background:#e8f1f8}
+.return-home:hover{background:#dce8f1}
+@media(max-width:600px){.return-home-wrap{margin:8px 0 14px}.return-home{width:100%;min-height:48px}}
+</style>
 <style id="question-create-mobile-layout">
 /* Mobile-first layout for question creation */
 @media(max-width:600px){
@@ -141,7 +147,6 @@ button.secondary{background:#e8f1f8!important;color:#173f5f!important;border:1px
 <div id="app" class="hidden">
 <header class="dashboard-top">
   <div class="dashboard-brand"><h1>ফেইসবুক পাঠশালা</h1><p>প্রশ্ন তৈরি ও ব্যবস্থাপনা</p><label for="managementSection" style="display:inline-block;margin-top:8px;color:#e2f3f7;font-size:13px;font-weight:700">ব্যবস্থাপনার বিভাগ</label><select id="managementSection" aria-label="ব্যবস্থাপনার বিভাগ" style="display:block;min-width:220px;max-width:100%;margin-top:5px;padding:9px 12px;border:1px solid #b8d5e0;border-radius:10px;background:#fff;color:#102a43;font-size:15px;font-weight:700" onchange="if(this.value){const u=new URL(location.href);u.searchParams.set('division',this.value);location.href=u.pathname+u.search}"><option value="">বিভাগ নির্বাচন করুন</option><option value="job">Job Care</option><option value="academic">Academic Care</option></select></div>
-  <a class="return-home" href="https://fbpathshala.github.io/home.html">⌂ মূল মেনু / হোম পেইজে ফিরুন</a>
   <div class="admin-menu">
     <button type="button" class="admin-menu-btn" id="adminMenuBtn">☰</button>
     <div class="admin-menu-panel hidden" id="adminMenuPanel">
@@ -263,6 +268,7 @@ button.secondary{background:#e8f1f8!important;color:#173f5f!important;border:1px
     <button id="importBtn" class="hidden" type="button" onclick="importRows()">Database-এ Import করুন</button>
     <p id="importMsg" class="msg"></p>
   </div>
+  <div class="return-home-wrap"><a class="return-home" href="https://fbpathshala.github.io/home.html">⌂ মূল মেনু / হোম পেইজে ফিরুন</a></div>
 </main>
 </div>
 <script src="js/supabase.js?v=20261008-1"></script>
