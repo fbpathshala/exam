@@ -29,10 +29,10 @@ const sb=window.db;
 const $=id=>document.getElementById(id);
 const cfg={
  job:{
-  labels:["ক্যাটাগরি","সাব-ক্যাটাগরি","সেট","বিষয়"],
-  tables:["question_bank_categories","question_bank_folders","question_bank_sets","subjects"],
-  nameCols:["name","folder_name","set_name","name"],
-  parents:[null,"category_id","folder_id",null]
+  labels:["ক্যাটাগরি","সাব-ক্যাটাগরি","সেট"],
+  tables:["question_bank_categories","question_bank_folders","question_bank_sets"],
+  nameCols:["name","folder_name","set_name"],
+  parents:[null,"category_id","folder_id"]
  },
  academic:{
   labels:["শ্রেণি","বিষয়","অধ্যায়","সেট"],
@@ -88,7 +88,6 @@ async function hasChildrenOrQuestions(id){
   if(l===0)return (await getCount("question_bank_folders","category_id",id))>0 || (await getCount("question_bank_folders","sub_category",(cache[0].find(x=>String(x.id)===String(id))||{}).name))>0;
   if(l===1)return (await getCount("question_bank_sets","folder_id",id))>0 || (await getCount("questions","folder_id",id))>0;
   if(l===2)return (await getCount("questions","set_id",id))>0;
-  return (await getCount("questions","subject_id",id))>0;
  }
  if(l===0)return (await getCount("academic_care_folders","category_id",id))>0 || (await getCount("academic_care_questions","category_id",id))>0 || (await getCount("academic_care_question_bank_items","category_id",id))>0;
  if(l===1)return (await getCount("academic_care_chapters","folder_id",id))>0 || (await getCount("academic_care_sets","folder_id",id))>0 || (await getCount("academic_care_questions","folder_id",id))>0 || (await getCount("academic_care_question_bank_items","folder_id",id))>0;
