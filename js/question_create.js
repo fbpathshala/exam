@@ -136,9 +136,12 @@ async function loadSubjects() {
 }
 
 async function selectCategory(c) {
-  if (!CATS[c]) return;
-  cat = c;
+  cat = CATS[c] ? c : '';
   setCategoryUI();
+  // A parent change must clear every dependent selection before loading new children.
+  for (const id of ['manageFolder','setManageFolder','questionFolder','manageSet','questionSet']) {
+    const el=$(id); if(el){el.value='';el.disabled=true;}
+  }
   await loadFolders();
 }
 
@@ -146,9 +149,11 @@ async function loadFolders(preferredFolderId=null) {
   try {
     if (!cat || !CATS[cat]) {
       for (const id of ['manageFolder','setManageFolder','questionFolder']) {
-        if ($(id)) $(id).innerHTML = '<option value="">সাব-ক্যাটাগরি নির্বাচন</option>';
+        if ($(id)) { $(id).innerHTML = '<option value="">আগে ক্যাটাগরি নির্বাচন করুন</option>'; $(id).value=''; $(id).disabled=true; }
       }
-      await loadSets();
+      for (const id of ['manageSet','questionSet']) {
+        if ($(id)) { $(id).innerHTML = '<option value="">আগে সাব-ক্যাটাগরি নির্বাচন করুন</option>'; $(id).value=''; $(id).disabled=true; }
+      }
       return;
     }
     const {data,error} = await client().from('question_bank_folders').select('id,folder_name').eq('sub_category', CATS[cat]).order('folder_name');
@@ -159,6 +164,7 @@ async function loadFolders(preferredFolderId=null) {
       const el = $(id);
       if (!el) continue;
       el.innerHTML = '<option value="">সাব-ক্যাটাগরি নির্বাচন করুন</option>' + rows.map(x => `<option value="${x.id}">${esc(x.folder_name)}</option>`).join('');
+      el.disabled = rows.length === 0;
       if (preferredFolderId && rows.some(x => String(x.id) === String(preferredFolderId))) el.value = String(preferredFolderId);
     }
 
@@ -172,7 +178,7 @@ async function loadSets(preferredSetId=null) {
   const folderId = qFolder || manageFolder;
   try {
     if (!folderId) {
-      ['manageSet','questionSet'].forEach(id => { if ($(id)) $(id).innerHTML = '<option value="">Set নির্বাচন করুন</option>'; });
+      ['manageSet','questionSet'].forEach(id => { if ($(id)) { $(id).innerHTML = '<option value="">আগে সাব-ক্যাটাগরি নির্বাচন করুন</option>'; $(id).value=''; $(id).disabled=true; } });
       return;
     }
     const {data,error} = await client().from('question_bank_sets').select('id,set_name').eq('folder_id', Number(folderId)).order('set_name');
@@ -182,6 +188,7 @@ async function loadSets(preferredSetId=null) {
       const el = $(id);
       if (!el) continue;
       el.innerHTML = '<option value="">Set নির্বাচন করুন</option>' + rows.map(x => `<option value="${x.id}">${esc(x.set_name)}</option>`).join('');
+      el.disabled = rows.length === 0;
       if (preferredSetId && rows.some(x => String(x.id) === String(preferredSetId))) el.value = String(preferredSetId);
     }
   } catch (e) { msg('folderMsg', e.message || 'Set লোড করতে সমস্যা হয়েছে।', true); }
@@ -193,9 +200,9 @@ async function loadImportFolders(preferredFolderId=null) {
   const el = $('importFolder');
   if (!el) return;
   if (!categoryKey || !categoryLabel) {
-    el.innerHTML = '<option value="">আগে ক্যাটাগরি নির্বাচন করুন</option>';
+    el.innerHTML = '<option value="">আগে ক্যাটাগরি নির্বাচন করুন</option>'; el.value=''; el.disabled=true;
     const setEl = $('importSet');
-    if (setEl) setEl.innerHTML = '<option value="">Set নির্বাচন করুন</option>';
+    if (setEl) { setEl.innerHTML = '<option value="">আগে সাব-ক্যাটাগরি নির্বাচন করুন</option>'; setEl.value=''; setEl.disabled=true; }
     return;
   }
   try {
@@ -203,6 +210,7 @@ async function loadImportFolders(preferredFolderId=null) {
     if (error) throw error;
     const rows = data || [];
     el.innerHTML = '<option value="">সাব-ক্যাটাগরি নির্বাচন করুন</option>' + rows.map(x => `<option value="${x.id}">${esc(x.folder_name)}</option>`).join('');
+    el.disabled = rows.length === 0;
     if (preferredFolderId && rows.some(x => String(x.id) === String(preferredFolderId))) el.value = String(preferredFolderId);
     await loadImportSets();
   } catch(e) { msg('importMsg', e.message || 'CSV/Excel-এর সাব-ক্যাটাগরি লোড করতে সমস্যা হয়েছে।', true); }
@@ -212,12 +220,13 @@ async function loadImportSets(preferredSetId=null) {
   const folderId = $('importFolder')?.value || '';
   const el = $('importSet');
   if (!el) return;
-  if (!folderId) { el.innerHTML = '<option value="">Set নির্বাচন করুন</option>'; return; }
+  if (!folderId) { el.innerHTML = '<option value="">আগে সাব-ক্যাটাগরি নির্বাচন করুন</option>'; el.value=''; el.disabled=true; return; }
   try {
     const {data,error} = await client().from('question_bank_sets').select('id,set_name').eq('folder_id', Number(folderId)).order('set_name');
     if (error) throw error;
     const rows = data || [];
     el.innerHTML = '<option value="">Set নির্বাচন করুন</option>' + rows.map(x => `<option value="${x.id}">${esc(x.set_name)}</option>`).join('');
+    el.disabled = rows.length === 0;
     if (preferredSetId && rows.some(x => String(x.id) === String(preferredSetId))) el.value = String(preferredSetId);
   } catch(e) { msg('importMsg', e.message || 'CSV/Excel-এর Set লোড করতে সমস্যা হয়েছে।', true); }
 }
