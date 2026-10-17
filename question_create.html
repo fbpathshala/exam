@@ -9,6 +9,9 @@
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <style>
   .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .return-home{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:9px 12px;border:1px solid #8fb4b9;border-radius:10px;color:#fff;text-decoration:none;font-weight:750;font-size:13px;white-space:nowrap;background:#ffffff12}
+  .return-home:hover{background:#ffffff25}
+  @media(max-width:760px){.return-home{width:100%;order:3}}
   .section-note{margin:6px 0 16px;color:#64748b;font-size:14px}
   .flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0 18px}
   .flow span{background:#eef2ff;border:1px solid #c7d2fe;border-radius:999px;padding:7px 11px;font-size:13px;font-weight:600}
@@ -107,6 +110,7 @@ button.secondary{background:#e8f1f8!important;color:#173f5f!important;border:1px
 <div id="app" class="hidden">
 <header class="dashboard-top">
   <div class="dashboard-brand"><h1>ফেইসবুক পাঠশালা</h1><p>প্রশ্ন তৈরি ও ব্যবস্থাপনা</p><label for="managementSection" style="display:inline-block;margin-top:8px;color:#e2f3f7;font-size:13px;font-weight:700">ব্যবস্থাপনার বিভাগ</label><select id="managementSection" aria-label="ব্যবস্থাপনার বিভাগ" style="display:block;min-width:220px;max-width:100%;margin-top:5px;padding:9px 12px;border:1px solid #b8d5e0;border-radius:10px;background:#fff;color:#102a43;font-size:15px;font-weight:700" onchange="if(this.value){const u=new URL(location.href);u.searchParams.set('division',this.value);location.href=u.pathname+u.search}"><option value="">বিভাগ নির্বাচন করুন</option><option value="job">Job Care</option><option value="academic">Academic Care</option></select></div>
+  <a class="return-home" href="https://fbpathshala.github.io/home.html">⌂ মূল মেনু / হোম পেইজে ফিরুন</a>
   <div class="admin-menu">
     <button type="button" class="admin-menu-btn" id="adminMenuBtn">☰</button>
     <div class="admin-menu-panel hidden" id="adminMenuPanel">
