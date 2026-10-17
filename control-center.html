@@ -80,15 +80,21 @@ function cleanEmbeddedSection(){
       style.textContent=`
         .dashboard-top,.admin-menu,.direct-dashboard-nav,.central-home-nav,.central-section-nav,
         .taxonomy-manager-link{display:none!important}
+        .central-section-return{display:none!important}
       `;
       doc.head.appendChild(style);
     }
-    doc.querySelectorAll('a[href*="home.html"],a[href*="index.html"],a[href*="control-center.html"]').forEach(a=>{
+    doc.querySelectorAll('a[href*="home.html"],a[href*="index.html"],a[href*="control-center.html"],a[href*="question-bank-select.html"]').forEach(a=>{
       if(a.closest(".return-home-wrap,.central-section-return")) return;
+      a.style.setProperty("display","none","important");
       const parent=a.parentElement;
-      if(parent && /^(P|NAV|DIV)$/.test(parent.tagName) && parent.querySelectorAll("a").length===1 && !parent.textContent.replace(a.textContent,"").trim()) parent.style.display="none";
-      else a.style.display="none";
+      if(parent && /^(P|NAV)$/.test(parent.tagName) && parent.querySelectorAll("a").length===1) parent.style.setProperty("display","none","important");
     });
+    const path=(new URL(workspaceFrame.src,location.href)).pathname;
+    if(/\/(exam-manager|results-manager)\.html$/.test(path)){
+      const header=doc.querySelector("header");
+      if(header && /ফেইসবুক পাঠশালা/.test(header.textContent)) header.style.setProperty("display","none","important");
+    }
   }catch(_){}
 }
 workspaceFrame.addEventListener("load",cleanEmbeddedSection);
