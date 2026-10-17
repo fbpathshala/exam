@@ -15,7 +15,7 @@
 <div id="app" class="hidden">
 <header class="top"><h1>প্রশ্ন ব্যাংক কাঠামো ব্যবস্থাপনা</h1><p>ক্যাটাগরি/শ্রেণি → সাব-ক্যাটাগরি/বিষয় → অধ্যায় → সেট</p></header>
 <section class="panel">
-<div class="row"><div class="field"><label for="section">ব্যবস্থাপনার বিভাগ</label><select id="section"><option value="">বিভাগ নির্বাচন করুন</option><option value="job">Job Care</option><option value="academic">Academic Care</option></select></div><div class="field"><label for="level">যে স্তর পরিচালনা করবেন</label><select id="level"></select></div></div>
+<div class="row"><div class="field"><label for="section">ব্যবস্থাপনার বিভাগ</label><select id="section"><option value="">বিভাগ নির্বাচন করুন</option><option value="job">Job Care</option><option value="academic">Academic Care</option><option value="subjects">Job Care — বিষয় ব্যবস্থাপনা</option></select></div><div class="field"><label for="level">যে স্তর পরিচালনা করবেন</label><select id="level"></select></div></div>
 <div id="parentFields" class="row"></div>
 <div class="flow" id="flow"></div>
 <div class="field"><label id="itemLabel" for="itemSelect">আইটেম নির্বাচন</label><select id="itemSelect"></select></div>
@@ -39,7 +39,8 @@ const cfg={
   tables:["academic_care_categories","academic_care_folders","academic_care_chapters","academic_care_sets"],
   nameCols:["name","folder_name","chapter_name","set_name"],
   parents:[null,"category_id","folder_id","chapter_id"]
- }
+ },
+ subjects:{labels:["বিষয়"],tables:["subjects"],nameCols:["name"],parents:[null]}
 };
 let cache={};
 let currentItems=[];
@@ -52,7 +53,7 @@ async function query(table,cols="id"){const {data,error}=await sb.from(table).se
 async function loadAll(){
  const c=hierarchy();cache={};
  for(let i=0;i<c.tables.length;i++){
-  const cols=$( "section" ).value==="job"&&i===1?"id,category_id,sub_category,folder_name":$( "section" ).value==="job"&&i===3?"id,name":i===1&&$("section").value==="academic"?"id,category_id,folder_name":i===2&&$("section").value==="academic"?"id,folder_id,chapter_name":i===c.tables.length-1?(i===2?"id,folder_id,set_name":"id,folder_id,chapter_id,set_name"):"id,"+c.nameCols[i]+(c.parents[i]?", "+c.parents[i]:"");
+  const cols=$( "section" ).value==="subjects"?"id,name":$( "section" ).value==="job"&&i===1?"id,category_id,sub_category,folder_name":$( "section" ).value==="job"&&i===3?"id,name":i===1&&$("section").value==="academic"?"id,category_id,folder_name":i===2&&$("section").value==="academic"?"id,folder_id,chapter_name":i===c.tables.length-1?(i===2?"id,folder_id,set_name":"id,folder_id,chapter_id,set_name"):"id,"+c.nameCols[i]+(c.parents[i]?", "+c.parents[i]:"");
   cache[i]=await query(c.tables[i],cols);
  }
  draw();
@@ -84,6 +85,7 @@ function buildLevels(){const section=$("section").value;if(!section||!cfg[sectio
 async function getCount(table,col,id){const {count,error}=await sb.from(table).select("id",{count:"exact",head:true}).eq(col,id);if(error)throw error;return count||0}
 async function hasChildrenOrQuestions(id){
  const section=$("section").value,l=level();
+ if(section==="subjects")return (await getCount("questions","subject_id",id))>0;
  if(section==="job"){
   if(l===0)return (await getCount("question_bank_folders","category_id",id))>0 || (await getCount("question_bank_folders","sub_category",(cache[0].find(x=>String(x.id)===String(id))||{}).name))>0;
   if(l===1)return (await getCount("question_bank_sets","folder_id",id))>0 || (await getCount("questions","folder_id",id))>0;
@@ -117,6 +119,6 @@ async function deleteItem(){
 }
 $("section").onchange=buildLevels;$("level").onchange=()=>loadAll().catch(e=>say(e.message,true));$("addBtn").onclick=()=>addItem().catch(e=>say(e.message,true));$("renameBtn").onclick=()=>renameItem().catch(e=>say(e.message,true));$("deleteBtn").onclick=()=>deleteItem();$("refreshBtn").onclick=()=>loadAll().catch(e=>say(e.message,true));$("logoutBtn").onclick=async()=>{await sb.auth.signOut();location.reload()};$("loginBtn").onclick=async()=>{const {error}=await sb.auth.signInWithPassword({email:$("email").value.trim(),password:$("password").value});if(error){$("loginMsg").textContent="লগইন হয়নি: "+error.message;return}await start()};
 async function start(){const {data:{session}}=await sb.auth.getSession();if(!session){$("login").classList.remove("hidden");$("app").classList.add("hidden");return}$("login").classList.add("hidden");$("app").classList.remove("hidden");buildLevels()}
-const initialSection=new URLSearchParams(location.search).get("section");if(initialSection==="academic"||initialSection==="job")$("section").value=initialSection;
+const params=new URLSearchParams(location.search);const initialSection=params.get("view")==="subjects"?"subjects":params.get("section");if(initialSection==="academic"||initialSection==="job"||initialSection==="subjects")$("section").value=initialSection;
 start();
 </script></body></html>
