@@ -132,7 +132,10 @@ async function loadSubjects() {
   if (error) return msg('loginMsg', error.message, true);
   subjects = data || [];
   const el = $('subject');
-  if (el) el.innerHTML = '<option value="">বিষয় নির্বাচন করুন</option>' + subjects.map(x => `<option value="${x.id}">${esc(x.name)}</option>`).join('');
+  if (el) {
+    el.innerHTML = '<option value="">বিষয় নির্বাচন করুন</option>' + subjects.map(x => `<option value="${x.id}">${esc(x.name)}</option>`).join('');
+    el.disabled = !($('questionSet')?.value);
+  }
 }
 
 async function selectCategory(c) {
@@ -190,6 +193,7 @@ async function loadSets(preferredSetId=null) {
       el.innerHTML = '<option value="">Set নির্বাচন করুন</option>' + rows.map(x => `<option value="${x.id}">${esc(x.set_name)}</option>`).join('');
       el.disabled = rows.length === 0;
       if (preferredSetId && rows.some(x => String(x.id) === String(preferredSetId))) el.value = String(preferredSetId);
+      if (id === 'questionSet' && $('subject')) $('subject').disabled = !el.value;
     }
   } catch (e) { msg('folderMsg', e.message || 'Set লোড করতে সমস্যা হয়েছে।', true); }
 }
@@ -404,8 +408,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   $('manageFolder')?.addEventListener('change',()=>syncFolderSelection('manageFolder'));
   $('setManageFolder')?.addEventListener('change',()=>syncFolderSelection('setManageFolder'));
   $('questionFolder')?.addEventListener('change',()=>syncFolderSelection('questionFolder'));
-  $('manageSet')?.addEventListener('change',()=>{if($('questionSet'))$('questionSet').value=$('manageSet').value;});
-  $('questionSet')?.addEventListener('change',()=>{if($('manageSet'))$('manageSet').value=$('questionSet').value;});
+  $('manageSet')?.addEventListener('change',()=>{if($('questionSet'))$('questionSet').value=$('manageSet').value;if($('subject'))$('subject').disabled=!$('questionSet')?.value;});
+  $('questionSet')?.addEventListener('change',()=>{if($('manageSet'))$('manageSet').value=$('questionSet').value;if($('subject'))$('subject').disabled=!$('questionSet').value;});
   $('questionCategory')?.addEventListener('change',e=>selectCategory(e.target.value));
   fillCategorySelect('importCategory');
   syncQuestionType();
