@@ -42,7 +42,7 @@
   .inline-actions{display:flex;gap:8px;flex-wrap:wrap}
   @media(max-width:1000px){.manage-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:650px){.manage-grid{grid-template-columns:1fr}}@media(max-width:760px){.category-hero{align-items:flex-start;gap:12px}.category-hero-icon{flex-basis:46px;height:46px;border-radius:14px}.category-workflow{gap:7px;padding:10px}.workflow-step{gap:5px;font-size:12px}.workflow-number{width:24px;height:24px}.category-select-wrap{max-width:none;padding:13px}.manage-grid{grid-template-columns:1fr}.manage-actions{grid-template-columns:1fr 1fr}.flow{gap:5px}.flow span{padding:6px 9px}}
 </style>
-<style id="direct-dashboard-navigation">.direct-dashboard-nav{position:fixed;right:16px;bottom:16px;z-index:9999;display:inline-flex;align-items:center;gap:8px;padding:11px 16px;border-radius:999px;background:#1d4ed8;color:#fff!important;text-decoration:none!important;font:700 15px/1.2 Arial,sans-serif;box-shadow:0 5px 18px #0003;border:2px solid #fff}.direct-dashboard-nav:hover{background:#1e40af;transform:translateY(-1px)}@media print{.direct-dashboard-nav{display:none!important}}</style>
+
 <style id="central-embedded-mode">body.embedded .dashboard-top,body.embedded .direct-dashboard-nav,body.embedded .central-home-nav,body.embedded .central-section-nav,body.embedded .taxonomy-manager-link,body.embedded .admin-menu{display:none!important}body.embedded #app{max-width:none!important;margin:0!important;padding:12px!important}body.embedded main{margin-top:0!important}body.embedded .category-hero{padding-top:0!important}@media(max-width:760px){body.embedded #app{padding:8px!important}}</style>
 <style id="premium-question-create-skin">
 :root{--qc-navy:#102a43;--qc-navy-2:#173f5f;--qc-teal:#0f9488;--qc-bg:#f3f7fb;--qc-border:#e0e8f1}
@@ -76,13 +76,8 @@ button.secondary{background:#e8f1f8!important;color:#173f5f!important;border:1px
 .direct-dashboard-nav{background:linear-gradient(110deg,#173f5f,#0f766e)!important;border:2px solid #fff!important;box-shadow:0 8px 24px rgba(16,42,67,.24)!important}
 @media(max-width:760px){#app{padding:12px 12px 28px}.dashboard-top{padding:15px!important;border-radius:14px!important}.card{border-radius:15px!important}.manage-grid{grid-template-columns:1fr}}
 </style>
-<style id="site-copy-deterrent">html,body{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important}input,textarea,select,[contenteditable="true"],[contenteditable=""]{-webkit-user-select:text!important;user-select:text!important;-webkit-touch-callout:default!important}@media print{body{display:none!important}}</style><style id="central-home-navigation">
-.central-home-nav{position:fixed;left:16px;bottom:16px;z-index:9999;display:inline-flex;align-items:center;gap:8px;padding:11px 15px;border-radius:999px;background:#0f766e;color:#fff!important;text-decoration:none!important;font:700 14px/1.2 Arial,sans-serif;box-shadow:0 5px 18px #0003;border:2px solid #fff}
-.central-home-nav:hover{background:#115e59;transform:translateY(-1px)}
-@media(max-width:480px){.central-home-nav{left:8px;bottom:8px;padding:10px 11px;font-size:12px}}
-@media print{.central-home-nav,.direct-dashboard-nav{display:none!important}}
-</style>
-<style id="central-section-nav-style">.central-section-nav{position:fixed;right:16px;bottom:68px;z-index:9999;display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:#0f766e;color:#fff!important;text-decoration:none!important;font:700 13px/1.2 Arial,sans-serif;box-shadow:0 5px 18px #0003;border:2px solid #fff}.central-section-nav:hover{background:#115e59}@media(max-width:520px){.central-section-nav{right:10px;bottom:64px;font-size:12px;padding:9px 11px}}@media print{.central-section-nav{display:none!important}}</style></head>
+<style id="site-copy-deterrent">html,body{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important}input,textarea,select,[contenteditable="true"],[contenteditable=""]{-webkit-user-select:text!important;user-select:text!important;-webkit-touch-callout:default!important}@media print{body{display:none!important}}</style>
+</head>
 <body>
 <script>if(new URLSearchParams(location.search).get("embedded")==="1")document.body.classList.add("embedded");</script>
 <div id="login" class="center">
@@ -101,7 +96,7 @@ button.secondary{background:#e8f1f8!important;color:#173f5f!important;border:1px
   <div class="admin-menu">
     <button type="button" class="admin-menu-btn" id="adminMenuBtn">☰</button>
     <div class="admin-menu-panel hidden" id="adminMenuPanel">
-      <button onclick="location.href='dashboard.html'">🏠 ড্যাশবোর্ড</button>
+      
       <button onclick="location.href='question_create.html'">➕ প্রশ্ন তৈরি</button>
       <button onclick="location.href='question_bank.html'">🗂️ প্রশ্ন ব্যাংক</button>
       <button onclick="location.href='exam-manager.html'">📋 পরীক্ষা পরিচালনা</button>
@@ -223,7 +218,7 @@ button.secondary{background:#e8f1f8!important;color:#173f5f!important;border:1px
 </div>
 <script src="js/supabase.js?v=20261008-1"></script>
 <script src="js/question_create.js?v=20261016-cq1"></script>
-<a class="direct-dashboard-nav" href="dashboard.html" aria-label="ড্যাশবোর্ডে ফিরে যান">🏠 ড্যাশবোর্ড</a><script id="site-copy-deterrent-script">(function(){function editable(t){return !!(t&&t.closest&&t.closest('input,textarea,select,[contenteditable="true"],[contenteditable=""]'))}document.addEventListener('contextmenu',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('selectstart',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('copy',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('cut',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('keydown',function(e){if(editable(e.target))return;var k=(e.key||'').toLowerCase();if((e.ctrlKey||e.metaKey)&&['c','x','u','s','p'].includes(k)){e.preventDefault();e.stopPropagation()}if(e.key==='PrintScreen')e.preventDefault()},true)})();</script><a class="central-home-nav" href="https://fbpathshala.github.io/home.html" aria-label="কেন্দ্রীয় হোমপেজে ফিরে যান">⌂ কেন্দ্রীয় হোমপেজ</a>
-<a class="central-section-nav" href="https://fbpathshala.github.io/home.html?section=job" aria-label="Job Care বিভাগের মেনুতে ফিরে যান">↩ Job Care মেনু</a><style id="taxonomy-manager-link-style">.taxonomy-manager-link{position:fixed;left:16px;bottom:66px;z-index:9998;padding:11px 15px;border:2px solid #fff;border-radius:999px;background:#0f766e;color:#fff!important;text-decoration:none!important;font:700 14px/1.2 Arial,sans-serif;box-shadow:0 5px 18px #0003}@media(max-width:520px){.taxonomy-manager-link{left:8px;bottom:62px;padding:9px 11px;font-size:12px}}@media print{.taxonomy-manager-link{display:none!important}}</style><a class="taxonomy-manager-link" href="taxonomy.html">🗂️ কাঠামো ব্যবস্থাপনা</a>
+<script id="site-copy-deterrent-script">(function(){function editable(t){return !!(t&&t.closest&&t.closest('input,textarea,select,[contenteditable="true"],[contenteditable=""]'))}document.addEventListener('contextmenu',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('selectstart',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('copy',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('cut',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('keydown',function(e){if(editable(e.target))return;var k=(e.key||'').toLowerCase();if((e.ctrlKey||e.metaKey)&&['c','x','u','s','p'].includes(k)){e.preventDefault();e.stopPropagation()}if(e.key==='PrintScreen')e.preventDefault()},true)})();</script>
+<style id="taxonomy-manager-link-style">.taxonomy-manager-link{position:fixed;left:16px;bottom:66px;z-index:9998;padding:11px 15px;border:2px solid #fff;border-radius:999px;background:#0f766e;color:#fff!important;text-decoration:none!important;font:700 14px/1.2 Arial,sans-serif;box-shadow:0 5px 18px #0003}@media(max-width:520px){.taxonomy-manager-link{left:8px;bottom:62px;padding:9px 11px;font-size:12px}}@media print{.taxonomy-manager-link{display:none!important}}</style><a class="taxonomy-manager-link" href="taxonomy.html">🗂️ কাঠামো ব্যবস্থাপনা</a>
 </body>
 </html>
