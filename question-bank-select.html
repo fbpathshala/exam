@@ -11,20 +11,31 @@
 header{background:linear-gradient(125deg,#102a43,#0f766e);color:#fff;padding:28px 20px}
 header h1{width:min(760px,100%);margin:0 auto;font-size:clamp(24px,4vw,32px)}
 main{width:min(760px,100%);margin:auto;padding:28px 20px}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-.card{display:flex;align-items:center;justify-content:center;gap:14px;min-height:150px;padding:22px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 6px 20px #102a4308;text-decoration:none;color:#102a43;font-size:clamp(19px,3vw,23px);font-weight:800}
-.card:focus-visible{outline:3px solid #0f766e;outline-offset:3px}.card.job{border-bottom:4px solid #2458d3}.card.academic{border-bottom:4px solid #0f766e}
-.icon{font-size:34px}
-@media(max-width:520px){main{padding:20px 14px}.grid{grid-template-columns:1fr}.card{min-height:105px}}
+.division-picker{max-width:520px;margin:8px auto;padding:20px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 6px 20px #102a4308}
+.division-picker label{display:block;font-weight:800;margin-bottom:10px}
+.division-picker select{width:100%;min-height:50px;padding:12px;border:1px solid #b8c9d8;border-radius:10px;background:#fff;color:#102a43;font:inherit;font-weight:700}
+.division-picker p{margin:12px 0 0;color:#607086;font-size:14px;line-height:1.6}
+@media(max-width:520px){main{padding:20px 14px}}
 </style>
 </head>
 <body>
 <header><h1>🗂️ প্রশ্ন ব্যাংক</h1></header>
 <main>
-<nav class="grid" aria-label="প্রশ্ন ব্যাংক নির্বাচন">
-<a class="card job" href="question-bank-type.html?care=job"><span class="icon" aria-hidden="true">💼</span><span>Job Care</span></a>
-<a class="card academic" href="question-bank-type.html?care=academic"><span class="icon" aria-hidden="true">🎓</span><span>Academic Care</span></a>
-</nav>
+<section class="division-picker">
+<label for="careDivision">বিভাগ নির্বাচন করুন</label>
+<select id="careDivision" required>
+<option value="" selected>বিভাগ নির্বাচন করুন</option>
+<option value="job">Job Care</option>
+<option value="academic">Academic Care</option>
+</select>
+<p id="divisionHint" aria-live="polite">বিভাগ নির্বাচন করলে শুধু সেই বিভাগের প্রশ্ন ব্যাংক খুলবে।</p>
+</section>
+<script>
+document.getElementById('careDivision').addEventListener('change', function(){
+  if(this.value === 'job') location.href = 'question-bank-type.html?care=job';
+  else if(this.value === 'academic') location.href = 'https://fbpathshala.github.io/academic/admin.html?view=questionBank';
+});
+</script>
 </main>
 </body>
 </html>
