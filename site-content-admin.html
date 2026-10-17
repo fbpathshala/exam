@@ -37,7 +37,6 @@ const SUPABASE_URL="https://ydvbnalhcnfqpxkkmywr.supabase.co";
 const SUPABASE_KEY="sb_publishable_xCbSWDkASsbUPl-WmygyMw_eVrJY_9a";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const $=id=>document.getElementById(id);
-const labels={"important-links":"গুরুত্বপূর্ণ তথ্য ও পোস্ট লিংক","breaking-news":"ব্রেকিং নিউজ","social-links":"ফেইসবুক পাঠশালা লিংক"};
 let session=null;
 function message(id,text){$(id).textContent=text;$(id).classList.remove("hidden")}
 function localTime(v){if(!v)return "";const d=new Date(v);return isNaN(d)? "":d.toISOString().slice(0,16)}
