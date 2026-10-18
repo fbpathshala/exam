@@ -27,11 +27,14 @@
   }
 
   function visibleQuestions() {
-    const subjectId = selectedSubject();
+    const subjectId = String(selectedSubject() || "").trim();
 
     if (!subjectId) return qs;
 
-    return qs.filter(q => String(q.subject_id ?? "") === subjectId);
+    return qs.filter(q => {
+      const questionSubjectId = String(q.subject_id ?? "").trim();
+      return questionSubjectId !== "" && questionSubjectId === subjectId;
+    });
   }
 
   function count() {
@@ -181,15 +184,26 @@
 
       say("questionMessage", "প্রশ্ন লোড হচ্ছে...");
 
-      const result = await db()
-        .from("questions")
-        .select("*")
-        .eq("set_id", Number(setId))
-        .order("id");
+      // Supabase REST সাধারণত প্রতি অনুরোধে সর্বোচ্চ ১০০০টি রেকর্ড দেয়।
+      // Range pagination দিয়ে নির্বাচিত সেটের সব প্রশ্ন আনা হবে।
+      const pageSize = 1000;
+      const allQuestions = [];
+      for (let from = 0; ; from += pageSize) {
+        const result = await db()
+          .from("questions")
+          .select("*")
+          .eq("set_id", Number(setId))
+          .order("id")
+          .range(from, from + pageSize - 1);
 
-      if (result.error) throw result.error;
+        if (result.error) throw result.error;
 
-      qs = result.data || [];
+        const page = result.data || [];
+        allQuestions.push(...page);
+        if (page.length < pageSize) break;
+      }
+
+      qs = allQuestions;
       chosen.clear();
       loadedSet = String(setId);
 
