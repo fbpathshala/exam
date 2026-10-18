@@ -122,7 +122,13 @@ document.getElementById("centralReturn").addEventListener("click",e=>{
   }
 });
 
-if(new URLSearchParams(location.search).has("section")&&routes[new URLSearchParams(location.search).get("section")])active=new URLSearchParams(location.search).get("section");
+const initialParams=new URLSearchParams(location.search);
+if(initialParams.has("section")&&routes[initialParams.get("section")])active=initialParams.get("section");
+// A direct exam-management link from the Academic Care workflow should open Academic Care immediately.
+// Keep explicit care=job / care=academic overrides available for other entry points.
+const requestedCare=initialParams.get("care");
+if(requestedCare==="job"||requestedCare==="academic")document.getElementById("care").value=requestedCare;
+else if(active==="exam-manage")document.getElementById("care").value="academic";
 render();
 </script>
 </body></html>
