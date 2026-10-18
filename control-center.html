@@ -115,7 +115,7 @@ document.getElementById("centralReturn").addEventListener("click",e=>{
   const r=routes[active], care=document.getElementById("care");
   if(r.universal){return;}
   if(active==="management"&&care.value&&activeManagementLevel>0){
-    e.preventDefault();activeManagementLevel=0;render();return;
+    e.preventDefault();activeManagementLevel--;render();return;
   }
   if(care.value){
     e.preventDefault();care.value="";activeManagementLevel=0;render();return;
