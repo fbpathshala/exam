@@ -60,7 +60,7 @@ iframe{display:block;width:100%;height:100%;border:0;background:#fff}
 <div class="framewrap"><iframe id="workspace" title="নির্বাচিত ব্যবস্থাপনা সেকশন" src="taxonomy.html"></iframe></div>
 </main>
 </div>
-<div class="central-return-wrap"><a class="central-return" href="https://fbpathshala.github.io/home.html">⌂ মূল মেনু / হোম পেইজে ফিরুন</a></div>
+<div class="central-return-wrap"><a class="central-return" id="centralReturn" href="https://fbpathshala.github.io/home.html">⌂ মূল মেনু / হোম পেইজে ফিরুন</a></div>
 <script>
 const routes={
 management:{title:"ব্যবস্থাপনা",note:"ক্যাটাগরি, সাব-ক্যাটাগরি, সেট, বিষয় এবং Academic Care-এর শ্রেণি/অধ্যায় পরিচালনা করুন।",job:"taxonomy.html?section=job",academic:"taxonomy.html?section=academic"},
@@ -78,7 +78,7 @@ let active="management";
 let activeManagementLevel=0;
 const managementLevels={job:[{level:0,label:"ক্যাটাগরি ব্যবস্থাপনা"},{level:1,label:"সাব ক্যাটাগরি ব্যবস্থাপনা"},{level:2,label:"সেট ব্যবস্থাপনা"},{level:3,label:"বিষয় ব্যবস্থাপনা",view:"subjects"}],academic:[{level:0,label:"শ্রেণি ব্যবস্থাপনা"},{level:1,label:"বিষয় ব্যবস্থাপনা"},{level:2,label:"অধ্যায় ব্যবস্থাপনা"},{level:3,label:"সেট ব্যবস্থাপনা"}]};
 function renderManagementOptions(){const box=document.getElementById("managementOptions"),care=document.getElementById("care").value;box.innerHTML="";if(active!=="management"||!care){box.hidden=true;return}box.hidden=false;managementLevels[care].forEach(item=>{const b=document.createElement("button");b.type="button";b.textContent=item.label;b.dataset.managementLevel=String(item.level);b.classList.toggle("active",item.level===activeManagementLevel);b.addEventListener("click",()=>{activeManagementLevel=item.level;renderManagementOptions();document.getElementById("sectionNote").textContent="নির্বাচিত ব্যবস্থাপনা: "+item.label;document.getElementById("workspace").src=item.view==="subjects"?"taxonomy.html?section=job&view=subjects":"taxonomy.html?section="+care+"&level="+item.level});box.append(b)})}
-function render(){const r=routes[active];document.getElementById("sectionTitle").textContent=r.title;const careLabel=document.querySelector("label[for=care]");const careSelect=document.getElementById("care");careLabel.hidden=!!r.universal;careSelect.hidden=!!r.universal;if(active==="management"&&careSelect.value&&!managementLevels[careSelect.value].some(x=>x.level===activeManagementLevel))activeManagementLevel=0;const workspace=document.getElementById("workspace");renderManagementOptions();if(r.universal){document.getElementById("sectionNote").textContent=r.note;workspace.src=r.url}else if(!careSelect.value){document.getElementById("sectionNote").textContent="কাজ শুরু করতে আগে বিভাগ নির্বাচন করুন। বিভাগ নির্বাচন না করা পর্যন্ত কোনো বিভাগের তথ্য লোড হবে না।";workspace.removeAttribute("src");workspace.src="about:blank"}else if(active==="management"){const list=managementLevels[careSelect.value];const item=list.find(x=>x.level===activeManagementLevel);document.getElementById("sectionNote").textContent="নিচ থেকে প্রয়োজনীয় ব্যবস্থাপনা নির্বাচন করুন: "+item.label;workspace.src=item.view==="subjects"?"taxonomy.html?section=job&view=subjects":"taxonomy.html?section="+careSelect.value+"&level="+activeManagementLevel}else{document.getElementById("sectionNote").textContent=r.note;workspace.src=r[careSelect.value]}document.querySelectorAll("[data-section]").forEach(b=>b.classList.toggle("active",b.dataset.section===active));}
+function render(){const r=routes[active];document.getElementById("sectionTitle").textContent=r.title;const careLabel=document.querySelector("label[for=care]");const careSelect=document.getElementById("care");careLabel.hidden=!!r.universal;careSelect.hidden=!!r.universal;if(active==="management"&&careSelect.value&&!managementLevels[careSelect.value].some(x=>x.level===activeManagementLevel))activeManagementLevel=0;const workspace=document.getElementById("workspace");renderManagementOptions();if(r.universal){document.getElementById("sectionNote").textContent=r.note;workspace.src=r.url}else if(!careSelect.value){document.getElementById("sectionNote").textContent="কাজ শুরু করতে আগে বিভাগ নির্বাচন করুন। বিভাগ নির্বাচন না করা পর্যন্ত কোনো বিভাগের তথ্য লোড হবে না।";workspace.removeAttribute("src");workspace.src="about:blank"}else if(active==="management"){const list=managementLevels[careSelect.value];const item=list.find(x=>x.level===activeManagementLevel);document.getElementById("sectionNote").textContent="নিচ থেকে প্রয়োজনীয় ব্যবস্থাপনা নির্বাচন করুন: "+item.label;workspace.src=item.view==="subjects"?"taxonomy.html?section=job&view=subjects":"taxonomy.html?section="+careSelect.value+"&level="+activeManagementLevel}else{document.getElementById("sectionNote").textContent=r.note;workspace.src=r[careSelect.value]}document.querySelectorAll("[data-section]").forEach(b=>b.classList.toggle("active",b.dataset.section===active));const back=document.getElementById("centralReturn");if(r.universal||!careSelect.value){back.href="https://fbpathshala.github.io/home.html";back.textContent="⌂ মূল মেনু / হোম পেইজে ফিরুন"}else if(active==="management"&&activeManagementLevel>0){back.href="#";back.textContent="← ব্যবস্থাপনার আগের ধাপে ফিরুন"}else{back.href="#";back.textContent="← "+r.title+" সেকশনে ফিরুন"}}
 // Keep embedded section pages free of legacy home/menu navigation.
 const workspaceFrame=document.getElementById("workspace");
 function cleanEmbeddedSection(){
@@ -111,6 +111,17 @@ workspaceFrame.addEventListener("load",cleanEmbeddedSection);
 document.getElementById("nav").addEventListener("click",e=>{const b=e.target.closest("[data-section]");if(!b)return;active=b.dataset.section;document.getElementById("nav").classList.remove("open");document.getElementById("nav").hidden=true;document.getElementById("menuToggle").setAttribute("aria-expanded","false");render()});
 document.getElementById("menuToggle").addEventListener("click",()=>{const nav=document.getElementById("nav");const opened=nav.hidden;nav.hidden=!opened;nav.classList.toggle("open",opened);document.getElementById("menuToggle").setAttribute("aria-expanded",String(opened))});
 document.getElementById("care").addEventListener("change",()=>{activeManagementLevel=0;render()});
+document.getElementById("centralReturn").addEventListener("click",e=>{
+  const r=routes[active], care=document.getElementById("care");
+  if(r.universal){return;}
+  if(active==="management"&&care.value&&activeManagementLevel>0){
+    e.preventDefault();activeManagementLevel=0;render();return;
+  }
+  if(care.value){
+    e.preventDefault();care.value="";activeManagementLevel=0;render();return;
+  }
+});
+
 if(new URLSearchParams(location.search).has("section")&&routes[new URLSearchParams(location.search).get("section")])active=new URLSearchParams(location.search).get("section");
 render();
 </script>
