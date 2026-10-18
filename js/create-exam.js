@@ -326,7 +326,7 @@
 
       const examResult = await db()
         .from("exams")
-        .insert({ exam_name: name })
+        .insert({ exam_name: name, total_questions: selected.length })
         .select("id")
         .single();
 
