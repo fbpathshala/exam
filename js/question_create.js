@@ -114,9 +114,24 @@ let academicImportRows = [];
 function renderAcademicQuestionUI(){
  const main=document.querySelector('#app main');if(!main)return;
  main.innerHTML = `
- <div class="card academic-taxonomy-card">
-   <div class="category-hero"><div class="category-hero-icon">▦</div><div class="category-hero-copy"><span class="category-eyebrow">QUESTION ORGANIZATION</span><h2>Academic Care প্রশ্নের গন্তব্য</h2><p>Job Care-এর মতো একই ধাপে শ্রেণি → বিষয় → অধ্যায় → সেট নির্বাচন করে প্রশ্ন তৈরি করুন।</p></div></div>
-   <div class="category-workflow"><div class="workflow-step"><span class="workflow-number">০১</span><span>শ্রেণি</span></div><span class="workflow-arrow">›</span><div class="workflow-step"><span class="workflow-number">০২</span><span>বিষয়</span></div><span class="workflow-arrow">›</span><div class="workflow-step"><span class="workflow-number">০৩</span><span>অধ্যায়</span></div><span class="workflow-arrow">›</span><div class="workflow-step"><span class="workflow-number">০৪</span><span>সেট</span></div></div>
+ <div class="card category-management-card">
+   <div class="category-hero">
+     <div class="category-hero-icon" aria-hidden="true">▦</div>
+     <div class="category-hero-copy">
+       <span class="category-eyebrow">QUESTION ORGANIZATION</span>
+       <h2>Academic Care ব্যবস্থাপনা</h2>
+       <p>শ্রেণি, বিষয়, অধ্যায় ও সেট নির্বাচন করে প্রশ্নের কাঠামো নির্ধারণ করুন।</p>
+     </div>
+   </div>
+   <div class="category-workflow" aria-label="ব্যবস্থাপনার ধাপ">
+     <div class="workflow-step"><span class="workflow-number">০১</span><span>শ্রেণি</span></div>
+     <span class="workflow-arrow" aria-hidden="true">›</span>
+     <div class="workflow-step"><span class="workflow-number">০২</span><span>বিষয়</span></div>
+     <span class="workflow-arrow" aria-hidden="true">›</span>
+     <div class="workflow-step"><span class="workflow-number">০৩</span><span>অধ্যায়</span></div>
+     <span class="workflow-arrow" aria-hidden="true">›</span>
+     <div class="workflow-step"><span class="workflow-number">০৪</span><span>সেট</span></div>
+   </div>
    <div class="grid"><div><label for="acCategory">শ্রেণি</label><select id="acCategory"><option value="">শ্রেণি নির্বাচন করুন</option></select></div><div><label for="acFolder">বিষয় / ফোল্ডার</label><select id="acFolder" disabled><option value="">আগে শ্রেণি নির্বাচন করুন</option></select></div><div><label for="acChapter">অধ্যায়</label><select id="acChapter" disabled><option value="">আগে বিষয় নির্বাচন করুন</option></select></div><div><label for="acSet">সেট</label><select id="acSet" disabled><option value="">আগে অধ্যায় নির্বাচন করুন</option></select></div></div>
    <p id="acTaxonomyMsg" class="msg" role="status" aria-live="polite"></p>
  </div>
