@@ -70,7 +70,7 @@
       margin: 0;
     }
 
-    .question input {
+    .question-content {\n      display: block;\n      min-width: 0;\n      line-height: 1.6;\n      overflow-wrap: anywhere;\n    }\n\n    .question-stem {\n      display: block;\n      font-weight: 700;\n      white-space: pre-wrap;\n    }\n\n    .question-options {\n      display: grid;\n      grid-template-columns: repeat(2, minmax(0, 1fr));\n      gap: 4px 14px;\n      margin-top: 7px;\n      font-size: .95rem;\n      font-weight: 400;\n    }\n\n    .question-option {\n      white-space: pre-wrap;\n      overflow-wrap: anywhere;\n    }\n\n    .question input {
       width: auto;
       margin-top: 4px;
       flex-shrink: 0;
@@ -222,7 +222,7 @@ table td{color:#243b53}
   </main>
 
   <script src="js/supabase.js"></script>
-  <script src="js/create-exam.js?v=20261018-question-filter-pagination2"></script>
+  <script src="js/create-exam.js?v=20261018-full-question-options1"></script>
 <script id="site-copy-deterrent-script">(function(){function editable(t){return !!(t&&t.closest&&t.closest('input,textarea,select,[contenteditable="true"],[contenteditable=""]'))}document.addEventListener('contextmenu',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('selectstart',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('copy',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('cut',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('keydown',function(e){if(editable(e.target))return;var k=(e.key||'').toLowerCase();if((e.ctrlKey||e.metaKey)&&['c','x','u','s','p'].includes(k)){e.preventDefault();e.stopPropagation()}if(e.key==='PrintScreen'){e.preventDefault()}} ,true)})();</script>
 <div class="central-section-return"><a href="https://fbpathshala.github.io/home.html">⌂ মূল মেনু / হোম পেইজে ফিরুন</a></div></body>
 </html>
