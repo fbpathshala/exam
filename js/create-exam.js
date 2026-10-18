@@ -70,10 +70,37 @@
         count();
       });
 
-      const text = document.createElement("span");
-      text.textContent = `${bn(index + 1)}। ${questionText(q)}`;
+      const content = document.createElement("span");
+      content.className = "question-content";
 
-      label.append(checkbox, text);
+      const stem = document.createElement("span");
+      stem.className = "question-stem";
+      stem.textContent = `${bn(index + 1)}। ${questionText(q)}`;
+      content.append(stem);
+
+      const optionFields = [
+        ["ক", q.option_a ?? q.option_1 ?? q.option1],
+        ["খ", q.option_b ?? q.option_2 ?? q.option2],
+        ["গ", q.option_c ?? q.option_3 ?? q.option3],
+        ["ঘ", q.option_d ?? q.option_4 ?? q.option4]
+      ];
+      const availableOptions = optionFields.filter(([, value]) =>
+        value !== null && value !== undefined && String(value).trim() !== ""
+      );
+
+      if (availableOptions.length) {
+        const options = document.createElement("div");
+        options.className = "question-options";
+        availableOptions.forEach(([letter, value]) => {
+          const option = document.createElement("div");
+          option.className = "question-option";
+          option.textContent = `${letter}. ${value}`;
+          options.append(option);
+        });
+        content.append(options);
+      }
+
+      label.append(checkbox, content);
       root.append(label);
     });
 
