@@ -146,6 +146,7 @@
     const categoryRow = categories.find(item => String(item.id) === String(category));
     const categoryName = categoryRow?.name ?? "";
     const matching = folders.filter(folder =>
+      String(folder.category_id ?? "") === String(category) ||
       String(folder.sub_category ?? "").trim() === String(categoryName).trim()
     );
 
@@ -267,7 +268,7 @@
 
       const folderResult = await db()
         .from("question_bank_folders")
-        .select("id,folder_name,sub_category")
+        .select("id,folder_name,category_id,sub_category")
         .order("folder_name");
 
       if (folderResult.error) throw folderResult.error;
@@ -379,7 +380,13 @@
 
       const examResult = await db()
         .from("exams")
-        .insert({ exam_name: name, total_questions: selected.length })
+        .insert({
+          exam_name: name,
+          total_questions: selected.length,
+          marks_per_question: marks,
+          negative_mark: negative,
+          pass_mark: pass
+        })
         .select("id")
         .single();
 
@@ -409,7 +416,9 @@
           selected.map((question, index) => ({
             exam_id: examId,
             question_id: question.id,
-            question_order: index + 1
+            question_order: index + 1,
+            marks,
+            negative_mark: negative
           }))
         );
 
