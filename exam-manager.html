@@ -17,7 +17,7 @@
     .panel{border-top:1px solid #dbe3ee;margin-top:10px;padding-top:10px}
     .q{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid #eee;align-items:center}
     .q input{width:auto}
-    #message{overflow-wrap:anywhere;white-space:pre-wrap}\n    #jobExamFilters{position:sticky;top:0;z-index:20;display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin:12px 0;padding:12px;background:linear-gradient(110deg,#e0f2fe,#eef2ff);border:1px solid #93c5fd;border-radius:12px;box-shadow:0 5px 14px rgba(29,78,216,.12)}\n    #jobExamFilters label{display:flex;flex-direction:column;gap:5px;font-weight:800;color:#1e40af}\n    #jobExamFilters select{min-width:165px}\n    @media(max-width:600px){#jobExamFilters{position:sticky;top:0;align-items:stretch}#jobExamFilters label,#jobExamFilters select{width:100%;min-width:0}}
+    #message{overflow-wrap:anywhere;white-space:pre-wrap}\n    #jobExamFilters{position:sticky;top:0;z-index:100;display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin:12px 0;padding:12px;background:linear-gradient(110deg,#e0f2fe,#eef2ff);border:1px solid #93c5fd;border-radius:12px;box-shadow:0 5px 14px rgba(29,78,216,.12)}\n    #jobExamFilters label{display:flex;flex-direction:column;gap:5px;font-weight:800;color:#1e40af}\n    #jobExamFilters select{min-width:165px}\n    @media(max-width:600px){#jobExamFilters{position:sticky;top:0;align-items:stretch}#jobExamFilters label,#jobExamFilters select{width:100%;min-width:0}}
     @media(max-width:600px){.buttons{grid-template-columns:1fr}}
   </style><style id="premium-contrast-guard">
 /* Premium admin theme: preserve strong readable contrast */
@@ -42,13 +42,14 @@ table td{color:#243b53}
     <span style="margin-left:auto"></span>
   </header>
   <main class="wrap">
+    <div class="filters" id="jobExamFilters"><label>পরীক্ষার ধরন <select id="examTypeFilter"><option value="">সব ধরনের পরীক্ষা</option><option value="MCQ">MCQ</option></select></label><label>পরীক্ষক <select id="examinerFilter"><option value="">সকল পরীক্ষক</option></select></label><label>পরীক্ষা <select id="examNameFilter"><option value="">সব পরীক্ষা</option></select></label><button type="button" class="secondary" id="resetExamFilters">ফিল্টার রিসেট</button></div>
     <section class="card">
       <h1>পরীক্ষা ব্যবস্থাপনা</h1>
       <p>পরীক্ষার নাম চাপলে লিংক কপি হবে। পাশে ☰ চাপলে কাজের বাটন খুলবে।</p>
       <p class="muted">নতুন পরীক্ষা তৈরি করতে ড্যাশবোর্ডের “পরীক্ষা তৈরি” অপশন ব্যবহার করুন।</p>
       <p id="message" class="msg">লোড হচ্ছে…</p>
     </section>
-    <div class="filters" id="jobExamFilters"><label>পরীক্ষার ধরন <select id="examTypeFilter"><option value="">সব ধরনের পরীক্ষা</option><option value="MCQ">MCQ</option></select></label><label>পরীক্ষক <select id="examinerFilter"><option value="">সকল পরীক্ষক</option></select></label><label>পরীক্ষা <select id="examNameFilter"><option value="">সব পরীক্ষা</option></select></label><button type="button" class="secondary" id="resetExamFilters">ফিল্টার রিসেট</button></div><div id="examList"></div>
+    <div id="examList"></div>
   </main>
   <script src="js/supabase.js"></script>
   <script src="js/exam-manager.js?v=20261020-job-special-filters3"></script>
