@@ -124,10 +124,10 @@ document.getElementById("centralReturn").addEventListener("click",e=>{
 
 const initialParams=new URLSearchParams(location.search);
 if(initialParams.has("section")&&routes[initialParams.get("section")])active=initialParams.get("section");
-// Always bind direct Academic exam-management/results links to Academic Care unless an explicit division is supplied.
+// Do not auto-select any department. Only honour an explicit ?care=job or ?care=academic.
 const requestedCare=initialParams.get("care");
 if(requestedCare==="job"||requestedCare==="academic")document.getElementById("care").value=requestedCare;
-else if(active==="exam-manage"||active==="results"||(active==="exam-create"&&location.pathname.endsWith("/control-center.html")))document.getElementById("care").value="academic";
+else document.getElementById("care").value="";
 render();
 </script>
 </body></html>
