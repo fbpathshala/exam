@@ -266,6 +266,10 @@
         categorySelect.add(new Option(category.name, String(category.id)));
       });
 
+      // Never restore/select a category automatically on page load.
+      categorySelect.selectedIndex = 0;
+      categorySelect.value = "";
+
       const folderResult = await db()
         .from("question_bank_folders")
         .select("id,folder_name,category_id,sub_category")
