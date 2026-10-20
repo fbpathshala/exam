@@ -3,6 +3,7 @@
 
   const $ = id => document.getElementById(id);
 
+  let categories = [];
   let folders = [];
   let subjects = [];
   let qs = [];
@@ -107,7 +108,7 @@
     count();
   }
 
-  function resetSets(message = "আগে ফোল্ডার নির্বাচন করুন") {
+  function resetSets(message = "আগে সাব-ক্যাটাগরি নির্বাচন করুন") {
     const select = $("setSelect");
     select.replaceChildren(new Option(message, ""));
     select.disabled = true;
@@ -136,24 +137,19 @@
     resetQuestions();
 
     if (!category) {
-      // সব ক্যাটাগরি নির্বাচন করলে সব ফোল্ডার দেখানো হবে।
-      folders.forEach(folder => {
-        $("folderSelect").add(
-          new Option(folder.folder_name, folder.id)
-        );
-      });
-
-      $("folderSelect").disabled = false;
+      resetFolders("আগে ক্যাটাগরি নির্বাচন করুন");
       return;
     }
 
+    // Job Care-এ সাব-ক্যাটাগরির রেকর্ড question_bank_folders টেবিলে থাকে।
+    // ক্যাটাগরির ID দিয়ে সম্পর্ক মেলানো হবে; নামের টেক্সট দিয়ে নয়।
     const matching = folders.filter(folder =>
-      String(folder.sub_category ?? "").trim() === category
+      String(folder.category_id ?? "") === String(category)
     );
 
     if (!matching.length) {
-      resetFolders("এই ক্যাটাগরিতে ফোল্ডার নেই");
-      say("questionMessage", "নির্বাচিত ক্যাটাগরিতে কোনো ফোল্ডার পাওয়া যায়নি।");
+      resetFolders("এই ক্যাটাগরিতে সাব-ক্যাটাগরি নেই");
+      say("questionMessage", "নির্বাচিত ক্যাটাগরিতে কোনো সাব-ক্যাটাগরি পাওয়া যায়নি।");
       return;
     }
 
@@ -206,7 +202,7 @@
       const setId = $("setSelect").value;
 
       if (!setId) {
-        throw new Error("প্রথমে ক্যাটাগরি, ফোল্ডার ও সেট নির্বাচন করুন।");
+        throw new Error("প্রথমে ক্যাটাগরি, সাব-ক্যাটাগরি ও সেট নির্বাচন করুন।");
       }
 
       say("questionMessage", "প্রশ্ন লোড হচ্ছে...");
@@ -253,13 +249,26 @@
         throw new Error("Supabase সংযোগ পাওয়া যায়নি।");
       }
 
+      const categoryResult = await db()
+        .from("question_bank_categories")
+        .select("id,name")
+        .order("name");
+
+      if (categoryResult.error) throw categoryResult.error;
+      categories = categoryResult.data || [];
+
+      const categorySelect = $("categorySelect");
+      categorySelect.replaceChildren(new Option("ক্যাটাগরি নির্বাচন করুন", ""));
+      categories.forEach(category => {
+        categorySelect.add(new Option(category.name, String(category.id)));
+      });
+
       const folderResult = await db()
         .from("question_bank_folders")
-        .select("id,folder_name,sub_category")
+        .select("id,folder_name,category_id,sub_category")
         .order("folder_name");
 
       if (folderResult.error) throw folderResult.error;
-
       folders = folderResult.data || [];
 
       const subjectResult = await db()
@@ -314,7 +323,7 @@
 
       say(
         "questionCount",
-        "প্রথমে ক্যাটাগরি, ফোল্ডার ও সেট নির্বাচন করুন।"
+        "প্রথমে ক্যাটাগরি, সাব-ক্যাটাগরি ও সেট নির্বাচন করুন।"
       );
 
     } catch (error) {
