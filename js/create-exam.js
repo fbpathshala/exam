@@ -141,10 +141,12 @@
       return;
     }
 
-    // Job Care-এ সাব-ক্যাটাগরির রেকর্ড question_bank_folders টেবিলে থাকে।
-    // ক্যাটাগরির ID দিয়ে সম্পর্ক মেলানো হবে; নামের টেক্সট দিয়ে নয়।
+    // Job Care-এর বর্তমান Question Bank কাঠামোয় folder-কে
+    // question_bank_folders.sub_category দিয়ে category name-এর সঙ্গে মেলানো হয়।
+    const categoryRow = categories.find(item => String(item.id) === String(category));
+    const categoryName = categoryRow?.name ?? "";
     const matching = folders.filter(folder =>
-      String(folder.category_id ?? "") === String(category)
+      String(folder.sub_category ?? "").trim() === String(categoryName).trim()
     );
 
     if (!matching.length) {
@@ -265,7 +267,7 @@
 
       const folderResult = await db()
         .from("question_bank_folders")
-        .select("id,folder_name,category_id,sub_category")
+        .select("id,folder_name,sub_category")
         .order("folder_name");
 
       if (folderResult.error) throw folderResult.error;
@@ -281,6 +283,7 @@
       subjects = subjectResult.data || [];
 
       const subjectSelect = $("subjectSelect");
+      subjectSelect.replaceChildren(new Option("সব বিষয়", ""));
 
       subjects.forEach(subject => {
         subjectSelect.add(
