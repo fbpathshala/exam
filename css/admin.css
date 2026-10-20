@@ -63,3 +63,42 @@ button{border-radius:10px;box-shadow:0 2px 4px rgba(20,45,78,.06)}
 button.secondary,.secondary{background:#e8eef6!important;color:#243b53!important;border-color:#d8e2ee!important}
 .notice,.hint{background:#eef6ff;color:#174a82;border-color:#d8e8fb}
 @media(max-width:600px){.direct-dashboard-nav{right:12px!important;bottom:12px!important}}
+
+
+/* Admin colour-contrast fix: category tabs must remain readable despite global button rules. */
+#bank .cats button,
+#bank .cats button:not(.active) {
+  background: #e8eef6 !important;
+  color: #243b53 !important;
+  border: 1px solid #cbd8e6 !important;
+}
+#bank .cats button.active {
+  background: #102a43 !important;
+  color: #ffffff !important;
+  border-color: #102a43 !important;
+}
+#bank .notice,
+#bank .hint,
+#bank .msg,
+#bank label,
+#bank h2 {
+  color: #102a43;
+}
+#bank select,
+#bank input,
+#bank textarea,
+#exam select,
+#exam input,
+#exam textarea,
+#materials select,
+#materials input,
+#materials textarea {
+  background: #ffffff !important;
+  color: #102a43 !important;
+}
+#bank select:disabled,
+#exam select:disabled {
+  color: #52677d !important;
+  background: #f1f5f9 !important;
+  opacity: 1;
+}
