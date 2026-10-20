@@ -6,7 +6,7 @@
   <title>নতুন পরীক্ষা তৈরি</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link rel="stylesheet" href="css/admin.css?v=20261012-contrast1">
+  <link rel="stylesheet" href="css/admin.css?v=20261020-job-subcategory1">
 
   <style>
     body {
@@ -126,7 +126,7 @@ table td{color:#243b53}
     <section class="card">
       <h1>নতুন পরীক্ষা তৈরি</h1>
       <p class="hint">
-        পরীক্ষার নাম ও নম্বর নির্ধারণ করে নিচের ক্যাটাগরি, ফোল্ডার,
+        পরীক্ষার নাম ও নম্বর নির্ধারণ করে ক্যাটাগরি, সাব-ক্যাটাগরি,
         সেট এবং বিষয় ফিল্টার ব্যবহার করে প্রশ্ন নির্বাচন করুন।
         পরীক্ষা তৈরির পর পরীক্ষা ব্যবস্থাপনা থেকে সেটিংস পরিবর্তন করতে পারবেন।
       </p>
@@ -166,15 +166,12 @@ table td{color:#243b53}
         <label>
           <span class="filter-title">১. ক্যাটাগরি</span>
           <select id="categorySelect">
-            <option value="">সব ক্যাটাগরি</option>
-            <option value="যাচাই পরীক্ষা">যাচাই পরীক্ষা</option>
-            <option value="নিয়োগ পরীক্ষা">নিয়োগ পরীক্ষা</option>
-            <option value="সাম্প্রতিক প্রশ্ন">সাম্প্রতিক</option>
+            <option value="">ক্যাটাগরি লোড হচ্ছে...</option>
           </select>
         </label>
 
         <label>
-          <span class="filter-title">২. ফোল্ডার</span>
+          <span class="filter-title">২. সাব-ক্যাটাগরি</span>
           <select id="folderSelect" disabled>
             <option value="">আগে ক্যাটাগরি নির্বাচন করুন</option>
           </select>
@@ -197,7 +194,7 @@ table td{color:#243b53}
 
       <button id="loadQuestions" type="button">প্রশ্ন দেখুন</button>
 
-      <p id="questionCount">প্রথমে ক্যাটাগরি, ফোল্ডার ও সেট নির্বাচন করুন।</p>
+      <p id="questionCount">প্রথমে ক্যাটাগরি, সাব-ক্যাটাগরি ও সেট নির্বাচন করুন।</p>
 
       <div id="questionList"></div>
 
@@ -222,7 +219,7 @@ table td{color:#243b53}
   </main>
 
   <script src="js/supabase.js"></script>
-  <script src="js/create-exam.js?v=20261018-full-question-options1"></script>
+  <script src="js/create-exam.js?v=20261020-job-subcategory1"></script>
 <script id="site-copy-deterrent-script">(function(){function editable(t){return !!(t&&t.closest&&t.closest('input,textarea,select,[contenteditable="true"],[contenteditable=""]'))}document.addEventListener('contextmenu',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('selectstart',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('copy',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('cut',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('keydown',function(e){if(editable(e.target))return;var k=(e.key||'').toLowerCase();if((e.ctrlKey||e.metaKey)&&['c','x','u','s','p'].includes(k)){e.preventDefault();e.stopPropagation()}if(e.key==='PrintScreen'){e.preventDefault()}} ,true)})();</script>
 <div class="central-section-return"><a href="https://fbpathshala.github.io/home.html">⌂ মূল মেনু / হোম পেইজে ফিরুন</a></div></body>
 </html>
