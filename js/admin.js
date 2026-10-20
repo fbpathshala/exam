@@ -4,7 +4,7 @@ const CATS = {
   recent: 'সাম্প্রতিক প্রশ্ন'
 };
 
-let cat = 'verification_test';
+let cat = '';
 let folders = [];
 let sets = [];
 let subjects = [];
@@ -259,6 +259,22 @@ async function loadBank() {
 
 async function loadFolders() {
 
+  if (!cat || !CATS[cat]) {
+    folders = [];
+    sets = [];
+    const folderPlaceholder = '<option value="">আগে ক্যাটাগরি নির্বাচন করুন</option>';
+    const setPlaceholder = '<option value="">আগে ফোল্ডার নির্বাচন করুন</option>';
+    if ($('folder')) $('folder').innerHTML = folderPlaceholder;
+    if ($('set')) $('set').innerHTML = setPlaceholder;
+    if ($('mapFolder')) $('mapFolder').innerHTML = folderPlaceholder;
+    if ($('mapSet')) $('mapSet').innerHTML = setPlaceholder;
+    if ($('filterFolder')) $('filterFolder').innerHTML = '<option value="">আগে ক্যাটাগরি নির্বাচন করুন</option>';
+    if ($('filterSet')) $('filterSet').innerHTML = '<option value="">আগে ফোল্ডার নির্বাচন করুন</option>';
+    if ($('currentCat')) $('currentCat').textContent = 'কোনো Category নির্বাচন করা হয়নি';
+    document.querySelectorAll('.cats button').forEach(b => b.classList.remove('active'));
+    return;
+  }
+
   const { data, error } = await db
     .from('question_bank_folders')
     .select('id,folder_name')
@@ -323,6 +339,12 @@ async function loadFolders() {
 async function loadFilterFolders() {
 
   if (!$('filterFolder')) return;
+
+  if (!cat || !CATS[cat]) {
+    $('filterFolder').innerHTML = '<option value="">আগে ক্যাটাগরি নির্বাচন করুন</option>';
+    if ($('filterSet')) $('filterSet').innerHTML = '<option value="">আগে ফোল্ডার নির্বাচন করুন</option>';
+    return;
+  }
 
   const { data, error } = await db
     .from('question_bank_folders')
@@ -1835,6 +1857,12 @@ function norm(value) {
 async function loadQuestions() {
 
   if (!$('questions')) return;
+
+  if (!cat || !CATS[cat]) {
+    $('questions').innerHTML = '<p class="notice">প্রশ্ন দেখতে আগে ক্যাটাগরি নির্বাচন করুন।</p>';
+    if ($('qmsg')) $('qmsg').textContent = '';
+    return;
+  }
 
   let query =
     db
