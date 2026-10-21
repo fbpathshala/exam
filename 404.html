@@ -23,7 +23,7 @@
   <script>
     (function () {
       // GitHub Pages project site path is /exam/. A short link looks like /exam/e/29.
-      var match = window.location.pathname.match(/^\/exam\/e\/(\d+)\/?$/);
+      var match = window.location.pathname.match(/^\/exam\/(?:e\/)?(\d+)\/?$/);
       if (match) {
         var id = match[1];
         window.location.replace('/exam/index.html?exam=' + encodeURIComponent(id));
