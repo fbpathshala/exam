@@ -67,59 +67,35 @@ function downloadExcel(){const r=getFiltered();const headers=['মেধা','�
 (function(){
  function init(){
   var bar=document.getElementById('topReviewFilters');
-  if(!bar||bar.dataset.pinReady==='portal')return;
-  bar.dataset.pinReady='portal';
-  var placeholder=document.createElement('div');
-  placeholder.id='topReviewFiltersPortalPlaceholder';
-  placeholder.style.width='100%';
-  placeholder.style.height='0px';
-  placeholder.style.display='block';
-  placeholder.setAttribute('aria-hidden','true');
-  bar.parentNode.insertBefore(placeholder,bar);
-  var threshold=placeholder.getBoundingClientRect().top+(window.scrollY||0);
-  var pinned=false,raf=false;
-  function setPinned(on){
-   if(on===pinned)return;
-   pinned=on;
-   if(on){
-    var r=placeholder.getBoundingClientRect();
-    placeholder.style.height=Math.ceil(bar.getBoundingClientRect().height)+'px';
-    document.body.appendChild(bar);
-    bar.classList.add('review-filters-pinned');
-    bar.style.position='fixed';
-    bar.style.top='0';
-    bar.style.left=Math.round(r.left)+'px';
-    bar.style.width=Math.round(r.width)+'px';
-    bar.style.right='auto';
-   }else{
-    bar.classList.remove('review-filters-pinned');
-    bar.style.position='';
-    bar.style.top='';
-    bar.style.left='';
-    bar.style.width='';
-    bar.style.right='';
-    placeholder.parentNode.insertBefore(bar,placeholder.nextSibling);
-    placeholder.style.height='0px';
-   }
+  var main=document.querySelector('main');
+  if(!bar||!main||bar.dataset.pinReady==='flow')return;
+  bar.dataset.pinReady='flow';
+  var placeholder=document.getElementById('topReviewFiltersPortalPlaceholder');
+  if(placeholder)placeholder.remove();
+  bar.classList.remove('review-filters-pinned');
+  ['position','top','left','right','width','zIndex','margin','transform','filter','contain'].forEach(function(k){bar.style[k]=''});
+  bar.style.position='sticky';
+  bar.style.top='0px';
+  bar.style.zIndex='100';
+  bar.style.background='#eaf6f7';
+  bar.style.opacity='1';
+  bar.style.boxShadow='0 6px 18px rgba(16,42,67,.24)';
+  bar.style.border='1px solid #b8d8e8';
+  bar.style.marginBottom='12px';
+  bar.style.isolation='isolate';
+  bar.style.alignSelf='stretch';
+  bar.style.width='100%';
+  bar.style.maxWidth='100%';
+  bar.style.scrollMarginTop='0px';
+  // Keep the filter inside the same document flow as the reports, rather than
+  // portalling it to body where scrolling report content can pass beneath it.
+  if(bar.parentNode!==main){
+   var title=main.querySelector('.card.noPrint');
+   if(title&&title.nextSibling)main.insertBefore(bar,title.nextSibling);
+   else main.insertBefore(bar,main.firstChild);
   }
-  function update(){
-   raf=false;
-   var y=window.scrollY||window.pageYOffset||0;
-   setPinned(y>=threshold);
-   if(pinned){
-    var r=placeholder.getBoundingClientRect();
-    bar.style.left=Math.round(r.left)+'px';
-    bar.style.width=Math.round(r.width)+'px';
-   }
-  }
-  function schedule(){if(!raf){raf=true;(window.requestAnimationFrame||function(fn){return setTimeout(fn,16)})(update)}}
-  window.addEventListener('scroll',schedule,{passive:true});
-  window.addEventListener('resize',function(){
-   threshold=placeholder.getBoundingClientRect().top+(window.scrollY||0);
-   schedule();
-  },{passive:true});
-  if(window.ResizeObserver)new ResizeObserver(function(){if(!pinned)threshold=placeholder.getBoundingClientRect().top+(window.scrollY||0);schedule()}).observe(placeholder);
-  update();
+  function align(){bar.style.top='0px'}
+  window.addEventListener('resize',align,{passive:true});
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
