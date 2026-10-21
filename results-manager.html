@@ -67,39 +67,31 @@ function downloadExcel(){const r=getFiltered();const headers=['মেধা','�
 ['resultTypeFilter','resultExaminerFilter'].forEach(id=>document.getElementById(id)?.addEventListener('change',loadExams));document.getElementById('resetResultFilters')?.addEventListener('click',()=>{['resultTypeFilter','resultExaminerFilter'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});loadExams()});init();
 
 </script><script id="site-copy-deterrent-script">(function(){function editable(t){return !!(t&&t.closest&&t.closest('input,textarea,select,[contenteditable="true"],[contenteditable=""]'))}document.addEventListener('contextmenu',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('selectstart',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('copy',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('cut',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('keydown',function(e){if(editable(e.target))return;var k=(e.key||'').toLowerCase();if((e.ctrlKey||e.metaKey)&&['c','x','u','s','p'].includes(k)){e.preventDefault();e.stopPropagation()}if(e.key==='PrintScreen')e.preventDefault()},true)})();</script><div class="central-section-return"><a href="https://fbpathshala.github.io/home.html">⌂ মূল মেনু / হোম পেইজে ফিরুন</a></div><script id="reliable-review-filter-pin">
+/* Keep review filters in normal document flow. Never pin, portal, or reposition them. */
 (function(){
- function init(){
-  var bar=document.getElementById('topReviewFilters');
-  var main=document.querySelector('main');
-  if(!bar||!main||bar.dataset.pinReady==='flow')return;
-  bar.dataset.pinReady='flow';
+ function resetFilterPosition(){
+  ['topReviewFilters','jobResultFilters'].forEach(function(id){
+   var bar=document.getElementById(id);
+   if(!bar)return;
+   bar.classList.remove('review-filters-pinned');
+   ['position','top','left','right','bottom','zIndex','transform','translate','inset','marginTop'].forEach(function(k){
+    bar.style.removeProperty(k.replace(/[A-Z]/g,function(m){return '-'+m.toLowerCase()}));
+   });
+   bar.style.setProperty('position','static','important');
+   bar.style.setProperty('top','auto','important');
+   bar.style.setProperty('left','auto','important');
+   bar.style.setProperty('right','auto','important');
+   bar.style.setProperty('bottom','auto','important');
+   bar.style.setProperty('z-index','auto','important');
+   bar.style.setProperty('transform','none','important');
+   bar.style.setProperty('margin-top','0','important');
+   bar.style.setProperty('width','100%','important');
+  });
   var placeholder=document.getElementById('topReviewFiltersPortalPlaceholder');
   if(placeholder)placeholder.remove();
-  bar.classList.remove('review-filters-pinned');
-  ['position','top','left','right','width','zIndex','margin','transform','filter','contain'].forEach(function(k){bar.style[k]=''});
-  bar.style.position='static';
-  bar.style.top='auto';
-  bar.style.zIndex='100';
-  bar.style.background='#eaf6f7';
-  bar.style.opacity='1';
-  bar.style.boxShadow='0 6px 18px rgba(16,42,67,.24)';
-  bar.style.border='1px solid #b8d8e8';
-  bar.style.marginBottom='12px';
-  bar.style.isolation='isolate';
-  bar.style.alignSelf='stretch';
-  bar.style.width='100%';
-  bar.style.maxWidth='100%';
-  bar.style.scrollMarginTop='0px';
-  // Keep the filter inside the same document flow as the reports, rather than
-  // portalling it to body where scrolling report content can pass beneath it.
-  if(bar.parentNode!==main){
-   var title=main.querySelector('.card.noPrint');
-   if(title&&title.nextSibling)main.insertBefore(bar,title.nextSibling);
-   else main.insertBefore(bar,main.firstChild);
-  }
-  function align(){bar.style.top='auto';bar.style.position='static'}
-  window.addEventListener('resize',align,{passive:true});
  }
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',resetFilterPosition,{once:true});
+ else resetFilterPosition();
+ window.addEventListener('pageshow',resetFilterPosition);
 })();
 </script></body></html>
