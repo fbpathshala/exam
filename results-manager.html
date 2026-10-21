@@ -65,58 +65,62 @@ function downloadExcel(){const r=getFiltered();const headers=['মেধা','�
 
 </script><script id="site-copy-deterrent-script">(function(){function editable(t){return !!(t&&t.closest&&t.closest('input,textarea,select,[contenteditable="true"],[contenteditable=""]'))}document.addEventListener('contextmenu',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('selectstart',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('copy',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('cut',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('keydown',function(e){if(editable(e.target))return;var k=(e.key||'').toLowerCase();if((e.ctrlKey||e.metaKey)&&['c','x','u','s','p'].includes(k)){e.preventDefault();e.stopPropagation()}if(e.key==='PrintScreen')e.preventDefault()},true)})();</script><div class="central-section-return"><a href="https://fbpathshala.github.io/home.html">⌂ মূল মেনু / হোম পেইজে ফিরুন</a></div><script id="reliable-review-filter-pin">
 (function(){
-  function setupReviewFilterPin(){
-    var bar=document.getElementById('topReviewFilters');
-    if(!bar || bar.dataset.pinReady==='1') return;
-    bar.dataset.pinReady='1';
-    var spacer=document.createElement('div');
-    spacer.id='topReviewFiltersSpacer';
-    spacer.style.display='none';
-    spacer.setAttribute('aria-hidden','true');
-    bar.parentNode.insertBefore(spacer,bar);
-    var threshold=0, ticking=false;
-    function measure(){
-      if(!bar.isConnected) return;
-      var wasPinned=bar.classList.contains('review-filters-pinned');
-      if(wasPinned) bar.classList.remove('review-filters-pinned');
-      spacer.style.display='none';
-      spacer.style.height='0px';
-      var rect=bar.getBoundingClientRect();
-      threshold=rect.top+(window.scrollY||window.pageYOffset||0);
-      if(wasPinned) pin();
-      else unpin();
-    }
-    function pin(){
-      if(bar.classList.contains('review-filters-pinned')) return;
-      var rect=bar.getBoundingClientRect();
-      spacer.style.display='block';
-      spacer.style.height=Math.ceil(rect.height)+'px';
-      spacer.style.width='100%';
-      bar.classList.add('review-filters-pinned');
-      bar.style.left=Math.round(rect.left)+'px';
-      bar.style.width=Math.round(rect.width)+'px';
-    }
-    function unpin(){
-      bar.classList.remove('review-filters-pinned');
-      bar.style.left='';
-      bar.style.width='';
-      spacer.style.display='none';
-      spacer.style.height='0px';
-    }
-    function update(){
-      ticking=false;
-      var y=window.scrollY||window.pageYOffset||0;
-      if(y>=threshold) pin(); else unpin();
-    }
-    window.addEventListener('scroll',function(){
-      if(!ticking){ticking=true;window.requestAnimationFrame(update);}
-    },{passive:true});
-    window.addEventListener('resize',function(){measure();update();},{passive:true});
-    if('ResizeObserver' in window){new ResizeObserver(function(){if(!bar.classList.contains('review-filters-pinned')) measure();}).observe(bar);}
-    measure(); update();
-    window.addEventListener('load',function(){measure();update();},{once:true});
+ function init(){
+  var bar=document.getElementById('topReviewFilters');
+  if(!bar||bar.dataset.pinReady==='portal')return;
+  bar.dataset.pinReady='portal';
+  var placeholder=document.createElement('div');
+  placeholder.id='topReviewFiltersPortalPlaceholder';
+  placeholder.style.width='100%';
+  placeholder.style.height='0px';
+  placeholder.style.display='block';
+  placeholder.setAttribute('aria-hidden','true');
+  bar.parentNode.insertBefore(placeholder,bar);
+  var threshold=placeholder.getBoundingClientRect().top+(window.scrollY||0);
+  var pinned=false,raf=false;
+  function setPinned(on){
+   if(on===pinned)return;
+   pinned=on;
+   if(on){
+    var r=placeholder.getBoundingClientRect();
+    placeholder.style.height=Math.ceil(bar.getBoundingClientRect().height)+'px';
+    document.body.appendChild(bar);
+    bar.classList.add('review-filters-pinned');
+    bar.style.position='fixed';
+    bar.style.top='0';
+    bar.style.left=Math.round(r.left)+'px';
+    bar.style.width=Math.round(r.width)+'px';
+    bar.style.right='auto';
+   }else{
+    bar.classList.remove('review-filters-pinned');
+    bar.style.position='';
+    bar.style.top='';
+    bar.style.left='';
+    bar.style.width='';
+    bar.style.right='';
+    placeholder.parentNode.insertBefore(bar,placeholder.nextSibling);
+    placeholder.style.height='0px';
+   }
   }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',setupReviewFilterPin,{once:true});
-  else setupReviewFilterPin();
+  function update(){
+   raf=false;
+   var y=window.scrollY||window.pageYOffset||0;
+   setPinned(y>=threshold);
+   if(pinned){
+    var r=placeholder.getBoundingClientRect();
+    bar.style.left=Math.round(r.left)+'px';
+    bar.style.width=Math.round(r.width)+'px';
+   }
+  }
+  function schedule(){if(!raf){raf=true;(window.requestAnimationFrame||function(fn){return setTimeout(fn,16)})(update)}}
+  window.addEventListener('scroll',schedule,{passive:true});
+  window.addEventListener('resize',function(){
+   threshold=placeholder.getBoundingClientRect().top+(window.scrollY||0);
+   schedule();
+  },{passive:true});
+  if(window.ResizeObserver)new ResizeObserver(function(){if(!pinned)threshold=placeholder.getBoundingClientRect().top+(window.scrollY||0);schedule()}).observe(placeholder);
+  update();
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 </script></body></html>
