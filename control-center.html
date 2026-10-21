@@ -88,6 +88,20 @@ let activeManagementLevel=0;
 const managementLevels={job:[{level:0,label:"ক্যাটাগরি ব্যবস্থাপনা"},{level:1,label:"সাব ক্যাটাগরি ব্যবস্থাপনা"},{level:2,label:"সেট ব্যবস্থাপনা"},{level:3,label:"বিষয় ব্যবস্থাপনা",view:"subjects"}],academic:[{level:0,label:"শ্রেণি ব্যবস্থাপনা"},{level:1,label:"বিষয় ব্যবস্থাপনা"},{level:2,label:"অধ্যায় ব্যবস্থাপনা"},{level:3,label:"সেট ব্যবস্থাপনা"}]};
 function freshSectionUrl(url){const u=new URL(url,location.href);u.searchParams.set("uiVersion","20261020-academic-route-fix2");u.searchParams.set("sectionLoad",String(Date.now()));return u.href}
 function renderManagementOptions(){const box=document.getElementById("managementOptions"),care=document.getElementById("care").value;box.innerHTML="";if(active!=="management"||!care){box.hidden=true;return}box.hidden=false;managementLevels[care].forEach(item=>{const b=document.createElement("button");b.type="button";b.textContent=item.label;b.dataset.managementLevel=String(item.level);b.classList.toggle("active",item.level===activeManagementLevel);b.addEventListener("click",()=>{activeManagementLevel=item.level;renderManagementOptions();document.getElementById("sectionNote").textContent="নির্বাচিত ব্যবস্থাপনা: "+item.label;document.getElementById("workspace").src=freshSectionUrl(item.view==="subjects"?"taxonomy.html?section=job&view=subjects":"taxonomy.html?section="+care+"&level="+item.level)});box.append(b)})}
+
+// Reapply the visible colour palette after mobile-browser back/forward cache restores.
+function enforceCentralPalette(){
+ const bar=document.querySelector('.toolbar');
+ const title=document.getElementById('sectionTitle');
+ const back=document.getElementById('centralReturn');
+ const care=document.getElementById('care');
+ if(bar){bar.style.setProperty('background','linear-gradient(120deg,#e0f2fe 0%,#ede9fe 52%,#ccfbf1 100%)','important');bar.style.setProperty('border-color','#818cf8','important')}
+ if(title){title.style.setProperty('background','linear-gradient(110deg,#312e81 0%,#1d4ed8 58%,#0e7490 100%)','important');title.style.setProperty('color','#fff','important');title.style.setProperty('-webkit-text-fill-color','#fff','important')}
+ if(back){back.style.setProperty('background','linear-gradient(110deg,#312e81 0%,#1d4ed8 55%,#0891b2 100%)','important');back.style.setProperty('color','#fff','important');back.style.setProperty('-webkit-text-fill-color','#fff','important');back.style.setProperty('border-color','#1d4ed8','important')}
+ if(care){care.style.setProperty('background','#fff','important');care.style.setProperty('color','#312e81','important');care.style.setProperty('border-color','#818cf8','important')}
+}
+window.addEventListener('pageshow',enforceCentralPalette);
+
 function render(){const r=routes[active];document.getElementById("sectionTitle").textContent=r.title;const careLabel=document.querySelector("label[for=care]");const careSelect=document.getElementById("care");careLabel.hidden=!!r.universal;careSelect.hidden=!!r.universal;if(active==="management"&&careSelect.value&&!managementLevels[careSelect.value].some(x=>x.level===activeManagementLevel))activeManagementLevel=0;const workspace=document.getElementById("workspace");renderManagementOptions();if(r.universal){document.getElementById("sectionNote").textContent=r.note;workspace.src=freshSectionUrl(r.url)}else if(!careSelect.value){document.getElementById("sectionNote").textContent="কাজ শুরু করতে আগে বিভাগ নির্বাচন করুন। বিভাগ নির্বাচন না করা পর্যন্ত কোনো বিভাগের তথ্য লোড হবে না।";workspace.removeAttribute("src");workspace.src="about:blank"}else if(active==="management"){const list=managementLevels[careSelect.value];const item=list.find(x=>x.level===activeManagementLevel);document.getElementById("sectionNote").textContent="নিচ থেকে প্রয়োজনীয় ব্যবস্থাপনা নির্বাচন করুন: "+item.label;workspace.src=freshSectionUrl(item.view==="subjects"?"taxonomy.html?section=job&view=subjects":"taxonomy.html?section="+careSelect.value+"&level="+activeManagementLevel)}else{document.getElementById("sectionNote").textContent=r.note;workspace.src=freshSectionUrl(r[careSelect.value])}document.querySelectorAll("[data-section]").forEach(b=>b.classList.toggle("active",b.dataset.section===active));const back=document.getElementById("centralReturn");if(r.universal||!careSelect.value){back.href="https://fbpathshala.github.io/home.html";back.textContent="⌂ মূল মেনু / হোম পেইজে ফিরুন"}else if(active==="management"&&activeManagementLevel>0){back.href="#";back.textContent="← ব্যবস্থাপনার আগের ধাপে ফিরুন"}else{back.href="#";back.textContent="← "+r.title+" সেকশনে ফিরুন"}}
 // Keep embedded section pages free of legacy home/menu navigation.
 const workspaceFrame=document.getElementById("workspace");
@@ -139,5 +153,6 @@ const requestedCare=initialParams.get("care");
 if(requestedCare==="job"||requestedCare==="academic")document.getElementById("care").value=requestedCare;
 else document.getElementById("care").value="";
 render();
+enforceCentralPalette();
 </script>
 </body></html>
