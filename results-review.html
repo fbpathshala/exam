@@ -61,7 +61,7 @@ async function loadResults(){
   if(ee)throw ee;
   const [setR,linkR,attR]=await Promise.all([
    db.from('exam_settings').select('total_questions,total_marks,marks_per_question,pass_mark,duration_minutes,show_result,show_rank,show_answers,show_answer_paper').eq('exam_id',id).maybeSingle(),
-   db.from('exam_questions').select('question_id').eq('exam_id',id),
+   db.from('exam_questions').select('question_id,marks').eq('exam_id',id),
    db.from('exam_attempts').select('id,student_id,score,total_questions,submitted_at,attempt_date').eq('exam_id',id).order('score',{ascending:false}).order('submitted_at',{ascending:true})
   ]);
   if(setR.error)throw setR.error;
@@ -74,7 +74,8 @@ async function loadResults(){
    :{data:[],error:null};
   if(qe)throw qe;
   questionMap={};
-  (qs||[]).forEach(q=>questionMap[String(q.id)]=q);
+  const questionMarks={};(linkR.data||[]).forEach(x=>{if(x.question_id!=null)questionMarks[String(x.question_id)]=Number(x.marks||0)});
+  (qs||[]).forEach(q=>questionMap[String(q.id)]={...q,marks:questionMarks[String(q.id)]||0});
   const allStudentsResult=await db.from('students').select('id,name,facebook_name,district,mobile');
   if(allStudentsResult.error)throw allStudentsResult.error;
   const studentMap={};
