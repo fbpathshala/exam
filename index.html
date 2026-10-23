@@ -291,9 +291,9 @@ function showResult(){
   marks.textContent=bn(d.score||0);
   rank.textContent=d.rank?bn(d.rank):"—";
   const resultQuestions=Array.isArray(d.review)?d.review:[];
-  const resultAttempted=resultQuestions.filter(q=>q.selected_option&&String(q.selected_option).trim()).length;
-  const resultCorrect=resultQuestions.filter(q=>!!q.is_correct).length;
-  const resultWrong=Math.max(0,resultAttempted-resultCorrect);
+  const resultAttempted=resultQuestions.filter(q=>String(q.question_type||"mcq").toLowerCase()==="cq"?!!String(q.written_answer||"").trim():!!(q.selected_option&&String(q.selected_option).trim())).length;
+  const resultCorrect=resultQuestions.filter(q=>String(q.question_type||"mcq").toLowerCase()!=="cq"&&!!q.is_correct).length;
+  const resultWrong=resultQuestions.filter(q=>String(q.question_type||"mcq").toLowerCase()!=="cq"&&!!(q.selected_option&&String(q.selected_option).trim())&&!q.is_correct).length;
   document.getElementById("resultTotalQuestions").textContent=bn(d.total_questions||resultQuestions.length||questions.length||0);
   document.getElementById("resultAttempted").textContent=bn(resultAttempted);
   document.getElementById("resultCorrect").textContent=bn(resultCorrect);
