@@ -74,6 +74,12 @@
       const content = document.createElement("span");
       content.className = "question-content";
 
+      const type = String(q.question_type || "mcq").toLowerCase();
+      const typeTag = document.createElement("span");
+      typeTag.textContent = type === "cq" ? "CQ — লিখিত" : "MCQ — বহুনির্বাচনী";
+      typeTag.style.cssText = "display:inline-block;font-size:12px;font-weight:800;padding:2px 7px;border-radius:6px;background:" + (type === "cq" ? "#fff7ed;color:#9a3412" : "#eff6ff;color:#1d4ed8") + ";margin-bottom:5px";
+      content.append(typeTag);
+
       const stem = document.createElement("span");
       stem.className = "question-stem";
       stem.textContent = `${bn(index + 1)}। ${questionText(q)}`;
@@ -89,7 +95,7 @@
         value !== null && value !== undefined && String(value).trim() !== ""
       );
 
-      if (availableOptions.length) {
+      if (type !== "cq" && availableOptions.length) {
         const options = document.createElement("div");
         options.className = "question-options";
         availableOptions.forEach(([letter, value]) => {
