@@ -68,6 +68,7 @@ $("contentForm").addEventListener("submit",async e=>{
 });
 $("sectionFilter").addEventListener("change",()=>{resetForm();loadItems()});$("resetBtn").addEventListener("click",resetForm);$("refreshBtn").addEventListener("click",loadItems);
 async function init(){const {data,error}=await db.auth.getSession();session=data?.session||null;if(error||!session){$("authMessage").textContent="এই অংশ ব্যবহার করতে home.html থেকে অ্যাডমিন হিসেবে লগইন করুন।";return} $("loginCard").classList.add("hidden");$("app").classList.remove("hidden");await loadItems()}
+const requestedSection=new URLSearchParams(location.search).get('section');if(['important-links','breaking-news','social-links'].includes(requestedSection))$('sectionFilter').value=requestedSection;
 init();
 </script>
 <div class="central-section-return"><a href="https://fbpathshala.github.io/home.html">⌂ মূল মেনু / হোম পেইজে ফিরুন</a></div></body></html>
