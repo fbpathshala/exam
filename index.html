@@ -333,7 +333,8 @@ function renderReview(items,showCorrect=true,showMarks=true){
   items.forEach((r,i)=>{
     let div=document.createElement("div");
     div.className="review-item"+(showCorrect?(r.is_correct?" review-correct":" review-wrong"):"");
-    const optionHtml=r.options.map(o=>{
+    if(String(r.question_type||"mcq").toLowerCase()==="cq"){div.innerHTML="<div><b>"+bn(i+1)+". "+esc(r.question_text)+"</b>"+(showMarks?" <span class=\"muted\">("+bn(r.marks_awarded??0)+" নম্বর"+(r.max_marks!=null?" / "+bn(r.max_marks):"")+")</span>":"")+"</div><div style=\"margin-top:10px;white-space:pre-wrap\"><b>তোমার উত্তর:</b> "+esc(r.written_answer||"উত্তর দেওয়া হয়নি")+"</div>"+(showCorrect&&r.reference_answer?"<div style=\"margin-top:8px;white-space:pre-wrap\"><b>নমুনা উত্তর:</b> "+esc(r.reference_answer)+"</div>":"");review.appendChild(div);return;}
+    const optionHtml=(r.options||[]).map(o=>{
       const letter=letters[o.display_letter];
       const classes=showCorrect?(o.selected&&!o.correct?"paper-wrong":o.correct?"paper-right":""):"";
       return `<div class="${classes}"><b>${letter}.</b> ${esc(o.text)}${showCorrect&&o.correct?" ✓":""}</div>`;
