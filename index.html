@@ -112,8 +112,8 @@ async function loadExam(){
       const source=sourceById.get(String(x.id));
       return {...x,
         correct_answer:String(x.correct_answer||source?.correct_answer||item?.correct_answer||"").trim().toUpperCase(),
-        question_type:String(x.question_type||source?.question_type||item?.question_type||"mcq").toLowerCase(),
-        reference_answer:x.reference_answer||source?.reference_answer||item?.reference_answer||"",
+        question_type:String(item?.question_type||x.question_type||source?.question_type||"mcq").toLowerCase(),
+        reference_answer:x.reference_answer||item?.reference_answer||source?.reference_answer||"",
         marks:Number(x.marks??item?.marks??settings.marks_per_question??1),
         negative_mark:Number(x.negative_mark??item?.negative_mark??settings.negative_mark??0),
         explanation:x.explanation||source?.explanation||item?.explanation||""
