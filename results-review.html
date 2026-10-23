@@ -118,9 +118,11 @@ async function loadResults(){
   const groups=(attR.data||[]).map(a=>{
    const st=studentMap[String(a.student_id)]||{};
    const aa=answerMap[String(a.id)]||[];
-   const correct=aa.filter(x=>x.is_correct===true).length;
-   const wrong=aa.filter(x=>x.is_correct===false&&String(x.selected_option||'').trim()!=='').length;
-   const unanswered=Math.max(0,Number(a.total_questions||totalQ)-correct-wrong);
+   const mcqAnswers=aa.filter(x=>String(x.question_type||'mcq').toLowerCase()!=='cq');
+   const correct=mcqAnswers.filter(x=>x.is_correct===true).length;
+   const wrong=mcqAnswers.filter(x=>x.is_correct===false&&String(x.selected_option||'').trim()!=='').length;
+   const answeredCQ=aa.filter(x=>String(x.question_type||'mcq').toLowerCase()==='cq'&&String(x.written_answer||'').trim()!=='').length;
+   const unanswered=Math.max(0,Number(a.total_questions||totalQ)-correct-wrong-answeredCQ);
    const score=Number(a.score||0);
    return {id:a.id,student_id:a.student_id,student_name:st.name||'—',facebook_name:st.facebook_name||'—',district:st.district||'—',mobile:st.mobile||'—',total_questions:Number(a.total_questions||totalQ),correct_count:correct,wrong_count:wrong,unanswered_count:unanswered,score,total_marks:totalMarks,percentage:totalMarks?Number((score/totalMarks*100).toFixed(2)):0,passed:score>=passMark,submitted_at:a.submitted_at,attempt_date:a.attempt_date,answers:aa,pass_mark:passMark,duration_minutes:Number(settings.duration_minutes||0)};
   });
