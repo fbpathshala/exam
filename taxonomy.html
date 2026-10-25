@@ -14,7 +14,7 @@
 <section id="login" class="panel login"><h2>অ্যাডমিন লগইন</h2><p class="hint">প্রশ্ন ব্যাংকের কাঠামো পরিচালনার জন্য অ্যাডমিন অ্যাকাউন্ট দিয়ে লগইন করুন।</p><input id="email" type="email" autocomplete="username" placeholder="Admin Email"><input id="password" type="password" autocomplete="current-password" placeholder="Password"><button id="loginBtn">লগইন</button><p id="loginMsg" class="status"></p></section>
 <div id="app" class="hidden">
 <section class="panel">
-<h2 style="margin:0 0 12px;font-size:20px">ব্যবস্থাপনা</h2>
+<h2 id="pageHeading" style="margin:0 0 12px;font-size:20px">ব্যবস্থাপনা</h2>
 <div class="field"><label for="section">বিভাগ নির্বাচন</label><select id="section"><option value="">বিভাগ নির্বাচন করুন</option><option value="job">Job Care</option><option value="academic">Academic Care</option></select></div>
 <div id="managementFields" class="hidden">
 <div class="field" id="levelWrap"><label for="level">ব্যবস্থাপনার স্তর</label><select id="level"></select></div>
@@ -31,6 +31,10 @@
 <script>
 const sb=window.db;
 const $=id=>document.getElementById(id);
+const params=new URLSearchParams(location.search);
+const isStudyMode=params.get("mode")==="study-materials";
+const studyDepartment=params.get("department")==="academic_care"?"academic_care":"job_care";
+const studyTypes=studyDepartment==="job_care"?[{type:"category",label:"ক্যাটাগরি"},{type:"subcategory",label:"সাব-ক্যাটাগরি"},{type:"set",label:"সেট"}]:[{type:"category",label:"শ্রেণি"},{type:"subcategory",label:"বিষয়"},{type:"chapter",label:"অধ্যায়"},{type:"set",label:"সেট"}];
 const cfg={
  job:{
   labels:["ক্যাটাগরি","সাব-ক্যাটাগরি","সেট"],
@@ -50,12 +54,13 @@ let cache={};
 let currentItems=[];
 function say(msg,bad=false){$("status").textContent=msg;$("status").style.color=bad?"#b42318":"#0f766e"}
 function opts(sel,items,placeholder){sel.innerHTML="";const o=document.createElement("option");o.value="";o.textContent=placeholder;sel.append(o);for(const x of items){const op=document.createElement("option");op.value=x.id;op.textContent=x.name;sel.append(op)}}
-function hierarchy(){return cfg[$("section").value]}
+function hierarchy(){if(isStudyMode)return {labels:studyTypes.map(x=>x.label),tables:studyTypes.map(()=> "study_material_taxonomy"),nameCols:studyTypes.map(()=> "name"),parents:studyTypes.map((x,i)=>i===0?null:"parent_id"),types:studyTypes.map(x=>x.type)};return cfg[$("section").value]}
 function level(){return Number($("level").value||0)}
 function parentId(){const p=level()-1;return p<0?null:$("parent_"+p)?.value||null}
 async function query(table,cols="id"){const {data,error}=await sb.from(table).select(cols).order("id");if(error)throw error;return data||[]}
 async function loadAll(){
  const c=hierarchy();cache={};
+ if(isStudyMode){const {data,error}=await sb.from("study_material_taxonomy").select("*").eq("department",studyDepartment).order("display_order").order("name");if(error)throw error;const nodes=data||[];for(let i=0;i<c.types.length;i++)cache[i]=nodes.filter(x=>x.node_type===c.types[i]);draw();return;}
  for(let i=0;i<c.tables.length;i++){
   const cols=$( "section" ).value==="subjects"?"id,name":$( "section" ).value==="job"&&i===1?"id,category_id,sub_category,folder_name":$( "section" ).value==="job"&&i===3?"id,name":i===1&&$("section").value==="academic"?"id,category_id,folder_name":i===2&&$("section").value==="academic"?"id,folder_id,chapter_name":i===c.tables.length-1?(i===2?"id,folder_id,set_name":"id,folder_id,chapter_id,set_name"):"id,"+c.nameCols[i]+(c.parents[i]?", "+c.parents[i]:"");
   cache[i]=await query(c.tables[i],cols);
@@ -68,7 +73,7 @@ function draw(){
  const parentCount=($("section").value==="job"&&l===3)?0:l;
  for(let i=0;i<parentCount;i++){
   const wrap=document.createElement("div");wrap.className="field";const label=document.createElement("label");label.htmlFor="parent_"+i;label.textContent=c.labels[i]+" নির্বাচন";const sel=document.createElement("select");sel.id="parent_"+i;sel.dataset.parentLevel=i;wrap.append(label,sel);parent.append(wrap);
-  const items=(cache[i]||[]).filter(x=>i===0||String(x[c.parents[i]]||"")===String($("parent_"+(i-1))?.value||"")).map(x=>({...x,name:x[c.nameCols[i]]}));
+  const items=(cache[i]||[]).filter(x=>i===0||(isStudyMode?String(x.parent_id||"")===String($("parent_"+(i-1))?.value||""):String(x[c.parents[i]]||"")===String($("parent_"+(i-1))?.value||""))).map(x=>({...x,name:x[c.nameCols[i]]}));
   opts(sel,items,"-- "+c.labels[i]+" নির্বাচন --");if(previous[i]&&Array.from(sel.options).some(o=>o.value===previous[i]))sel.value=previous[i];
   if(i>0){const prev=$("parent_"+(i-1));if(prev)sel.disabled=!prev.value}
   sel.onchange=()=>{for(let j=i+1;j<l;j++){const child=$("parent_"+j);if(child){child.value="";child.disabled=true}}draw()};
@@ -78,14 +83,14 @@ function draw(){
 function drawItems(){
  const c=hierarchy(),l=level(),parent=parentId();
  let items=(cache[l]||[]).map(x=>({...x,name:x[c.nameCols[l]]}));
- if(l>0){const col=c.parents[l];if(!($("section").value==="job"&&l===1))items=items.filter(x=>String(x[col]??"")===String(parent??""))}
+ if(l>0){const col=c.parents[l];if(isStudyMode)items=items.filter(x=>String(x.parent_id??"")===String(parent??""));else if(!($("section").value==="job"&&l===1))items=items.filter(x=>String(x[col]??"")===String(parent??""))}
  if($("section").value==="job"&&l===1){const cat=cache[0].find(x=>String(x.id)===String(parent));items=items.filter(x=>x.category_id?String(x.category_id)===String(parent):x.sub_category===cat?.name)}
  if($("section").value==="academic"&&l===3){items=items.filter(x=>x.chapter_id?String(x.chapter_id)===String(parent):String(x.folder_id)===String($("parent_1")?.value||""))}
  currentItems=items;opts($("itemSelect"),items,"-- "+c.labels[l]+" নির্বাচন --");
  const chosen=$("itemSelect").value;if(chosen)$("itemSelect").value=chosen;
  $("addBtn").textContent="＋ "+c.labels[l]+" যোগ করুন";$("renameBtn").textContent="✏️ নাম পরিবর্তন";$("deleteBtn").textContent="🗑️ নিরাপদে মুছুন";
 }
-function buildLevels(){const section=$("section").value; $("managementFields").classList.toggle("hidden",!section);if(!section||!cfg[section]){cache={};currentItems=[];$("level").innerHTML="<option value=\"\">আগে বিভাগ নির্বাচন করুন</option>";$("level").disabled=true;$("parentFields").innerHTML="";$("flow").textContent="";$("itemLabel").textContent="আইটেম নির্বাচন";$("itemSelect").innerHTML="<option value=\"\">আগে বিভাগ নির্বাচন করুন</option>";$("itemSelect").disabled=true;$("newName").value="";$("newName").disabled=true;["addBtn","renameBtn","deleteBtn"].forEach(id=>$(id).disabled=true);say("বিভাগ নির্বাচন করলে সংশ্লিষ্ট ড্রপডাউন স্বয়ংক্রিয়ভাবে চালু হবে।");return}$("level").disabled=false;$("itemSelect").disabled=false;$("newName").disabled=false;["addBtn","renameBtn","deleteBtn"].forEach(id=>$(id).disabled=false);const c=hierarchy();opts($("level"),c.labels.map((name,id)=>({id,name})), "স্তর নির্বাচন");const requestedLevel=Number(new URLSearchParams(location.search).get("level"));$("level").value=Number.isInteger(requestedLevel)&&requestedLevel>=0&&requestedLevel<c.labels.length?String(requestedLevel):"0";loadAll().catch(e=>say("তথ্য লোড হয়নি: "+e.message,true))}
+function buildLevels(){if(isStudyMode){$("section").value=studyDepartment==="job_care"?"job":"academic";$("section").closest(".field").classList.add("hidden");$("pageHeading").textContent="স্টাডি ম্যাটেরিয়ালস — "+(studyDepartment==="job_care"?"Job Care":"Academic Care");}const section=$("section").value; $("managementFields").classList.toggle("hidden",!section);if(!section||!cfg[section]){cache={};currentItems=[];$("level").innerHTML="<option value=\"\">আগে বিভাগ নির্বাচন করুন</option>";$("level").disabled=true;$("parentFields").innerHTML="";$("flow").textContent="";$("itemLabel").textContent="আইটেম নির্বাচন";$("itemSelect").innerHTML="<option value=\"\">আগে বিভাগ নির্বাচন করুন</option>";$("itemSelect").disabled=true;$("newName").value="";$("newName").disabled=true;["addBtn","renameBtn","deleteBtn"].forEach(id=>$(id).disabled=true);say("বিভাগ নির্বাচন করলে সংশ্লিষ্ট ড্রপডাউন স্বয়ংক্রিয়ভাবে চালু হবে।");return}$("level").disabled=false;$("itemSelect").disabled=false;$("newName").disabled=false;["addBtn","renameBtn","deleteBtn"].forEach(id=>$(id).disabled=false);const c=hierarchy();opts($("level"),c.labels.map((name,id)=>({id,name})), "স্তর নির্বাচন");const requestedLevel=Number(new URLSearchParams(location.search).get("level"));$("level").value=Number.isInteger(requestedLevel)&&requestedLevel>=0&&requestedLevel<c.labels.length?String(requestedLevel):"0";loadAll().catch(e=>say("তথ্য লোড হয়নি: "+e.message,true))}
 async function getCount(table,col,id){const {count,error}=await sb.from(table).select("id",{count:"exact",head:true}).eq(col,id);if(error)throw error;return count||0}
 async function hasChildrenOrQuestions(id){
  const section=$("section").value,l=level();
@@ -102,6 +107,7 @@ async function hasChildrenOrQuestions(id){
 }
 async function addItem(){
  const c=hierarchy(),l=level(),name=$("newName").value.trim();if(!name){say("আগে নাম লিখুন।",true);return}
+ if(isStudyMode){if(l>0&&!parentId()){say("আগে উপরের স্তর নির্বাচন করুন।",true);return}const {error}=await sb.from("study_material_taxonomy").insert({department:studyDepartment,node_type:c.types[l],parent_id:l===0?null:Number(parentId()),name,display_order:0,updated_at:new Date().toISOString()});if(error){say("যোগ হয়নি: "+error.message,true);return}$("newName").value="";await loadAll();say(c.labels[l]+" যোগ হয়েছে।");return;}
  if(l>0&&c.parents[l]&&!parentId()){say("আগে উপরের স্তর নির্বাচন করুন।",true);return}
  const row={[c.nameCols[l]]:name};if(l>0)row[c.parents[l]]=Number(parentId());
  if($("section").value==="job"&&l===1){const p=cache[0].find(x=>String(x.id)===String(parentId()));row.category_id=Number(parentId());row.sub_category=p?.name||""}
@@ -111,15 +117,15 @@ async function addItem(){
 }
 async function renameItem(){
  const c=hierarchy(),l=level(),id=$("itemSelect").value,name=$("newName").value.trim();if(!id||!name){say("নাম পরিবর্তনের জন্য আইটেম নির্বাচন করে নতুন নাম লিখুন।",true);return}
- const old=currentItems.find(x=>String(x.id)===String(id));const {error}=await sb.from(c.tables[l]).update({[c.nameCols[l]]:name}).eq("id",id);if(error){say("নাম পরিবর্তন হয়নি: "+error.message,true);return}
+ const old=currentItems.find(x=>String(x.id)===String(id));if(isStudyMode){const {error}=await sb.from("study_material_taxonomy").update({name,updated_at:new Date().toISOString()}).eq("id",id).eq("department",studyDepartment);if(error){say("নাম পরিবর্তন হয়নি: "+error.message,true);return}$("newName").value="";await loadAll();say("নাম পরিবর্তন হয়েছে।");return}const {error}=await sb.from(c.tables[l]).update({[c.nameCols[l]]:name}).eq("id",id);if(error){say("নাম পরিবর্তন হয়নি: "+error.message,true);return}
  if($("section").value==="job"&&l===0&&old?.name){const {error:e}=await sb.from("question_bank_folders").update({sub_category:name}).eq("category_id",id);if(e){say("ক্যাটাগরির নাম বদলেছে, কিন্তু পুরোনো নামের সহায়ক তথ্য আপডেট হয়নি: "+e.message,true);await loadAll();return}}
  $("newName").value="";await loadAll();say("নাম পরিবর্তন হয়েছে। আইডি ও সংশ্লিষ্ট রেকর্ড অক্ষত আছে।");
 }
 async function deleteItem(){
  const c=hierarchy(),l=level(),id=$("itemSelect").value;if(!id){say("আগে একটি আইটেম নির্বাচন করুন।",true);return}
- try{if(await hasChildrenOrQuestions(id)){say("এই আইটেমের অধীনে সেট/প্রশ্ন আছে। রেকর্ডের নিরাপত্তার জন্য এখন মুছতে দেওয়া হচ্ছে না। আগে সংশ্লিষ্ট আইটেমগুলো সরাতে হবে।",true);return}}catch(e){say("সম্পর্কিত রেকর্ড যাচাই হয়নি, তাই নিরাপত্তার জন্য মুছিনি: "+e.message,true);return}
+ try{if(isStudyMode){const child=(cache[level()+1]||[]).some(x=>String(x.parent_id)===String(id));if(child){say("এই আইটেমের অধীনে আরও আইটেম আছে, তাই মুছতে পারবেন না।",true);return}const {count,error}=await sb.from("study_materials").select("id",{count:"exact",head:true}).eq("taxonomy_id",id);if(error)throw error;if(count>0){say("এই আইটেমে স্টাডি ম্যাটেরিয়াল যুক্ত আছে, তাই মুছতে পারবেন না।",true);return}}else if(await hasChildrenOrQuestions(id)){say("এই আইটেমের অধীনে সেট/প্রশ্ন আছে। রেকর্ডের নিরাপত্তার জন্য এখন মুছতে দেওয়া হচ্ছে না। আগে সংশ্লিষ্ট আইটেমগুলো সরাতে হবে।",true);return}}catch(e){say("সম্পর্কিত রেকর্ড যাচাই হয়নি, তাই নিরাপত্তার জন্য মুছিনি: "+e.message,true);return}
  if(!confirm("নির্বাচিত "+c.labels[l]+" মুছবেন? এই কাজটি ফিরিয়ে আনা যাবে না।"))return;
- const {error}=await sb.from(c.tables[l]).delete().eq("id",id);if(error){say("মুছতে সমস্যা: "+error.message,true);return}await loadAll();say(c.labels[l]+" মুছে ফেলা হয়েছে। কোনো প্রশ্ন বা শিক্ষার্থী রেকর্ড মুছে ফেলা হয়নি।");
+ const {error}=isStudyMode?await sb.from("study_material_taxonomy").delete().eq("id",id).eq("department",studyDepartment):await sb.from(c.tables[l]).delete().eq("id",id);if(error){say("মুছতে সমস্যা: "+error.message,true);return}await loadAll();say(c.labels[l]+" মুছে ফেলা হয়েছে। কোনো প্রশ্ন বা শিক্ষার্থী রেকর্ড মুছে ফেলা হয়নি।");
 }
 $("section").onchange=buildLevels;$("level").onchange=()=>loadAll().catch(e=>say(e.message,true));$("addBtn").onclick=()=>addItem().catch(e=>say(e.message,true));$("renameBtn").onclick=()=>renameItem().catch(e=>say(e.message,true));$("deleteBtn").onclick=()=>deleteItem();$("refreshBtn").onclick=()=>loadAll().catch(e=>say(e.message,true));$("loginBtn").onclick=async()=>{const {error}=await sb.auth.signInWithPassword({email:$("email").value.trim(),password:$("password").value});if(error){$("loginMsg").textContent="লগইন হয়নি: "+error.message;return}await start()};
 async function start(){const {data:{session}}=await sb.auth.getSession();if(!session){$("login").classList.remove("hidden");$("app").classList.add("hidden");return}$("login").classList.add("hidden");$("app").classList.remove("hidden");buildLevels()}
