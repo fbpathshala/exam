@@ -757,8 +757,8 @@ table td{color:#243b53}
       return msg('folderMsg', 'আগে Folder নির্বাচন করুন', true);
     }
 
-    const old = document.getElementById('folder')
-      .selectedOptions[0]?.textContent || '';
+    const old = (document.getElementById('folder')
+      .selectedOptions[0]?.textContent || '').trim();
 
     const name = prompt('নতুন Folder-এর নাম লিখুন:', old);
     if(name === null) return;
@@ -769,23 +769,35 @@ table td{color:#243b53}
       return msg('folderMsg', 'Folder-এর নাম খালি রাখা যাবে না', true);
     }
 
-    if(value === old) return;
-
-    msg('folderMsg', 'Folder Rename হচ্ছে...');
-
-    const r = await db.from('question_bank_folders')
-      .update({folder_name:value})
-      .eq('id', Number(id));
-
-    if(r.error){
-      return msg('folderMsg', r.error.message, true);
+    if(value === old) {
+      return msg('folderMsg', 'নামে কোনো পরিবর্তন করা হয়নি।');
     }
 
-    await loadFolders();
-    document.getElementById('folder').value = String(id);
-    await loadSets();
+    msg('folderMsg', 'Folder-এর নাম পরিবর্তন হচ্ছে...');
 
-    msg('folderMsg', '✅ Folder-এর নাম পরিবর্তন হয়েছে');
+    try {
+      const r = await db.from('question_bank_folders')
+        .update({folder_name:value})
+        .eq('id', Number(id))
+        .select('id,folder_name')
+        .maybeSingle();
+
+      if(r.error){
+        return msg('folderMsg', 'নাম পরিবর্তন হয়নি: ' + r.error.message, true);
+      }
+      if(!r.data){
+        return msg('folderMsg', 'নাম পরিবর্তন হয়নি—এই Folder-এ আপডেটের অনুমতি বা রেকর্ড পাওয়া যায়নি। আবার লগইন করে চেষ্টা করুন।', true);
+      }
+
+      await loadFolders();
+      document.getElementById('folder').value = String(id);
+      await loadSets();
+      await loadFilterFolders();
+
+      msg('folderMsg', '✅ Folder-এর নাম পরিবর্তন হয়েছে: ' + r.data.folder_name);
+    } catch(e) {
+      msg('folderMsg', 'নাম পরিবর্তনের সময় সমস্যা: ' + (e?.message || e), true);
+    }
   }
 
   async function deleteSelectedFolder(){
@@ -840,8 +852,8 @@ table td{color:#243b53}
       return msg('folderMsg', 'আগে Set নির্বাচন করুন', true);
     }
 
-    const old = document.getElementById('set')
-      .selectedOptions[0]?.textContent || '';
+    const old = (document.getElementById('set')
+      .selectedOptions[0]?.textContent || '').trim();
 
     const name = prompt('নতুন Set-এর নাম লিখুন:', old);
     if(name === null) return;
@@ -852,22 +864,34 @@ table td{color:#243b53}
       return msg('folderMsg', 'Set-এর নাম খালি রাখা যাবে না', true);
     }
 
-    if(value === old) return;
-
-    msg('folderMsg', 'Set Rename হচ্ছে...');
-
-    const r = await db.from('question_bank_sets')
-      .update({set_name:value})
-      .eq('id', Number(id));
-
-    if(r.error){
-      return msg('folderMsg', r.error.message, true);
+    if(value === old) {
+      return msg('folderMsg', 'নামে কোনো পরিবর্তন করা হয়নি।');
     }
 
-    await loadSets();
-    document.getElementById('set').value = String(id);
+    msg('folderMsg', 'Set-এর নাম পরিবর্তন হচ্ছে...');
 
-    msg('folderMsg', '✅ Set-এর নাম পরিবর্তন হয়েছে');
+    try {
+      const r = await db.from('question_bank_sets')
+        .update({set_name:value})
+        .eq('id', Number(id))
+        .select('id,set_name')
+        .maybeSingle();
+
+      if(r.error){
+        return msg('folderMsg', 'নাম পরিবর্তন হয়নি: ' + r.error.message, true);
+      }
+      if(!r.data){
+        return msg('folderMsg', 'নাম পরিবর্তন হয়নি—এই Set-এ আপডেটের অনুমতি বা রেকর্ড পাওয়া যায়নি। আবার লগইন করে চেষ্টা করুন।', true);
+      }
+
+      await loadSets();
+      document.getElementById('set').value = String(id);
+      await loadFilterSets();
+
+      msg('folderMsg', '✅ Set-এর নাম পরিবর্তন হয়েছে: ' + r.data.set_name);
+    } catch(e) {
+      msg('folderMsg', 'নাম পরিবর্তনের সময় সমস্যা: ' + (e?.message || e), true);
+    }
   }
 
   async function deleteSelectedSet(){
