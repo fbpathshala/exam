@@ -29,7 +29,7 @@
   async function heartbeat() {
     try {
       const row = { visitor_id: visitorId, last_seen_at: new Date().toISOString(), page_path: location.pathname.slice(0, 300) };
-      const { error } = await db.from('site_live_visitors').upsert(row, { onConflict: 'visitor_id' });
+      const { error } = await db.rpc('record_live_visitor', { p_visitor_id: visitorId, p_page_path: row.page_path });
       if (error) console.warn('Live visitor heartbeat unavailable:', error.message);
     } catch (e) { console.warn('Live visitor heartbeat failed.'); }
   }
