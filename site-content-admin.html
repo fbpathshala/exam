@@ -29,7 +29,7 @@
 <button class="btn" type="submit">সংরক্ষণ করুন</button><button class="btn secondary" type="button" id="resetBtn">নতুন ফর্ম</button>
 </form><div id="formMessage" class="status hidden" role="status"></div>
 </section>
-<section class="card"><div class="top"><h2 style="margin-right:auto">সংরক্ষিত কনটেন্ট</h2><button class="btn secondary" id="refreshBtn" type="button">রিফ্রেশ</button></div><div id="listMessage" class="status">লোড হচ্ছে…</div><div id="items"></div></section>
+<section class="card"><div class="top"><h2 style="margin-right:auto">সংরক্ষিত কনটেন্ট</h2><button class="btn secondary" id="refreshBtn" type="button">রিফ্রেশ</button></div><div id="noticeFilters" class="grid hidden"><div><label for="noticeStatusFilter">অবস্থা</label><select id="noticeStatusFilter"><option value="all">সব অবস্থা</option><option value="published">প্রকাশিত</option><option value="draft">খসড়া</option></select></div><div><label for="noticeTimeFilter">সময় / মেয়াদ</label><select id="noticeTimeFilter"><option value="all">সব সময়</option><option value="active">এখন প্রকাশযোগ্য</option><option value="scheduled">ভবিষ্যতে প্রকাশ হবে</option><option value="expired">মেয়াদ শেষ</option><option value="no-expiry">মেয়াদ নির্ধারিত নেই</option></select></div><div style="grid-column:1/-1"><label for="noticeSearch">নোটিশ খুঁজুন</label><input id="noticeSearch" type="search" placeholder="শিরোনাম বা বিবরণ লিখুন"></div></div><div id="listMessage" class="status">লোড হচ্ছে…</div><div id="items"></div></section>
 </div>
 </main>
 <script>
@@ -41,21 +41,50 @@ let session=null;let sourceCache={links:[],materials:[]};
 function message(id,text){$(id).textContent=text;$(id).classList.remove("hidden")}
 function localTime(v){if(!v)return "";const d=new Date(v);return isNaN(d)? "":d.toISOString().slice(0,16)}
 function resetForm(){$("contentForm").reset();$("recordId").value="";$("order").value="0";$("formTitle").textContent="নতুন কনটেন্ট যোগ করুন";$("formMessage").classList.add("hidden");$("sourcePicker").value="";syncHighlightFields()}\nfunction syncHighlightFields(){$("highlightFields").classList.toggle("hidden",$("sectionFilter").value!=="breaking-news")}\nasync function loadSources(){const [links,materials]=await Promise.all([db.from("site_content").select("id,title,body,link_url").eq("section","important-links").eq("status","published").order("sort_order"),db.from("study_materials").select("id,title,description,department,material_type,folder_name").eq("published",true).order("created_at",{ascending:false})]);if(links.error||materials.error){return}sourceCache={links:links.data||[],materials:materials.data||[]};const select=$("sourcePicker"),keep=select.value;select.replaceChildren(new Option("লিংক ছাড়া নিজস্ব ঘোষণা / সরাসরি URL",""));for(const r of sourceCache.links){const o=new Option("৮ নম্বর • "+r.title,"site_content:"+r.id);select.add(o)}for(const r of sourceCache.materials){const dept=r.department==="academic_care"?"একাডেমিক কেয়ার":"জব কেয়ার";const o=new Option("স্টাডি ম্যাটেরিয়াল • "+dept+" • "+r.title,"study_materials:"+r.id);select.add(o)}if([...select.options].some(o=>o.value===keep))select.value=keep}\nfunction sourceChanged(){const value=$("sourcePicker").value;if(!value){$("displayLabel").value=$("displayLabel").value||"গুরুত্বপূর্ণ নোটিশ";return}const [type,id]=value.split(":");if(type==="site_content"){const r=sourceCache.links.find(x=>String(x.id)===id);if(r){if(!$("title").value.trim())$("title").value=r.title;$("link").value=r.link_url||""}}else if(type==="study_materials"){const r=sourceCache.materials.find(x=>String(x.id)===id);if(r){if(!$("title").value.trim())$("title").value=r.title;const dept=r.department==="academic_care"?"academic_care":"job_care";$("link").value=dept==="academic_care"?"https://fbpathshala.github.io/exam/academic-study-materials.html#material-"+r.id:"https://fbpathshala.github.io/exam/study-materials.html#material-"+r.id}}if(!$("displayLabel").value.trim())$("displayLabel").value="সর্বশেষ আপডেট"}
-async function loadItems(){
- const section=$("sectionFilter").value;$("listMessage").textContent="লোড হচ্ছে…";$("items").innerHTML="";
- const {data,error}=await db.from("site_content").select("*").eq("section",section).order("sort_order").order("created_at",{ascending:false});
- if(error){$("listMessage").textContent="লোড করা যায়নি: "+error.message;return}
- $("listMessage").textContent=data.length?("মোট "+data.length+"টি কনটেন্ট"):"এখনও কোনো কনটেন্ট নেই।";
- for(const row of data){
+let cachedItems=[];
+function noticeTimeState(row){
+ const now=Date.now(),start=row.publish_at?new Date(row.publish_at).getTime():null,end=row.expires_at?new Date(row.expires_at).getTime():null;
+ if(start!==null&&Number.isFinite(start)&&start>now)return "scheduled";
+ if(end!==null&&Number.isFinite(end)&&end<=now)return "expired";
+ if(end===null)return "no-expiry";
+ return "active";
+}
+function renderItems(){
+ const section=$("sectionFilter").value;
+ const isNotice=section==="breaking-news";
+ const statusFilter=isNotice?$("noticeStatusFilter").value:"all";
+ const timeFilter=isNotice?$("noticeTimeFilter").value:"all";
+ const query=isNotice?$("noticeSearch").value.trim().toLocaleLowerCase():"";
+ const rows=cachedItems.filter(row=>{
+  if(statusFilter!=="all"&&row.status!==statusFilter)return false;
+  if(timeFilter!=="all"&&noticeTimeState(row)!==timeFilter)return false;
+  if(query&&!((row.title||"").toLocaleLowerCase().includes(query)||(row.body||"").toLocaleLowerCase().includes(query)))return false;
+  return true;
+ });
+ $("listMessage").textContent=rows.length?("ফিল্টার অনুযায়ী "+rows.length+"টি কনটেন্ট দেখানো হচ্ছে (মোট "+cachedItems.length+"টি)"): "এই ফিল্টারে কোনো নোটিশ পাওয়া যায়নি।";
+ $("items").replaceChildren();
+ for(const row of rows){
   const el=document.createElement("article");el.className="item";
   const h=document.createElement("h3");h.textContent=row.title||"(শিরোনাম নেই)";el.append(h);
-  const meta=document.createElement("div");meta.className="meta";meta.textContent=(row.status==="published"?"প্রকাশিত":"খসড়া")+" • ক্রম "+row.sort_order;el.append(meta);
+  let statusText=row.status==="published"?"প্রকাশিত":"খসড়া";
+  if(isNotice){const states={active:"এখন প্রকাশযোগ্য",scheduled:"ভবিষ্যতে প্রকাশ হবে",expired:"মেয়াদ শেষ","no-expiry":"মেয়াদ নির্ধারিত নেই"};statusText+=" • "+(states[noticeTimeState(row)]||"সময় অনির্দিষ্ট");}
+  const meta=document.createElement("div");meta.className="meta";meta.textContent=statusText+" • ক্রম "+row.sort_order;el.append(meta);
+  if(row.publish_at){const p=document.createElement("p");p.className="meta";p.textContent="প্রকাশের সময়: "+new Date(row.publish_at).toLocaleString("bn-BD");el.append(p)}
+  if(row.expires_at){const p=document.createElement("p");p.className="meta";p.textContent="মেয়াদ শেষ: "+new Date(row.expires_at).toLocaleString("bn-BD");el.append(p)}
   if(row.body){const p=document.createElement("p");p.textContent=row.body;el.append(p)}
   if(row.link_url){const a=document.createElement("a");a.href=row.link_url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=row.link_url;el.append(a)}
   const edit=document.createElement("button");edit.className="btn secondary";edit.textContent="সম্পাদনা";edit.onclick=()=>editItem(row);el.append(edit);
   const del=document.createElement("button");del.className="btn danger";del.textContent="মুছুন";del.onclick=()=>deleteItem(row);el.append(del);
   $("items").append(el);
  }
+}
+async function loadItems(){
+ const section=$("sectionFilter").value;
+ $("noticeFilters").classList.toggle("hidden",section!=="breaking-news");
+ $("listMessage").textContent="লোড হচ্ছে…";$("items").innerHTML="";
+ const {data,error}=await db.from("site_content").select("*").eq("section",section).order("sort_order").order("created_at",{ascending:false});
+ if(error){cachedItems=[];$("listMessage").textContent="লোড করা যায়নি: "+error.message;return}
+ cachedItems=data||[];renderItems();
 }
 function editItem(r){$("recordId").value=r.id;$("title").value=r.title||"";$("body").value=r.body||"";$("link").value=r.link_url||"";$("status").value=r.status;$("order").value=r.sort_order??0;$("publishAt").value=localTime(r.publish_at);$("expiresAt").value=localTime(r.expires_at);$("displayLabel").value=r.display_label||"";$("sourcePicker").value=r.source_type&&r.source_id?r.source_type+":"+r.source_id:"";$("formTitle").textContent="কনটেন্ট সম্পাদনা";syncHighlightFields();window.scrollTo({top:0,behavior:"smooth"})}
 async function deleteItem(r){if(!confirm("এই কনটেন্ট মুছে ফেলবেন?"))return;const {error}=await db.from("site_content").delete().eq("id",r.id);if(error){alert("মুছতে সমস্যা: "+error.message);return}await loadItems();resetForm()}
@@ -66,7 +95,7 @@ $("contentForm").addEventListener("submit",async e=>{
  if(result.error){message("formMessage","সংরক্ষণ হয়নি: "+result.error.message);return}
  message("formMessage","সংরক্ষণ সফল হয়েছে।");resetForm();await loadItems();
 });
-$("sectionFilter").addEventListener("change",async()=>{resetForm();syncHighlightFields();if($("sectionFilter").value==="breaking-news")await loadSources();await loadItems()});$("sourcePicker").addEventListener("change",sourceChanged);$("resetBtn").addEventListener("click",resetForm);$("refreshBtn").addEventListener("click",loadItems);
+$("sectionFilter").addEventListener("change",async()=>{resetForm();syncHighlightFields();if($("sectionFilter").value==="breaking-news")await loadSources();await loadItems()});$("noticeStatusFilter").addEventListener("change",renderItems);$("noticeTimeFilter").addEventListener("change",renderItems);$("noticeSearch").addEventListener("input",renderItems);$("sourcePicker").addEventListener("change",sourceChanged);$("resetBtn").addEventListener("click",resetForm);$("refreshBtn").addEventListener("click",loadItems);
 async function init(){const {data,error}=await db.auth.getSession();session=data?.session||null;if(error||!session){$("authMessage").textContent="এই অংশ ব্যবহার করতে home.html থেকে অ্যাডমিন হিসেবে লগইন করুন।";return} $("loginCard").classList.add("hidden");$("app").classList.remove("hidden");await loadItems()}
 const requestedSection=new URLSearchParams(location.search).get('section');if(['important-links','breaking-news','social-links'].includes(requestedSection))$('sectionFilter').value=requestedSection;
 init();
