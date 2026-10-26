@@ -4,6 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>কেন্দ্রীয় সাইট কনটেন্ট ব্যবস্থাপনা</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js?v=20261026-central-session-fix1"></script>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f1f5f9;color:#102a43;font-family:system-ui,-apple-system,"Noto Sans Bengali",sans-serif}header{background:#102a43;color:white;padding:18px}header a{color:#c9f5f0}main{max-width:1000px;margin:20px auto;padding:0 14px}.card{background:white;border:1px solid #dbe5ef;border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 3px 12px #102a430a}h1{font-size:21px;margin:0 0 6px}h2{font-size:18px;margin:0 0 14px}label{display:block;font-weight:700;margin:12px 0 5px}input,textarea,select{width:100%;padding:11px;border:1px solid #bdcddd;border-radius:8px;font:inherit;background:white}textarea{min-height:100px;resize:vertical}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.btn{border:0;border-radius:8px;padding:11px 15px;font:inherit;font-weight:800;cursor:pointer;background:#0f766e;color:white;margin:8px 6px 0 0}.secondary{background:#e2e8f0;color:#102a43}.danger{background:#b91c1c}.item{border:1px solid #dbe5ef;border-radius:10px;padding:13px;margin-top:10px}.meta{color:#64748b;font-size:13px}.status{padding:10px;border-radius:8px;background:#eff6ff;margin:10px 0}.hidden{display:none!important}.item h3{margin:0 0 7px;font-size:17px;overflow-wrap:anywhere}.item p{white-space:pre-wrap;overflow-wrap:anywhere}.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.top select{max-width:330px}@media(max-width:650px){.grid{grid-template-columns:1fr}main{padding:0 10px}.card{padding:14px}}
 </style>
@@ -34,9 +35,7 @@
 </div>
 </main>
 <script>
-const SUPABASE_URL="https://ydvbnalhcnfqpxkkmywr.supabase.co";
-const SUPABASE_KEY="sb_publishable_xCbSWDkASsbUPl-WmygyMw_eVrJY_9a";
-const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const db=window.db;
 const $=id=>document.getElementById(id);
 let session=null;let sourceCache={links:[],materials:[]};
 function message(id,text){$(id).textContent=text;$(id).classList.remove("hidden")}
