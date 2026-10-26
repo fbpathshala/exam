@@ -151,14 +151,31 @@ function preparePreviousResultAccess(){
 }
 function restoreCachedReview(data,mobile){
   if(!data||!exam)return data;
+  const showPaper=settings.show_answer_paper!==false;
+  const showCorrect=settings.show_answers===true;
+  if(!showPaper){data.review=[];return data;}
   try{
     const raw=localStorage.getItem(resultCacheKey());
-    if(!raw)return data;
-    const cached=JSON.parse(raw);
-    if(String(cached?.exam?.id)!==String(exam.id))return data;
-    if(String(cached?.student?.mobile||"").replace(/\D/g,"")!==String(mobile||"").replace(/\D/g,""))return data;
-    if(Array.isArray(cached?.resultData?.review))data.review=cached.resultData.review;
+    if(raw){
+      const cached=JSON.parse(raw);
+      if(String(cached?.exam?.id)===String(exam.id)&&
+         String(cached?.student?.mobile||"").replace(/\D/g,"")===String(mobile||"").replace(/\D/g,"")&&
+         Array.isArray(cached?.resultData?.review)){
+        data.review=cached.resultData.review;
+      }
+    }
   }catch(_){}
+  // Local cached answers must never bypass the current exam's answer-visibility setting.
+  if(!showCorrect&&Array.isArray(data.review)){
+    data.review=data.review.map(item=>{
+      const clean={...item};
+      delete clean.correct_option;delete clean.explanation;delete clean.reference_answer;delete clean.is_correct;
+      if(Array.isArray(clean.options))clean.options=clean.options.map(option=>{
+        const safe={...option};delete safe.correct;return safe;
+      });
+      return clean;
+    });
+  }
   return data;
 }
 async function showPreviousResult(){
