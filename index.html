@@ -282,9 +282,14 @@ function showResult(){
   examPage.classList.add("hidden");
   resultPage.classList.remove("hidden");
   resultExamTitle.textContent=exam.exam_name||"পরীক্ষার ফলাফল";
-  resultMessage.textContent=String(settings.thank_you_message||"").trim()||"পরীক্ষায় অংশগ্রহণ করার জন্য আন্তরিক ধন্যবাদ। আপনার ফলাফল ও উত্তরপত্র নিচে দেওয়া হলো।";resultMessage.hidden=false;resultMessage.classList.remove("hidden");resultMessage.style.display="block";resultMessage.style.visibility="visible";
   const d=resultData||{};
   const show=settings.show_result!==false;
+  const showPaper=settings.show_answer_paper!==false;
+  const defaultThanks=show
+    ? (showPaper?"পরীক্ষায় অংশগ্রহণ করার জন্য আন্তরিক ধন্যবাদ। আপনার ফলাফল ও উত্তরপত্র নিচে দেওয়া হলো।":"পরীক্ষায় অংশগ্রহণ করার জন্য আন্তরিক ধন্যবাদ। আপনার ফলাফল নিচে দেওয়া হলো।")
+    : (showPaper?"পরীক্ষায় অংশগ্রহণ করার জন্য আন্তরিক ধন্যবাদ। আপনার উত্তরপত্র নিচে দেওয়া হলো।":"পরীক্ষায় অংশগ্রহণ করার জন্য আন্তরিক ধন্যবাদ।");
+  resultMessage.textContent=String(settings.thank_you_message||"").trim()||defaultThanks;
+  resultMessage.hidden=false;resultMessage.classList.remove("hidden");resultMessage.style.display="block";resultMessage.style.visibility="visible";
   score.classList.add("hidden");
   document.querySelector("#resultPage .result-grid").classList.toggle("hidden",!show);
   score.textContent=bn(d.score||0)+" / "+bn(d.total_marks||0);
