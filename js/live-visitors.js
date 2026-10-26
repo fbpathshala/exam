@@ -1,8 +1,21 @@
 /* Lightweight heartbeat tracker for active site visitors.
    Include after js/supabase.js. Active means seen within the last 2 minutes. */
 (function () {
-  const db = window.db;
-  if (!db || !db.from) return;
+  function getClient() {
+    if (window.db && window.db.from) return window.db;
+    if (!window.supabase || !window.supabase.createClient) return null;
+    const url = window.FBPATHSHALA_SUPABASE_URL || 'https://ydvbnalhcnfqpxkkmywr.supabase.co';
+    const key = window.FBPATHSHALA_SUPABASE_KEY || 'sb_publishable_xCbSWDkASsbUPl-WmygyMw_eVrJY_9a';
+    window.db = window.supabase.createClient(url, key, {
+      auth: { storageKey: 'sb-ydvbnalhcnfqpxkkmywr-auth-token', persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+    });
+    return window.db;
+  }
+  const db = getClient();
+  if (!db || !db.from) {
+    console.warn('Live visitor tracker: Supabase client unavailable.');
+    return;
+  }
   let visitorId = '';
   try {
     visitorId = localStorage.getItem('fbpathshala_live_visitor_id') || '';
