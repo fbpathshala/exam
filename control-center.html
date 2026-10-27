@@ -116,7 +116,7 @@ function cleanEmbeddedSection(){
       style.id="central-legacy-navigation-cleanup";
       style.textContent=`
         .dashboard-top,.admin-menu,.direct-dashboard-nav,.central-home-nav,.central-section-nav,
-        .taxonomy-manager-link{display:none!important}
+        .taxonomy-manager-link,.menu-toggle,#menuToggle,button[aria-controls="nav"]{display:none!important}
         .central-section-return{display:none!important}
       `;
       doc.head.appendChild(style);
