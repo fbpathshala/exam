@@ -23,9 +23,9 @@
 <h2 id="formTitle">নতুন কনটেন্ট যোগ করুন</h2>
 <form id="contentForm">
 <input id="recordId" type="hidden">
-<label for="title" id="titleLabel">লিংকের নাম</label><input id="title" required maxlength="220" placeholder="যেমন: গুরুত্বপূর্ণ পোস্ট">
-<div id="bodyField"><label for="body" id="bodyLabel">সংক্ষিপ্ত বিবরণ (ঐচ্ছিক)</label><textarea id="body" placeholder="লিংকটি কী কাজে লাগবে তা লিখুন"></textarea></div>
-<label for="link" id="linkLabel">গন্তব্য URL</label><input id="link" type="url" placeholder="https://example.com"><div id="highlightFields" class="hidden"><label for="displayLabel">লিংক থাকলে বোতামের লেখা (ঐচ্ছিক)</label><input id="displayLabel" maxlength="80" placeholder="যেমন: নোটিশ / জরুরি ঘোষণা"><label for="sourcePicker">গুরুত্বপূর্ণ পোস্ট বা প্রকাশিত স্টাডি ম্যাটেরিয়াল বেছে নিন</label><select id="sourcePicker"><option value="">লিংক ছাড়া নিজস্ব ঘোষণা / সরাসরি URL</option></select><p class="meta">উৎস নির্বাচন করলে মূল কনটেন্টের পৃষ্ঠা লিংক হিসেবে বসবে। শিরোনামটি হাইলাইটের জন্য আলাদা করে লিখতে পারবেন।</p></div>
+<label for="title" id="titleLabel">তথ্য / পোস্টের শিরোনাম</label><input id="title" required maxlength="220" placeholder="যেমন: ২০২৬ সালের নিয়োগ বিজ্ঞপ্তি">
+<div id="bodyField"><label for="body" id="bodyLabel">বিস্তারিত লেখা</label><textarea id="body" placeholder="এখানে তথ্যটি লিখুন। PDF/ছবি/বাইরের ওয়েবপেজের লিংক দিলে সেটিও অনলাইনে দেখার ব্যবস্থা থাকবে।"></textarea><p class="meta" id="bodyHelp">শুধু লেখা দিয়েও তথ্য প্রকাশ করা যাবে।</p></div>
+<label for="link" id="linkLabel">PDF / ছবির / বাইরের পেজের লিংক (ঐচ্ছিক)</label><input id="link" type="url" placeholder="https://..."><p class="meta" id="linkHelp">PDF দিলে ওয়েবসাইটে পড়ার ভিউয়ারে খুলবে; কোনো ডাউনলোড বাটন দেখানো হবে না।</p><div id="highlightFields" class="hidden"><label for="displayLabel">লিংক থাকলে বোতামের লেখা (ঐচ্ছিক)</label><input id="displayLabel" maxlength="80" placeholder="যেমন: নোটিশ / জরুরি ঘোষণা"><label for="sourcePicker">গুরুত্বপূর্ণ পোস্ট বা প্রকাশিত স্টাডি ম্যাটেরিয়াল বেছে নিন</label><select id="sourcePicker"><option value="">লিংক ছাড়া নিজস্ব ঘোষণা / সরাসরি URL</option></select><p class="meta">উৎস নির্বাচন করলে মূল কনটেন্টের পৃষ্ঠা লিংক হিসেবে বসবে। শিরোনামটি হাইলাইটের জন্য আলাদা করে লিখতে পারবেন।</p></div>
 <div class="grid"><div><label for="status">অবস্থা</label><select id="status"><option value="draft">খসড়া</option><option value="published">প্রকাশিত</option></select></div><div><label for="order">ক্রম</label><input id="order" type="number" value="0"></div></div>
 <div class="grid hidden" id="scheduleFields"><div><label for="publishAt">প্রকাশের সময় (ঐচ্ছিক)</label><input id="publishAt" type="datetime-local"></div><div><label for="expiresAt">মেয়াদ শেষ (ঐচ্ছিক)</label><input id="expiresAt" type="datetime-local"></div></div>
 <button class="btn" type="submit">সংরক্ষণ করুন</button><button class="btn secondary" type="button" id="resetBtn">নতুন ফর্ম</button>
@@ -45,7 +45,7 @@ function syncHighlightFields(){
  const section=$("sectionFilter").value;
  const isNotice=section==="breaking-news";
  const labels={
-  "important-links":["গুরুত্বপূর্ণ তথ্য ও পোস্ট লিংক","গুরুত্বপূর্ণ পোস্টের শিরোনাম, বিবরণ ও সরাসরি লিংক পরিচালনা করুন।"],
+  "important-links":["গুরুত্বপূর্ণ তথ্য ও পোস্ট লিংক","লিখিত তথ্য, PDF, ছবি এবং নির্দিষ্ট বাইরের পোস্ট/পেজ এক জায়গা থেকে প্রকাশ করুন।"],
   "breaking-news":["নোটিশ ব্যবস্থাপনা","স্ক্রলিং নোটিশের প্রকাশের সময়, মেয়াদ এবং প্রয়োজনে উৎস কনটেন্ট নির্ধারণ করুন।"],
   "social-links":["ফেইসবুক পাঠশালা লিংক","ফেইসবুক পেইজ ও গ্রুপের লিংক পরিচালনা করুন।"]
  };
@@ -54,12 +54,12 @@ function syncHighlightFields(){
  $("sectionHelp").textContent=item[1];
  const isSocial=section==="social-links";
  $("formTitle").textContent=isNotice?"নতুন নোটিশ তৈরি করুন":isSocial?"নতুন ফেইসবুক লিংক যোগ করুন":"নতুন গুরুত্বপূর্ণ লিংক যোগ করুন";
- $("titleLabel").textContent=isNotice?"নোটিশের শিরোনাম":isSocial?"পেইজ / গ্রুপের নাম":"লিংকের নাম";
- $("title").placeholder=isNotice?"যেমন: জরুরি ঘোষণা":isSocial?"যেমন: Facebook গ্রুপ":"যেমন: গুরুত্বপূর্ণ পোস্ট";
- $("bodyLabel").textContent=isNotice?"নোটিশের বিস্তারিত":"সংক্ষিপ্ত বিবরণ (ঐচ্ছিক)";
- $("body").placeholder=isNotice?"নোটিশের বিস্তারিত লিখুন":"এই লিংকটি কী কাজে লাগবে তা লিখুন (ঐচ্ছিক)";
- $("linkLabel").textContent=isNotice?"সম্পর্কিত লিংক (ঐচ্ছিক)":"গন্তব্য URL";
- $("link").placeholder="https://...";
+ $("titleLabel").textContent=isNotice?"নোটিশের শিরোনাম":isSocial?"পেইজ / গ্রুপের নাম":"তথ্য / পোস্টের শিরোনাম";
+ $("title").placeholder=isNotice?"যেমন: জরুরি ঘোষণা":isSocial?"যেমন: Facebook গ্রুপ":"যেমন: ২০২৬ সালের নিয়োগ বিজ্ঞপ্তি";
+ $("bodyLabel").textContent=isNotice?"নোটিশের বিস্তারিত":isSocial?"সংক্ষিপ্ত বিবরণ (ঐচ্ছিক)":"বিস্তারিত লেখা";
+ $("body").placeholder=isNotice?"নোটিশের বিস্তারিত লিখুন":isSocial?"এই লিংকটি কী কাজে লাগবে তা লিখুন (ঐচ্ছিক)":"এখানে পুরো তথ্য লিখুন; চাইলে PDF/ছবি/পোস্টের লিংকও যোগ করুন।";
+ $("linkLabel").textContent=isNotice?"সম্পর্কিত লিংক (ঐচ্ছিক)":isSocial?"গন্তব্য URL":"PDF / ছবির / বাইরের পেজের লিংক (ঐচ্ছিক)";
+ $("link").placeholder="https://...";$("linkHelp").textContent=isNotice?"সম্পর্কিত নোটিশ বা পোস্টের সরাসরি লিংক দিন (ঐচ্ছিক)":isSocial?"Facebook পেইজ বা গ্রুপের URL দিন":"PDF দিলে ওয়েবসাইটে পড়ার ভিউয়ারে খুলবে; ডাউনলোড বাটন দেখানো হবে না।";$("bodyHelp").textContent=isNotice?"নোটিশের মূল বক্তব্য লিখুন":isSocial?"লিংকের উদ্দেশ্য সংক্ষেপে লিখুন":"শুধু লেখা দিয়েও প্রকাশ করা যাবে; লিংক দিলে বিস্তারিত পেজে সেটি দেখানো হবে।";
  $("listHeading").textContent=isNotice?"নোটিশ তালিকা":isSocial?"ফেইসবুক লিংক তালিকা":"গুরুত্বপূর্ণ লিংক তালিকা";
  $("scheduleFields").classList.toggle("hidden",!isNotice);
  $("highlightFields").classList.toggle("hidden",!isNotice);
