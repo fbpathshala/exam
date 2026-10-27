@@ -10,8 +10,8 @@ header{position:sticky;top:0;z-index:20;background:#102a43;color:#fff;padding:14
 .brand{font-size:19px;font-weight:850}.sub{font-size:12px;color:#c7d9e8;margin-top:3px}
 .layout{display:block;min-height:calc(100vh - 65px)}
 aside{padding:0 18px;background:#fff;border-bottom:1px solid #dbe5ef;position:relative}
-.menu-toggle{display:inline-flex!important;align-items:center;justify-content:center;margin:10px 0;padding:10px 14px;border:1px solid #cbd5e1;border-radius:9px;background:#e8f1f8;color:#173f5f;font:750 14px system-ui;cursor:pointer}
-.nav{display:none!important;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:6px;padding:10px 0}.nav.open{display:grid!important}.nav[hidden]{display:none!important}.nav button{width:100%;border:0;border-radius:8px;background:transparent;color:#334e68;text-align:left;padding:12px;font:700 14px system-ui;cursor:pointer}
+.menu-toggle{display:none!important}
+.nav{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:6px;padding:10px 0}.nav.open{display:grid!important}.nav[hidden]{display:none!important}.nav button{width:100%;border:0;border-radius:8px;background:transparent;color:#334e68;text-align:left;padding:12px;font:700 14px system-ui;cursor:pointer}
 .nav button.active,.nav button:hover{background:#e5f3f5;color:#0f766e}
 main{padding:18px;min-width:0}.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}.management-options{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px;padding:10px;border:1px solid #c7d2fe;border-radius:13px;background:linear-gradient(120deg,#eff6ff 0%,#f5f3ff 48%,#ecfeff 100%);box-shadow:0 3px 10px #102a4308}.management-options[hidden]{display:none!important}.management-options button{flex:1 1 155px;min-height:44px;border:1px solid #102a43;border-radius:9px;background:#102a43;color:#fff;padding:10px 13px;font:700 14px system-ui;cursor:pointer;transition:background .15s,border-color .15s,transform .15s}.management-options button.active,.management-options button:hover{background:#244660;border-color:#0ea5e9;color:#fff;box-shadow:0 3px 9px #0f766e12}.management-options button:active{transform:translateY(1px)}
 .results-type-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:12px 0 16px}.results-type-options[hidden]{display:none!important}.results-type-card{min-height:112px;border:1px solid #94a3b8;border-radius:15px;background:linear-gradient(145deg,#fff,#eff6ff);color:#102a43;padding:18px;text-align:left;box-shadow:0 5px 16px #102a4310;cursor:pointer}.results-type-card strong{display:block;font-size:18px;margin-bottom:8px;color:#1d4ed8}.results-type-card span{font-size:13px;line-height:1.6;color:#475569}.results-type-card:hover{border-color:#2563eb;box-shadow:0 8px 20px #2563eb20;transform:translateY(-1px)}
@@ -50,7 +50,7 @@ iframe{display:block;width:100%;height:100%;border:0;background:#fff}
 <body>
 
 <div class="layout">
-<aside><button class="menu-toggle" id="menuToggle" type="button" aria-expanded="false" aria-controls="nav">☰ সব সেকশন দেখুন</button><nav class="nav" id="nav" aria-label="কেন্দ্রীয় সেকশন" hidden>
+<aside><button class="menu-toggle" id="menuToggle" type="button" aria-expanded="false" aria-controls="nav" hidden>☰ সব সেকশন</button><nav class="nav" id="nav" aria-label="কেন্দ্রীয় সেকশন">
 <button class="active" data-section="management">১. ব্যবস্থাপনা</button>
 <button data-section="question-create">২. প্রশ্ন তৈরি</button>
 <button data-section="question-bank">৩. প্রশ্ন ব্যাংক</button>
@@ -134,9 +134,9 @@ function cleanEmbeddedSection(){
   }catch(_){}
 }
 workspaceFrame.addEventListener("load",cleanEmbeddedSection);
-document.getElementById("nav").addEventListener("click",e=>{const b=e.target.closest("[data-section]");if(!b)return;active=b.dataset.section;selectedReviewType="ALL";document.getElementById("nav").classList.remove("open");document.getElementById("nav").hidden=true;document.getElementById("menuToggle").setAttribute("aria-expanded","false");render()});
+document.getElementById("nav").addEventListener("click",e=>{const b=e.target.closest("[data-section]");if(!b)return;active=b.dataset.section;selectedReviewType="ALL";document.getElementById("nav").classList.add("open");document.getElementById("nav").hidden=false;document.getElementById("menuToggle").setAttribute("aria-expanded","true");render()});
 document.getElementById("reviewTypeFilter").addEventListener("change",e=>{selectedReviewType=e.target.value||"ALL";render()});
-document.getElementById("menuToggle").addEventListener("click",()=>{const nav=document.getElementById("nav");const open=nav.hidden||!nav.classList.contains("open");nav.hidden=!open;nav.classList.toggle("open",open);document.getElementById("menuToggle").setAttribute("aria-expanded",String(open))});
+document.getElementById("menuToggle").addEventListener("click",()=>{const nav=document.getElementById("nav");nav.hidden=false;nav.classList.add("open");document.getElementById("menuToggle").setAttribute("aria-expanded","true")});
 document.getElementById("care").addEventListener("change",()=>{activeManagementLevel=0;selectedReviewType="ALL";render()});
 document.getElementById("managementAreaFilter").addEventListener("change",()=>{selectedManagementArea=document.getElementById("managementAreaFilter").value;document.getElementById("care").value="";activeManagementLevel=0;render()});
 document.getElementById("centralReturn").addEventListener("click",e=>{
