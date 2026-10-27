@@ -15,8 +15,8 @@
 <section class="card" id="loginCard"><h2>অ্যাডমিন যাচাই</h2><p id="authMessage">লগইন যাচাই হচ্ছে…</p><a href="home.html">কেন্দ্রীয় হোমপেজ</a></section>
 <div id="app" class="hidden">
 <section class="card">
-<div class="top"><h2 style="margin-right:auto">কনটেন্ট নির্বাচন</h2><select id="sectionFilter"><option value="important-links">গুরুত্বপূর্ণ তথ্য ও পোস্ট লিংক</option><option value="breaking-news">নোটিশ</option><option value="social-links">ফেইসবুক পাঠশালা লিংক</option></select></div>
-<p class="meta">প্রকাশিত কনটেন্ট পাবলিক সাইটে দেখানোর জন্য প্রস্তুত হবে। নোটিশের প্রকাশের সময় ও মেয়াদ নির্ধারণ করুন।</p>
+<div class="top"><h2 id="sectionHeading" style="margin-right:auto">কনটেন্ট নির্বাচন</h2><select id="sectionFilter"><option value="important-links">গুরুত্বপূর্ণ তথ্য ও পোস্ট লিংক</option><option value="breaking-news">নোটিশ</option><option value="social-links">ফেইসবুক পাঠশালা লিংক</option></select></div>
+<p class="meta" id="sectionHelp">প্রকাশিত কনটেন্ট পাবলিক সাইটে দেখানোর জন্য প্রস্তুত হবে।</p>
 <div id="tickerSetting" class="status hidden"><strong>হোমপেজের চলমান নোটিশ</strong><p class="meta">এটি বন্ধ করলে কোনো নোটিশ মুছে যাবে না; শুধু হোমপেজের চলমান বারটি লুকানো থাকবে।</p><label style="display:flex;align-items:center;gap:10px"><input id="tickerEnabled" type="checkbox" style="width:auto"> চলমান নোটিশ চালু রাখুন</label><div id="tickerSettingMessage" class="meta">সেটিং লোড হচ্ছে…</div></div>
 </section>
 <section class="card">
@@ -27,7 +27,7 @@
 <label for="body">বিবরণ / নোট</label><textarea id="body" placeholder="প্রয়োজনীয় তথ্য লিখুন"></textarea>
 <label for="link">লিংক URL (ঐচ্ছিক)</label><input id="link" type="url" placeholder="https://..."><div id="highlightFields" class="hidden"><label for="displayLabel">লিংক থাকলে বোতামের লেখা (ঐচ্ছিক)</label><input id="displayLabel" maxlength="80" placeholder="যেমন: নোটিশ / জরুরি ঘোষণা"><label for="sourcePicker">গুরুত্বপূর্ণ পোস্ট বা প্রকাশিত স্টাডি ম্যাটেরিয়াল বেছে নিন</label><select id="sourcePicker"><option value="">লিংক ছাড়া নিজস্ব ঘোষণা / সরাসরি URL</option></select><p class="meta">উৎস নির্বাচন করলে মূল কনটেন্টের পৃষ্ঠা লিংক হিসেবে বসবে। শিরোনামটি হাইলাইটের জন্য আলাদা করে লিখতে পারবেন।</p></div>
 <div class="grid"><div><label for="status">অবস্থা</label><select id="status"><option value="draft">খসড়া</option><option value="published">প্রকাশিত</option></select></div><div><label for="order">ক্রম</label><input id="order" type="number" value="0"></div></div>
-<div class="grid"><div><label for="publishAt">প্রকাশের সময় (ঐচ্ছিক)</label><input id="publishAt" type="datetime-local"></div><div><label for="expiresAt">মেয়াদ শেষ (ঐচ্ছিক)</label><input id="expiresAt" type="datetime-local"></div></div>
+<div class="grid hidden" id="scheduleFields"><div><label for="publishAt">প্রকাশের সময় (ঐচ্ছিক)</label><input id="publishAt" type="datetime-local"></div><div><label for="expiresAt">মেয়াদ শেষ (ঐচ্ছিক)</label><input id="expiresAt" type="datetime-local"></div></div>
 <button class="btn" type="submit">সংরক্ষণ করুন</button><button class="btn secondary" type="button" id="resetBtn">নতুন ফর্ম</button>
 </form><div id="formMessage" class="status hidden" role="status"></div>
 </section>
@@ -40,8 +40,24 @@ const $=id=>document.getElementById(id);
 let session=null;let sourceCache={links:[],materials:[]};
 function message(id,text){$(id).textContent=text;$(id).classList.remove("hidden")}
 function localTime(v){if(!v)return "";const d=new Date(v);return isNaN(d)? "":d.toISOString().slice(0,16)}
-function resetForm(){$("contentForm").reset();$("recordId").value="";$("order").value="0";$("formTitle").textContent="নতুন কনটেন্ট যোগ করুন";$("formMessage").classList.add("hidden");$("sourcePicker").value="";syncHighlightFields()}
-function syncHighlightFields(){$("highlightFields").classList.toggle("hidden",$("sectionFilter").value!=="breaking-news")}
+function resetForm(){$("contentForm").reset();$("recordId").value="";$("order").value="0";$("formMessage").classList.add("hidden");$("sourcePicker").value="";syncHighlightFields()}
+function syncHighlightFields(){
+ const section=$("sectionFilter").value;
+ const isNotice=section==="breaking-news";
+ const labels={
+  "important-links":["গুরুত্বপূর্ণ তথ্য ও পোস্ট লিংক","গুরুত্বপূর্ণ পোস্টের শিরোনাম, বিবরণ ও সরাসরি লিংক পরিচালনা করুন।"],
+  "breaking-news":["নোটিশ ব্যবস্থাপনা","স্ক্রলিং নোটিশের প্রকাশের সময়, মেয়াদ এবং প্রয়োজনে উৎস কনটেন্ট নির্ধারণ করুন।"],
+  "social-links":["ফেইসবুক পাঠশালা লিংক","ফেইসবুক পেইজ ও গ্রুপের লিংক পরিচালনা করুন।"]
+ };
+ const item=labels[section]||labels["important-links"];
+ $("sectionHeading").textContent=item[0];
+ $("sectionHelp").textContent=item[1];
+ $("formTitle").textContent=section==="breaking-news"?"নতুন নোটিশ যোগ করুন":section==="social-links"?"নতুন ফেইসবুক লিংক যোগ করুন":"নতুন গুরুত্বপূর্ণ তথ্য / পোস্ট লিংক যোগ করুন";
+ $("scheduleFields").classList.toggle("hidden",!isNotice);
+ $("highlightFields").classList.toggle("hidden",!isNotice);
+ $("tickerSetting").classList.toggle("hidden",!isNotice);
+ $("noticeFilters").classList.toggle("hidden",!isNotice);
+}
 async function loadSources(){const [links,materials]=await Promise.all([db.from("site_content").select("id,title,body,link_url").eq("section","important-links").eq("status","published").order("sort_order"),db.from("study_materials").select("id,title,description,department,material_type,folder_name").eq("published",true).order("created_at",{ascending:false})]);if(links.error||materials.error){return}sourceCache={links:links.data||[],materials:materials.data||[]};const select=$("sourcePicker"),keep=select.value;select.replaceChildren(new Option("লিংক ছাড়া নিজস্ব ঘোষণা / সরাসরি URL",""));for(const r of sourceCache.links){const o=new Option("৮ নম্বর • "+r.title,"site_content:"+r.id);select.add(o)}for(const r of sourceCache.materials){const dept=r.department==="academic_care"?"একাডেমিক কেয়ার":"জব কেয়ার";const o=new Option("স্টাডি ম্যাটেরিয়াল • "+dept+" • "+r.title,"study_materials:"+r.id);select.add(o)}if([...select.options].some(o=>o.value===keep))select.value=keep}
 function sourceChanged(){const value=$("sourcePicker").value;if(!value){$("displayLabel").value=$("displayLabel").value||"গুরুত্বপূর্ণ নোটিশ";return}const [type,id]=value.split(":");if(type==="site_content"){const r=sourceCache.links.find(x=>String(x.id)===id);if(r){if(!$("title").value.trim())$("title").value=r.title;$("link").value=r.link_url||""}}else if(type==="study_materials"){const r=sourceCache.materials.find(x=>String(x.id)===id);if(r){if(!$("title").value.trim())$("title").value=r.title;const dept=r.department==="academic_care"?"academic_care":"job_care";$("link").value=dept==="academic_care"?"https://fbpathshala.github.io/exam/academic-study-materials.html#material-"+r.id:"https://fbpathshala.github.io/exam/study-materials.html#material-"+r.id}}if(!$("displayLabel").value.trim())$("displayLabel").value="সর্বশেষ আপডেট"}
 let cachedItems=[];
@@ -83,7 +99,7 @@ function renderItems(){
 }
 async function loadItems(){
  const section=$("sectionFilter").value;
- $("noticeFilters").classList.toggle("hidden",section!=="breaking-news");
+ syncHighlightFields();
  $("listMessage").textContent="লোড হচ্ছে…";$("items").innerHTML="";
  const {data,error}=await db.from("site_content").select("*").eq("section",section).order("sort_order").order("created_at",{ascending:false});
  if(error){cachedItems=[];$("listMessage").textContent="লোড করা যায়নি: "+error.message;return}
@@ -99,7 +115,7 @@ $("contentForm").addEventListener("submit",async e=>{
  message("formMessage","সংরক্ষণ সফল হয়েছে।");resetForm();await loadItems();
 });
 $("sectionFilter").addEventListener("change",async()=>{resetForm();syncHighlightFields();await loadTickerSetting();if($("sectionFilter").value==="breaking-news")await loadSources();await loadItems()});$("noticeStatusFilter").addEventListener("change",renderItems);$("noticeTimeFilter").addEventListener("change",renderItems);$("noticeSearch").addEventListener("input",renderItems);$("sourcePicker").addEventListener("change",sourceChanged);$("resetBtn").addEventListener("click",resetForm);$("refreshBtn").addEventListener("click",loadItems);
-async function loadTickerSetting(){ $("tickerSetting").classList.toggle("hidden",$("sectionFilter").value!=="breaking-news");if($("sectionFilter").value!=="breaking-news")return;const {data,error}=await db.from("site_feature_settings").select("enabled").eq("feature_key","breaking_news_ticker").maybeSingle();if(error){$("tickerSettingMessage").textContent="সেটিং লোড হয়নি: "+error.message;return}$("tickerEnabled").checked=data?!!data.enabled:true;$("tickerSettingMessage").textContent=data?"বর্তমান সেটিং লোড হয়েছে।":"ডিফল্টভাবে চালু আছে।"}
+async function loadTickerSetting(){ syncHighlightFields();if($("sectionFilter").value!=="breaking-news")return;const {data,error}=await db.from("site_feature_settings").select("enabled").eq("feature_key","breaking_news_ticker").maybeSingle();if(error){$("tickerSettingMessage").textContent="সেটিং লোড হয়নি: "+error.message;return}$("tickerEnabled").checked=data?!!data.enabled:true;$("tickerSettingMessage").textContent=data?"বর্তমান সেটিং লোড হয়েছে।":"ডিফল্টভাবে চালু আছে।"}
 $("tickerEnabled").addEventListener("change",async()=>{const enabled=$("tickerEnabled").checked;$("tickerEnabled").disabled=true;$("tickerSettingMessage").textContent="সংরক্ষণ হচ্ছে…";const {error}=await db.from("site_feature_settings").upsert({feature_key:"breaking_news_ticker",enabled,updated_at:new Date().toISOString()},{onConflict:"feature_key"});$("tickerEnabled").disabled=false;if(error){$("tickerEnabled").checked=!enabled;$("tickerSettingMessage").textContent="সংরক্ষণ হয়নি: "+error.message;return}$("tickerSettingMessage").textContent=enabled?"চলমান নোটিশ চালু করা হয়েছে।":"চলমান নোটিশ বন্ধ করা হয়েছে।"});
 async function init(){try{if(!db||!db.auth){$("authMessage").textContent="লগইন সেবা লোড হয়নি। পেজ রিফ্রেশ করে আবার চেষ্টা করুন।";return}const result=await Promise.race([db.auth.getSession(),new Promise((_,reject)=>setTimeout(()=>reject(new Error("session-timeout")),12000))]);const {data,error}=result;session=data?.session||null;if(error){$("authMessage").textContent="সেশন যাচাই করা যায়নি: "+error.message;return}if(!session){$("authMessage").textContent="এই অংশ ব্যবহার করতে home.html থেকে অ্যাডমিন হিসেবে লগইন করুন।";return}$("loginCard").classList.add("hidden");$("app").classList.remove("hidden");await loadTickerSetting();await loadItems()}catch(error){$("authMessage").textContent=error?.message==="session-timeout"?"লগইন যাচাইয়ে সময় বেশি লাগছে। পেজ রিফ্রেশ করুন; সমস্যা থাকলে আবার লগইন করুন।":"লগইন যাচাই করা যায়নি। পেজ রিফ্রেশ করে আবার চেষ্টা করুন।";console.error("Central content admin session check failed:",error)}}
 const requestedSection=new URLSearchParams(location.search).get('section');if(['important-links','breaking-news','social-links'].includes(requestedSection))$('sectionFilter').value=requestedSection;
