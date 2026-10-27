@@ -86,6 +86,7 @@ materials:{title:"স্টাডি ম্যাটেরিয়ালস",note:
 };
 let active="management";
 let activeManagementLevel=0;
+let selectedManagementArea="";
 let selectedReviewType="ALL";
 const managementLevels={job:[{level:0,label:"ক্যাটাগরি ব্যবস্থাপনা"},{level:1,label:"সাব ক্যাটাগরি ব্যবস্থাপনা"},{level:2,label:"সেট ব্যবস্থাপনা"},{level:3,label:"বিষয় ব্যবস্থাপনা",view:"subjects"},{level:4,label:"স্টাডি ম্যাটেরিয়াল কাঠামো",url:"study-material-taxonomy.html?department=job_care"}],academic:[{level:0,label:"শ্রেণি ব্যবস্থাপনা"},{level:1,label:"বিষয় ব্যবস্থাপনা"},{level:2,label:"অধ্যায় ব্যবস্থাপনা"},{level:3,label:"সেট ব্যবস্থাপনা"},{level:4,label:"স্টাডি ম্যাটেরিয়াল কাঠামো",url:"study-material-taxonomy.html?department=academic_care"}]};
 function freshSectionUrl(url){const u=new URL(url,location.href);u.searchParams.set("uiVersion","20261027-central-auth-debug1");u.searchParams.set("sectionLoad",String(Date.now()));return u.href}
