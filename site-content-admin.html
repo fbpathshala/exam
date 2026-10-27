@@ -80,7 +80,7 @@ function renderItems(){
   if(query&&!((row.title||"").toLocaleLowerCase().includes(query)||(row.body||"").toLocaleLowerCase().includes(query)))return false;
   return true;
  });
- $("listMessage").textContent=rows.length?("ফিল্টার অনুযায়ী "+rows.length+"টি কনটেন্ট দেখানো হচ্ছে (মোট "+cachedItems.length+"টি)"): "এই ফিল্টারে কোনো নোটিশ পাওয়া যায়নি।";
+ $("listMessage").textContent=rows.length?("ফিল্টার অনুযায়ী "+rows.length+"টি কনটেন্ট দেখানো হচ্ছে (মোট "+cachedItems.length+"টি)"):isNotice?"এই ফিল্টারে কোনো নোটিশ পাওয়া যায়নি।":"এই বিভাগে এখনো কোনো কনটেন্ট যোগ করা হয়নি।";
  $("items").replaceChildren();
  for(const row of rows){
   const el=document.createElement("article");el.className="item";
