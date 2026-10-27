@@ -60,7 +60,7 @@ function syncHighlightFields(){
  $("body").placeholder=isNotice?"নোটিশের বিস্তারিত লিখুন":isSocial?"এই লিংকটি কী কাজে লাগবে তা লিখুন (ঐচ্ছিক)":"এখানে পুরো তথ্য লিখুন; চাইলে PDF/ছবি/পোস্টের লিংকও যোগ করুন।";
  $("linkLabel").textContent=isNotice?"সম্পর্কিত লিংক (ঐচ্ছিক)":isSocial?"গন্তব্য URL":"PDF / ছবির / বাইরের পেজের লিংক (ঐচ্ছিক)";
  $("link").placeholder="https://...";$("linkHelp").textContent=isNotice?"সম্পর্কিত নোটিশ বা পোস্টের সরাসরি লিংক দিন (ঐচ্ছিক)":isSocial?"Facebook পেইজ বা গ্রুপের URL দিন":"PDF দিলে ওয়েবসাইটে পড়ার ভিউয়ারে খুলবে; ডাউনলোড বাটন দেখানো হবে না।";$("bodyHelp").textContent=isNotice?"নোটিশের মূল বক্তব্য লিখুন":isSocial?"লিংকের উদ্দেশ্য সংক্ষেপে লিখুন":"শুধু লেখা দিয়েও প্রকাশ করা যাবে; লিংক দিলে বিস্তারিত পেজে সেটি দেখানো হবে।";
- $("listHeading").textContent=isNotice?"নোটিশ তালিকা":isSocial?"ফেইসবুক লিংক তালিকা":"গুরুত্বপূর্ণ লিংক তালিকা";
+ $("listHeading").textContent=isNotice?"নোটিশ তালিকা":isSocial?"ফেইসবুক লিংক তালিকা":"গুরুত্বপূর্ণ তথ্যের তালিকা";$("linkStatusFilter").previousElementSibling.textContent=isSocial?"লিংকের অবস্থা":"তথ্যের অবস্থা";$("linkSearch").previousElementSibling.textContent=isSocial?"লিংক খুঁজুন":"তথ্য খুঁজুন";$("linkSearch").placeholder=isSocial?"নাম বা URL লিখুন":"শিরোনাম, লেখা বা URL লিখুন";
  $("scheduleFields").classList.toggle("hidden",!isNotice);
  $("highlightFields").classList.toggle("hidden",!isNotice);
  $("tickerSetting").classList.toggle("hidden",!isNotice);
@@ -100,7 +100,7 @@ function renderItems(){
   if(row.publish_at){const p=document.createElement("p");p.className="meta";p.textContent="প্রকাশের সময়: "+new Date(row.publish_at).toLocaleString("bn-BD");el.append(p)}
   if(row.expires_at){const p=document.createElement("p");p.className="meta";p.textContent="মেয়াদ শেষ: "+new Date(row.expires_at).toLocaleString("bn-BD");el.append(p)}
   if(row.body){const p=document.createElement("p");p.textContent=row.body;el.append(p)}
-  if(row.link_url){const a=document.createElement("a");a.href=row.link_url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=isNotice?(row.display_label||"নোটিশের লিংক খুলুন"):"লিংক খুলুন ↗";a.className="btn secondary";a.style.display="inline-block";a.style.textDecoration="none";el.append(a);const url=document.createElement("div");url.className="meta";url.style.overflowWrap="anywhere";url.textContent=row.link_url;el.append(url)}
+  if(row.link_url){const a=document.createElement("a");a.href=section==="important-links"?"https://fbpathshala.github.io/important-info.html?id="+encodeURIComponent(row.id):row.link_url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=isNotice?(row.display_label||"নোটিশের লিংক খুলুন"):section==="important-links"?"অনলাইনে দেখুন ↗":"লিংক খুলুন ↗";a.className="btn secondary";a.style.display="inline-block";a.style.textDecoration="none";el.append(a);if(section!=="important-links"){const url=document.createElement("div");url.className="meta";url.style.overflowWrap="anywhere";url.textContent=row.link_url;el.append(url)}}
   const edit=document.createElement("button");edit.className="btn secondary";edit.textContent="সম্পাদনা";edit.onclick=()=>editItem(row);el.append(edit);
   const del=document.createElement("button");del.className="btn danger";del.textContent="মুছুন";del.onclick=()=>deleteItem(row);el.append(del);
   $("items").append(el);
