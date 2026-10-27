@@ -23,15 +23,15 @@
 <h2 id="formTitle">নতুন কনটেন্ট যোগ করুন</h2>
 <form id="contentForm">
 <input id="recordId" type="hidden">
-<label for="title">শিরোনাম / লিংকের নাম</label><input id="title" required maxlength="220" placeholder="যেমন: গুরুত্বপূর্ণ পোস্ট">
-<label for="body">বিবরণ / নোট</label><textarea id="body" placeholder="প্রয়োজনীয় তথ্য লিখুন"></textarea>
-<label for="link">লিংক URL (ঐচ্ছিক)</label><input id="link" type="url" placeholder="https://..."><div id="highlightFields" class="hidden"><label for="displayLabel">লিংক থাকলে বোতামের লেখা (ঐচ্ছিক)</label><input id="displayLabel" maxlength="80" placeholder="যেমন: নোটিশ / জরুরি ঘোষণা"><label for="sourcePicker">গুরুত্বপূর্ণ পোস্ট বা প্রকাশিত স্টাডি ম্যাটেরিয়াল বেছে নিন</label><select id="sourcePicker"><option value="">লিংক ছাড়া নিজস্ব ঘোষণা / সরাসরি URL</option></select><p class="meta">উৎস নির্বাচন করলে মূল কনটেন্টের পৃষ্ঠা লিংক হিসেবে বসবে। শিরোনামটি হাইলাইটের জন্য আলাদা করে লিখতে পারবেন।</p></div>
+<label for="title" id="titleLabel">লিংকের নাম</label><input id="title" required maxlength="220" placeholder="যেমন: গুরুত্বপূর্ণ পোস্ট">
+<div id="bodyField"><label for="body" id="bodyLabel">সংক্ষিপ্ত বিবরণ (ঐচ্ছিক)</label><textarea id="body" placeholder="লিংকটি কী কাজে লাগবে তা লিখুন"></textarea></div>
+<label for="link" id="linkLabel">গন্তব্য URL</label><input id="link" type="url" placeholder="https://example.com"><div id="highlightFields" class="hidden"><label for="displayLabel">লিংক থাকলে বোতামের লেখা (ঐচ্ছিক)</label><input id="displayLabel" maxlength="80" placeholder="যেমন: নোটিশ / জরুরি ঘোষণা"><label for="sourcePicker">গুরুত্বপূর্ণ পোস্ট বা প্রকাশিত স্টাডি ম্যাটেরিয়াল বেছে নিন</label><select id="sourcePicker"><option value="">লিংক ছাড়া নিজস্ব ঘোষণা / সরাসরি URL</option></select><p class="meta">উৎস নির্বাচন করলে মূল কনটেন্টের পৃষ্ঠা লিংক হিসেবে বসবে। শিরোনামটি হাইলাইটের জন্য আলাদা করে লিখতে পারবেন।</p></div>
 <div class="grid"><div><label for="status">অবস্থা</label><select id="status"><option value="draft">খসড়া</option><option value="published">প্রকাশিত</option></select></div><div><label for="order">ক্রম</label><input id="order" type="number" value="0"></div></div>
 <div class="grid hidden" id="scheduleFields"><div><label for="publishAt">প্রকাশের সময় (ঐচ্ছিক)</label><input id="publishAt" type="datetime-local"></div><div><label for="expiresAt">মেয়াদ শেষ (ঐচ্ছিক)</label><input id="expiresAt" type="datetime-local"></div></div>
 <button class="btn" type="submit">সংরক্ষণ করুন</button><button class="btn secondary" type="button" id="resetBtn">নতুন ফর্ম</button>
 </form><div id="formMessage" class="status hidden" role="status"></div>
 </section>
-<section class="card"><div class="top"><h2 style="margin-right:auto">সংরক্ষিত কনটেন্ট</h2><button class="btn secondary" id="refreshBtn" type="button">রিফ্রেশ</button></div><div id="noticeFilters" class="grid hidden"><div><label for="noticeStatusFilter">অবস্থা</label><select id="noticeStatusFilter"><option value="all">সব অবস্থা</option><option value="published">প্রকাশিত</option><option value="draft">খসড়া</option></select></div><div><label for="noticeTimeFilter">সময় / মেয়াদ</label><select id="noticeTimeFilter"><option value="all">সব সময়</option><option value="active">এখন প্রকাশযোগ্য</option><option value="scheduled">ভবিষ্যতে প্রকাশ হবে</option><option value="expired">মেয়াদ শেষ</option><option value="no-expiry">মেয়াদ নির্ধারিত নেই</option></select></div><div style="grid-column:1/-1"><label for="noticeSearch">নোটিশ খুঁজুন</label><input id="noticeSearch" type="search" placeholder="শিরোনাম বা বিবরণ লিখুন"></div></div><div id="listMessage" class="status">লোড হচ্ছে…</div><div id="items"></div></section>
+<section class="card"><div class="top"><h2 id="listHeading" style="margin-right:auto">সংরক্ষিত লিংক</h2><button class="btn secondary" id="refreshBtn" type="button">রিফ্রেশ</button></div><div id="linkFilters" class="grid"><div><label for="linkStatusFilter">লিংকের অবস্থা</label><select id="linkStatusFilter"><option value="all">সব লিংক</option><option value="published">প্রকাশিত লিংক</option><option value="draft">খসড়া লিংক</option></select></div><div><label for="linkSearch">লিংক খুঁজুন</label><input id="linkSearch" type="search" placeholder="নাম বা URL লিখুন"></div></div><div id="noticeFilters" class="grid hidden"><div><label for="noticeStatusFilter">অবস্থা</label><select id="noticeStatusFilter"><option value="all">সব অবস্থা</option><option value="published">প্রকাশিত</option><option value="draft">খসড়া</option></select></div><div><label for="noticeTimeFilter">সময় / মেয়াদ</label><select id="noticeTimeFilter"><option value="all">সব সময়</option><option value="active">এখন প্রকাশযোগ্য</option><option value="scheduled">ভবিষ্যতে প্রকাশ হবে</option><option value="expired">মেয়াদ শেষ</option><option value="no-expiry">মেয়াদ নির্ধারিত নেই</option></select></div><div style="grid-column:1/-1"><label for="noticeSearch">নোটিশ খুঁজুন</label><input id="noticeSearch" type="search" placeholder="শিরোনাম বা বিবরণ লিখুন"></div></div><div id="listMessage" class="status">লোড হচ্ছে…</div><div id="items"></div></section>
 </div>
 </main>
 <script>
@@ -52,11 +52,20 @@ function syncHighlightFields(){
  const item=labels[section]||labels["important-links"];
  $("sectionHeading").textContent=item[0];
  $("sectionHelp").textContent=item[1];
- $("formTitle").textContent=section==="breaking-news"?"নতুন নোটিশ যোগ করুন":section==="social-links"?"নতুন ফেইসবুক লিংক যোগ করুন":"নতুন গুরুত্বপূর্ণ তথ্য / পোস্ট লিংক যোগ করুন";
+ const isSocial=section==="social-links";
+ $("formTitle").textContent=isNotice?"নতুন নোটিশ তৈরি করুন":isSocial?"নতুন ফেইসবুক লিংক যোগ করুন":"নতুন গুরুত্বপূর্ণ লিংক যোগ করুন";
+ $("titleLabel").textContent=isNotice?"নোটিশের শিরোনাম":isSocial?"পেইজ / গ্রুপের নাম":"লিংকের নাম";
+ $("title").placeholder=isNotice?"যেমন: জরুরি ঘোষণা":isSocial?"যেমন: Facebook গ্রুপ":"যেমন: গুরুত্বপূর্ণ পোস্ট";
+ $("bodyLabel").textContent=isNotice?"নোটিশের বিস্তারিত":"সংক্ষিপ্ত বিবরণ (ঐচ্ছিক)";
+ $("body").placeholder=isNotice?"নোটিশের বিস্তারিত লিখুন":"এই লিংকটি কী কাজে লাগবে তা লিখুন (ঐচ্ছিক)";
+ $("linkLabel").textContent=isNotice?"সম্পর্কিত লিংক (ঐচ্ছিক)":"গন্তব্য URL";
+ $("link").placeholder="https://...";
+ $("listHeading").textContent=isNotice?"নোটিশ তালিকা":isSocial?"ফেইসবুক লিংক তালিকা":"গুরুত্বপূর্ণ লিংক তালিকা";
  $("scheduleFields").classList.toggle("hidden",!isNotice);
  $("highlightFields").classList.toggle("hidden",!isNotice);
  $("tickerSetting").classList.toggle("hidden",!isNotice);
  $("noticeFilters").classList.toggle("hidden",!isNotice);
+ $("linkFilters").classList.toggle("hidden",isNotice);
 }
 async function loadSources(){const [links,materials]=await Promise.all([db.from("site_content").select("id,title,body,link_url").eq("section","important-links").eq("status","published").order("sort_order"),db.from("study_materials").select("id,title,description,department,material_type,folder_name").eq("published",true).order("created_at",{ascending:false})]);if(links.error||materials.error){return}sourceCache={links:links.data||[],materials:materials.data||[]};const select=$("sourcePicker"),keep=select.value;select.replaceChildren(new Option("লিংক ছাড়া নিজস্ব ঘোষণা / সরাসরি URL",""));for(const r of sourceCache.links){const o=new Option("৮ নম্বর • "+r.title,"site_content:"+r.id);select.add(o)}for(const r of sourceCache.materials){const dept=r.department==="academic_care"?"একাডেমিক কেয়ার":"জব কেয়ার";const o=new Option("স্টাডি ম্যাটেরিয়াল • "+dept+" • "+r.title,"study_materials:"+r.id);select.add(o)}if([...select.options].some(o=>o.value===keep))select.value=keep}
 function sourceChanged(){const value=$("sourcePicker").value;if(!value){$("displayLabel").value=$("displayLabel").value||"গুরুত্বপূর্ণ নোটিশ";return}const [type,id]=value.split(":");if(type==="site_content"){const r=sourceCache.links.find(x=>String(x.id)===id);if(r){if(!$("title").value.trim())$("title").value=r.title;$("link").value=r.link_url||""}}else if(type==="study_materials"){const r=sourceCache.materials.find(x=>String(x.id)===id);if(r){if(!$("title").value.trim())$("title").value=r.title;const dept=r.department==="academic_care"?"academic_care":"job_care";$("link").value=dept==="academic_care"?"https://fbpathshala.github.io/exam/academic-study-materials.html#material-"+r.id:"https://fbpathshala.github.io/exam/study-materials.html#material-"+r.id}}if(!$("displayLabel").value.trim())$("displayLabel").value="সর্বশেষ আপডেট"}
@@ -71,13 +80,13 @@ function noticeTimeState(row){
 function renderItems(){
  const section=$("sectionFilter").value;
  const isNotice=section==="breaking-news";
- const statusFilter=isNotice?$("noticeStatusFilter").value:"all";
+ const statusFilter=isNotice?$("noticeStatusFilter").value:$("linkStatusFilter").value;
  const timeFilter=isNotice?$("noticeTimeFilter").value:"all";
- const query=isNotice?$("noticeSearch").value.trim().toLocaleLowerCase():"";
+ const query=(isNotice?$("noticeSearch").value:$("linkSearch").value).trim().toLocaleLowerCase();
  const rows=cachedItems.filter(row=>{
   if(statusFilter!=="all"&&row.status!==statusFilter)return false;
   if(timeFilter!=="all"&&noticeTimeState(row)!==timeFilter)return false;
-  if(query&&!((row.title||"").toLocaleLowerCase().includes(query)||(row.body||"").toLocaleLowerCase().includes(query)))return false;
+  if(query&&!((row.title||"").toLocaleLowerCase().includes(query)||(row.body||"").toLocaleLowerCase().includes(query)||(row.link_url||"").toLocaleLowerCase().includes(query)))return false;
   return true;
  });
  $("listMessage").textContent=rows.length?("ফিল্টার অনুযায়ী "+rows.length+"টি কনটেন্ট দেখানো হচ্ছে (মোট "+cachedItems.length+"টি)"):isNotice?"এই ফিল্টারে কোনো নোটিশ পাওয়া যায়নি।":"এই বিভাগে এখনো কোনো কনটেন্ট যোগ করা হয়নি।";
@@ -91,7 +100,7 @@ function renderItems(){
   if(row.publish_at){const p=document.createElement("p");p.className="meta";p.textContent="প্রকাশের সময়: "+new Date(row.publish_at).toLocaleString("bn-BD");el.append(p)}
   if(row.expires_at){const p=document.createElement("p");p.className="meta";p.textContent="মেয়াদ শেষ: "+new Date(row.expires_at).toLocaleString("bn-BD");el.append(p)}
   if(row.body){const p=document.createElement("p");p.textContent=row.body;el.append(p)}
-  if(row.link_url){const a=document.createElement("a");a.href=row.link_url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=row.link_url;el.append(a)}
+  if(row.link_url){const a=document.createElement("a");a.href=row.link_url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=isNotice?(row.display_label||"নোটিশের লিংক খুলুন"):"লিংক খুলুন ↗";a.className="btn secondary";a.style.display="inline-block";a.style.textDecoration="none";el.append(a);const url=document.createElement("div");url.className="meta";url.style.overflowWrap="anywhere";url.textContent=row.link_url;el.append(url)}
   const edit=document.createElement("button");edit.className="btn secondary";edit.textContent="সম্পাদনা";edit.onclick=()=>editItem(row);el.append(edit);
   const del=document.createElement("button");del.className="btn danger";del.textContent="মুছুন";del.onclick=()=>deleteItem(row);el.append(del);
   $("items").append(el);
@@ -109,12 +118,12 @@ function editItem(r){$("recordId").value=r.id;$("title").value=r.title||"";$("bo
 async function deleteItem(r){if(!confirm("এই কনটেন্ট মুছে ফেলবেন?"))return;const {error}=await db.from("site_content").delete().eq("id",r.id);if(error){alert("মুছতে সমস্যা: "+error.message);return}await loadItems();resetForm()}
 $("contentForm").addEventListener("submit",async e=>{
  e.preventDefault();if(!session){message("formMessage","সেশন পাওয়া যায়নি। আবার লগইন করুন।");return}
- const selectedSource=$("sectionFilter").value==="breaking-news"?$("sourcePicker").value:"";const [sourceType,sourceId]=selectedSource?selectedSource.split(":"):["none",null];const payload={section:$("sectionFilter").value,title:$("title").value.trim(),body:$("body").value.trim(),link_url:$("link").value.trim()||null,status:$("status").value,sort_order:Number($("order").value)||0,publish_at:$("publishAt").value?new Date($("publishAt").value).toISOString():null,expires_at:$("expiresAt").value?new Date($("expiresAt").value).toISOString():null,display_label:$("sectionFilter").value==="breaking-news"?$("displayLabel").value.trim():"",source_type:sourceType,source_id:sourceId,updated_at:new Date().toISOString()};
+ const isNotice=$("sectionFilter").value==="breaking-news";const selectedSource=isNotice?$("sourcePicker").value:"";const [sourceType,sourceId]=selectedSource?selectedSource.split(":"):["none",null];const payload={section:$("sectionFilter").value,title:$("title").value.trim(),body:$("body").value.trim(),link_url:$("link").value.trim()||null,status:$("status").value,sort_order:Number($("order").value)||0,publish_at:isNotice&&$("publishAt").value?new Date($("publishAt").value).toISOString():null,expires_at:isNotice&&$("expiresAt").value?new Date($("expiresAt").value).toISOString():null,display_label:isNotice?$("displayLabel").value.trim():"",source_type:sourceType,source_id:sourceId,updated_at:new Date().toISOString()};
  const id=$("recordId").value;const result=id?await db.from("site_content").update(payload).eq("id",id):await db.from("site_content").insert(payload);
  if(result.error){message("formMessage","সংরক্ষণ হয়নি: "+result.error.message);return}
  message("formMessage","সংরক্ষণ সফল হয়েছে।");resetForm();await loadItems();
 });
-$("sectionFilter").addEventListener("change",async()=>{resetForm();syncHighlightFields();await loadTickerSetting();if($("sectionFilter").value==="breaking-news")await loadSources();await loadItems()});$("noticeStatusFilter").addEventListener("change",renderItems);$("noticeTimeFilter").addEventListener("change",renderItems);$("noticeSearch").addEventListener("input",renderItems);$("sourcePicker").addEventListener("change",sourceChanged);$("resetBtn").addEventListener("click",resetForm);$("refreshBtn").addEventListener("click",loadItems);
+$("sectionFilter").addEventListener("change",async()=>{resetForm();syncHighlightFields();await loadTickerSetting();if($("sectionFilter").value==="breaking-news")await loadSources();await loadItems()});$("noticeStatusFilter").addEventListener("change",renderItems);$("noticeTimeFilter").addEventListener("change",renderItems);$("noticeSearch").addEventListener("input",renderItems);$("linkStatusFilter").addEventListener("change",renderItems);$("linkSearch").addEventListener("input",renderItems);$("sourcePicker").addEventListener("change",sourceChanged);$("resetBtn").addEventListener("click",resetForm);$("refreshBtn").addEventListener("click",loadItems);
 async function loadTickerSetting(){ syncHighlightFields();if($("sectionFilter").value!=="breaking-news")return;const {data,error}=await db.from("site_feature_settings").select("enabled").eq("feature_key","breaking_news_ticker").maybeSingle();if(error){$("tickerSettingMessage").textContent="সেটিং লোড হয়নি: "+error.message;return}$("tickerEnabled").checked=data?!!data.enabled:true;$("tickerSettingMessage").textContent=data?"বর্তমান সেটিং লোড হয়েছে।":"ডিফল্টভাবে চালু আছে।"}
 $("tickerEnabled").addEventListener("change",async()=>{const enabled=$("tickerEnabled").checked;$("tickerEnabled").disabled=true;$("tickerSettingMessage").textContent="সংরক্ষণ হচ্ছে…";const {error}=await db.from("site_feature_settings").upsert({feature_key:"breaking_news_ticker",enabled,updated_at:new Date().toISOString()},{onConflict:"feature_key"});$("tickerEnabled").disabled=false;if(error){$("tickerEnabled").checked=!enabled;$("tickerSettingMessage").textContent="সংরক্ষণ হয়নি: "+error.message;return}$("tickerSettingMessage").textContent=enabled?"চলমান নোটিশ চালু করা হয়েছে।":"চলমান নোটিশ বন্ধ করা হয়েছে।"});
 async function init(){try{if(!db||!db.auth){$("authMessage").textContent="লগইন সেবা লোড হয়নি। পেজ রিফ্রেশ করে আবার চেষ্টা করুন।";return}const result=await Promise.race([db.auth.getSession(),new Promise((_,reject)=>setTimeout(()=>reject(new Error("session-timeout")),12000))]);const {data,error}=result;session=data?.session||null;if(error){$("authMessage").textContent="সেশন যাচাই করা যায়নি: "+error.message;return}if(!session){$("authMessage").textContent="এই অংশ ব্যবহার করতে home.html থেকে অ্যাডমিন হিসেবে লগইন করুন।";return}$("loginCard").classList.add("hidden");$("app").classList.remove("hidden");await loadTickerSetting();await loadItems()}catch(error){$("authMessage").textContent=error?.message==="session-timeout"?"লগইন যাচাইয়ে সময় বেশি লাগছে। পেজ রিফ্রেশ করুন; সমস্যা থাকলে আবার লগইন করুন।":"লগইন যাচাই করা যায়নি। পেজ রিফ্রেশ করে আবার চেষ্টা করুন।";console.error("Central content admin session check failed:",error)}}
