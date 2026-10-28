@@ -93,6 +93,47 @@ button.secondary{background:#e8f1f8!important;color:#173f5f!important;border:1px
 .direct-dashboard-nav{background:linear-gradient(110deg,#173f5f,#0f766e)!important;border:2px solid #fff!important;box-shadow:0 8px 24px rgba(16,42,67,.24)!important}
 @media(max-width:760px){#app{padding:12px 12px 28px}.dashboard-top{padding:15px!important;border-radius:14px!important}.card{border-radius:15px!important}.manage-grid{grid-template-columns:1fr}}
 </style>
+<style id="clean-question-create-form">
+/* Calm, consistent form styling: clear sections, fewer competing visual effects. */
+html,body{background:#f5f7fa!important;color:#243b53}
+body.embedded #app{padding:12px!important}
+#app{max-width:1220px;margin:0 auto;padding:16px 18px 28px}
+main{display:grid;gap:14px}
+.card{border:1px solid #dce4ec!important;border-radius:12px!important;background:#fff!important;box-shadow:0 2px 8px rgba(16,42,67,.045)!important;padding:clamp(14px,2vw,22px)!important}
+.card h2{margin-top:0;color:#173f5f!important;font-size:clamp(19px,2vw,23px);letter-spacing:0}
+.section-note{margin:6px 0 14px;color:#64748b;font-size:13px;line-height:1.6}
+.destination,.manage-box,.category-select-wrap,.category-workflow{border:1px solid #e2e8f0!important;border-radius:10px!important;background:#f8fafc!important;box-shadow:none!important}
+.category-hero{padding:0 0 14px;gap:12px}
+.category-hero-icon{width:44px;height:44px;flex-basis:44px;border-radius:10px;background:#173f5f!important;box-shadow:none!important;font-size:22px}
+.category-eyebrow{letter-spacing:.6px}
+.category-hero h2{font-size:clamp(19px,2.2vw,24px);letter-spacing:0}
+.category-hero p{font-size:13px;line-height:1.55}
+.category-workflow{gap:8px;padding:10px 12px;margin-bottom:14px}
+.workflow-step{font-size:12px}
+.workflow-number{width:24px;height:24px;border-radius:7px}
+.category-select-wrap{max-width:520px;padding:12px 14px;margin-bottom:12px}
+.category-select-wrap select{min-height:44px;box-shadow:none!important}
+.manage-grid{gap:12px;margin:12px 0}
+.manage-box{padding:14px}
+.manage-box h3{font-size:16px}
+input,select,textarea{border:1px solid #cbd5e1!important;border-radius:8px!important;box-shadow:none!important;color:#102a43!important}
+input:focus,select:focus,textarea:focus{outline:2px solid #99f6e4!important;border-color:#0f766e!important}
+button{border-radius:8px!important;background:#0f766e!important;box-shadow:none!important;font-weight:700}
+button:hover{filter:brightness(.96)}
+button.secondary{background:#f1f5f9!important;color:#334155!important;border:1px solid #cbd5e1!important}
+.msg{line-height:1.55}
+@media(max-width:760px){
+ #app,body.embedded #app{padding:8px!important}
+ main{gap:10px}
+ .card{padding:13px!important;border-radius:10px!important}
+ .category-hero{align-items:flex-start}
+ .category-hero-icon{flex-basis:40px;width:40px;height:40px}
+ .category-workflow{gap:6px;padding:8px}
+ .workflow-arrow{font-size:18px}
+ .manage-grid{grid-template-columns:minmax(0,1fr);gap:10px}
+ .manage-actions{gap:7px}
+}
+</style>
 <style id="question-create-return-bottom">
 .return-home-wrap{display:flex;justify-content:flex-start;margin:4px 0 18px}
 .return-home{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 15px;border:1px solid #cbdceb;border-radius:10px;color:#173f5f;text-decoration:none;font-weight:750;font-size:14px;background:#e8f1f8}
