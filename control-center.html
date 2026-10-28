@@ -112,7 +112,7 @@ function render(){
  const showCare=!r.universal;
  careLabel.hidden=!showCare;careSelect.hidden=!showCare;
  toggle.hidden=!(active==="question-create"||active==="materials");
- toggle.textContent=managementView?"← মূল কাজের ফর্মে ফিরুন":"⚙ "+(active==="materials"?"স্টাডি ম্যাটেরিয়াল ব্যবস্থাপনা":"প্রশ্ন ব্যবস্থাপনা")+" খুলুন";
+ toggle.textContent=managementView?"← মূল কাজের ফর্মে ফিরুন":"⚙ "+(active==="materials"?"স্টাডি ম্যাটেরিয়াল ব্যবস্থাপনা":"প্রশ্ন ব্যবস্থাপনা")+" খুলুন";toggle.style.setProperty("background-color",managementView?"#ffffff":"#0f766e","important");toggle.style.setProperty("color",managementView?"#0f766e":"#ffffff","important");toggle.style.setProperty("border-color",managementView?"#0f766e":"#0f766e","important");toggle.style.setProperty("font-weight","800","important");
  renderManagementOptions();
  typeCards.hidden=!(active==="results"&&!!careSelect.value);
  const typeSelect=document.getElementById("reviewTypeFilter");if(typeSelect)typeSelect.value=selectedReviewType||"ALL";
