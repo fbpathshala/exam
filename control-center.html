@@ -93,7 +93,7 @@ main{padding:16px;max-width:1600px;margin:0 auto}
 <div class="management-options" id="managementOptions" hidden aria-label="ব্যবস্থাপনার ধরন"></div>
 <div class="results-type-options" id="resultsTypeOptions" hidden aria-label="ফলাফলের ধরন ফিল্টার"><label for="reviewTypeFilter"><strong>ফলাফলের ধরন ফিল্টার</strong><select id="reviewTypeFilter"><option value="ALL">সকল পরীক্ষা — MCQ, CQ ও MCQ + CQ</option><option value="MCQ">MCQ পরীক্ষা</option><option value="CQ">CQ পরীক্ষা</option><option value="MCQ_CQ">MCQ + CQ পরীক্ষা</option></select></label><p>ধরন নির্বাচন করলেই নিচের ছয়টি রিপোর্ট একই ধরনের পরীক্ষার তথ্য দিয়ে আপডেট হবে।</p></div>
 <p class="note" id="sectionNote">বিভাগ অনুযায়ী ব্যবস্থাপনার ধরন নির্বাচন করুন।</p>
-<div class="framewrap"><iframe id="workspace" title="নির্বাচিত কাজের সেকশন" src="about:blank"></iframe></div>
+<div class="framewrap" id="mainFrameWrap"><iframe id="workspace" title="নির্বাচিত কাজের সেকশন" src="about:blank"></iframe></div>
 <div class="management-framewrap" id="managementFrameWrap" hidden><h3 id="managementFrameTitle">ব্যবস্থাপনা</h3><iframe id="managementWorkspace" title="ইনলাইন ব্যবস্থাপনা" src="about:blank"></iframe></div>
 </main>
 </div>
@@ -148,7 +148,7 @@ function render(){
  else if(managementView&&active==="materials"){document.getElementById("sectionNote").textContent="স্টাডি ম্যাটেরিয়ালস ফর্ম খোলা রেখেই নিচে তার কাঠামো ব্যবস্থাপনা করুন।";workspace.src=freshSectionUrl(r[careSelect.value]);document.getElementById("managementFrameWrap").hidden=false;document.getElementById("managementWorkspace").src=freshSectionUrl("study-material-taxonomy.html?department="+(careSelect.value==="job"?"job_care":"academic_care"));document.getElementById("managementFrameTitle").textContent="স্টাডি ম্যাটেরিয়াল কাঠামো"}
  else if(active==="results"){document.getElementById("sectionNote").textContent=r.note+" — "+({MCQ:"MCQ পরীক্ষা",CQ:"CQ পরীক্ষা",MCQ_CQ:"MCQ + CQ পরীক্ষা",ALL:"সকল পরীক্ষা"}[selectedReviewType]||"");let url=r[careSelect.value];const u=new URL(url,location.href);if(careSelect.value==="job"){u.searchParams.set("division","job");u.searchParams.set("central","1");if(selectedReviewType&&selectedReviewType!=="ALL")u.searchParams.set("examType",selectedReviewType)}else{u.searchParams.set("division","academic");u.searchParams.set("view","reviews");if(selectedReviewType!=="ALL")u.searchParams.set("examType",selectedReviewType)}workspace.src=freshSectionUrl(u.href)}
  else{document.getElementById("sectionNote").textContent=r.note;workspace.src=freshSectionUrl(r[careSelect.value])}
- if(!(managementView&&(active==="question-create"||active==="materials")))document.getElementById("managementFrameWrap").hidden=true;
+ const showInlineManagement=managementView&&(active==="question-create"||active==="materials")&&!!careSelect.value;document.getElementById("mainFrameWrap").hidden=showInlineManagement;if(!showInlineManagement)document.getElementById("managementFrameWrap").hidden=true;
  document.querySelectorAll("[data-section]").forEach(b=>b.classList.toggle("active",b.dataset.section===active));
  const back=document.getElementById("centralReturn");
  if(r.universal||(!careSelect.value)){back.href="https://fbpathshala.github.io/home.html";back.textContent="⌂ মূল মেনু / হোম পেইজে ফিরুন"}
