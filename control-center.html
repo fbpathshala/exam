@@ -175,7 +175,7 @@ function cleanEmbeddedFrame(frame,styleId){
       if(parent && /^(P|NAV|DIV)$/.test(parent.tagName) && parent.querySelectorAll("a").length===1) parent.style.setProperty("display","none","important");
     });
     const path=(new URL(frame.src,location.href)).pathname;
-    if(/\\/(exam-manager|results-manager)\\.html$/.test(path)){
+    if(path.endsWith("/exam-manager.html")||path.endsWith("/results-manager.html")){
       const header=doc.querySelector("header");
       if(header && /ফেইসবুক পাঠশালা/.test(header.textContent)) header.style.setProperty("display","none","important");
     }
