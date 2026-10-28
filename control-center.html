@@ -29,6 +29,32 @@ iframe{display:block;width:100%;height:100%;border:0;background:#fff}
 .management-framewrap{margin-top:16px;padding:12px;border:1px solid #c7d2fe;border-radius:16px;background:#f8fafc}.management-framewrap h3{margin:0 0 10px;color:#312e81}.management-framewrap iframe{width:100%;height:620px;border:1px solid #c7d2fe;border-radius:12px;background:#fff}[hidden]{display:none!important}
 @media(max-width:760px){aside{padding:0 10px}.nav{left:10px;right:10px;grid-template-columns:1fr 1fr}.nav button{font-size:12px;padding:10px}main{padding:10px}.toolbar{padding:14px;gap:8px;border-radius:13px}.toolbar .title{width:100%;font-size:21px;margin:0 0 3px}.toolbar label{margin-right:0}#care{flex:1;min-width:0;width:100%}.framewrap{height:calc(100vh - 340px);min-height:300px}}
 </style>
+<style id="clean-question-create-layout">
+/* Keep the central workspace calm and aligned instead of stacking competing gradients. */
+main{padding:16px;max-width:1600px;margin:0 auto}
+.toolbar{display:flex;align-items:center;gap:10px;padding:14px 16px;margin:0 0 12px;border:1px solid #dbe5ef;border-radius:12px;background:#fff!important;box-shadow:0 2px 8px rgba(16,42,67,.05)!important}
+.toolbar:before{display:none}
+.toolbar #sectionTitle.title{min-height:40px;margin:0 auto 0 0;padding:8px 12px;border:0!important;border-radius:8px;background:#e8f1f8!important;color:#173f5f!important;-webkit-text-fill-color:#173f5f!important;box-shadow:none!important;font-size:20px;letter-spacing:0}
+.toolbar label{padding:0;border:0;background:transparent!important;color:#475569!important;border-radius:0}
+.toolbar #care{min-height:42px;min-width:180px;border:1px solid #cbd5e1!important;border-radius:8px;background:#fff!important;color:#173f5f!important;box-shadow:none!important}
+.toolbar #managementToggle.header-link{min-height:42px;padding:9px 12px;border:1px solid #0f766e!important;border-radius:8px;background:#0f766e!important;color:#fff!important;-webkit-text-fill-color:#fff!important;font-size:13px;font-weight:750}
+.toolbar #managementToggle.header-link:hover{background:#115e59!important}
+.toolbar a#centralReturn.central-return{min-height:42px;padding:9px 12px;border:1px solid #cbd5e1!important;border-radius:8px;background:#f8fafc!important;color:#334155!important;-webkit-text-fill-color:#334155!important;box-shadow:none!important;font-size:13px;font-weight:700}
+.toolbar a#centralReturn.central-return:hover{background:#e8f1f8!important;filter:none;transform:none}
+.note{margin:0 0 12px;padding:10px 12px;border:1px solid #e2e8f0;border-left:3px solid #0f766e;border-radius:8px;background:#f8fafc;color:#475569;line-height:1.55}
+.framewrap{height:calc(100vh - 285px);min-height:380px;border:1px solid #dbe5ef;border-radius:12px;background:#fff}
+.management-framewrap{margin-top:12px;padding:12px;border:1px solid #dbe5ef;border-radius:12px;background:#fff}
+.management-framewrap h3{color:#173f5f}
+@media(max-width:760px){
+ main{padding:10px}
+ .toolbar{display:grid;grid-template-columns:minmax(0,1fr);gap:9px;padding:12px}
+ .toolbar #sectionTitle.title{width:100%;margin:0;font-size:19px}
+ .toolbar label{margin:0}
+ .toolbar #care{width:100%;min-width:0}
+ .toolbar #managementToggle.header-link,.toolbar a#centralReturn.central-return{width:100%;justify-content:center;margin:0}
+ .framewrap{height:calc(100vh - 330px);min-height:320px}
+}
+</style>
 <style id="central-nearby-return">
 .toolbar a#centralReturn.central-return{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:42px;max-width:100%;padding:9px 13px;border:1px solid #1d4ed8;border-radius:11px;background:linear-gradient(110deg,#312e81 0%,#1d4ed8 55%,#0891b2 100%)!important;color:#fff!important;-webkit-text-fill-color:#fff!important;text-decoration:none;font-weight:900;font-size:13px;white-space:normal;text-align:center;box-shadow:0 4px 12px rgba(37,99,235,.24);transition:filter .15s,transform .15s}
 .central-return:hover{color:#fff!important;background:linear-gradient(110deg,#3730a3,#1d4ed8)!important;filter:saturate(1.12);transform:translateY(-1px)}
