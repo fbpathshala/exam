@@ -51,19 +51,18 @@ iframe{display:block;width:100%;height:100%;border:0;background:#fff}
 
 <div class="layout">
 <aside><button class="menu-toggle" id="menuToggle" type="button" aria-expanded="false" aria-controls="nav" hidden>☰ সব সেকশন</button><nav class="nav" id="nav" aria-label="কেন্দ্রীয় সেকশন" hidden>
-<button class="active" data-section="management">১. ব্যবস্থাপনা</button>
-<button data-section="question-create">২. প্রশ্ন তৈরি</button>
-<button data-section="question-bank">৩. প্রশ্ন ব্যাংক</button>
-<button data-section="exam-create">৪. পরীক্ষা তৈরি</button>
-<button data-section="exam-manage">৫. পরীক্ষা পরিচালনা</button>
-<button data-section="results">৬. ফলাফল পর্যালোচনা</button>
-<button data-section="materials">৭. স্টাডি ম্যাটেরিয়ালস</button>
-<button data-section="important-links">৮. গুরুত্বপূর্ণ তথ্য ও পোস্ট লিংক</button>
-<button data-section="breaking-news">৯. নোটিশ</button>
-<button data-section="social-links">১০. ফেইসবুক পাঠশালা লিংক</button>
+<button data-section="question-create">১. প্রশ্ন তৈরি</button>
+<button data-section="question-bank">২. প্রশ্ন ব্যাংক</button>
+<button data-section="exam-create">৩. পরীক্ষা তৈরি</button>
+<button data-section="exam-manage">৪. পরীক্ষা পরিচালনা</button>
+<button data-section="results">৫. ফলাফল পর্যালোচনা</button>
+<button data-section="materials">৬. স্টাডি ম্যাটেরিয়ালস</button>
+<button data-section="important-links">৭. গুরুত্বপূর্ণ তথ্য ও পোস্ট লিংক</button>
+<button data-section="breaking-news">৮. নোটিশ</button>
+<button data-section="social-links">৯. ফেইসবুক পাঠশালা লিংক</button>
 </nav></aside>
 <main>
-<div class="toolbar"><div class="title" id="sectionTitle">ব্যবস্থাপনা</div><label for="managementAreaFilter" id="managementAreaLabel">ব্যবস্থাপনার ধরন:</label><select id="managementAreaFilter"><option value="">নির্বাচন করুন</option><option value="question-create">প্রশ্ন তৈরি</option><option value="study-materials">স্টাডি ম্যাটেরিয়ালস</option></select><label for="care" hidden>বিভাগ:</label><select id="care" hidden><option value="">বিভাগ নির্বাচন করুন</option><option value="job">Job Care</option><option value="academic">Academic Care</option></select><a class="central-return" id="centralReturn" href="https://fbpathshala.github.io/home.html">⌂ মূল মেনু / হোম পেইজে ফিরুন</a></div>
+<div class="toolbar"><div class="title" id="sectionTitle">প্রশ্ন তৈরি</div><label for="care" id="careLabel">বিভাগ:</label><select id="care"><option value="">বিভাগ নির্বাচন করুন</option><option value="job">Job Care</option><option value="academic">Academic Care</option></select><button type="button" id="managementToggle" class="header-link" hidden>⚙ ব্যবস্থাপনা খুলুন</button><a class="central-return" id="centralReturn" href="https://fbpathshala.github.io/home.html">⌂ মূল মেনু / হোম পেইজে ফিরুন</a></div>
 <div class="management-options" id="managementOptions" hidden aria-label="ব্যবস্থাপনার ধরন"></div>
 <div class="results-type-options" id="resultsTypeOptions" hidden aria-label="ফলাফলের ধরন ফিল্টার"><label for="reviewTypeFilter"><strong>ফলাফলের ধরন ফিল্টার</strong><select id="reviewTypeFilter"><option value="ALL">সকল পরীক্ষা — MCQ, CQ ও MCQ + CQ</option><option value="MCQ">MCQ পরীক্ষা</option><option value="CQ">CQ পরীক্ষা</option><option value="MCQ_CQ">MCQ + CQ পরীক্ষা</option></select></label><p>ধরন নির্বাচন করলেই নিচের ছয়টি রিপোর্ট একই ধরনের পরীক্ষার তথ্য দিয়ে আপডেট হবে।</p></div>
 <p class="note" id="sectionNote">বিভাগ অনুযায়ী ব্যবস্থাপনার ধরন নির্বাচন করুন।</p>
@@ -84,13 +83,13 @@ materials:{title:"স্টাডি ম্যাটেরিয়ালস",note:
 "breaking-news":{title:"নোটিশ",note:"পাবলিক হোমপেজের নিচে সময়সীমাসহ স্ক্রলিং নোটিশ প্রকাশ ও পরিচালনা করুন।",universal:true,url:"site-content-admin.html?section=breaking-news"},
 "social-links":{title:"ফেইসবুক পাঠশালা লিংক",note:"ফেইসবুক পাঠশালা পেইজ ও গ্রুপের লিংক পরিচালনা করুন।",universal:true,url:"site-content-admin.html?section=social-links"}
 };
-let active="management";
+let active="question-create";
 let activeManagementLevel=0;
-let selectedManagementArea="";
+let managementView=false;
 let selectedReviewType="ALL";
 const managementLevels={job:[{level:0,label:"ক্যাটাগরি ব্যবস্থাপনা"},{level:1,label:"সাব ক্যাটাগরি ব্যবস্থাপনা"},{level:2,label:"সেট ব্যবস্থাপনা"},{level:3,label:"বিষয় ব্যবস্থাপনা",view:"subjects"},{level:4,label:"স্টাডি ম্যাটেরিয়াল কাঠামো",url:"study-material-taxonomy.html?department=job_care"}],academic:[{level:0,label:"শ্রেণি ব্যবস্থাপনা"},{level:1,label:"বিষয় ব্যবস্থাপনা"},{level:2,label:"অধ্যায় ব্যবস্থাপনা"},{level:3,label:"সেট ব্যবস্থাপনা"},{level:4,label:"স্টাডি ম্যাটেরিয়াল কাঠামো",url:"study-material-taxonomy.html?department=academic_care"}]};
-function freshSectionUrl(url){const u=new URL(url,location.href);u.searchParams.set("uiVersion","20261028-important-links-fix1");u.searchParams.set("sectionLoad",String(Date.now()));return u.href}
-function renderManagementOptions(){const box=document.getElementById("managementOptions"),care=document.getElementById("care").value;box.innerHTML="";if(active!=="management"||selectedManagementArea!=="question-create"||!care){box.hidden=true;return}box.hidden=false;managementLevels[care].filter(item=>!item.url).forEach(item=>{const b=document.createElement("button");b.type="button";b.textContent=item.label;b.dataset.managementLevel=String(item.level);b.classList.toggle("active",item.level===activeManagementLevel);b.addEventListener("click",()=>{activeManagementLevel=item.level;renderManagementOptions();document.getElementById("sectionNote").textContent="নির্বাচিত ব্যবস্থাপনা: "+item.label;const target=item.url?item.url:(item.view==="subjects"?"taxonomy.html?section=job&view=subjects":"taxonomy.html?section="+care+"&level="+item.level);document.getElementById("workspace").src=freshSectionUrl(target)});box.append(b)})}
+function freshSectionUrl(url){const u=new URL(url,location.href);u.searchParams.set("uiVersion","20261028-management-inline-fix1");u.searchParams.set("sectionLoad",String(Date.now()));return u.href}
+function renderManagementOptions(){const box=document.getElementById("managementOptions"),care=document.getElementById("care").value;box.innerHTML="";if(!managementView||active!=="question-create"||!care){box.hidden=true;return}box.hidden=false;managementLevels[care].forEach(item=>{const b=document.createElement("button");b.type="button";b.textContent=item.label;b.dataset.managementLevel=String(item.level);b.classList.toggle("active",item.level===activeManagementLevel);b.addEventListener("click",()=>{activeManagementLevel=item.level;renderManagementOptions();document.getElementById("sectionNote").textContent="নির্বাচিত ব্যবস্থাপনা: "+item.label;const target=item.url?item.url:(item.view==="subjects"?"taxonomy.html?section=job&view=subjects":"taxonomy.html?section="+care+"&level="+item.level);document.getElementById("workspace").src=freshSectionUrl(target)});box.append(b)})}
 
 // Reapply the visible colour palette after mobile-browser back/forward cache restores.
 function enforceCentralPalette(){
@@ -105,7 +104,30 @@ function enforceCentralPalette(){
 }
 window.addEventListener('pageshow',enforceCentralPalette);
 
-function render(){const r=routes[active];document.getElementById("sectionTitle").textContent=r.title;const careLabel=document.querySelector("label[for=care]");const careSelect=document.getElementById("care");const areaLabel=document.getElementById("managementAreaLabel");const areaSelect=document.getElementById("managementAreaFilter");areaLabel.hidden=active!=="management";areaSelect.hidden=active!=="management";careLabel.hidden=!!r.universal||(active==="management"&&!selectedManagementArea);careSelect.hidden=!!r.universal||(active==="management"&&!selectedManagementArea);if(active==="management"&&!selectedManagementArea){careLabel.hidden=true;careSelect.hidden=true;}if(active==="management"&&careSelect.value&&!managementLevels[careSelect.value].some(x=>x.level===activeManagementLevel))activeManagementLevel=0;const workspace=document.getElementById("workspace");const typeCards=document.getElementById("resultsTypeOptions");renderManagementOptions();typeCards.hidden=!(active==="results"&&!!careSelect.value);const typeSelect=document.getElementById("reviewTypeFilter");if(typeSelect)typeSelect.value=selectedReviewType||"ALL";if(r.universal){areaSelect.value="";careSelect.value="";areaLabel.hidden=true;areaSelect.hidden=true;careLabel.hidden=true;careSelect.hidden=true;document.getElementById("sectionNote").textContent=r.note;workspace.src=freshSectionUrl(r.url)}else if(active==="management"&&!selectedManagementArea){document.getElementById("sectionNote").textContent="আগে প্রশ্ন তৈরি অথবা স্টাডি ম্যাটেরিয়ালস নির্বাচন করুন।";workspace.src="about:blank"}else if(!careSelect.value){document.getElementById("sectionNote").textContent="কাজ শুরু করতে আগে বিভাগ নির্বাচন করুন। বিভাগ নির্বাচন না করা পর্যন্ত কোনো বিভাগের তথ্য লোড হবে না।";workspace.src="about:blank"}else if(active==="management"&&selectedManagementArea==="study-materials"){document.getElementById("sectionNote").textContent="স্টাডি ম্যাটেরিয়ালের নিজস্ব কাঠামো";workspace.src=freshSectionUrl("taxonomy.html?mode=study-materials&department="+(careSelect.value==="job"?"job_care":"academic_care"))}else if(active==="management"){const list=managementLevels[careSelect.value].filter(x=>!x.url);const item=list.find(x=>x.level===activeManagementLevel)||list[0];document.getElementById("sectionNote").textContent="নিচ থেকে প্রয়োজনীয় ব্যবস্থাপনা নির্বাচন করুন: "+item.label;workspace.src=freshSectionUrl(item.url?item.url:(item.view==="subjects"?"taxonomy.html?section=job&view=subjects":"taxonomy.html?section="+careSelect.value+"&level="+item.level))}else if(active==="results"){document.getElementById("sectionNote").textContent=r.note+" — "+({MCQ:"MCQ পরীক্ষা",CQ:"CQ পরীক্ষা",MCQ_CQ:"MCQ + CQ পরীক্ষা",ALL:"সকল পরীক্ষা"}[selectedReviewType]||"");let url=r[careSelect.value];const u=new URL(url,location.href);if(careSelect.value==="job"){u.searchParams.set("division","job");u.searchParams.set("central","1");if(selectedReviewType&&selectedReviewType!=="ALL")u.searchParams.set("examType",selectedReviewType)}else{u.searchParams.set("division","academic");u.searchParams.set("view","reviews");if(selectedReviewType!=="ALL")u.searchParams.set("examType",selectedReviewType)}workspace.src=freshSectionUrl(u.href)}else{document.getElementById("sectionNote").textContent=r.note;workspace.src=freshSectionUrl(r[careSelect.value])}document.querySelectorAll("[data-section]").forEach(b=>b.classList.toggle("active",b.dataset.section===active));const back=document.getElementById("centralReturn");if(r.universal||(!careSelect.value)){back.href="https://fbpathshala.github.io/home.html";back.textContent="⌂ মূল মেনু / হোম পেইজে ফিরুন"}else if(active==="results"&&selectedReviewType&&selectedReviewType!=="ALL"){back.href="#";back.textContent="← ফলাফলের ধরন ফিল্টার রিসেট"}else if(active==="results"){back.href="#";back.textContent="← বিভাগ নির্বাচন"}else if(active==="management"&&activeManagementLevel>0){back.href="#";back.textContent="← ব্যবস্থাপনার আগের ধাপে ফিরুন"}else{back.href="#";back.textContent="← "+r.title+" সেকশনে ফিরুন"}}
+function render(){
+ const r=routes[active],careLabel=document.getElementById("careLabel"),careSelect=document.getElementById("care"),workspace=document.getElementById("workspace"),typeCards=document.getElementById("resultsTypeOptions"),toggle=document.getElementById("managementToggle");
+ document.getElementById("sectionTitle").textContent=r.title;
+ const showCare=!r.universal;
+ careLabel.hidden=!showCare;careSelect.hidden=!showCare;
+ toggle.hidden=!(active==="question-create"||active==="materials");
+ toggle.textContent=managementView?"← মূল কাজের ফর্মে ফিরুন":"⚙ "+(active==="materials"?"স্টাডি ম্যাটেরিয়াল ব্যবস্থাপনা":"প্রশ্ন ব্যবস্থাপনা")+" খুলুন";
+ renderManagementOptions();
+ typeCards.hidden=!(active==="results"&&!!careSelect.value);
+ const typeSelect=document.getElementById("reviewTypeFilter");if(typeSelect)typeSelect.value=selectedReviewType||"ALL";
+ if(r.universal){careLabel.hidden=true;careSelect.hidden=true;document.getElementById("sectionNote").textContent=r.note;workspace.src=freshSectionUrl(r.url)}
+ else if(!careSelect.value){document.getElementById("sectionNote").textContent="কাজ শুরু করতে আগে Job Care অথবা Academic Care নির্বাচন করুন।";workspace.src="about:blank"}
+ else if(managementView&&active==="question-create"){const list=managementLevels[careSelect.value];const item=list.find(x=>x.level===activeManagementLevel)||list[0];document.getElementById("sectionNote").textContent="প্রশ্ন তৈরির ব্যবস্থাপনা — "+item.label;workspace.src=freshSectionUrl(item.url?item.url:(item.view==="subjects"?"taxonomy.html?section=job&view=subjects":"taxonomy.html?section="+careSelect.value+"&level="+item.level))}
+ else if(managementView&&active==="materials"){document.getElementById("sectionNote").textContent="স্টাডি ম্যাটেরিয়ালের কাঠামো ব্যবস্থাপনা";workspace.src=freshSectionUrl("taxonomy.html?mode=study-materials&department="+(careSelect.value==="job"?"job_care":"academic_care"))}
+ else if(active==="results"){document.getElementById("sectionNote").textContent=r.note+" — "+({MCQ:"MCQ পরীক্ষা",CQ:"CQ পরীক্ষা",MCQ_CQ:"MCQ + CQ পরীক্ষা",ALL:"সকল পরীক্ষা"}[selectedReviewType]||"");let url=r[careSelect.value];const u=new URL(url,location.href);if(careSelect.value==="job"){u.searchParams.set("division","job");u.searchParams.set("central","1");if(selectedReviewType&&selectedReviewType!=="ALL")u.searchParams.set("examType",selectedReviewType)}else{u.searchParams.set("division","academic");u.searchParams.set("view","reviews");if(selectedReviewType!=="ALL")u.searchParams.set("examType",selectedReviewType)}workspace.src=freshSectionUrl(u.href)}
+ else{document.getElementById("sectionNote").textContent=r.note;workspace.src=freshSectionUrl(r[careSelect.value])}
+ document.querySelectorAll("[data-section]").forEach(b=>b.classList.toggle("active",b.dataset.section===active));
+ const back=document.getElementById("centralReturn");
+ if(r.universal||(!careSelect.value)){back.href="https://fbpathshala.github.io/home.html";back.textContent="⌂ মূল মেনু / হোম পেইজে ফিরুন"}
+ else if(managementView){back.href="#";back.textContent="← মূল কাজের ফর্মে ফিরুন"}
+ else if(active==="results"&&selectedReviewType&&selectedReviewType!=="ALL"){back.href="#";back.textContent="← ফলাফলের ধরন ফিল্টার রিসেট"}
+ else if(active==="results"){back.href="#";back.textContent="← বিভাগ নির্বাচন"}
+ else{back.href="#";back.textContent="← "+r.title+" সেকশনে ফিরুন"}
+}
 // Keep embedded section pages free of legacy home/menu navigation.
 const workspaceFrame=document.getElementById("workspace");
 function cleanEmbeddedSection(){
@@ -135,17 +157,15 @@ function cleanEmbeddedSection(){
   }catch(_){}
 }
 workspaceFrame.addEventListener("load",cleanEmbeddedSection);
-document.getElementById("nav").addEventListener("click",e=>{const b=e.target.closest("[data-section]");if(!b)return;active=b.dataset.section;selectedReviewType="ALL";document.getElementById("nav").classList.remove("open");document.getElementById("nav").hidden=true;document.getElementById("menuToggle").setAttribute("aria-expanded","false");render()});
+document.getElementById("nav").addEventListener("click",e=>{const b=e.target.closest("[data-section]");if(!b)return;active=b.dataset.section;managementView=false;activeManagementLevel=0;selectedReviewType="ALL";document.getElementById("nav").classList.remove("open");document.getElementById("nav").hidden=true;document.getElementById("menuToggle").setAttribute("aria-expanded","false");render()});
+document.getElementById("managementToggle").addEventListener("click",()=>{managementView=!managementView;activeManagementLevel=0;render()});
 document.getElementById("reviewTypeFilter").addEventListener("change",e=>{selectedReviewType=e.target.value||"ALL";render()});
 document.getElementById("menuToggle").addEventListener("click",()=>{const nav=document.getElementById("nav"),toggle=document.getElementById("menuToggle"),open=nav.hidden;nav.hidden=!open;nav.classList.toggle("open",open);toggle.setAttribute("aria-expanded",String(open));});
 document.getElementById("care").addEventListener("change",()=>{activeManagementLevel=0;selectedReviewType="ALL";render()});
-document.getElementById("managementAreaFilter").addEventListener("change",()=>{selectedManagementArea=document.getElementById("managementAreaFilter").value;document.getElementById("care").value="";activeManagementLevel=0;render()});
 document.getElementById("centralReturn").addEventListener("click",e=>{
   const r=routes[active], care=document.getElementById("care");
   if(r.universal){return;}
-  if(active==="management"&&care.value&&activeManagementLevel>0){
-    e.preventDefault();activeManagementLevel--;render();return;
-  }
+  if(managementView){e.preventDefault();managementView=false;render();return;}
   if(active==="results"&&selectedReviewType&&selectedReviewType!=="ALL"){e.preventDefault();selectedReviewType="ALL";render();return;}
   if(care.value){
     e.preventDefault();care.value="";activeManagementLevel=0;selectedReviewType="";render();return;
@@ -153,12 +173,12 @@ document.getElementById("centralReturn").addEventListener("click",e=>{
 });
 
 const initialParams=new URLSearchParams(location.search);
-if(initialParams.has("section")&&routes[initialParams.get("section")])active=initialParams.get("section");
+if(initialParams.has("section")&&routes[initialParams.get("section")]&&initialParams.get("section")!=="management")active=initialParams.get("section");
 // Do not auto-select any department. Only honour an explicit ?care=job or ?care=academic.
 const requestedCare=initialParams.get("care");
 if(requestedCare==="job"||requestedCare==="academic")document.getElementById("care").value=requestedCare;
 else document.getElementById("care").value="";
-if(active==="management"){document.getElementById("managementAreaFilter").value="";document.getElementById("care").value="";}
+if(active==="management")active="question-create";
 render();
 enforceCentralPalette();
 </script>
