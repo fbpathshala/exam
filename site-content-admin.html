@@ -15,7 +15,7 @@
 <section class="card" id="loginCard"><h2>অ্যাডমিন যাচাই</h2><p id="authMessage">লগইন যাচাই হচ্ছে…</p><a href="home.html">কেন্দ্রীয় হোমপেজ</a></section>
 <div id="app" class="hidden">
 <section class="card">
-<div class="top"><h2 id="sectionHeading" style="margin-right:auto">কনটেন্ট নির্বাচন</h2><select id="sectionFilter"><option value="important-links">গুরুত্বপূর্ণ তথ্য ও পোস্ট লিংক</option><option value="breaking-news">নোটিশ</option><option value="social-links">ফেইসবুক পাঠশালা লিংক</option></select></div>
+<div class="top"><h2 id="sectionHeading" style="margin-right:auto">কনটেন্ট নির্বাচন</h2><select id="sectionFilter"><option value="important-links">গুরুত্বপূর্ণ তথ্য ও পোস্ট লিংক</option><option value="breaking-news">নোটিশ</option><option value="social-links">ফেইসবুক পাঠশালা লিংক</option></select><select id="contentType"><option value="info">গুরুত্বপূর্ণ তথ্য</option><option value="link">গুরুত্বপূর্ণ লিংক</option></select></div>
 <p class="meta" id="sectionHelp">প্রকাশিত কনটেন্ট পাবলিক সাইটে দেখানোর জন্য প্রস্তুত হবে।</p>
 <div id="tickerSetting" class="status hidden"><strong>হোমপেজের চলমান নোটিশ</strong><p class="meta">এটি বন্ধ করলে কোনো নোটিশ মুছে যাবে না; শুধু হোমপেজের চলমান বারটি লুকানো থাকবে।</p><label style="display:flex;align-items:center;gap:10px"><input id="tickerEnabled" type="checkbox" style="width:auto"> চলমান নোটিশ চালু রাখুন</label><div id="tickerSettingMessage" class="meta">সেটিং লোড হচ্ছে…</div></div>
 </section>
@@ -24,7 +24,6 @@
 <form id="contentForm">
 <input id="recordId" type="hidden">
 <label for="title" id="titleLabel">তথ্য / পোস্টের শিরোনাম</label><input id="title" required maxlength="220" placeholder="যেমন: ২০২৬ সালের নিয়োগ বিজ্ঞপ্তি">
-<div id="contentTypeField"><label for="contentType">তথ্যের ধরন</label><select id="contentType"><option value="info">গুরুত্বপূর্ণ তথ্য</option><option value="link">গুরুত্বপূর্ণ লিংক</option></select><p class="meta">এখানে তথ্য বা লিংক—যেটি যোগ করবেন সেটি নির্বাচন করুন।</p></div>
 <div id="categoryField"><label for="category">ক্যাটাগরি (ঐচ্ছিক)</label><select id="category"><option value="">কোনো ক্যাটাগরি নয়</option></select><label for="subcategory">সাব-ক্যাটাগরি (ঐচ্ছিক)</label><input id="subcategory" maxlength="100" placeholder="প্রয়োজনে দিন"><button class="btn secondary" type="button" id="toggleCategoryManager">⚙ ক্যাটাগরি ব্যবস্থাপনা</button><div id="categoryManager" class="status hidden"><strong>ক্যাটাগরি ব্যবস্থাপনা</strong><p class="meta">ক্যাটাগরি যোগ করতে নাম দিন। সাব-ক্যাটাগরি ঐচ্ছিক।</p><label for="newCategory">ক্যাটাগরির নাম</label><input id="newCategory" maxlength="100" placeholder="যেমন: নোটিশ, পরীক্ষার ফলাফল, সার্কুলার"><label for="newSubcategory">সাব-ক্যাটাগরির নাম (ঐচ্ছিক)</label><input id="newSubcategory" maxlength="100" placeholder="প্রয়োজনে দিন"><button class="btn" type="button" id="addCategoryBtn">ক্যাটাগরি সংরক্ষণ</button><div id="categoryManagerMessage" class="meta"></div></div></div><div id="bodyField"><label for="body" id="bodyLabel">বিস্তারিত লেখা</label><textarea id="body" placeholder="এখানে তথ্যটি লিখুন। PDF/ছবি/বাইরের ওয়েবপেজের লিংক দিলে সেটিও অনলাইনে দেখার ব্যবস্থা থাকবে।"></textarea><p class="meta" id="bodyHelp">শুধু লেখা দিয়েও তথ্য প্রকাশ করা যাবে।</p></div>
 <label for="link" id="linkLabel">PDF / ছবির / বাইরের পেজের লিংক (ঐচ্ছিক)</label><input id="link" type="url" placeholder="https://..."><p class="meta" id="linkHelp">PDF দিলে ওয়েবসাইটে পড়ার ভিউয়ারে খুলবে; কোনো ডাউনলোড বাটন দেখানো হবে না।</p><div id="fileUploadField"><label for="contentFile">অথবা PDF / ছবি সরাসরি আপলোড করুন</label><input id="contentFile" type="file" accept="application/pdf,image/jpeg,image/png,image/webp" multiple><p class="meta">প্রতি ফাইল সর্বোচ্চ ৫০ MB। এক পোস্টে একাধিক PDF/ছবি এবং আলাদা বাইরের URL একসঙ্গে যুক্ত করা যাবে।</p><div id="existingAttachments" class="meta"></div></div><div id="highlightFields" class="hidden"><label for="displayLabel">লিংক থাকলে বোতামের লেখা (ঐচ্ছিক)</label><input id="displayLabel" maxlength="80" placeholder="যেমন: নোটিশ / জরুরি ঘোষণা"><label for="sourcePicker">গুরুত্বপূর্ণ পোস্ট বা প্রকাশিত স্টাডি ম্যাটেরিয়াল বেছে নিন</label><select id="sourcePicker"><option value="">লিংক ছাড়া নিজস্ব ঘোষণা / সরাসরি URL</option></select><p class="meta">উৎস নির্বাচন করলে মূল কনটেন্টের পৃষ্ঠা লিংক হিসেবে বসবে। শিরোনামটি হাইলাইটের জন্য আলাদা করে লিখতে পারবেন।</p></div>
 <div class="grid"><div><label for="status">অবস্থা</label><select id="status"><option value="draft">খসড়া</option><option value="published">প্রকাশিত</option></select></div><div><label for="order">ক্রম</label><input id="order" type="number" value="0"></div></div>
@@ -51,6 +50,7 @@ function syncHighlightFields(){
   "social-links":["ফেইসবুক পাঠশালা লিংক","ফেইসবুক পেইজ ও গ্রুপের লিংক পরিচালনা করুন।"]
  };
  const item=labels[section]||labels["important-links"];
+ $("contentType").classList.toggle("hidden",section!=="important-links");
  $("sectionHeading").textContent=item[0];
  $("sectionHelp").textContent=item[1];
  const isSocial=section==="social-links";$("categoryField").classList.toggle("hidden",section!=="important-links");$("contentTypeField").classList.toggle("hidden",section!=="important-links");
@@ -107,6 +107,7 @@ function renderItems(){
  const timeFilter=isNotice?$("noticeTimeFilter").value:"all";
  const query=(isNotice?$("noticeSearch").value:$("linkSearch").value).trim().toLocaleLowerCase();
  const rows=cachedItems.filter(row=>{
+  if(section==="important-links"&&(row.content_type||"info")!==$("contentType").value)return false;
   if(statusFilter!=="all"&&row.status!==statusFilter)return false;
   if(timeFilter!=="all"&&noticeTimeState(row)!==timeFilter)return false;
   if(query&&!((row.title||"").toLocaleLowerCase().includes(query)||(row.body||"").toLocaleLowerCase().includes(query)||(row.link_url||"").toLocaleLowerCase().includes(query)))return false;
@@ -147,7 +148,7 @@ $("contentForm").addEventListener("submit",async e=>{
  if(result.error){message("formMessage","সংরক্ষণ হয়নি: "+result.error.message);return}
  currentAttachments=nextAttachments;resetForm();message("formMessage","সংরক্ষণ সফল হয়েছে।");await loadItems();
 });
-$("contentType").addEventListener("change",async()=>{await loadManagedCategories();$("category").value="";$("subcategory").value="";const linkMode=$("contentType").value==="link";$("bodyField").classList.toggle("hidden",linkMode);$("fileUploadField").classList.toggle("hidden",linkMode);$("bodyLabel").textContent=linkMode?"বিবরণ (ঐচ্ছিক)":"বিস্তারিত লেখা";$("linkLabel").textContent=linkMode?"গুরুত্বপূর্ণ লিংকের URL":"PDF / ছবির / বাইরের পেজের লিংক (ঐচ্ছিক)";$("link").required=linkMode;});
+$("contentType").addEventListener("change",async()=>{await loadManagedCategories();$("category").value="";$("subcategory").value="";const linkMode=$("contentType").value==="link";$("bodyField").classList.toggle("hidden",linkMode);$("fileUploadField").classList.toggle("hidden",linkMode);$("bodyLabel").textContent=linkMode?"বিবরণ (ঐচ্ছিক)":"বিস্তারিত লেখা";$("linkLabel").textContent=linkMode?"গুরুত্বপূর্ণ লিংকের URL":"PDF / ছবির / বাইরের পেজের লিংক (ঐচ্ছিক)";$("link").required=linkMode;renderItems();});
 $("toggleCategoryManager").addEventListener("click",()=>$("categoryManager").classList.toggle("hidden"));
 $("addCategoryBtn").addEventListener("click",addManagedCategory);
 $("sectionFilter").addEventListener("change",async()=>{resetForm();syncHighlightFields();$("status").value=$("sectionFilter").value==="important-links"?"published":"draft";await loadTickerSetting();if($("sectionFilter").value==="breaking-news")await loadSources();await loadItems();await loadManagedCategories()});$("noticeStatusFilter").addEventListener("change",renderItems);$("noticeTimeFilter").addEventListener("change",renderItems);$("noticeSearch").addEventListener("input",renderItems);$("linkStatusFilter").addEventListener("change",renderItems);$("linkSearch").addEventListener("input",renderItems);$("sourcePicker").addEventListener("change",sourceChanged);$("resetBtn").addEventListener("click",resetForm);$("refreshBtn").addEventListener("click",loadItems);
