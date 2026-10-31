@@ -25,7 +25,7 @@
 <input id="recordId" type="hidden">
 <label for="title" id="titleLabel">তথ্য / পোস্টের শিরোনাম</label><input id="title" required maxlength="220" placeholder="যেমন: ২০২৬ সালের নিয়োগ বিজ্ঞপ্তি">
 <div id="categoryField"><label for="category">ক্যাটাগরি (ঐচ্ছিক)</label><select id="category"><option value="">কোনো ক্যাটাগরি নয়</option></select><label for="subcategory">সাব-ক্যাটাগরি (ঐচ্ছিক)</label><select id="subcategory"><option value="">কোনো সাব-ক্যাটাগরি নয়</option></select></div><div id="bodyField"><label for="body" id="bodyLabel">বিস্তারিত লেখা</label><textarea id="body" placeholder="এখানে তথ্যটি লিখুন। PDF/ছবি/বাইরের ওয়েবপেজের লিংক দিলে সেটিও অনলাইনে দেখার ব্যবস্থা থাকবে।"></textarea><p class="meta" id="bodyHelp">শুধু লেখা দিয়েও তথ্য প্রকাশ করা যাবে।</p></div>
-<div id="linkField"><label for="link" id="linkLabel">PDF / ছবির / বাইরের পেজের লিংক (ঐচ্ছিক)</label><input id="link" type="url" placeholder="https://..."><p class="meta" id="linkHelp">PDF দিলে ওয়েবসাইটে পড়ার ভিউয়ারে খুলবে; কোনো ডাউনলোড বাটন দেখানো হবে না।</p></div><div id="fileUploadField"><label for="contentFile">অথবা PDF / ছবি সরাসরি আপলোড করুন</label><input id="contentFile" type="file" accept="application/pdf,image/jpeg,image/png,image/webp" multiple><p class="meta">প্রতি ফাইল সর্বোচ্চ ৫০ MB। এক পোস্টে একাধিক PDF/ছবি এবং আলাদা বাইরের URL একসঙ্গে যুক্ত করা যাবে।</p><div id="existingAttachments" class="meta"></div></div><div id="linkLabelField" class="hidden"><label for="displayLabel">লিংকে যে লেখা দেখাবে (ঐচ্ছিক)</label><input id="displayLabel" maxlength="80" placeholder="যেমন: বিস্তারিত দেখুন"></div><div id="highlightFields" class="field-group hidden"><label for="sourcePicker">নোটিশে যে কনটেন্টের লিংক যুক্ত করবেন</label><select id="sourcePicker"><option value="">কোনো পোস্ট যুক্ত নয় — সাধারণ নোটিশ</option></select></div>
+<div id="linkField"><label for="link" id="linkLabel">PDF / ছবির / বাইরের পেজের লিংক (ঐচ্ছিক)</label><input id="link" type="url" placeholder="https://..."><p class="meta" id="linkHelp">PDF দিলে ওয়েবসাইটে পড়ার ভিউয়ারে খুলবে; কোনো ডাউনলোড বাটন দেখানো হবে না।</p></div><div id="fileUploadField"><label for="contentFile">অথবা PDF / ছবি সরাসরি আপলোড করুন</label><input id="contentFile" type="file" accept="application/pdf,image/jpeg,image/png,image/webp" multiple><p class="meta">প্রতি ফাইল সর্বোচ্চ ৫০ MB। এক পোস্টে একাধিক PDF/ছবি এবং আলাদা বাইরের URL একসঙ্গে যুক্ত করা যাবে।</p><div id="existingAttachments" class="meta"></div></div><div id="linkLabelField" class="hidden"><label for="displayLabel">লিংকে যে লেখা দেখাবে (ঐচ্ছিক)</label><input id="displayLabel" maxlength="80" placeholder="যেমন: বিস্তারিত দেখুন"></div><div id="highlightFields" class="field-group hidden"><label for="sourcePicker">নোটিশের সঙ্গে কোন প্রকাশিত পোস্ট যুক্ত করবেন? (ঐচ্ছিক)</label><p class="field-group-help">গুরুত্বপূর্ণ তথ্য অথবা স্টাডি ম্যাটেরিয়াল বেছে নিন। কিছু না বাছলে নোটিশটি লিংক ছাড়াই প্রকাশিত হবে।</p><select id="sourcePicker"><option value="">কোনো পোস্ট যুক্ত নয় — সাধারণ নোটিশ</option></select><p id="sourcePickerMessage" class="meta" aria-live="polite">পোস্টের তালিকা লোড হচ্ছে…</p></div>
 <div class="grid"><div><label for="status">অবস্থা</label><select id="status"><option value="draft">খসড়া</option><option value="published">প্রকাশিত</option></select></div><div><label for="order">ক্রম</label><input id="order" type="number" value="0"></div></div>
 <div class="grid hidden" id="scheduleFields"><div><label for="publishAt">প্রকাশের সময় (ঐচ্ছিক)</label><input id="publishAt" type="datetime-local"></div><div><label for="expiresAt">মেয়াদ শেষ (ঐচ্ছিক)</label><input id="expiresAt" type="datetime-local"></div></div>
 <div class="form-actions"><button class="btn" type="submit">সংরক্ষণ করুন</button><button class="btn secondary" type="button" id="resetBtn">ফর্ম পরিষ্কার করুন</button></div>
@@ -70,34 +70,57 @@ function syncHighlightFields(){
  $("linkFilters").classList.toggle("hidden",isNotice);
 }
 async function loadSources(){
+ const select=$("sourcePicker"),status=$("sourcePickerMessage");
+ select.disabled=true;status.textContent="প্রকাশিত পোস্টের তালিকা লোড হচ্ছে…";
  const [links,materials]=await Promise.all([
-  db.from("site_content").select("id,title").eq("section","important-links").eq("status","published").order("sort_order"),
+  db.from("site_content").select("id,title").eq("section","important-links").eq("content_type","info").eq("status","published").order("sort_order").order("created_at",{ascending:false}),
   db.from("study_materials").select("id,title,department").eq("published",true).order("created_at",{ascending:false})
  ]);
- if(links.error||materials.error){$("formMessage").textContent="পোস্টের তালিকা লোড করা যায়নি।";return}
+ if(links.error||materials.error){
+  sourceCache={links:[],materials:[]};
+  select.replaceChildren(new Option("তালিকা লোড হয়নি — আবার চেষ্টা করুন",""));
+  status.textContent="পোস্টের তালিকা লোড হয়নি: "+(links.error?.message||materials.error?.message||"অজানা সমস্যা");
+  select.disabled=false;return;
+ }
  sourceCache={links:links.data||[],materials:materials.data||[]};
- const select=$("sourcePicker"),keep=select.value;
+ const keep=select.value;
  select.replaceChildren(new Option("কোনো পোস্ট যুক্ত নয় — সাধারণ নোটিশ",""));
- for(const r of sourceCache.links)select.add(new Option("গুরুত্বপূর্ণ তথ্য • "+r.title,"site_content:"+r.id));
+ const groupInfo=document.createElement("optgroup");groupInfo.label="গুরুত্বপূর্ণ তথ্য";
+ for(const r of sourceCache.links)groupInfo.append(new Option(r.title,"site_content:"+r.id));
+ if(sourceCache.links.length)select.append(groupInfo);
+ const groupMaterials=document.createElement("optgroup");groupMaterials.label="স্টাডি ম্যাটেরিয়াল";
  for(const r of sourceCache.materials){
   const dept=r.department==="academic_care"?"একাডেমিক কেয়ার":"জব কেয়ার";
-  select.add(new Option("স্টাডি ম্যাটেরিয়াল • "+dept+" • "+r.title,"study_materials:"+r.id));
+  groupMaterials.append(new Option(dept+" • "+r.title,"study_materials:"+r.id));
  }
+ if(sourceCache.materials.length)select.append(groupMaterials);
  if([...select.options].some(o=>o.value===keep))select.value=keep;
+ status.textContent=(sourceCache.links.length+sourceCache.materials.length)
+  ?"মোট "+(sourceCache.links.length+sourceCache.materials.length)+"টি প্রকাশিত পোস্ট পাওয়া গেছে।"
+  :"এখনো কোনো প্রকাশিত গুরুত্বপূর্ণ তথ্য বা স্টাডি ম্যাটেরিয়াল নেই।";
+ select.disabled=false;
 }
 function sourceChanged(){
  const value=$("sourcePicker").value;
  $("link").value="";
  if(!value){$("displayLabel").value="";return}
  const [type,id]=value.split(":");
+ let selected=null,url="";
  if(type==="site_content"){
-  const r=sourceCache.links.find(x=>String(x.id)===id);
-  if(r){if(!$("title").value.trim())$("title").value=r.title;$("link").value="https://fbpathshala.github.io/important-info.html?id="+encodeURIComponent(r.id)}
+  selected=sourceCache.links.find(x=>String(x.id)===id);
+  if(selected)url="https://fbpathshala.github.io/important-info.html?id="+encodeURIComponent(selected.id);
  }else if(type==="study_materials"){
-  const r=sourceCache.materials.find(x=>String(x.id)===id);
-  if(r){if(!$("title").value.trim())$("title").value=r.title;const dept=r.department==="academic_care"?"academic_care":"job_care";$("link").value=dept==="academic_care"?"https://fbpathshala.github.io/exam/academic-study-materials.html#material-"+r.id:"https://fbpathshala.github.io/exam/study-materials.html#material-"+r.id}
+  selected=sourceCache.materials.find(x=>String(x.id)===id);
+  if(selected){
+   const page=selected.department==="academic_care"?"academic-study-materials.html":"study-materials.html";
+   url="https://fbpathshala.github.io/exam/"+page+"#material-"+encodeURIComponent(selected.id);
+  }
  }
+ if(!selected){$("sourcePicker").value="";$("displayLabel").value="";$("sourcePickerMessage").textContent="নির্বাচিত পোস্টটি পাওয়া যায়নি। তালিকা রিফ্রেশ করে আবার বাছুন।";return}
+ if(!$("title").value.trim())$("title").value=selected.title;
+ $("link").value=url;
  $("displayLabel").value="বিস্তারিত দেখুন";
+ $("sourcePickerMessage").textContent="নির্বাচিত পোস্ট: "+selected.title;
 }
 
 function syncContentTypeFields(){const linkMode=$("contentType").value==="link";const isImportant=$("sectionFilter").value==="important-links";$("bodyField").classList.toggle("hidden",linkMode);$("fileUploadField").classList.toggle("hidden",linkMode);$("categoryField").classList.toggle("hidden",!isImportant||linkMode);$("categoryManagerPlacement").classList.toggle("hidden",!isImportant||linkMode);$("bodyLabel").textContent="বিস্তারিত লেখা";$("linkLabel").textContent=linkMode?"গুরুত্বপূর্ণ লিংকের URL":"PDF / ছবির / বাইরের পেজের লিংক (ঐচ্ছিক)";$("linkHelp").textContent=linkMode?"যে ওয়েবপেজ বা Facebook পোস্টে পাঠাতে চান, তার সম্পূর্ণ URL দিন।":"PDF দিলে ওয়েবসাইটে পড়ার ভিউয়ারে খুলবে; ডাউনলোড বাটন দেখানো হবে না।";$("link").required=linkMode;}
