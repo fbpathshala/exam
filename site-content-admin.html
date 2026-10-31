@@ -63,7 +63,7 @@ function syncHighlightFields(){
  $("listHeading").textContent=isNotice?"আগের নোটিশ":isSocial?"ফেইসবুক লিংক":"আগের কনটেন্ট";$("linkStatusFilter").previousElementSibling.textContent=isSocial?"লিংকের অবস্থা":"তথ্যের অবস্থা";$("linkSearch").previousElementSibling.textContent=isSocial?"লিংক খুঁজুন":"তথ্য খুঁজুন";$("linkSearch").placeholder=isSocial?"নাম বা URL লিখুন":"শিরোনাম, লেখা বা URL লিখুন";
  $("fileUploadField").classList.toggle("hidden",section!=="important-links");
  $("scheduleFields").classList.toggle("hidden",!isNotice);
- $("highlightFields").classList.toggle("hidden",!isNotice);$("linkLabelField").classList.toggle("hidden",!isNotice);$("linkField").classList.toggle("hidden",isNotice);
+ $("highlightFields").classList.toggle("hidden",!isNotice);$("linkLabelField").classList.add("hidden");$("linkField").classList.toggle("hidden",isNotice);
  $("tickerSetting").classList.toggle("hidden",!isNotice);
 
  $("noticeFilters").classList.toggle("hidden",!isNotice);
