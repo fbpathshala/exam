@@ -73,7 +73,7 @@ async function loadSources(){
  const select=$("sourcePicker"),status=$("sourcePickerMessage");
  select.disabled=true;status.textContent="প্রকাশিত পোস্টের তালিকা লোড হচ্ছে…";
  const [links,materials]=await Promise.all([
-  db.from("site_content").select("id,title").eq("section","important-links").eq("content_type","info").eq("status","published").order("sort_order").order("created_at",{ascending:false}),
+  db.from("site_content").select("id,title,content_type").eq("section","important-links").eq("status","published").order("sort_order").order("created_at",{ascending:false}),
   db.from("study_materials").select("id,title,department").eq("published",true).order("created_at",{ascending:false})
  ]);
  if(links.error||materials.error){
