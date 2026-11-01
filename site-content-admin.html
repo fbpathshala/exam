@@ -39,7 +39,7 @@ const db=window.db;
 const $=id=>document.getElementById(id);
 let session=null;let sourceCache={links:[],materials:[]};let currentAttachments=[];let managedCategories=[];
 function message(id,text){$(id).textContent=text;$(id).classList.remove("hidden")}
-function localTime(v){if(!v)return "";const d=new Date(v);return isNaN(d)? "":d.toISOString().slice(0,16)}
+function localTime(v){if(!v)return "";const d=new Date(v);if(isNaN(d))return "";const pad=n=>String(n).padStart(2,"0");return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())+"T"+pad(d.getHours())+":"+pad(d.getMinutes())}
 function resetForm(){$("contentForm").reset();$("recordId").value="";$("order").value="0";$("status").value=$("sectionFilter").value==="important-links"?"published":"draft";$("formMessage").classList.add("hidden");$("sourcePicker").value="";currentAttachments=[];renderExistingAttachments();syncHighlightFields();syncContentTypeFields();loadManagedCategories()}
 function syncHighlightFields(){
  const section=$("sectionFilter").value;
