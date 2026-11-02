@@ -76,7 +76,7 @@ async function loadSources(){
   const now=new Date().toISOString();
   const query=Promise.all([
    db.from("site_content").select("id,title,content_type,publish_at,expires_at").eq("section","important-links").eq("status","published").or("publish_at.is.null,publish_at.lte."+now).or("expires_at.is.null,expires_at.gt."+now).order("sort_order").order("created_at",{ascending:false}),
-   db.from("study_materials").select("id,title,department").eq("published",true).order("created_at",{ascending:false})
+   db.from("study_materials").select("id,title,department,category,folder_name,material_type,file_name,display_order").eq("published",true).order("folder_name").order("display_order").order("created_at",{ascending:false})
   ]);
   const timeout=new Promise((_,reject)=>setTimeout(()=>reject(new Error("সার্ভার থেকে উত্তর আসতে দেরি হচ্ছে। রিফ্রেশ করে আবার চেষ্টা করুন।")),12000));
   const [links,materials]=await Promise.race([query,timeout]);
@@ -87,7 +87,7 @@ async function loadSources(){
   for(const r of sourceCache.links)info.append(new Option(r.title,"site_content:"+r.id));
   if(sourceCache.links.length)select.append(info);
   const mats=document.createElement("optgroup");mats.label="স্টাডি ম্যাটেরিয়াল";
-  for(const r of sourceCache.materials){const dept=r.department==="academic_care"?"একাডেমিক কেয়ার":"জব কেয়ার";mats.append(new Option(dept+" • "+r.title,"study_materials:"+r.id));}
+  for(const r of sourceCache.materials){const dept=r.department==="academic_care"?"একাডেমিক কেয়ার":"জব কেয়ার";const kind=r.material_type==="image"?"ছবি":r.material_type==="text"?"লিখিত নোট":"PDF";const label=[dept,r.category,r.folder_name,r.title,kind,r.file_name].filter(Boolean).join(" • ");mats.append(new Option(label,"study_materials:"+r.id));}
   if(sourceCache.materials.length)select.append(mats);
   if([...select.options].some(o=>o.value===keep))select.value=keep;
   status.textContent=sourceCache.links.length+sourceCache.materials.length?"মোট "+(sourceCache.links.length+sourceCache.materials.length)+"টি প্রকাশিত পোস্ট পাওয়া গেছে।":"এখনো কোনো প্রকাশিত গুরুত্বপূর্ণ তথ্য বা স্টাডি ম্যাটেরিয়াল নেই।";
