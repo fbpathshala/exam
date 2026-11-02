@@ -25,6 +25,7 @@ select{min-height:42px;padding:8px 12px;border:1px solid #b8c8d8;border-radius:9
 #care option{background:#fff;color:#172554}
 .note{font-size:13px;color:#475569;margin:0 0 12px;padding:10px 13px;border-left:4px solid #38bdf8;border-radius:0 10px 10px 0;background:linear-gradient(90deg,#f0f9ff,#f8fafc)}
 .framewrap{height:calc(100vh - 300px);min-height:350px;background:#fff;border:1px solid #dbe5ef;border-radius:13px;overflow:hidden}
+.framewrap.notice-scroll-frame{height:auto;min-height:0;overflow:visible}.framewrap.notice-scroll-frame iframe{height:1000px;min-height:1000px}
 iframe{display:block;width:100%;height:100%;border:0;background:#fff}
 .management-framewrap{margin-top:16px;padding:12px;border:1px solid #c7d2fe;border-radius:16px;background:#f8fafc}.management-framewrap h3{margin:0 0 10px;color:#312e81}.management-framewrap iframe{width:100%;height:620px;border:1px solid #c7d2fe;border-radius:12px;background:#fff}[hidden]{display:none!important}
 @media(max-width:760px){aside{padding:0 10px}.nav{left:10px;right:10px;grid-template-columns:1fr 1fr}.nav button{font-size:12px;padding:10px}main{padding:10px}.toolbar{padding:14px;gap:8px;border-radius:13px}.toolbar .title{width:100%;font-size:21px;margin:0 0 3px}.toolbar label{margin-right:0}#care{flex:1;min-width:0;width:100%}.framewrap{height:calc(100vh - 340px);min-height:300px}}
@@ -134,6 +135,7 @@ window.addEventListener('pageshow',enforceCentralPalette);
 
 function render(){
  const r=routes[active],careLabel=document.getElementById("careLabel"),careSelect=document.getElementById("care"),workspace=document.getElementById("workspace"),typeCards=document.getElementById("resultsTypeOptions"),toggle=document.getElementById("managementToggle");
+ const noticeScroll=active==="breaking-news";document.getElementById("mainFrameWrap").classList.toggle("notice-scroll-frame",noticeScroll);if(!noticeScroll)workspace.style.height="";
  document.getElementById("sectionTitle").textContent=r.title;
  const showCare=!r.universal;
  careLabel.hidden=!showCare;careSelect.hidden=!showCare;
@@ -182,9 +184,22 @@ function cleanEmbeddedFrame(frame,styleId){
   }catch(_){}
 }
 function cleanEmbeddedSection(){cleanEmbeddedFrame(workspaceFrame,"central-legacy-navigation-cleanup")}
+let noticeResizeObserver=null;
+function resizeNoticeFrame(){
+ const wrap=document.getElementById("mainFrameWrap");
+ if(active!=="breaking-news"){if(noticeResizeObserver){noticeResizeObserver.disconnect();noticeResizeObserver=null}workspaceFrame.style.height="";wrap.classList.remove("notice-scroll-frame");return}
+ wrap.classList.add("notice-scroll-frame");
+ try{
+  const doc=workspaceFrame.contentDocument;if(!doc)return;
+  const apply=()=>{const height=Math.max(doc.documentElement?.scrollHeight||0,doc.body?.scrollHeight||0);if(height>0)workspaceFrame.style.height=Math.max(1000,height+24)+"px"};
+  apply();
+  if(noticeResizeObserver)noticeResizeObserver.disconnect();
+  if(typeof ResizeObserver!=="undefined"){noticeResizeObserver=new ResizeObserver(apply);noticeResizeObserver.observe(doc.documentElement);if(doc.body)noticeResizeObserver.observe(doc.body)}
+ }catch(_){workspaceFrame.style.height="1500px"}
+}
 const managementFrame=document.getElementById("managementWorkspace");
 function cleanEmbeddedManagement(){cleanEmbeddedFrame(managementFrame,"central-management-navigation-cleanup")}
-workspaceFrame.addEventListener("load",cleanEmbeddedSection);
+workspaceFrame.addEventListener("load",()=>{cleanEmbeddedSection();resizeNoticeFrame()});
 managementFrame.addEventListener("load",cleanEmbeddedManagement);
 document.getElementById("nav").addEventListener("click",e=>{const b=e.target.closest("[data-section]");if(!b)return;active=b.dataset.section;managementView=false;activeManagementLevel=0;selectedReviewType="ALL";document.getElementById("nav").classList.remove("open");document.getElementById("nav").hidden=true;document.getElementById("menuToggle").setAttribute("aria-expanded","false");render()});
 document.getElementById("managementToggle").addEventListener("click",()=>{managementView=!managementView;activeManagementLevel=0;render()});
