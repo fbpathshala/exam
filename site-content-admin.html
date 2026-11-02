@@ -72,33 +72,29 @@ function syncHighlightFields(){
 async function loadSources(){
  const select=$("sourcePicker"),status=$("sourcePickerMessage");
  select.disabled=true;status.textContent="প্রকাশিত পোস্টের তালিকা লোড হচ্ছে…";
- const [links,materials]=await Promise.all([
-  db.from("site_content").select("id,title,content_type,publish_at,expires_at").eq("section","important-links").eq("status","published").or("publish_at.is.null,publish_at.lte."+new Date().toISOString()).or("expires_at.is.null,expires_at.gt."+new Date().toISOString()).order("sort_order").order("created_at",{ascending:false}),
-  db.from("study_materials").select("id,title,department").eq("published",true).order("created_at",{ascending:false})
- ]);
- if(links.error||materials.error){
-  sourceCache={links:[],materials:[]};
-  select.replaceChildren(new Option("তালিকা লোড হয়নি — আবার চেষ্টা করুন",""));
-  status.textContent="পোস্টের তালিকা লোড হয়নি: "+(links.error?.message||materials.error?.message||"অজানা সমস্যা");
-  select.disabled=false;return;
- }
- sourceCache={links:links.data||[],materials:materials.data||[]};
- const keep=select.value;
- select.replaceChildren(new Option("কোনো পোস্ট যুক্ত নয় — সাধারণ নোটিশ",""));
- const groupInfo=document.createElement("optgroup");groupInfo.label="গুরুত্বপূর্ণ তথ্য";
- for(const r of sourceCache.links)groupInfo.append(new Option(r.title,"site_content:"+r.id));
- if(sourceCache.links.length)select.append(groupInfo);
- const groupMaterials=document.createElement("optgroup");groupMaterials.label="স্টাডি ম্যাটেরিয়াল";
- for(const r of sourceCache.materials){
-  const dept=r.department==="academic_care"?"একাডেমিক কেয়ার":"জব কেয়ার";
-  groupMaterials.append(new Option(dept+" • "+r.title,"study_materials:"+r.id));
- }
- if(sourceCache.materials.length)select.append(groupMaterials);
- if([...select.options].some(o=>o.value===keep))select.value=keep;
- status.textContent=(sourceCache.links.length+sourceCache.materials.length)
-  ?"মোট "+(sourceCache.links.length+sourceCache.materials.length)+"টি প্রকাশিত পোস্ট পাওয়া গেছে।"
-  :"এখনো কোনো প্রকাশিত গুরুত্বপূর্ণ তথ্য বা স্টাডি ম্যাটেরিয়াল নেই।";
- select.disabled=false;
+ try{
+  const now=new Date().toISOString();
+  const query=Promise.all([
+   db.from("site_content").select("id,title,content_type,publish_at,expires_at").eq("section","important-links").eq("status","published").or("publish_at.is.null,publish_at.lte."+now).or("expires_at.is.null,expires_at.gt."+now).order("sort_order").order("created_at",{ascending:false}),
+   db.from("study_materials").select("id,title,department").eq("published",true).order("created_at",{ascending:false})
+  ]);
+  const timeout=new Promise((_,reject)=>setTimeout(()=>reject(new Error("সার্ভার থেকে উত্তর আসতে দেরি হচ্ছে। রিফ্রেশ করে আবার চেষ্টা করুন।")),12000));
+  const [links,materials]=await Promise.race([query,timeout]);
+  if(links.error||materials.error)throw new Error(links.error?.message||materials.error?.message||"অজানা সমস্যা");
+  sourceCache={links:links.data||[],materials:materials.data||[]};
+  const keep=select.value;select.replaceChildren(new Option("কোনো পোস্ট যুক্ত নয় — সাধারণ নোটিশ",""));
+  const info=document.createElement("optgroup");info.label="গুরুত্বপূর্ণ তথ্য";
+  for(const r of sourceCache.links)info.append(new Option(r.title,"site_content:"+r.id));
+  if(sourceCache.links.length)select.append(info);
+  const mats=document.createElement("optgroup");mats.label="স্টাডি ম্যাটেরিয়াল";
+  for(const r of sourceCache.materials){const dept=r.department==="academic_care"?"একাডেমিক কেয়ার":"জব কেয়ার";mats.append(new Option(dept+" • "+r.title,"study_materials:"+r.id));}
+  if(sourceCache.materials.length)select.append(mats);
+  if([...select.options].some(o=>o.value===keep))select.value=keep;
+  status.textContent=sourceCache.links.length+sourceCache.materials.length?"মোট "+(sourceCache.links.length+sourceCache.materials.length)+"টি প্রকাশিত পোস্ট পাওয়া গেছে।":"এখনো কোনো প্রকাশিত গুরুত্বপূর্ণ তথ্য বা স্টাডি ম্যাটেরিয়াল নেই।";
+ }catch(error){
+  sourceCache={links:[],materials:[]};select.replaceChildren(new Option("তালিকা লোড হয়নি — আবার চেষ্টা করুন",""));
+  status.textContent="পোস্টের তালিকা লোড হয়নি: "+(error?.message||"অজানা সমস্যা");
+ }finally{select.disabled=false;}
 }
 function sourceChanged(){
  const value=$("sourcePicker").value;
