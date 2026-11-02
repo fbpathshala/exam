@@ -204,8 +204,8 @@ function renderItems(){
   if(row.body){const p=document.createElement("p");p.textContent=row.body;el.append(p)}
   if(row.link_url){const a=document.createElement("a");a.href=section==="important-links"?"https://fbpathshala.github.io/important-info.html?id="+encodeURIComponent(row.id):row.link_url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=isNotice?(row.display_label||"নোটিশের লিংক খুলুন"):section==="important-links"?"অনলাইনে দেখুন ↗":"লিংক খুলুন ↗";a.className="btn secondary";a.style.display="inline-block";a.style.textDecoration="none";el.append(a);if(section!=="important-links"){const url=document.createElement("div");url.className="meta";url.style.overflowWrap="anywhere";url.textContent=row.link_url;el.append(url)}}else if(section==="important-links"){const preview=document.createElement("a");preview.href="https://fbpathshala.github.io/important-info.html?id="+encodeURIComponent(row.id);preview.target="_blank";preview.rel="noopener noreferrer";preview.textContent="অনলাইনে দেখুন ↗";preview.className="btn secondary";preview.style.display="inline-block";preview.style.textDecoration="none";el.append(preview)}
   if(section==="important-links"){const copy=document.createElement("button");copy.className="btn secondary";copy.textContent="লিংক কপি";copy.onclick=async()=>{const url="https://fbpathshala.github.io/important-info.html?id="+encodeURIComponent(row.id);try{await navigator.clipboard.writeText(url);copy.textContent="কপি হয়েছে";setTimeout(()=>copy.textContent="লিংক কপি",1600)}catch(e){window.prompt("লিংক কপি করুন",url)}};el.append(copy)}
-  const edit=document.createElement("button");edit.className="btn secondary";edit.textContent="সম্পাদনা";edit.onclick=()=>{edit.disabled=true;edit.textContent="খুলছে…";editItem(row).finally(()=>{edit.disabled=false;edit.textContent="সম্পাদনা"})};el.append(edit);
-  const del=document.createElement("button");del.className="btn danger";del.textContent="মুছুন";del.onclick=()=>deleteItem(row);el.append(del);
+  const edit=document.createElement("button");edit.type="button";edit.className="btn secondary";edit.textContent="সম্পাদনা";edit.onclick=()=>{edit.disabled=true;edit.textContent="খুলছে…";editItem(row).finally(()=>{edit.disabled=false;edit.textContent="সম্পাদনা"})};el.append(edit);
+  const del=document.createElement("button");del.type="button";del.className="btn danger";del.textContent="মুছুন";del.onclick=()=>deleteItem(row);el.append(del);
   $("items").append(el);
  }
 }
@@ -227,7 +227,29 @@ async function loadItems(){
  }
 }
 function renderExistingAttachments(){$("existingAttachments").replaceChildren();currentAttachments.forEach((file,index)=>{const row=document.createElement("div");row.style.cssText="display:flex;align-items:center;gap:8px;margin-top:6px;overflow-wrap:anywhere";const link=document.createElement("a");link.href=file.url;link.target="_blank";link.rel="noopener noreferrer";link.textContent=file.name||("সংযুক্ত ফাইল "+(index+1));row.append(link);const remove=document.createElement("button");remove.type="button";remove.className="btn danger";remove.style.cssText="margin:0;padding:4px 8px;font-size:12px";remove.textContent="বাদ দিন";remove.onclick=()=>{currentAttachments.splice(index,1);renderExistingAttachments()};row.append(remove);$("existingAttachments").append(row)})}
-async function editItem(r){try{$("formMessage").classList.add("hidden");$("recordId").value=r.id;$("title").value=r.title||"";$("contentType").value=r.content_type||"info";syncContentTypeFields();await loadManagedCategories(r.category||"",r.subcategory||"");$("category").value=r.category||"";$("subcategory").value=r.subcategory||"";$("body").value=r.body||"";$("link").value=r.link_url||"";$("status").value=r.status||"draft";$("order").value=r.sort_order??0;$("publishAt").value=localTime(r.publish_at);$("expiresAt").value=localTime(r.expires_at);$("displayLabel").value=r.display_label||"";if(r.section==="breaking-news"){await loadSources();const sourceValue=r.source_type&&r.source_id&&r.source_type!=="none"?r.source_type+":"+r.source_id:"";$("noticeLinkMode").value=sourceValue||r.link_url?"linked":"general";syncNoticeLinkFields();$("sourcePicker").value=sourceValue;if(sourceValue){sourceChanged();if($("sourcePicker").value!==sourceValue){$("sourcePickerMessage").textContent="আগের সংযুক্ত পোস্টটি আর প্রকাশিত তালিকায় নেই। নোটিশটি সংরক্ষণের আগে নতুন পোস্ট নির্বাচন করুন।";$("sourcePicker").value="";}}const base=r.publish_at||r.created_at;const durationMs=r.expires_at&&base?new Date(r.expires_at).getTime()-new Date(base).getTime():null;const days=[1,3,7,15,30].find(d=>durationMs!==null&&Math.abs(durationMs-d*86400000)<120000);$("noticeDuration").value=r.expires_at?(days?String(days):"custom"):"none";}currentAttachments=Array.isArray(r.attachments)?r.attachments.slice():[];renderExistingAttachments();$("formTitle").textContent=r.section==="breaking-news"?"নোটিশ সম্পাদনা":"কনটেন্ট সম্পাদনা";syncHighlightFields();window.scrollTo({top:0,behavior:"smooth"});}catch(error){$("formTitle").textContent="সম্পাদনা করা যায়নি";message("formMessage","সম্পাদনার ফর্ম খোলা যায়নি: "+(error?.message||"অজানা সমস্যা")+"। আবার চেষ্টা করুন।");console.error("Content edit failed:",error)}}
+async function editItem(r){
+ $("formMessage").classList.add("hidden");
+ $("recordId").value=r.id;$("title").value=r.title||"";$("contentType").value=r.content_type||"info";
+ syncContentTypeFields();$("category").value=r.category||"";$("subcategory").value=r.subcategory||"";
+ $("body").value=r.body||"";$("link").value=r.link_url||"";$("status").value=r.status||"draft";$("order").value=r.sort_order??0;
+ $("publishAt").value=localTime(r.publish_at);$("expiresAt").value=localTime(r.expires_at);$("displayLabel").value=r.display_label||"";
+ currentAttachments=Array.isArray(r.attachments)?r.attachments.slice():[];renderExistingAttachments();
+ $("noticeLinkMode").value=(r.source_type&&r.source_id&&r.source_type!=="none")||r.link_url?"linked":"general";
+ const base=r.publish_at||r.created_at,durationMs=r.expires_at&&base?new Date(r.expires_at).getTime()-new Date(base).getTime():null;
+ const days=[1,3,7,15,30].find(d=>durationMs!==null&&Math.abs(durationMs-d*86400000)<120000);
+ $("noticeDuration").value=r.expires_at?(days?String(days):"custom"):"none";
+ $("formTitle").textContent=r.section==="breaking-news"?"নোটিশ সম্পাদনা":"কনটেন্ট সম্পাদনা";
+ syncHighlightFields();window.scrollTo({top:0,behavior:"smooth"});
+ try{
+  await loadManagedCategories(r.category||"",r.subcategory||"");
+  if(r.section==="breaking-news"){
+   await loadSources();
+   const sourceValue=r.source_type&&r.source_id&&r.source_type!=="none"?r.source_type+":"+r.source_id:"";
+   $("noticeLinkMode").value=sourceValue||r.link_url?"linked":"general";syncNoticeLinkFields();$("sourcePicker").value=sourceValue;
+   if(sourceValue){sourceChanged();if($("sourcePicker").value!==sourceValue){$("sourcePickerMessage").textContent="আগের সংযুক্ত পোস্টটি আর প্রকাশিত তালিকায় নেই। নোটিশটি সংরক্ষণের আগে নতুন পোস্ট নির্বাচন করুন।";$("sourcePicker").value="";}}
+  }
+ }catch(error){message("formMessage","নোটিশের তথ্য ফর্মে এসেছে, তবে ক্যাটাগরি/উৎসের তালিকা লোড হয়নি: "+(error?.message||"অজানা সমস্যা"))}
+}
 async function deleteItem(r){if(!confirm("এই কনটেন্ট মুছে ফেলবেন?"))return;const {error}=await db.from("site_content").delete().eq("id",r.id);if(error){alert("মুছতে সমস্যা: "+error.message);return}await loadItems();resetForm()}
 $("contentForm").addEventListener("submit",async e=>{
  e.preventDefault();if(!session){message("formMessage","সেশন পাওয়া যায়নি। আবার লগইন করুন।");return}
