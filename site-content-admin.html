@@ -92,14 +92,7 @@ async function loadSources(){
   run("একাডেমিক কেয়ার পরীক্ষা",db.from("academic_care_exams").select("id,title,status,public_token").eq("status","published").order("created_at",{ascending:false}))
  ]);
  sourceCache={links,materials,jobExams,academicExams};
- select.replaceChildren(new Option("প্রকাশিত পোস্ট / পরীক্ষা নির্বাচন করুন",""));
- const addGroup=(label,rows,makeOption,kind)=>{if(!rows.length)return;const group=document.createElement("optgroup");group.label=label;group.dataset.kind=kind;rows.forEach(r=>group.append(makeOption(r)));select.append(group)};
- addGroup("গুরুত্বপূর্ণ তথ্য",links,r=>new Option(r.title,"site_content:"+r.id),"info");
- addGroup("জব কেয়ার — পরীক্ষা",jobExams,r=>new Option(r.exam_name+" • পরীক্ষা","exams:"+r.id),"exam");
- addGroup("একাডেমিক কেয়ার — পরীক্ষা",academicExams,r=>new Option(r.title+" • পরীক্ষা","academic_care_exams:"+r.public_token),"exam");
- addGroup("স্টাডি ম্যাটেরিয়াল",materials,r=>{const dept=r.department==="academic_care"?"একাডেমিক কেয়ার":"জব কেয়ার";const kind=r.material_type==="image"?"ছবি":r.material_type==="text"?"লিখিত নোট":"PDF";const label=[dept,r.category,r.folder_name,r.title,kind,r.file_name].filter(Boolean).join(" • ");return new Option(label,"study_materials:"+r.id)},"material");
  applySourceFilter();
- if([...select.options].some(o=>o.value===keep))select.value=keep;
  const total=links.length+materials.length+jobExams.length+academicExams.length;
  if(problems.length){
   status.textContent=(total?"মোট "+total+"টি উৎস পাওয়া গেছে। ":"") +"কিছু তালিকা লোড হয়নি: "+problems.join(" | ");
@@ -108,7 +101,18 @@ async function loadSources(){
  }
  select.disabled=false;
 }
-function applySourceFilter(){const kind=$("sourceTypeFilter").value;$("sourcePicker").querySelectorAll("optgroup").forEach(group=>{group.hidden=kind!=="all"&&group.dataset.kind!==kind;});}
+function applySourceFilter(){
+ const select=$("sourcePicker"),kind=$("sourceTypeFilter").value,keep=select.value;
+ select.replaceChildren(new Option("নির্বাচিত ধরনের পোস্ট / পরীক্ষা বাছাই করুন",""));
+ const addGroup=(label,rows,makeOption)=>{if(!rows.length)return;const group=document.createElement("optgroup");group.label=label;rows.forEach(r=>group.append(makeOption(r)));select.append(group)};
+ if(kind==="all"||kind==="info")addGroup("সাধারণ তথ্য",sourceCache.links,r=>new Option(r.title,"site_content:"+r.id));
+ if(kind==="all"||kind==="exam"){
+  addGroup("জব কেয়ার — পরীক্ষা",sourceCache.jobExams,r=>new Option(r.exam_name+" • পরীক্ষা","exams:"+r.id));
+  addGroup("একাডেমিক কেয়ার — পরীক্ষা",sourceCache.academicExams,r=>new Option(r.title+" • পরীক্ষা","academic_care_exams:"+r.public_token));
+ }
+ if(kind==="all"||kind==="material")addGroup("স্টাডি ম্যাটেরিয়াল",sourceCache.materials,r=>{const dept=r.department==="academic_care"?"একাডেমিক কেয়ার":"জব কেয়ার";const materialKind=r.material_type==="image"?"ছবি":r.material_type==="text"?"লিখিত নোট":"PDF";const label=[dept,r.category,r.folder_name,r.title,materialKind,r.file_name].filter(Boolean).join(" • ");return new Option(label,"study_materials:"+r.id)});
+ if([...select.options].some(o=>o.value===keep))select.value=keep;
+}
 function sourceChanged(){
  const value=$("sourcePicker").value;
  $("link").value="";
@@ -228,7 +232,7 @@ $("addCategoryBtn").addEventListener("click",addManagedCategory);
 $("sectionFilter").addEventListener("change",async()=>{resetForm();syncHighlightFields();$("status").value=$("sectionFilter").value==="important-links"?"published":"draft";await loadSources();await loadTickerSetting();await loadItems();await loadManagedCategories()});$("noticeStatusFilter").addEventListener("change",renderItems);$("noticeTimeFilter").addEventListener("change",renderItems);$("noticeSearch").addEventListener("input",renderItems);$("linkStatusFilter").addEventListener("change",renderItems);$("linkSearch").addEventListener("input",renderItems);$("sourceTypeFilter").addEventListener("change",applySourceFilter);$("sourcePicker").addEventListener("change",sourceChanged);$("noticeLinkMode").addEventListener("change",()=>{if($("noticeLinkMode").value==="general"){$("sourcePicker").value="";$("link").value="";$("displayLabel").value="";}syncNoticeLinkFields()});$("resetBtn").addEventListener("click",resetForm);$("refreshBtn").addEventListener("click",async()=>{await loadSources();await loadItems()});
 async function loadTickerSetting(){syncHighlightFields();if($("sectionFilter").value!=="breaking-news")return;try{const request=db.from("site_feature_settings").select("enabled").eq("feature_key","breaking_news_ticker").maybeSingle();const result=await Promise.race([Promise.resolve(request),new Promise((_,reject)=>setTimeout(()=>reject(new Error("সময় শেষ")),8000))]);const {data,error}=result;if(error)throw error;$("tickerEnabled").checked=data?!!data.enabled:true;$("tickerSettingMessage").textContent=data?"বর্তমান সেটিং লোড হয়েছে।":"ডিফল্টভাবে চালু আছে।"}catch(error){$("tickerSettingMessage").textContent="নোটিশ সেটিং লোড হয়নি: "+(error?.message||"অজানা সমস্যা")+" — উৎসের তালিকা আলাদাভাবে লোড করা হবে।"}}
 $("tickerEnabled").addEventListener("change",async()=>{const enabled=$("tickerEnabled").checked;$("tickerEnabled").disabled=true;$("tickerSettingMessage").textContent="সংরক্ষণ হচ্ছে…";const {error}=await db.from("site_feature_settings").upsert({feature_key:"breaking_news_ticker",enabled,updated_at:new Date().toISOString()},{onConflict:"feature_key"});$("tickerEnabled").disabled=false;if(error){$("tickerEnabled").checked=!enabled;$("tickerSettingMessage").textContent="সংরক্ষণ হয়নি: "+error.message;return}$("tickerSettingMessage").textContent=enabled?"চলমান নোটিশ চালু করা হয়েছে।":"চলমান নোটিশ বন্ধ করা হয়েছে।"});
-async function init(){try{if(!db||!db.auth){$("authMessage").textContent="লগইন সেবা লোড হয়নি। পেজ রিফ্রেশ করে আবার চেষ্টা করুন।";return}const result=await Promise.race([db.auth.getSession(),new Promise((_,reject)=>setTimeout(()=>reject(new Error("session-timeout")),12000))]);const {data,error}=result;session=data?.session||null;if(error){$("authMessage").textContent="সেশন যাচাই করা যায়নি: "+error.message;return}if(!session){$("authMessage").textContent="এই অংশ ব্যবহার করতে home.html থেকে অ্যাডমিন হিসেবে লগইন করুন।";return}$("loginCard").classList.add("hidden");$("app").classList.remove("hidden");await loadTickerSetting();await loadSources();await loadItems();await loadManagedCategories()}catch(error){$("authMessage").textContent=error?.message==="session-timeout"?"লগইন যাচাইয়ে সময় বেশি লাগছে। পেজ রিফ্রেশ করুন; সমস্যা থাকলে আবার লগইন করুন।":"লগইন যাচাই করা যায়নি। পেজ রিফ্রেশ করে আবার চেষ্টা করুন।";console.error("Central content admin session check failed:",error)}}
+async function init(){try{if(!db||!db.auth){$("authMessage").textContent="লগইন সেবা লোড হয়নি। পেজ রিফ্রেশ করে আবার চেষ্টা করুন।";return}const result=await Promise.race([db.auth.getSession(),new Promise((_,reject)=>setTimeout(()=>reject(new Error("session-timeout")),12000))]);const {data,error}=result;session=data?.session||null;if(error){$("authMessage").textContent="সেশন যাচাই করা যায়নি: "+error.message;return}if(!session){$("authMessage").textContent="এই অংশ ব্যবহার করতে home.html থেকে অ্যাডমিন হিসেবে লগইন করুন।";return}$("loginCard").classList.add("hidden");$("app").classList.remove("hidden");await loadSources();await loadTickerSetting();await loadItems();await loadManagedCategories()}catch(error){$("authMessage").textContent=error?.message==="session-timeout"?"লগইন যাচাইয়ে সময় বেশি লাগছে। পেজ রিফ্রেশ করুন; সমস্যা থাকলে আবার লগইন করুন।":"লগইন যাচাই করা যায়নি। পেজ রিফ্রেশ করে আবার চেষ্টা করুন।";console.error("Central content admin session check failed:",error)}}
 const requestedSection=new URLSearchParams(location.search).get('section');if(['important-links','breaking-news','social-links'].includes(requestedSection))$('sectionFilter').value=requestedSection;
 init();
 </script>
