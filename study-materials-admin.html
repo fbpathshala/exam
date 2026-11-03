@@ -53,7 +53,8 @@ async function load(){
  $('listMessage').textContent='লোড হচ্ছে…';$('items').replaceChildren();
  const {data,error}=await db.from('study_materials').select('*').eq('department',$('departmentSwitch').value).order('folder_name').order('display_order').order('created_at',{ascending:false});
  if(error){$('listMessage').textContent='লোড করা যায়নি: '+error.message;return}
- allMaterialRows=data||[];updateStats();$('listMessage').textContent='মোট '+allMaterialRows.length+'টি উপকরণ • '+new Set(allMaterialRows.map(r=>(r.folder_name||'সাধারণ').trim()||'সাধারণ')).size+'টি ফোল্ডার';renderMaterialList();}\nfunction renderMaterialRows(rows){$('items').replaceChildren();$('listMessage').textContent='মোট '+allMaterialRows.length+'টি • দেখানো হচ্ছে '+rows.length+'টি উপকরণ';
+ allMaterialRows=data||[];updateStats();$('listMessage').textContent='মোট '+allMaterialRows.length+'টি উপকরণ • '+new Set(allMaterialRows.map(r=>(r.folder_name||'সাধারণ').trim()||'সাধারণ')).size+'টি ফোল্ডার';renderMaterialList();}
+function renderMaterialRows(rows){$('items').replaceChildren();$('listMessage').textContent='মোট '+allMaterialRows.length+'টি • দেখানো হচ্ছে '+rows.length+'টি উপকরণ';
  const folders=new Map();
  for(const r of rows){const folder=(r.folder_name||'সাধারণ').trim()||'সাধারণ';if(!folders.has(folder))folders.set(folder,[]);folders.get(folder).push(r)}
  for(const [folder,folderRows] of folders){
