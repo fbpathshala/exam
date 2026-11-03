@@ -17,12 +17,97 @@ button.danger{background:#fff1f2!important;color:#b42318!important;border:1px so
 .card:nth-child(2)>h2{display:flex;align-items:center;gap:9px}.card:nth-child(2)>h2:before{content:"☷";display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:#e7f4f2;color:var(--teal)}
 @media(max-width:650px){body{padding:9px!important}.card{padding:13px!important;border-radius:12px!important}.grid{grid-template-columns:1fr!important}button{width:auto;max-width:100%}}
 </style></head><body><main class="wrap"><section class="card"><h1>📚 স্টাডি ম্যাটেরিয়াল কাঠামো ব্যবস্থাপনা</h1><p>এই তালিকা শুধু স্টাডি ম্যাটেরিয়ালের জন্য। প্রশ্ন ব্যাংকের বিভাগ/সেট এতে বদলাবে না।</p><div id="departmentControl"><label for="department">বিভাগ</label><select id="department"><option value="job_care">Job Care — ক্যাটাগরি → সাব-ক্যাটাগরি → সেট</option><option value="academic_care">Academic Care — শ্রেণি → বিষয় → অধ্যায়/সেট</option></select></div><div class="grid"><div><label for="level">স্তর</label><select id="level"><option value="category">প্রথম স্তর</option><option value="subcategory">দ্বিতীয় স্তর</option><option value="set">সেট</option></select></div><div id="parentWrap"><label id="parentLabel" for="parent">যার অধীনে যোগ হবে</label><select id="parent"></select></div></div><label for="name">নাম</label><input id="name" maxlength="160" placeholder="নতুন নাম লিখুন"><label for="order">প্রদর্শনের ক্রম</label><input id="order" type="number" value="0"><button id="save">সংরক্ষণ</button><button id="cancel" class="secondary">নতুন এন্ট্রি</button><div id="status" class="status">লোড হচ্ছে…</div></section><section class="card"><h2>বর্তমান কাঠামো</h2><p class="muted">কোনো স্তর মুছলে সেটি ব্যবহৃত উপকরণের সংযোগ থেকে আলাদা হতে পারে; তাই ব্যবহৃত স্তর মুছতে বাধা দেওয়া হবে।</p><div id="list"></div></section></main><script>
-const db=supabase.createClient('https://ydvbnalhcnfqpxkkmywr.supabase.co','sb_publishable_xCbSWDkASsbUPl-WmygyMw_eVrJY_9a');const $=x=>document.getElementById(x);let session=null,nodes=[],editing=null;
+const db=supabase.createClient('https://ydvbnalhcnfqpxkkmywr.supabase.co','sb_publishable_xCbSWDkASsbUPl-WmygyMw_eVrJY_9a');
+const $=id=>document.getElementById(id);
+let session=null,nodes=[],editingId=null,busy=false;
 function say(s){$('status').textContent=s}
 function levels(){return $('department').value==='job_care'?[['category','ক্যাটাগরি'],['subcategory','সাব-ক্যাটাগরি'],['set','সেট']]:[['category','শ্রেণি'],['subcategory','বিষয়'],['chapter','অধ্যায়'],['set','সেট']]}
-function parentsFor(type){const ix=levels().findIndex(x=>x[0]===type);return ix<=0?[]:nodes.filter(n=>n.department===$('department').value&&n.node_type===levels()[ix-1][0]).sort((a,b)=>a.display_order-b.display_order||a.name.localeCompare(b.name))}
-function updateForm(){const ls=levels();$('level').innerHTML='';ls.forEach(([v,l])=>{const o=document.createElement('option');o.value=v;o.textContent=l;$('level').append(o)});if(editing)$('level').value=editing.node_type;const type=$('level').value;const ps=parentsFor(type);$('parentWrap').classList.toggle('hidden',type==='category');$('parentLabel').textContent=ls[Math.max(0,ls.findIndex(x=>x[0]===type)-1)]?.[1]+' নির্বাচন করুন';$('parent').innerHTML='';ps.forEach(n=>{const o=document.createElement('option');o.value=n.id;o.textContent=n.name;$('parent').append(o)});if(editing?.parent_id)$('parent').value=editing.parent_id;$('name').value=editing?.name||'';$('order').value=editing?.display_order??0}
-function trail(n){let a=[n.name],p=n.parent_id;while(p){const x=nodes.find(z=>z.id===p);if(!x)break;a.unshift(x.name);p=x.parent_id}return a.join(' › ')}
-async function load(){const {data,error}=await db.from('study_material_taxonomy').select('*').eq('department',$('department').value).order('display_order').order('name');if(error){say('লোড করা যায়নি: '+error.message);return}nodes=data||[];updateForm();$('list').replaceChildren();if(!nodes.length){$('list').textContent='এখনো কোনো কাঠামো তৈরি হয়নি। উপরের ফর্ম থেকে প্রথম স্তর তৈরি করুন।';say('প্রস্তুত।');return}for(const n of nodes){const el=document.createElement('div');el.className='item';const title=document.createElement('strong');title.textContent=trail(n);el.append(title);const m=document.createElement('div');m.className='muted';m.textContent=levels().find(x=>x[0]===n.node_type)?.[1]||n.node_type;el.append(m);const e=document.createElement('button');e.className='secondary';e.textContent='সম্পাদনা';e.onclick=()=>{editing=n;updateForm();window.scrollTo({top:0,behavior:'smooth'})};el.append(e);const d=document.createElement('button');d.className='danger';d.textContent='মুছুন';d.onclick=async()=>{if(nodes.some(x=>x.parent_id===n.id)){alert('আগে এর অধীনের স্তরগুলো সরান।');return}const {count,error:checkErr}=await db.from('study_materials').select('id',{count:'exact',head:true}).or('category_id.eq.'+n.id+',subcategory_id.eq.'+n.id+',chapter_id.eq.'+n.id+',set_id.eq.'+n.id);if(checkErr){alert('ব্যবহার যাচাই করা যায়নি: '+checkErr.message);return}if(count){alert('এই স্তরটি উপকরণে ব্যবহৃত হচ্ছে, তাই মুছতে দেওয়া হয়নি।');return}if(!confirm('এই স্তর মুছবেন?'))return;const {error}=await db.from('study_material_taxonomy').delete().eq('id',n.id);if(error)alert('মুছতে সমস্যা: '+error.message);else{editing=null;await load()}};el.append(d);$('list').append(el)}say('মোট '+nodes.length+'টি স্তর।')}
-$('department').onchange=()=>{editing=null;load()};$('level').onchange=()=>{editing=null;updateForm()};$('cancel').onclick=()=>{editing=null;updateForm();say('নতুন এন্ট্রির জন্য প্রস্তুত।')};$('save').onclick=async()=>{if(!session){say('অ্যাডমিন লগইন প্রয়োজন।');return}const type=$('level').value,name=$('name').value.trim();if(!name){say('নাম লিখুন।');return}const ix=levels().findIndex(x=>x[0]===type);const parent_id=ix===0?null:Number($('parent').value);if(ix>0&&!parent_id){say('আগের স্তর নির্বাচন করুন।');return}const payload={department:$('department').value,node_type:type,parent_id,name,display_order:Number($('order').value)||0,updated_at:new Date().toISOString()};const q=editing?db.from('study_material_taxonomy').update(payload).eq('id',editing.id):db.from('study_material_taxonomy').insert(payload);const {error}=await q;if(error){say('সংরক্ষণ হয়নি: '+error.message);return}editing=null;$('name').value='';say('সংরক্ষণ সফল হয়েছে।');await load()};async function init(){const requested=new URLSearchParams(location.search).get('department');if(requested==='job_care'||requested==='academic_care'){$('department').value=requested;$('departmentControl').classList.add('hidden')};const {data,error}=await db.auth.getSession();session=data?.session||null;if(error||!session){say('অ্যাডমিন হিসেবে লগইন করুন, তারপর পেজটি আবার খুলুন।');$('save').disabled=true;return}await load()}init();
+function currentNode(){return nodes.find(n=>String(n.id)===String(editingId))||null}
+function parentOptions(type){const ls=levels(),ix=ls.findIndex(x=>x[0]===type);if(ix<=0)return [];const parentType=ls[ix-1][0];return nodes.filter(n=>n.node_type===parentType).sort((a,b)=>(a.display_order-b.display_order)||a.name.localeCompare(b.name,'bn'))}
+function updateForm(){
+ const oldLevel=$('level').value, node=currentNode(), ls=levels();
+ $('level').replaceChildren();
+ ls.forEach(([v,l])=>{const o=document.createElement('option');o.value=v;o.textContent=l;$('level').append(o)});
+ $('level').value=node?node.node_type:(ls.some(x=>x[0]===oldLevel)?oldLevel:ls[0][0]);
+ const type=$('level').value, ix=ls.findIndex(x=>x[0]===type), parents=parentOptions(type);
+ $('parentWrap').classList.toggle('hidden',ix===0);
+ $('parentLabel').textContent=(ls[ix-1]?.[1]||'অভিভাবক')+' নির্বাচন করুন';
+ $('parent').replaceChildren();
+ const first=document.createElement('option');first.value='';first.textContent='— নির্বাচন করুন —';$('parent').append(first);
+ parents.forEach(n=>{const o=document.createElement('option');o.value=String(n.id);o.textContent=n.name;$('parent').append(o)});
+ if(node?.parent_id)$('parent').value=String(node.parent_id);
+ $('name').value=node?.name||'';
+ $('order').value=node?.display_order??0;
+ $('save').textContent=node?'নাম/তথ্য পরিবর্তন সংরক্ষণ':'নতুন স্তর যোগ করুন';
+}
+function trail(n){const a=[n.name];let p=n.parent_id,guard=0;while(p&&guard++<10){const x=nodes.find(z=>String(z.id)===String(p));if(!x)break;a.unshift(x.name);p=x.parent_id}return a.join(' › ')}
+function typeLabel(type){return levels().find(x=>x[0]===type)?.[1]||type}
+function makeButton(label,cls,handler){const b=document.createElement('button');b.type='button';b.className=cls;b.textContent=label;b.addEventListener('click',handler);return b}
+async function load(){
+ $('list').replaceChildren();say('কাঠামো লোড হচ্ছে…');
+ const {data,error}=await db.from('study_material_taxonomy').select('id,department,node_type,parent_id,name,display_order').eq('department',$('department').value).order('display_order').order('name');
+ if(error){say('কাঠামো লোড হয়নি: '+error.message);return}
+ nodes=data||[];updateForm();
+ if(!nodes.length){const p=document.createElement('p');p.textContent='এখনো কোনো কাঠামো নেই। প্রথম স্তর যোগ করে শুরু করুন।';$('list').append(p)}
+ for(const n of nodes){
+  const el=document.createElement('div');el.className='item';
+  const title=document.createElement('strong');title.textContent=trail(n);el.append(title);
+  const meta=document.createElement('div');meta.className='muted';meta.textContent=typeLabel(n.node_type)+' · ক্রম '+n.display_order;el.append(meta);
+  el.append(makeButton('নাম পরিবর্তন','secondary',()=>renameNode(n)));
+  el.append(makeButton('সম্পাদনা','secondary',()=>{editingId=n.id;updateForm();say('নির্বাচিত: '+trail(n)+'। পরিবর্তন করে সংরক্ষণ করুন।');window.scrollTo({top:0,behavior:'smooth'})}));
+  el.append(makeButton('মুছুন','danger',()=>deleteNode(n)));
+  $('list').append(el);
+ }
+ say('মোট '+nodes.length+'টি স্তর লোড হয়েছে।');
+}
+async function renameNode(n){
+ const next=prompt('নতুন নাম লিখুন:',n.name);if(next===null)return;const name=next.trim();
+ if(!name){say('নাম খালি রাখা যাবে না।');return}
+ if(name===n.name){say('নামে কোনো পরিবর্তন হয়নি।');return}
+ if(busy)return;busy=true;
+ const {error}=await db.from('study_material_taxonomy').update({name,updated_at:new Date().toISOString()}).eq('id',n.id).eq('department',$('department').value);
+ busy=false;
+ if(error){say('নাম পরিবর্তন হয়নি: '+error.message);return}
+ editingId=null;say('নাম সফলভাবে পরিবর্তন হয়েছে।');await load();
+}
+async function deleteNode(n){
+ if(busy)return;
+ const children=nodes.filter(x=>String(x.parent_id)===String(n.id));
+ if(children.length){say('এই স্তরের অধীনে '+children.length+'টি স্তর আছে। আগে সেগুলো সরান বা অন্য অভিভাবকের অধীনে নিন।');return}
+ const {count,error:checkError}=await db.from('study_materials').select('id',{count:'exact',head:true}).or('category_id.eq.'+n.id+',subcategory_id.eq.'+n.id+',chapter_id.eq.'+n.id+',set_id.eq.'+n.id);
+ if(checkError){say('ব্যবহৃত উপকরণ যাচাই করা যায়নি: '+checkError.message);return}
+ if(count>0){say('এই স্তরটি '+count+'টি উপকরণে ব্যবহৃত হচ্ছে। উপকরণের সংযোগ না সরিয়ে এটি মোছা যাবে না।');return}
+ if(!confirm('“'+n.name+'” মুছে ফেলবেন? এই কাজ ফিরিয়ে আনা যাবে না।'))return;
+ busy=true;const {error}=await db.from('study_material_taxonomy').delete().eq('id',n.id).eq('department',$('department').value);busy=false;
+ if(error){say('মুছতে সমস্যা: '+error.message);return}
+ if(String(editingId)===String(n.id))editingId=null;say('স্তরটি মুছে ফেলা হয়েছে।');await load();
+}
+$('department').addEventListener('change',()=>{editingId=null;load()});
+$('level').addEventListener('change',()=>{if(editingId){editingId=null;say('নতুন স্তর যোগের মোডে ফিরে এসেছেন।')}updateForm()});
+$('cancel').addEventListener('click',()=>{editingId=null;$('name').value='';$('order').value='0';updateForm();say('নতুন স্তর যোগের জন্য প্রস্তুত।')});
+$('save').addEventListener('click',async()=>{
+ if(!session){say('অ্যাডমিন লগইন প্রয়োজন।');return}if(busy)return;
+ const type=$('level').value,name=$('name').value.trim(),ls=levels(),ix=ls.findIndex(x=>x[0]===type),parent_id=ix===0?null:Number($('parent').value);
+ if(!name){say('নাম লিখুন।');$('name').focus();return}
+ if(ix>0&&!parent_id){say('আগের স্তর নির্বাচন করুন।');$('parent').focus();return}
+ const parent=ix>0?nodes.find(n=>String(n.id)===String(parent_id)):null;
+ if(ix>0&&(!parent||parent.node_type!==ls[ix-1][0])){say('সঠিক অভিভাবক স্তর নির্বাচন করুন।');return}
+ const payload={department:$('department').value,node_type:type,parent_id,name,display_order:Number($('order').value)||0,updated_at:new Date().toISOString()};
+ busy=true;$('save').disabled=true;say(editingId?'পরিবর্তন সংরক্ষণ হচ্ছে…':'নতুন স্তর যোগ হচ্ছে…');
+ const result=editingId
+  ?await db.from('study_material_taxonomy').update(payload).eq('id',editingId).eq('department',$('department').value).select('id').maybeSingle()
+  :await db.from('study_material_taxonomy').insert(payload).select('id').maybeSingle();
+ busy=false;$('save').disabled=false;
+ if(result.error){say('সংরক্ষণ হয়নি: '+result.error.message);return}
+ if(!result.data){say('কোনো রেকর্ড পরিবর্তন হয়নি। লগইন/অনুমতি যাচাই করুন।');return}
+ editingId=null;$('name').value='';$('order').value='0';say('সফলভাবে সংরক্ষণ হয়েছে।');await load();
+});
+async function init(){
+ const requested=new URLSearchParams(location.search).get('department');
+ if(requested==='job_care'||requested==='academic_care'){$('department').value=requested;$('departmentControl').classList.add('hidden')}
+ const {data,error}=await db.auth.getSession();session=data?.session||null;
+ if(error||!session){say('অ্যাডমিন হিসেবে লগইন করুন, তারপর পেজটি আবার খুলুন।');$('save').disabled=true;return}
+ await load();
+}
+init();
 </script></body></html>
