@@ -16,7 +16,7 @@ function nodeName(id){return taxonomyNodes.find(n=>String(n.id)===String(id))?.n
 function updateSubcategoryOptions(){const cat=$('categoryFilter').value;const vals=taxonomyNodes.filter(n=>n.node_type==='subcategory'&&(!cat||String(n.parent_id)===cat)).map(n=>({value:String(n.id),label:n.name}));fillSelect('subcategoryFilter',vals,'সব সাব-ক্যাটাগরি');updateSetOptions()}
 function updateSetOptions(){const sub=$('subcategoryFilter').value;const vals=taxonomyNodes.filter(n=>n.node_type==='set'&&(!sub||String(n.parent_id)===sub)).map(n=>({value:String(n.id),label:n.name}));const folders=[...new Set(items.map(x=>(x.folder_name||'সাধারণ').trim()||'সাধারণ'))].map(name=>({value:'folder:'+name,label:'📁 '+name}));const combined=[...vals,...folders.filter(f=>!vals.some(v=>v.label===f.label))];fillSelect('setFilter',combined,'সব সেট / ফোল্ডার')}
 function matches(x){const q=$('search').value.trim().toLowerCase();const cat=$('categoryFilter').value,sub=$('subcategoryFilter').value,set=$('setFilter').value;const folder=(x.folder_name||'সাধারণ').trim()||'সাধারণ';return(!cat||String(x.category_id||'')===cat)&&(!sub||String(x.subcategory_id||'')===sub)&&(!set||(set.startsWith('folder:')?folder===set.slice(7):String(x.set_id||'')===set))&&(!q||(x.title+' '+(x.taxonomyPath||'')+' '+(x.category||'')+' '+(x.description||'')).toLowerCase().includes(q))}
-function cleanBatchCaption(value){return String(value||'').replace(/\\s*•\\s*ছবি\\s*\\d+\\s*\\/\\s*\\d+\\s*$/,'').replace(/ছবি\\s*\\d+\\s*\\/\\s*\\d+\\s*$/,'').trim()}
+function cleanBatchCaption(value){return String(value||'').replace(/\s*•\s*ছবি\s*\d+\s*\/\s*\d+\s*$/,'').replace(/ছবি\s*\d+\s*\/\s*\d+\s*$/,'').trim()}
 function imageGroupKey(x){return [x.department||'',x.title||'',(x.folder_name||'সাধারণ').trim(),x.category_id||'',x.subcategory_id||'',x.chapter_id||'',x.set_id||''].join('¦')}
 function render(){
  const rows=items.filter(matches),groups=new Map();
@@ -34,7 +34,7 @@ function render(){
  $('list').innerHTML=[...folders].map(([folder,folderGroups])=>'<h3 class="folder-heading">📁 '+esc(folder)+' ('+folderGroups.length+'টি)</h3>'+folderGroups.map(g=>{
   const x=g.first,meta=x.taxonomyPath||x.category||'সাধারণ';
   if(g.kind==='image'){
-   const imgs=g.rows.slice().sort((a,b)=>{const ai=Number((String(a.description||'').match(/ছবি\\s*(\\d+)\\s*\\//)||[])[1]||0),bi=Number((String(b.description||'').match(/ছবি\\s*(\\d+)\\s*\\//)||[])[1]||0);return ai&&bi?ai-bi:(a.display_order||0)-(b.display_order||0)});
+   const imgs=g.rows.slice().sort((a,b)=>{const ai=Number((String(a.description||'').match(/ছবি\s*(\d+)\s*\//)||[])[1]||0),bi=Number((String(b.description||'').match(/ছবি\s*(\d+)\s*\//)||[])[1]||0);return ai&&bi?ai-bi:(a.display_order||0)-(b.display_order||0)});
    const caption=g.rows.map(r=>cleanBatchCaption(r.description)).find(Boolean)||'';
    return '<article class="item" id="material-'+esc(x.id)+'"><h2>'+esc(x.title)+'</h2><div class="meta">'+esc(meta)+'</div><div class="image-gallery">'+imgs.map(img=>'<a href="'+esc(img.file_path)+'" target="_blank" rel="noopener"><img src="'+esc(img.file_path)+'" alt="'+esc(x.title)+'" loading="lazy"></a>').join('')+'</div>'+(caption?'<div class="content image-group-caption">'+esc(caption)+'</div>':'')+'</article>';
   }
