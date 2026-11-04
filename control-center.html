@@ -44,6 +44,10 @@ main{padding:16px;max-width:1600px;margin:0 auto}
 .toolbar a#centralReturn.central-return:hover{background:#e8f1f8!important;filter:none;transform:none}
 .note{margin:0 0 12px;padding:10px 12px;border:1px solid #e2e8f0;border-left:3px solid #0f766e;border-radius:8px;background:#f8fafc;color:#475569;line-height:1.55}
 .framewrap{height:calc(100vh - 285px);min-height:380px;border:1px solid #dbe5ef;border-radius:12px;background:#fff}
+.framewrap.materials-content-frame{height:auto;min-height:0;overflow:visible}
+.framewrap.materials-content-frame iframe{height:900px}
+.management-framewrap.materials-structure-frame{height:auto;overflow:visible}
+.management-framewrap.materials-structure-frame iframe{height:1100px}
 .management-framewrap{margin-top:12px;padding:12px;border:1px solid #dbe5ef;border-radius:12px;background:#fff}
 .management-framewrap h3{color:#173f5f}
 @media(max-width:760px){
@@ -107,7 +111,7 @@ management:{title:"ব্যবস্থাপনা",note:"ক্যাটা�
 "exam-create":{title:"পরীক্ষা তৈরি",note:"নির্বাচিত বিভাগের প্রশ্ন ব্যাংক থেকে প্রশ্ন নিয়ে পরীক্ষা তৈরি করুন।",job:"create-exam.html",academic:"https://fbpathshala.github.io/academic/exam-create.html"},
 "exam-manage":{title:"পরীক্ষা পরিচালনা",note:"নির্বাচিত বিভাগের পরীক্ষা পরিচালনা করুন।",job:"exam-manager.html",academic:"https://fbpathshala.github.io/academic/exam-management.html?central=1&view=exams&routeFix=20261020-academic-exam-route2"},
 results:{title:"ফলাফল পর্যালোচনা",note:"MCQ ফলাফল, লিখিত CQ উত্তর মূল্যায়ন, নম্বর সংরক্ষণ এবং আপডেট হওয়া সম্মিলিত ফলাফল/র‍্যাঙ্ক দেখুন।",job:"results-manager.html?embedded=1&central=1&v=20261025-report-dom-fix4",academic:"https://fbpathshala.github.io/academic/exam-management.html?central=1&view=reviews&routeFix=20261020-academic-review-route2"},
-materials:{title:"স্টাডি ম্যাটেরিয়ালস",note:"একটি ড্যাশবোর্ড থেকেই উপকরণ যোগ/সম্পাদনা, সংরক্ষিত উপকরণ এবং ক্যাটাগরি–বিষয় কাঠামো পরিচালনা করুন।",job:"study-materials-admin.html?department=job_care&v=20261025-study-material-gallery2",academic:"study-materials-admin.html?department=academic_care&v=20261025-study-material-gallery2"},
+materials:{title:"স্টাডি ম্যাটেরিয়ালস",note:"একটি ড্যাশবোর্ড থেকেই উপকরণ যোগ/সম্পাদনা, সংরক্ষিত উপকরণ এবং ক্যাটাগরি–বিষয় কাঠামো পরিচালনা করুন।",job:"study-materials-admin.html?department=job_care&embedded=1&v=20261025-study-material-gallery2",academic:"study-materials-admin.html?department=academic_care&embedded=1&v=20261025-study-material-gallery2"},
 "important-links":{title:"গুরুত্বপূর্ণ তথ্য ও পোস্ট লিংক",note:"এটি কোনো বিভাগের অধীন নয়। গুরুত্বপূর্ণ পোস্টের লিংক ও নোট পরিচালনা করুন।",universal:true,url:"site-content-admin.html?section=important-links"},
 "breaking-news":{title:"নোটিশ",note:"পাবলিক হোমপেজের নিচে সময়সীমাসহ স্ক্রলিং নোটিশ প্রকাশ ও পরিচালনা করুন।",universal:true,url:"site-content-admin.html?section=breaking-news"},
 "social-links":{title:"ফেইসবুক পাঠশালা লিংক",note:"ফেইসবুক পাঠশালা পেইজ ও গ্রুপের লিংক পরিচালনা করুন।",universal:true,url:"site-content-admin.html?section=social-links"}
@@ -135,26 +139,27 @@ window.addEventListener('pageshow',enforceCentralPalette);
 
 function render(){
  const r=routes[active],careLabel=document.getElementById("careLabel"),careSelect=document.getElementById("care"),workspace=document.getElementById("workspace"),typeCards=document.getElementById("resultsTypeOptions"),toggle=document.getElementById("managementToggle");
- const noticeScroll=active==="breaking-news";document.getElementById("mainFrameWrap").classList.toggle("notice-scroll-frame",noticeScroll);if(!noticeScroll)workspace.style.height="";
+ const noticeScroll=active==="breaking-news";document.getElementById("mainFrameWrap").classList.toggle("notice-scroll-frame",noticeScroll);document.getElementById("mainFrameWrap").classList.toggle("materials-content-frame",active==="materials"&&!managementView);document.getElementById("managementFrameWrap").classList.toggle("materials-structure-frame",active==="materials"&&managementView);if(!noticeScroll)workspace.style.height="";
  document.getElementById("sectionTitle").textContent=r.title;
  const showCare=!r.universal;
  careLabel.hidden=!showCare;careSelect.hidden=!showCare;
- toggle.hidden=active!=="question-create";
- toggle.textContent=managementView?"← মূল কাজের ফর্মে ফিরুন":"⚙ প্রশ্ন ব্যবস্থাপনা খুলুন";toggle.style.setProperty("background","#0f766e","important");toggle.style.setProperty("color","#ffffff","important");toggle.style.setProperty("-webkit-text-fill-color","#ffffff","important");toggle.style.setProperty("border-color","#0f766e","important");toggle.style.setProperty("font-weight","800","important");
+ toggle.hidden=!(active==="question-create"||active==="materials");
+ toggle.textContent=managementView?(active==="materials"?"← স্টাডি ম্যাটেরিয়ালসে ফিরুন":"← মূল কাজের ফর্মে ফিরুন"):(active==="materials"?"⚙ কাঠামো ব্যবস্থাপনা খুলুন":"⚙ প্রশ্ন ব্যবস্থাপনা খুলুন");toggle.style.setProperty("background","#0f766e","important");toggle.style.setProperty("color","#ffffff","important");toggle.style.setProperty("-webkit-text-fill-color","#ffffff","important");toggle.style.setProperty("border-color","#0f766e","important");toggle.style.setProperty("font-weight","800","important");
  renderManagementOptions();
  typeCards.hidden=!(active==="results"&&!!careSelect.value);
  const typeSelect=document.getElementById("reviewTypeFilter");if(typeSelect)typeSelect.value=selectedReviewType||"ALL";
  if(r.universal){careLabel.hidden=true;careSelect.hidden=true;document.getElementById("sectionNote").textContent=r.note;workspace.src=freshSectionUrl(r.url)}
  else if(!careSelect.value){document.getElementById("sectionNote").textContent="কাজ শুরু করতে আগে Job Care অথবা Academic Care নির্বাচন করুন।";workspace.src="about:blank"}
+ else if(managementView&&active==="materials"){document.getElementById("sectionNote").textContent="নির্বাচিত বিভাগের কাঠামো ব্যবস্থাপনা। স্টাডি ম্যাটেরিয়ালসে ফিরতে উপরের “স্টাডি ম্যাটেরিয়ালসে ফিরুন” বাটনে ক্লিক করুন।";workspace.src="about:blank";document.getElementById("managementFrameWrap").hidden=false;const dept=careSelect.value==="academic"?"academic_care":"job_care";document.getElementById("managementWorkspace").src=freshSectionUrl("taxonomy.html?mode=study-materials&department="+dept+"&embedded=1");document.getElementById("managementFrameTitle").textContent=(careSelect.value==="academic"?"একাডেমিক কেয়ার":"জব কেয়ার")+" — কাঠামো ব্যবস্থাপনা"}
  else if(managementView&&active==="question-create"){document.getElementById("sectionNote").textContent="ব্যবস্থাপনা চালু আছে। মূল প্রশ্ন তৈরির ফর্মে ফিরতে উপরের “মূল কাজের ফর্মে ফিরুন” বাটনে ক্লিক করুন।";workspace.src=freshSectionUrl(r[careSelect.value]);const list=managementLevels[careSelect.value];const item=list.find(x=>x.level===activeManagementLevel)||list[0];document.getElementById("managementFrameWrap").hidden=false;document.getElementById("managementWorkspace").src=freshSectionUrl(item.url?item.url:(item.view==="subjects"?"taxonomy.html?section=job&view=subjects":"taxonomy.html?section="+careSelect.value+"&level="+item.level));document.getElementById("managementFrameTitle").textContent=item.label}
 
  else if(active==="results"){document.getElementById("sectionNote").textContent=r.note+" — "+({MCQ:"MCQ পরীক্ষা",CQ:"CQ পরীক্ষা",MCQ_CQ:"MCQ + CQ পরীক্ষা",ALL:"সকল পরীক্ষা"}[selectedReviewType]||"");let url=r[careSelect.value];const u=new URL(url,location.href);if(careSelect.value==="job"){u.searchParams.set("division","job");u.searchParams.set("central","1");if(selectedReviewType&&selectedReviewType!=="ALL")u.searchParams.set("examType",selectedReviewType)}else{u.searchParams.set("division","academic");u.searchParams.set("view","reviews");if(selectedReviewType!=="ALL")u.searchParams.set("examType",selectedReviewType)}workspace.src=freshSectionUrl(u.href)}
  else{document.getElementById("sectionNote").textContent=r.note;workspace.src=freshSectionUrl(r[careSelect.value])}
- const showInlineManagement=managementView&&active==="question-create"&&!!careSelect.value;document.getElementById("mainFrameWrap").hidden=showInlineManagement;if(!showInlineManagement)document.getElementById("managementFrameWrap").hidden=true;
+ const showInlineManagement=managementView&&(active==="question-create"||active==="materials")&&!!careSelect.value;document.getElementById("mainFrameWrap").hidden=showInlineManagement;if(!showInlineManagement)document.getElementById("managementFrameWrap").hidden=true;
  document.querySelectorAll("[data-section]").forEach(b=>b.classList.toggle("active",b.dataset.section===active));
  const back=document.getElementById("centralReturn");
- back.hidden=!!managementView;
- if(r.universal||(!careSelect.value)){back.href="https://fbpathshala.github.io/home.html";back.textContent="⌂ মূল মেনু / হোম পেইজে ফিরুন"}
+ back.hidden=managementView&&active==="question-create";
+ if(r.universal||(!careSelect.value)|| (managementView&&active==="materials")){back.href="https://fbpathshala.github.io/home.html";back.textContent="⌂ মূল মেনু / হোম পেইজে ফিরুন"}
  else if(managementView){back.href="#";back.textContent="← মূল কাজের ফর্মে ফিরুন"}
  else if(active==="results"&&selectedReviewType&&selectedReviewType!=="ALL"){back.href="#";back.textContent="← ফলাফলের ধরন ফিল্টার রিসেট"}
  else if(active==="results"){back.href="#";back.textContent="← বিভাগ নির্বাচন"}
@@ -178,6 +183,7 @@ function cleanEmbeddedFrame(frame,styleId){
       if(parent && /^(P|NAV|DIV)$/.test(parent.tagName) && parent.querySelectorAll("a").length===1) parent.style.setProperty("display","none","important");
     });
     const path=(new URL(frame.src,location.href)).pathname;
+    doc.querySelectorAll(".admin-return").forEach(a=>a.style.setProperty("display","none","important"));
     if(path.endsWith("/exam-manager.html")||path.endsWith("/results-manager.html")){
       const header=doc.querySelector("header");
       if(header && /ফেইসবুক পাঠশালা/.test(header.textContent)) header.style.setProperty("display","none","important");
@@ -199,8 +205,10 @@ function resizeNoticeFrame(){
  }catch(_){workspaceFrame.style.height="1500px"}
 }
 const managementFrame=document.getElementById("managementWorkspace");
-function cleanEmbeddedManagement(){cleanEmbeddedFrame(managementFrame,"central-management-navigation-cleanup")}
-workspaceFrame.addEventListener("load",()=>{cleanEmbeddedSection();resizeNoticeFrame()});
+let managementResizeObserver=null,workspaceResizeObserver=null;
+function resizeEmbeddedFrame(frame,which){try{const doc=frame.contentDocument;if(!doc)return;const apply=()=>{const h=Math.max(doc.documentElement?.scrollHeight||0,doc.body?.scrollHeight||0);if(h>0)frame.style.height=Math.max(760,h+24)+"px"};apply();const old=which==="management"?managementResizeObserver:workspaceResizeObserver;if(old)old.disconnect();if(typeof ResizeObserver!=="undefined"){const ob=new ResizeObserver(apply);ob.observe(doc.documentElement);if(doc.body)ob.observe(doc.body);if(which==="management")managementResizeObserver=ob;else workspaceResizeObserver=ob}}catch(_){frame.style.height="1200px"}}
+function cleanEmbeddedManagement(){cleanEmbeddedFrame(managementFrame,"central-management-navigation-cleanup");if(active==="materials")resizeEmbeddedFrame(managementFrame,"management")}
+workspaceFrame.addEventListener("load",()=>{cleanEmbeddedSection();resizeNoticeFrame();if(active==="materials"&&!managementView)resizeEmbeddedFrame(workspaceFrame,"workspace")});
 managementFrame.addEventListener("load",cleanEmbeddedManagement);
 document.getElementById("nav").addEventListener("click",e=>{const b=e.target.closest("[data-section]");if(!b)return;active=b.dataset.section;managementView=false;activeManagementLevel=0;selectedReviewType="ALL";document.getElementById("nav").classList.remove("open");document.getElementById("nav").hidden=true;document.getElementById("menuToggle").setAttribute("aria-expanded","false");render()});
 document.getElementById("managementToggle").addEventListener("click",()=>{managementView=!managementView;activeManagementLevel=0;render()});
