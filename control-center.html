@@ -218,6 +218,7 @@ document.getElementById("care").addEventListener("change",()=>{activeManagementL
 document.getElementById("centralReturn").addEventListener("click",e=>{
   const r=routes[active], care=document.getElementById("care");
   if(r.universal){return;}
+  if(managementView&&active==="materials"){return;}
   if(managementView){e.preventDefault();managementView=false;render();return;}
   if(active==="results"&&selectedReviewType&&selectedReviewType!=="ALL"){e.preventDefault();selectedReviewType="ALL";render();return;}
   if(care.value){
