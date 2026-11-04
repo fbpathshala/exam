@@ -153,6 +153,7 @@ function render(){
  const showInlineManagement=managementView&&(active==="question-create"||active==="materials")&&!!careSelect.value;document.getElementById("mainFrameWrap").hidden=showInlineManagement;if(!showInlineManagement)document.getElementById("managementFrameWrap").hidden=true;
  document.querySelectorAll("[data-section]").forEach(b=>b.classList.toggle("active",b.dataset.section===active));
  const back=document.getElementById("centralReturn");
+ back.hidden=!!managementView;
  if(r.universal||(!careSelect.value)){back.href="https://fbpathshala.github.io/home.html";back.textContent="⌂ মূল মেনু / হোম পেইজে ফিরুন"}
  else if(managementView){back.href="#";back.textContent="← মূল কাজের ফর্মে ফিরুন"}
  else if(active==="results"&&selectedReviewType&&selectedReviewType!=="ALL"){back.href="#";back.textContent="← ফলাফলের ধরন ফিল্টার রিসেট"}
