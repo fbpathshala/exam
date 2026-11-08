@@ -42,7 +42,7 @@ function message(id,text){$(id).textContent=text;$(id).classList.remove("hidden"
 function localTime(v){if(!v)return "";const d=new Date(v);if(isNaN(d))return "";const pad=n=>String(n).padStart(2,"0");return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())+"T"+pad(d.getHours())+":"+pad(d.getMinutes())}
 function resetForm(){$("contentForm").reset();$("recordId").value="";$("displayLabel").value="নোটিশ";$("order").value="0";$("status").value=$("sectionFilter").value==="important-links"?"published":"draft";$("formMessage").classList.add("hidden");$("noticeLinkMode").value="general";$("sourcePicker").value="";$("link").value="";$("noticeDuration").value="";currentAttachments=[];renderExistingAttachments();syncNoticeLinkFields();syncHighlightFields();syncContentTypeFields();loadManagedCategories()}
 function applyNoticeDuration(){const choice=$("noticeDuration").value;if(choice==="none"){$("expiresAt").value="";return}if(!choice||choice==="custom")return;const base=$("publishAt").value?new Date($("publishAt").value):new Date();if(!Number.isFinite(base.getTime()))return;base.setTime(base.getTime()+Number(choice)*86400000);$("expiresAt").value=localTime(base.toISOString())}
-function syncNoticeLinkFields(){const linked=$("noticeLinkMode").value==="linked";$("sourcePickerField").classList.toggle("hidden",!linked);if(!linked){$("sourcePicker").value="";$("link").value="";}}
+function syncNoticeLinkFields(){const linked=$("noticeLinkMode").value==="linked";$("sourcePickerField").classList.toggle("hidden",!linked);$("title").readOnly=linked;$("title").placeholder=linked?"প্রকাশিত পোস্ট বাছাই করলে শিরোনাম নিজে থেকে আসবে":"যেমন: জরুরি ঘোষণা";if(!linked){$("sourcePicker").value="";$("link").value="";}}
 function syncHighlightFields(){
  const section=$("sectionFilter").value;
  const isNotice=section==="breaking-news";
@@ -118,7 +118,7 @@ function applySourceFilter(){
 function sourceChanged(){
  const value=$("sourcePicker").value;
  $("link").value="";
- if(!value){return}
+ if(!value){$("title").value="";return}
  const [type,id]=value.split(":");
  let selected=null,url="";
  if(type==="site_content"){
@@ -137,11 +137,12 @@ function sourceChanged(){
   selected=sourceCache.academicExams.find(x=>String(x.public_token)===id);
   if(selected)url="https://fbpathshala.github.io/academic/student.html?exam="+encodeURIComponent(selected.public_token);
  }
- if(!selected){$("sourcePicker").value="";$("sourcePickerMessage").textContent="নির্বাচিত পোস্ট বা পরীক্ষাটি পাওয়া যায়নি। তালিকা রিফ্রেশ করে আবার বাছুন।";return}
- if(!$("title").value.trim())$("title").value=selected.title||selected.exam_name||"";
+ if(!selected){$("sourcePicker").value="";$("title").value="";$("sourcePickerMessage").textContent="নির্বাচিত পোস্ট বা পরীক্ষাটি পাওয়া যায়নি। তালিকা রিফ্রেশ করে আবার বাছুন।";return}
+ const sourceTitle=(selected.title||selected.exam_name||"").trim();
+ if(!sourceTitle){$("sourcePicker").value="";$("title").value="";$("sourcePickerMessage").textContent="নির্বাচিত উৎসে শিরোনাম নেই। অন্য পোস্ট বা পরীক্ষা বেছে নিন।";return}
+ $("title").value=sourceTitle;
  $("link").value=url;
- if(!$("displayLabel").value.trim())$("displayLabel").value="";
- $("sourcePickerMessage").textContent="নির্বাচিত: "+(selected.title||selected.exam_name);
+ $("sourcePickerMessage").textContent="নির্বাচিত: "+sourceTitle+" — শিরোনাম স্বয়ংক্রিয়ভাবে যুক্ত হয়েছে।";
 }
 
 function syncContentTypeFields(){const linkMode=$("contentType").value==="link";const isImportant=$("sectionFilter").value==="important-links";$("bodyField").classList.toggle("hidden",linkMode);$("fileUploadField").classList.toggle("hidden",linkMode);$("categoryField").classList.toggle("hidden",!isImportant||linkMode);$("categoryManagerPlacement").classList.toggle("hidden",!isImportant||linkMode);$("bodyLabel").textContent="বিস্তারিত লেখা";$("linkLabel").textContent=linkMode?"গুরুত্বপূর্ণ লিংকের URL":"PDF / ছবির / বাইরের পেজের লিংক (ঐচ্ছিক)";$("linkHelp").textContent=linkMode?"যে ওয়েবপেজ বা Facebook পোস্টে পাঠাতে চান, তার সম্পূর্ণ URL দিন।":"PDF দিলে ওয়েবসাইটে পড়ার ভিউয়ারে খুলবে; ডাউনলোড বাটন দেখানো হবে না।";$("link").required=linkMode;}
