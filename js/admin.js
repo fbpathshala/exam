@@ -236,8 +236,12 @@ async function selectCategory(c) {
       'বর্তমান Category: ' + CATS[c];
   }
 
+  // Category বদলালে আগের folder/set filter সরিয়ে নতুন category-র সব প্রশ্ন দেখাও।
   await loadFolders();
+  if ($('filterFolder')) $('filterFolder').value = '';
+  if ($('filterSet')) $('filterSet').value = '';
   await loadFilterFolders();
+  await loadQuestions();
 }
 
 
@@ -1883,13 +1887,13 @@ async function loadQuestions() {
         subjects(name)
         `
       )
+      .eq('category', CATS[cat])
       .order(
         'id',
         {
           ascending: false
         }
-      )
-      .limit(200);
+      );
 
 
   if ($('filterFolder')?.value) {
