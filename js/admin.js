@@ -2899,6 +2899,15 @@ document.addEventListener(
     }
 
 
+    // Set বদলালে Question Bank তালিকা সঙ্গে সঙ্গে ফিল্টার হবে।
+    if ($('filterSet')) {
+      $('filterSet').addEventListener(
+        'change',
+        loadQuestions
+      );
+    }
+
+
     if ($('mapFolder')) {
 
       $('mapFolder')
