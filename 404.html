@@ -22,7 +22,12 @@
   </main>
   <script>
     (function () {
-      // GitHub Pages project site path is /exam/. A short link looks like /exam/e/29.
+      // Study materials use /exam/m/ID; exams keep /exam/ID and /exam/e/ID.
+      var materialMatch = window.location.pathname.match(/^\/exam\/m\/(\d+)\/?$/);
+      if (materialMatch) {
+        window.location.replace('/exam/material-link.html?id=' + encodeURIComponent(materialMatch[1]));
+        return;
+      }
       var match = window.location.pathname.match(/^\/exam\/(?:e\/)?(\d+)\/?$/);
       if (match) {
         var id = match[1];
