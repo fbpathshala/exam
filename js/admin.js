@@ -2242,9 +2242,14 @@ async function loadExams() {
               <b
                 role="button"
                 tabindex="0"
-                title="পরীক্ষার লিংক কপি করতে চাপ দিন"
-                style="cursor:pointer"
-                onclick="copyLink(${x.id})"
+                title="লিংক কপি করতে চেপে ধরে রাখুন"
+                style="cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:pan-y"
+                onpointerdown="startExamLinkPress(${x.id},event)"
+                onpointerup="cancelExamLinkPress()"
+                onpointerleave="cancelExamLinkPress()"
+                onpointercancel="cancelExamLinkPress()"
+                oncontextmenu="event.preventDefault();cancelExamLinkPress();copyLink(${x.id})"
+                onclick="event.preventDefault();event.stopPropagation();return false"
                 onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();copyLink(${x.id})}">
                 ${esc(x.exam_name)}
               </b>
@@ -2317,6 +2322,25 @@ async function loadExams() {
 /* =========================
    EXAM LINK
 ========================= */
+
+let examLinkPressTimer = null;
+let examLinkLongPressed = false;
+
+function startExamLinkPress(id, event) {
+  if (event && event.button !== undefined && event.button !== 0) return;
+  if (examLinkPressTimer) clearTimeout(examLinkPressTimer);
+  examLinkLongPressed = false;
+  examLinkPressTimer = setTimeout(() => {
+    examLinkPressTimer = null;
+    examLinkLongPressed = true;
+    copyLink(id);
+  }, 650);
+}
+
+function cancelExamLinkPress() {
+  if (examLinkPressTimer) clearTimeout(examLinkPressTimer);
+  examLinkPressTimer = null;
+}
 
 async function copyLink(id) {
 
