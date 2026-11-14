@@ -126,13 +126,24 @@ $('formMessage').classList.add('hidden');
 const selectedCat=taxonomyNodes.find(n=>String(n.id)===$('categoryNode').value),selectedSub=taxonomyNodes.find(n=>String(n.id)===$('subcategoryNode').value),selectedChapter=taxonomyNodes.find(n=>String(n.id)===$('chapterNode').value),selectedSet=taxonomyNodes.find(n=>String(n.id)===$('setNode').value),academic=$('departmentSwitch').value==='academic_care';if(!selectedCat||!selectedSub||String(selectedSub.parent_id)!==String(selectedCat.id)){msg('formMessage','সঠিক ক্যাটাগরি ও তার অধীনের সাব-ক্যাটাগরি/বিষয় নির্বাচন করুন।');return}if(academic&&(!selectedChapter||String(selectedChapter.parent_id)!==String(selectedSub.id))){msg('formMessage','সঠিক অধ্যায় নির্বাচন করুন।');return}if(!selectedSet||String(selectedSet.parent_id)!==String(academic?selectedChapter.id:selectedSub.id)){msg('formMessage','নির্বাচিত স্তরের অধীনে থাকা সঠিক সেট নির্বাচন করুন।');return}const base={department:$('departmentSwitch').value,category_id:selectedCat.id,subcategory_id:selectedSub.id,chapter_id:selectedChapter?.id||null,set_id:selectedSet.id,folder_name:selectedSet?.name||$('folderNameLegacy').value.trim()||'সাধারণ',title:$('title').value.trim(),description:$('description').value.trim()||null,material_type:t,content_text:t==='text'?$('textContent').value.trim():null,category:selectedSub?.name||selectedCat?.name||$('categoryLegacy').value||null,published:$('published').value==='true',display_order:Number($('order').value)||0,updated_at:new Date().toISOString()};
 if(id){
 const groupIds=editingGroupIds.length?editingGroupIds:[Number(id)];
+if(editingGroupRows.length&&editingGroupRows[0].material_type==='image'){
+ const removedRows=editingGroupRows.filter(x=>pendingRemoveIds.includes(x.id)),keepIds=groupIds.filter(x=>!pendingRemoveIds.includes(x));
+ if(!keepIds.length&&!files.length){msg('formMessage','সব ছবি সরাতে চাইলে পুরো পোস্টটি মুছুন, অথবা নতুন ছবি যোগ করুন।');return}
+ if(keepIds.length){const result=await db.from('study_materials').update(base).in('id',keepIds);if(result.error){msg('formMessage','সংরক্ষণ হয়নি: '+result.error.message);return}}
+ if(removedRows.length){const del=await db.from('study_materials').delete().in('id',pendingRemoveIds);if(del.error){msg('formMessage','পোস্টের তথ্য সংরক্ষিত, তবে নির্বাচিত ছবি রেকর্ড রিমুভ হয়নি: '+del.error.message);return}const storageError=await removeStoredFiles(removedRows);if(storageError){msg('formMessage','ছবি রেকর্ড রিমুভ হয়েছে, তবে স্টোরেজ ফাইল মুছতে সমস্যা: '+storageError.message);return}}
+ if(files.length){
+  const newRows=[],uploadedPaths=[];const createdAt=editingGroupRows[0].created_at;
+  for(let i=0;i<files.length;i++){const f=files[i],objectPath=Date.now()+'-'+i+'-'+safeName(f.name);const {error:upErr}=await db.storage.from('study-materials').upload(objectPath,f,{upsert:false,contentType:f.type||undefined});if(upErr){if(uploadedPaths.length)await db.storage.from('study-materials').remove(uploadedPaths);msg('formMessage','নতুন ছবি আপলোড হয়নি: '+upErr.message);return}uploadedPaths.push(objectPath);newRows.push({...base,created_at:createdAt,file_path:db.storage.from('study-materials').getPublicUrl(objectPath).data.publicUrl,file_name:f.name,content_text:null,display_order:Math.max(-1,...editingGroupRows.map(x=>Number(x.display_order)||0))+i+1})}
+  const {error:insertErr}=await db.from('study_materials').insert(newRows);if(insertErr){await db.storage.from('study-materials').remove(uploadedPaths);msg('formMessage','নতুন ছবি সংরক্ষণ হয়নি: '+insertErr.message);return}
+ }
+ msg('formMessage','ছবির পোস্টের পরিবর্তন সংরক্ষণ হয়েছে।');reset();await load();return;
+}
 if(groupIds.length>1){
- if(files.length){msg('formMessage','একাধিক ছবির গ্রুপ সম্পাদনায় নতুন ছবি যোগ করা যাবে না। বিদ্যমান ছবিগুলো থেকে যেগুলো রাখতে চান রাখুন, ভুলগুলো রিমুভ চিহ্নিত করে সংরক্ষণ করুন।');return}
- const removedRows=editingGroupRows.filter(x=>pendingRemoveIds.includes(x.id)),keepIds=groupIds.filter(x=>!pendingRemoveIds.includes(x));if(!keepIds.length){msg('formMessage','অন্তত একটি ছবি রাখতে হবে। সব ছবি সরাতে চাইলে পুরো পোস্টটি তালিকা থেকে মুছুন।');return}
+ const removedRows=editingGroupRows.filter(x=>pendingRemoveIds.includes(x.id)),keepIds=groupIds.filter(x=>!pendingRemoveIds.includes(x));if(!keepIds.length){msg('formMessage','অন্তত একটি ফাইল রাখতে হবে।');return}
  const result=await db.from('study_materials').update(base).in('id',keepIds);
  if(result.error){msg('formMessage','সংরক্ষণ হয়নি: '+result.error.message);return}
- if(removedRows.length){const del=await db.from('study_materials').delete().in('id',pendingRemoveIds);if(del.error){msg('formMessage','পোস্টের তথ্য সংরক্ষিত, তবে নির্বাচিত ছবি রেকর্ড রিমুভ হয়নি: '+del.error.message);return}const storageError=await removeStoredFiles(removedRows);if(storageError){msg('formMessage','ছবি রেকর্ড রিমুভ হয়েছে, তবে স্টোরেজ ফাইল মুছতে সমস্যা: '+storageError.message);return}}
- msg('formMessage',removedRows.length?removedRows.length+'টি ছবি রিমুভ করে পরিবর্তন সংরক্ষণ হয়েছে.':'ছবির গ্রুপের পরিবর্তন সংরক্ষণ সফল হয়েছে।');reset();await load();return;
+ if(removedRows.length){const del=await db.from('study_materials').delete().in('id',pendingRemoveIds);if(del.error){msg('formMessage','পোস্টের তথ্য সংরক্ষিত, তবে নির্বাচিত ফাইল রেকর্ড রিমুভ হয়নি: '+del.error.message);return}const storageError=await removeStoredFiles(removedRows);if(storageError){msg('formMessage','ফাইল রেকর্ড রিমুভ হয়েছে, তবে স্টোরেজ ফাইল মুছতে সমস্যা: '+storageError.message);return}}
+ msg('formMessage','পরিবর্তন সংরক্ষণ সফল হয়েছে।');reset();await load();return;
 }
 let filePath=null,fileName=null;
 const {data:old,error:oldErr}=await db.from('study_materials').select('file_path,file_name,material_type').eq('id',id).maybeSingle();
