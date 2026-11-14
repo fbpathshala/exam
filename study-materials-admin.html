@@ -118,6 +118,15 @@ async function copyAdminMaterialLink(row){
  const r=g.first,ids=g.rows.map(x=>x.id),wrap=$('adminDetail');wrap.replaceChildren();wrap.classList.remove('hidden');
  const heading=document.createElement('div');heading.className='section-heading';const intro=document.createElement('div');const eyebrow=document.createElement('span');eyebrow.className='step-label';eyebrow.textContent='POST DETAILS';intro.append(eyebrow);const title=document.createElement('h2');title.textContent=r.title;intro.append(title);heading.append(intro);
  const back=document.createElement('button');back.type='button';back.className='btn secondary';back.textContent='← সূচিতে ফিরুন';back.onclick=()=>{wrap.classList.add('hidden');wrap.replaceChildren()};heading.append(back);wrap.append(heading);
+ const publicUrl=publicMaterialUrl(r);
+ const linkSection=document.createElement('div');linkSection.style.cssText='padding:13px;margin:12px 0;border:1px solid #b9d4e8;border-radius:10px;background:#f3f8fc';
+ const linkLabel=document.createElement('strong');linkLabel.textContent='পাবলিক সাইটের লিংক';linkSection.append(linkLabel);
+ const linkValue=document.createElement('div');linkValue.style.cssText='margin:7px 0;overflow-wrap:anywhere;line-height:1.6';linkValue.textContent=publicUrl;linkSection.append(linkValue);
+ const linkActions=document.createElement('div');linkActions.className='item-actions';
+ const copyLink=document.createElement('button');copyLink.type='button';copyLink.className='btn';copyLink.textContent='লিংক কপি করুন';copyLink.onclick=()=>copyAdminMaterialLink(r);linkActions.append(copyLink);
+ const openLink=document.createElement('a');openLink.className='btn secondary';openLink.href=publicUrl;openLink.target='_blank';openLink.rel='noopener';openLink.textContent='পাবলিক পেজ খুলুন';linkActions.append(openLink);
+ if(!g.rows.every(x=>x.published)){linkValue.textContent='প্রকাশিত হলে পাবলিক লিংক কার্যকর হবে।';copyLink.disabled=true;openLink.removeAttribute('href');openLink.setAttribute('aria-disabled','true')}
+ linkSection.append(linkActions);wrap.append(linkSection);
  const status=document.createElement('div');status.className='meta';status.textContent=(g.rows.every(x=>x.published)?'প্রকাশিত':g.rows.every(x=>!x.published)?'খসড়া':'আংশিক প্রকাশিত')+' • '+(r.category||'সাধারণ')+' • '+r.material_type+' • ক্রমিক নং: '+toBnNumber(postNumberById.get(String(r.id))||1);wrap.append(status);
  const description=document.createElement('p');description.textContent=cleanImageBatchCaption(r.description)||'কোনো সংক্ষিপ্ত পরিচিতি দেওয়া হয়নি।';wrap.append(description);
  if(r.material_type==='text'&&r.content_text){const content=document.createElement('div');content.className='admin-detail-content';content.style.cssText='white-space:pre-wrap;padding:14px;background:#f8fafc;border:1px solid #dbe5ef;border-radius:10px;margin:12px 0';content.textContent=r.content_text;wrap.append(content)}
