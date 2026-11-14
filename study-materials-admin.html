@@ -67,10 +67,34 @@ async function copyAdminMaterialLink(row){
   catch(_){window.prompt('এই লিংকটি কপি করুন:',url)}
  }
  function bindAdminTitleAction(button,group,row){
-  button.addEventListener('click',event=>{
+  let pressTimer=null,longPressed=false;
+  const cancelPress=()=>{if(pressTimer)clearTimeout(pressTimer);pressTimer=null};
+  button.addEventListener('pointerdown',event=>{
+   if(event.button!==undefined&&event.button!==0)return;
+   longPressed=false;
+   cancelPress();
+   pressTimer=setTimeout(async()=>{
+    longPressed=true;
+    await copyAdminMaterialLink(row);
+   },650);
+  });
+  button.addEventListener('pointerup',cancelPress);
+  button.addEventListener('pointercancel',cancelPress);
+  button.addEventListener('pointerleave',cancelPress);
+  button.addEventListener('contextmenu',event=>{
    event.preventDefault();
-   event.stopPropagation();
+   cancelPress();
+   longPressed=true;
    copyAdminMaterialLink(row);
+  });
+  button.addEventListener('click',event=>{
+   if(longPressed){
+    event.preventDefault();
+    event.stopPropagation();
+    longPressed=false;
+    return;
+   }
+   renderAdminDetail(group);
   });
  }
  function renderMaterialRows(rows){
@@ -84,8 +108,8 @@ async function copyAdminMaterialLink(row){
   for(const g of groups){
    const row=g.first,tr=document.createElement('tr'),numberCell=document.createElement('td'),nameCell=document.createElement('td');
    numberCell.className='index-number';nameCell.className='index-title';
-   const number=document.createElement('button');number.type='button';number.textContent=toBnNumber(postNumberById.get(String(row.id))||1);number.setAttribute('aria-label','ক্রমিক '+number.textContent+' — '+row.title+' বিস্তারিত দেখুন');number.addEventListener('click',()=>renderAdminDetail(g));
-   const title=document.createElement('button');title.type='button';title.textContent=row.title;title.setAttribute('aria-label',row.title+' — ক্লিক করলে পাবলিক লিংক কপি হবে');bindAdminTitleAction(title,g,row);
+   const number=document.createElement('button');number.type='button';number.textContent=toBnNumber(postNumberById.get(String(row.id))||1);number.setAttribute('aria-label','ক্রমিক '+number.textContent+' — '+row.title+' বিস্তারিত দেখুন');bindAdminTitleAction(number,g,row);
+   const title=document.createElement('button');title.type='button';title.textContent=row.title;title.setAttribute('aria-label',row.title+' — সাধারণ ক্লিকে বিস্তারিত খুলবে, চেপে ধরে রাখলে পাবলিক লিংক কপি হবে');bindAdminTitleAction(title,g,row);
    numberCell.append(number);nameCell.append(title);tr.append(numberCell,nameCell);body.append(tr);
   }
   table.append(body);$('items').append(table);
