@@ -17,7 +17,7 @@
 .exam-index .index-number{width:68px;text-align:center;font-weight:800;color:#42627c}
 .exam-index .index-title{font-weight:650}.exam-index .index-action{width:150px;text-align:center}
 .exam-index .btn{margin:0;padding:8px 12px;font-size:13px;white-space:nowrap}
-.exam-closed{display:inline-block;padding:7px 12px;border-radius:7px;background:#f1f5f9;color:#64748b;font-size:13px;font-weight:750}
+.exam-closed{display:inline-block;padding:7px 12px;border-radius:7px;background:#f1f5f9;color:#64748b;font-size:13px;font-weight:750}.exam-total{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;margin:12px 0;border-radius:13px;background:linear-gradient(120deg,#e8f2ff,#f0fdfa);border:1px solid #cbdff0}.exam-total span{font-size:15px;font-weight:750;color:#31536d}.exam-total strong{font-size:30px;line-height:1.2;color:#123b62}.exam-help{margin:8px 0 14px;color:#52677a;font-size:14px}.exam-name-link{color:#1456a0;text-decoration:none;font-weight:800}.exam-name-link:hover{text-decoration:underline}.exam-open{display:inline-block;padding:7px 12px;border-radius:7px;background:#dcfce7;color:#166534;font-size:13px;font-weight:800}
 @media(max-width:520px){.exam-index th,.exam-index td{padding:10px 9px;font-size:12px}.exam-index .index-number{width:48px}.exam-index .index-action{width:125px}.exam-index .btn{padding:7px 9px;font-size:12px}}
 
 #list.exam-index-host .exam-index-wrap{display:block!important;width:100%!important;max-width:100%;overflow-x:auto!important;visibility:visible!important;border:1px solid #cbd9e5!important;border-radius:12px;background:#fff!important}
@@ -36,7 +36,7 @@
 <body data-fp-theme="premium">
 <header class="top"><b>📚 ফেইসবুক পাঠশালা</b><div>পরীক্ষা</div></header>
 <main class="wrap">
-<section class="card"><h2>📝 পরীক্ষার তালিকা</h2><input id="search" placeholder="পরীক্ষার নাম খুঁজুন" oninput="render()"><br><br><select id="filter" onchange="render()"><option value="all">সব পরীক্ষা</option><option value="active">সক্রিয় পরীক্ষা</option></select></section>
+<section class="card"><h2>📝 পরীক্ষার সূচিপত্র</h2><div class="exam-total"><span>মোট পরীক্ষা</span><strong id="examTotal">লোড হচ্ছে…</strong></div><p class="exam-help">পরীক্ষায় অংশগ্রহণ করতে পরীক্ষার নামের ওপর ক্লিক করুন।</p><input id="search" placeholder="পরীক্ষার নাম খুঁজুন" oninput="render()"><br><br><select id="filter" onchange="render()"><option value="all">সব পরীক্ষা</option><option value="active">চালু পরীক্ষা</option><option value="closed">বন্ধ পরীক্ষা</option></select></section>
 <section id="list" class="card muted exam-index-host">পরীক্ষাগুলো লোড হচ্ছে…</section>
 </main>
 <script>
@@ -56,8 +56,9 @@ async function load(){
 }
 function render(){
  const q=document.getElementById('search').value.toLowerCase().trim(),f=document.getElementById('filter').value;
- const rows=exams.filter(e=>(f==='all'||String(e.status||'').toLowerCase()==='active')&&(!q||String(e.exam_name||'').toLowerCase().includes(q)));
- document.getElementById('list').innerHTML=rows.length?'<div class="exam-index-wrap"><table class="exam-index"><thead><tr><th scope="col">ক্রমিক</th><th scope="col">পরীক্ষার নাম</th><th scope="col">বিস্তারিত</th></tr></thead><tbody>'+rows.map((e,i)=>{const active=String(e.status||'').toLowerCase()==='active';return '<tr><td class="index-number">'+bn(i+1)+'</td><td class="index-title">'+esc(e.exam_name||'নামহীন পরীক্ষা')+'</td><td class="index-action">'+(active?'<a class="btn" href="index.html?exam='+encodeURIComponent(e.id)+'">পরীক্ষা শুরু করুন</a>':'<span class="exam-closed">বন্ধ</span>')+'</td></tr>'}).join('')+'</tbody></table></div>':'কোনো পরীক্ষা পাওয়া যায়নি';
+ document.getElementById('examTotal').textContent=bn(exams.length);
+ const rows=exams.filter(e=>{const active=String(e.status||'').toLowerCase()==='active';return (f==='all'||(f==='active'?active:!active))&&(!q||String(e.exam_name||'').toLowerCase().includes(q))});
+ document.getElementById('list').innerHTML=rows.length?'<div class="exam-index-wrap"><table class="exam-index"><thead><tr><th scope="col">ক্রম</th><th scope="col">পরীক্ষার নাম</th><th scope="col">পরীক্ষার স্ট্যাটাস</th></tr></thead><tbody>'+rows.map((e,i)=>{const active=String(e.status||'').toLowerCase()==='active';return '<tr><td class="index-number">'+bn(i+1)+'</td><td class="index-title"><a class="exam-name-link" href="/job/exam/'+encodeURIComponent(e.id)+'">'+esc(e.exam_name||'নামহীন পরীক্ষা')+'</a></td><td class="index-action">'+(active?'<span class="exam-open">চালু</span>':'<span class="exam-closed">বন্ধ</span>')+'</td></tr>'}).join('')+'</tbody></table></div>':'কোনো পরীক্ষা পাওয়া যায়নি';
 }
 load();
 </script>
