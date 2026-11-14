@@ -10,9 +10,9 @@
 .dashboard-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 14px}.dashboard-stats>div{padding:12px 15px;border:1px solid var(--line);border-radius:11px;background:#fff}.dashboard-stats span{display:block;font-size:11px;color:var(--muted)}.dashboard-stats strong{display:block;margin-top:4px;color:var(--blue);font-size:14px}
 .workspace-panel.hidden{display:none!important}.section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.section-heading h2{margin:4px 0 5px}.card{padding:20px!important;border-radius:14px!important}.card>h2{margin-bottom:14px}
 .list-tools{display:grid;grid-template-columns:minmax(0,1fr) 190px;gap:10px;margin:14px 0}.list-tools input,.list-tools select{min-height:44px}
-#items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.toc-admin-item .admin-toc-line{display:flex;align-items:flex-start;gap:11px}.toc-admin-item .post-order{flex:0 0 auto;margin:0}.toc-admin-item h3{flex:1;margin:0;line-height:1.55}.toc-admin-item .item-actions{margin-top:10px}.admin-detail-content{line-height:1.8}.folder-heading{grid-column:1/-1;margin:14px 0 0}.item{margin:0!important;padding:15px!important;background:#fff;border:1px solid #dbe5ef;border-radius:12px}.item h3{font-size:15px}.item .meta{margin:6px 0 10px}.item .btn{margin:4px 4px 0 0}.item-actions{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-top:14px}.item-actions .btn{margin:0;min-height:40px;padding:9px 13px;white-space:nowrap}.item-actions .meta{margin:0;flex-basis:100%}
+#items{width:100%;overflow-x:auto;border:1px solid #cbd9e5;border-radius:12px;background:#fff}.admin-index{width:100%;border-collapse:collapse;min-width:320px}.admin-index th,.admin-index td{padding:12px 14px;border:1px solid #dbe5ef;text-align:left;vertical-align:middle;line-height:1.6}.admin-index th{background:#eaf2f8;color:#173f5f;font-size:13px}.admin-index tbody tr:nth-child(even){background:#f8fbfd}.admin-index .index-number{width:74px;text-align:center;font-weight:800;color:#42627c}.admin-index button{border:0;background:transparent;color:#173f5f;font:inherit;font-weight:700;text-align:left;cursor:pointer;padding:3px 4px;border-radius:6px;touch-action:pan-y}.admin-index button:hover,.admin-index button:focus-visible{background:#e8f1f8;outline:2px solid #93c5fd;outline-offset:1px}.admin-index .index-number button{font-weight:800}.admin-detail-content{line-height:1.8}.folder-heading{margin:14px 0 0}.item{margin:0!important;padding:15px!important;background:#fff;border:1px solid #dbe5ef;border-radius:12px}.item h3{font-size:15px}.item .meta{margin:6px 0 10px}.item .btn{margin:4px 4px 0 0}.item-actions{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-top:14px}.item-actions .btn{margin:0;min-height:40px;padding:9px 13px;white-space:nowrap}.item-actions .meta{margin:0;flex-basis:100%}
 .taxonomy-card iframe{display:block;width:100%;height:780px;border:1px solid var(--line);border-radius:11px;background:#f8fafc}
-@media(max-width:720px){.workspace-intro{align-items:stretch;flex-direction:column;padding:17px}.department-switch{width:100%}.workspace-tabs{grid-template-columns:1fr}.workspace-tab{text-align:left;padding:0 12px}.dashboard-stats{grid-template-columns:1fr}.list-tools{grid-template-columns:1fr}#items{grid-template-columns:1fr}.card{padding:14px!important}.taxonomy-card iframe{height:850px}}
+@media(max-width:720px){.workspace-intro{align-items:stretch;flex-direction:column;padding:17px}.department-switch{width:100%}.workspace-tabs{grid-template-columns:1fr}.workspace-tab{text-align:left;padding:0 12px}.dashboard-stats{grid-template-columns:1fr}.list-tools{grid-template-columns:1fr}.admin-index th,.admin-index td{padding:10px 9px;font-size:13px}.admin-index .index-number{width:58px}.card{padding:14px!important}.taxonomy-card iframe{height:850px}}
 </style></head>
 <body><header class="admin-header"><div class="admin-header-inner"><div><div class="eyebrow">FB PATHSHALA · ADMIN WORKSPACE</div><h1>📚 স্টাডি ম্যাটেরিয়াল ব্যবস্থাপনা</h1><p>উপকরণ যোগ, সম্পাদনা, প্রকাশ এবং সাজানোর একক অ্যাডমিন প্যানেল</p></div><a class="admin-return" href="control-center.html?section=materials">← কেন্দ্রীয় অ্যাডমিন প্যানেল</a></div></header>
 <main><section class="card" id="loginCard"><h2>অ্যাডমিন যাচাই</h2><p id="authMessage">লগইন যাচাই হচ্ছে…</p><a href="home.html">কেন্দ্রীয় হোমপেজ</a></section>
@@ -42,7 +42,7 @@ function publicMaterialUrl(row){return new URL('/exam/m/'+encodeURIComponent(row
 function updateStats(){const groups=materialGroups(allMaterialRows),total=groups.length,published=groups.filter(g=>g.rows.some(r=>!!r.published)).length;$('statTotal').textContent=String(total);$('statPublished').textContent=String(published);$('statDraft').textContent=String(total-published)}
 function msg(id,t){$(id).textContent=t;$(id).classList.remove('hidden')}
 function reset(){ editingGroupIds=[];editingGroupRows=[];pendingRemoveIds=[];$("existingFiles").replaceChildren();$("existingFiles").classList.add("hidden");const selectedDepartment=$('departmentSwitch').value||'job_care';$('form').reset();$('departmentSwitch').value=selectedDepartment;$('materialDepartment').value=selectedDepartment;$('id').value='';$('folderNameLegacy').value='';$('categoryLegacy').value='';$('categoryNode').value='';$('subcategoryNode').value='';$('chapterNode').value='';$('setNode').value='';$('order').value='0';$('formTitle').textContent='নতুন উপকরণ যোগ করুন';$('form').querySelector('button[type="submit"]').textContent='সংরক্ষণ করুন';$('file').required=false;$('file').value='';$('formMessage').classList.add('hidden');syncType();}
-function syncType(){const t=$('type').value;$('fileWrap').classList.toggle('hidden',t==='text');$('textWrap').classList.toggle('hidden',t!=='text');$('file').multiple=t==='image'&&!$('id').value;$('file').accept=t==='image'?'image/png,image/jpeg,image/webp': 'application/pdf';$('file').setAttribute('aria-label',t==='image'?'একসাথে সর্বোচ্চ ৩০টি JPG, PNG বা WebP ছবি নির্বাচন করুন':'PDF ফাইল নির্বাচন করুন');$('file').onchange=()=>{const files=Array.from($('file').files||[]);if(!files.length)return;if(t==='image'&&files.length>30){$('file').value='';msg('formMessage','একবারে সর্বোচ্চ ৩০টি ছবি আপলোড করা যাবে। প্রয়োজন হলে পরের ব্যাচে বাকি ছবি দিন।');return}const validFile=f=>t==='image'?(['image/png','image/jpeg','image/webp'].includes(f.type)||['.png','.jpg','.jpeg','.webp'].some(ext=>f.name.toLowerCase().endsWith(ext))):(f.type==='application/pdf'||f.name.toLowerCase().endsWith('.pdf'));if(files.some(f=>!validFile(f))){$('file').value='';msg('formMessage',t==='image'?'শুধু JPG, PNG বা WebP ছবি নির্বাচন করুন।':'শুধু PDF ফাইল নির্বাচন করুন।');return}if($('id').value&&files.length>1){$('file').value='';msg('formMessage','সম্পাদনার সময় একবারে একটি ছবি নির্বাচন করুন।');return}};}
+function syncType(){const t=$('type').value;$('fileWrap').classList.toggle('hidden',t==='text');$('textWrap').classList.toggle('hidden',t!=='text');$('file').multiple=t==='image';$('file').accept=t==='image'?'image/png,image/jpeg,image/webp': 'application/pdf';$('file').setAttribute('aria-label',t==='image'?'একসাথে সর্বোচ্চ ৩০টি JPG, PNG বা WebP ছবি নির্বাচন করুন':'PDF ফাইল নির্বাচন করুন');$('file').onchange=()=>{const files=Array.from($('file').files||[]);if(!files.length)return;if(t==='image'&&files.length>30){$('file').value='';msg('formMessage','একবারে সর্বোচ্চ ৩০টি ছবি আপলোড করা যাবে। প্রয়োজন হলে পরের ব্যাচে বাকি ছবি দিন।');return}const validFile=f=>t==='image'?(['image/png','image/jpeg','image/webp'].includes(f.type)||['.png','.jpg','.jpeg','.webp'].some(ext=>f.name.toLowerCase().endsWith(ext))):(f.type==='application/pdf'||f.name.toLowerCase().endsWith('.pdf'));if(files.some(f=>!validFile(f))){$('file').value='';msg('formMessage',t==='image'?'শুধু JPG, PNG বা WebP ছবি নির্বাচন করুন।':'শুধু PDF ফাইল নির্বাচন করুন।');return}};}
 let taxonomyNodes=[],taxonomyLoadToken=0,allMaterialRows=[];
 function activatePanel(panelId){document.querySelectorAll('.workspace-panel').forEach(p=>p.classList.toggle('hidden',p.id!==panelId));document.querySelectorAll('.workspace-tab').forEach(b=>b.classList.toggle('active',b.dataset.panel===panelId));if(panelId==='savedPanel')load();}
 document.querySelectorAll('.workspace-tab').forEach(b=>b.addEventListener('click',()=>activatePanel(b.dataset.panel)));
@@ -60,23 +60,39 @@ async function load(){
  const {data,error}=await db.from('study_materials').select('*').eq('department',$('departmentSwitch').value).order('created_at',{ascending:false}).order('id',{ascending:false});
  if(error){$('listMessage').textContent='লোড করা যায়নি: '+error.message;return}
  allMaterialRows=data||[];assignAdminPostNumbers(allMaterialRows);updateStats();$('listMessage').textContent='মোট '+allMaterialRows.length+'টি উপকরণ • '+new Set(allMaterialRows.map(r=>(r.folder_name||'সাধারণ').trim()||'সাধারণ')).size+'টি ফোল্ডার';renderMaterialList();}
-function renderMaterialRows(rows){
- $('items').replaceChildren();
- $('adminDetail').classList.add('hidden');$('adminDetail').replaceChildren();
- const groups=materialGroups(rows).sort(compareAdminPostOrder);groups.forEach((g,i)=>g.rows.forEach(row=>postNumberById.set(String(row.id),i+1)));
- $('listMessage').textContent='মোট '+materialGroups(allMaterialRows).length+'টি • দেখানো হচ্ছে '+groups.length+'টি উপকরণ';
- for(const g of groups){
-  const r=g.first,ids=g.rows.map(x=>x.id),el=document.createElement('article');el.className='item toc-admin-item';
-  const line=document.createElement('div');line.className='admin-toc-line';
-  const order=document.createElement('span');order.className='post-order';order.textContent=toBnNumber(postNumberById.get(String(r.id))||1);line.append(order);
-  const title=document.createElement('h3');title.textContent=r.title;line.append(title);el.append(line);
-  const actions=document.createElement('div');actions.className='item-actions';
-  const view=document.createElement('button');view.type='button';view.className='btn secondary';view.textContent='ফুল ভিউ';view.onclick=()=>renderAdminDetail(g);actions.append(view);
-  if(g.rows.every(x=>!!x.published)){const url=publicMaterialUrl(r);const copy=document.createElement('button');copy.type='button';copy.className='btn secondary';copy.textContent='লিংক';copy.onclick=async()=>{try{await navigator.clipboard.writeText(url);copy.textContent='কপি হয়েছে';setTimeout(()=>copy.textContent='লিংক',1800)}catch(_){window.prompt('এই লিংকটি কপি করুন:',url)}};actions.append(copy)}
-  el.append(actions);$('items').append(el);
+async function copyAdminMaterialLink(row){
+  if(!row||!row.published){$('listMessage').textContent='প্রকাশিত হলে এই উপকরণের লিংক কপি করা যাবে।';return}
+  const url=publicMaterialUrl(row);
+  try{await navigator.clipboard.writeText(url);$('listMessage').textContent='লিংক কপি হয়েছে: '+row.title}
+  catch(_){window.prompt('এই লিংকটি কপি করুন:',url)}
  }
-}
-function renderAdminDetail(g){
+ function bindAdminTitleAction(button,group,row){
+  let holdTimer=null,didLongPress=false,startX=0,startY=0;
+  const cancel=()=>{if(holdTimer)clearTimeout(holdTimer);holdTimer=null};
+  button.addEventListener('pointerdown',event=>{if(event.button!==undefined&&event.button!==0)return;didLongPress=false;startX=event.clientX;startY=event.clientY;cancel();holdTimer=setTimeout(()=>{didLongPress=true;copyAdminMaterialLink(row)},650)});
+  button.addEventListener('pointermove',event=>{if(Math.abs(event.clientX-startX)>12||Math.abs(event.clientY-startY)>12)cancel()});
+  button.addEventListener('pointerup',cancel);button.addEventListener('pointercancel',cancel);button.addEventListener('pointerleave',cancel);
+  button.addEventListener('contextmenu',event=>{event.preventDefault();cancel();didLongPress=true;copyAdminMaterialLink(row)});
+  button.addEventListener('click',event=>{if(didLongPress){event.preventDefault();event.stopPropagation();didLongPress=false;return}renderAdminDetail(group)});
+ }
+ function renderMaterialRows(rows){
+  $('items').replaceChildren();
+  $('adminDetail').classList.add('hidden');$('adminDetail').replaceChildren();
+  const groups=materialGroups(rows).sort(compareAdminPostOrder);groups.forEach((g,i)=>g.rows.forEach(row=>postNumberById.set(String(row.id),i+1)));
+  $('listMessage').textContent='মোট '+materialGroups(allMaterialRows).length+'টি • দেখানো হচ্ছে '+groups.length+'টি উপকরণ';
+  const table=document.createElement('table');table.className='admin-index';
+  table.innerHTML='<thead><tr><th scope="col">ক্রমিক</th><th scope="col">নাম</th></tr></thead>';
+  const body=document.createElement('tbody');
+  for(const g of groups){
+   const row=g.first,tr=document.createElement('tr'),numberCell=document.createElement('td'),nameCell=document.createElement('td');
+   numberCell.className='index-number';nameCell.className='index-title';
+   const number=document.createElement('button');number.type='button';number.textContent=toBnNumber(postNumberById.get(String(row.id))||1);number.setAttribute('aria-label','ক্রমিক '+number.textContent+' — '+row.title+' খুলুন');bindAdminTitleAction(number,g,row);
+   const title=document.createElement('button');title.type='button';title.textContent=row.title;title.setAttribute('aria-label',row.title+' খুলুন; চেপে ধরলে লিংক কপি হবে');bindAdminTitleAction(title,g,row);
+   numberCell.append(number);nameCell.append(title);tr.append(numberCell,nameCell);body.append(tr);
+  }
+  table.append(body);$('items').append(table);
+ }
+ function renderAdminDetail(g){
  const r=g.first,ids=g.rows.map(x=>x.id),wrap=$('adminDetail');wrap.replaceChildren();wrap.classList.remove('hidden');
  const heading=document.createElement('div');heading.className='section-heading';const intro=document.createElement('div');const eyebrow=document.createElement('span');eyebrow.className='step-label';eyebrow.textContent='POST DETAILS';intro.append(eyebrow);const title=document.createElement('h2');title.textContent=r.title;intro.append(title);heading.append(intro);
  const back=document.createElement('button');back.type='button';back.className='btn secondary';back.textContent='← সূচিতে ফিরুন';back.onclick=()=>{wrap.classList.add('hidden');wrap.replaceChildren()};heading.append(back);wrap.append(heading);
@@ -118,7 +134,7 @@ if(!session){msg('formMessage','অ্যাডমিন সেশন নেই�
 const id=$('id').value,t=$('type').value,files=Array.from($('file').files||[]);
 if(t!=='text'&&!files.length&&!id){msg('formMessage','ফাইল নির্বাচন করুন।');return}
 if(t==='image'&&files.length>30){msg('formMessage','একবারে সর্বোচ্চ ৩০টি ছবি আপলোড করা যাবে।');return}
-if(id&&files.length>1){msg('formMessage','সম্পাদনার সময় একবারে একটি ছবি নির্বাচন করুন।');return}
+
 const validFile=f=>t==='image'?(['image/png','image/jpeg','image/webp'].includes(f.type)||['.png','.jpg','.jpeg','.webp'].some(ext=>f.name.toLowerCase().endsWith(ext))):(f.type==='application/pdf'||f.name.toLowerCase().endsWith('.pdf'));
 if(files.some(f=>!validFile(f))){msg('formMessage',t==='image'?'শুধু JPG, PNG বা WebP ছবি নির্বাচন করুন।':'শুধু PDF ফাইল নির্বাচন করুন।');return}
 if(t==='text'&&!$('textContent').value.trim()){msg('formMessage','লিখিত নোট লিখুন।');return}
