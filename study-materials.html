@@ -36,7 +36,7 @@ function compareNewest(a,b){const ta=Date.parse(a.created_at||'')||0,tb=Date.par
 function buildMaterialGroups(source){const map=new Map();for(const x of source){const key=x.material_type==='image'?'image¦'+imageGroupKey(x):'single¦'+x.id;if(!map.has(key))map.set(key,{kind:x.material_type==='image'?'image':'single',rows:[],first:x});map.get(key).rows.push(x)}const groups=[...map.values()];for(const g of groups){g.rows.sort((a,b)=>{const ai=Number((String(a.description||'').match(/ছবি\s*(\d+)\s*\//)||[])[1]||0),bi=Number((String(b.description||'').match(/ছবি\s*(\d+)\s*\//)||[])[1]||0);return ai&&bi?ai-bi:(a.display_order||0)-(b.display_order||0)});g.first=g.rows[0]}return groups.sort((a,b)=>compareNewest(a.first,b.first))}
 function assignPostNumbers(source){const groups=buildMaterialGroups(source),counts=new Map();for(const g of groups){const key=String(g.first.subcategory_id||g.first.category_id||'uncategorized'),number=(counts.get(key)||0)+1;counts.set(key,number);g.postNumber=number;for(const row of g.rows)row.postNumber=number}return groups}
 function render(){
- const groups=buildMaterialGroups(items.filter(matches));
+ const groups=assignPostNumbers(items).filter(g=>matches(g.first));
  const hashId=location.hash?decodeURIComponent(location.hash.slice(1)):'';
  const detailGroup=hashId.startsWith('material-')?groups.find(g=>'material-'+String(g.first.id)===hashId):null;
  if(detailGroup){
