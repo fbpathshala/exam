@@ -147,8 +147,8 @@ function sourceChanged(){
  }else if(type==="study_materials"){
   selected=sourceCache.materials.find(x=>String(x.id)===id);
   if(selected){
-   const page=selected.department==="academic_care"?"academic-study-materials.html":"study-materials.html";
-   url="https://fbpathshala.github.io/exam/"+page+"#material-"+encodeURIComponent(selected.id);
+   const base=selected.department==="academic_care"?"/academic/material/":"/job/material/";
+   url="https://fbpathshala.github.io"+base+encodeURIComponent(selected.id);
   }
  }else if(type==="exams"){
   selected=sourceCache.jobExams.find(x=>String(x.id)===id);
