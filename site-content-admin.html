@@ -88,11 +88,31 @@ async function loadSources(){
  const now=new Date().toISOString();
  const [links,materials,jobExams,academicExams]=await Promise.all([
   run("গুরুত্বপূর্ণ তথ্য",db.from("site_content").select("id,title,content_type,publish_at,expires_at").eq("section","important-links").eq("status","published").or("publish_at.is.null,publish_at.lte."+now).or("expires_at.is.null,expires_at.gt."+now).order("sort_order").order("created_at",{ascending:false})),
-  run("স্টাডি ম্যাটেরিয়াল",db.from("study_materials").select("id,title,department,category,folder_name,material_type,file_name,display_order").eq("published",true).in("department",["job_care","academic_care"]).order("folder_name").order("display_order").order("created_at",{ascending:false})),
+  run("স্টাডি ম্যাটেরিয়াল",db.from("study_materials").select("id,title,department,category,folder_name,material_type,file_name,display_order,description,category_id,subcategory_id,chapter_id,set_id,created_at").eq("published",true).in("department",["job_care","academic_care"]).order("folder_name").order("display_order").order("created_at",{ascending:false})),
   run("জব কেয়ার পরীক্ষা",db.from("exams").select("id,exam_name,status,start_at,end_at").eq("status","active").order("id",{ascending:false})),
   run("একাডেমিক কেয়ার পরীক্ষা",db.from("academic_care_exams").select("id,title,status,public_token").eq("status","published").order("created_at",{ascending:false}))
  ]);
- sourceCache={links,materials,jobExams,academicExams};
+ // The study-material table stores each image in a multi-image post as a separate row.
+ // Match the admin dashboard's grouping rule so the notice picker shows one post, not its files.
+ const cleanBatchCaption=value=>String(value||"").replace(/\\s*•\\s*ছবি\\s*\\d+\\s*\\/\\s*\\d+\\s*$/,"").replace(/ছবি\\s*\\d+\\s*\\/\\s*\\d+\\s*$/,"").trim();
+ const materialGroupMap=new Map();
+ for(const row of materials){
+  const key=row.material_type==="image"
+   ?"image¦"+[row.department||"",row.title||"",(row.folder_name||"সাধারণ").trim(),row.category_id||"",row.subcategory_id||"",row.chapter_id||"",row.set_id||"",row.created_at||"",cleanBatchCaption(row.description)].join("¦")
+   :"single¦"+row.id;
+  if(!materialGroupMap.has(key))materialGroupMap.set(key,[]);
+  materialGroupMap.get(key).push(row);
+ }
+ const materialPosts=[...materialGroupMap.values()].map(rows=>{
+  rows.sort((a,b)=>{
+   const ai=Number((String(a.description||"").match(/ছবি\\s*(\\d+)\\s*\\//)||[])[1]||0);
+   const bi=Number((String(b.description||"").match(/ছবি\\s*(\\d+)\\s*\\//)||[])[1]||0);
+   const order=ai&&bi?ai-bi:(Number(a.display_order)||0)-(Number(b.display_order)||0);
+   return order||String(a.id).localeCompare(String(b.id),undefined,{numeric:true});
+  });
+  return rows[0];
+ });
+ sourceCache={links,materials:materialPosts,jobExams,academicExams};
  applySourceFilter();
  const total=links.length+materials.length+jobExams.length+academicExams.length;
  if(problems.length){
