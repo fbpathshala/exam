@@ -2230,11 +2230,9 @@ async function loadExams() {
 
           const url =
             new URL(
-              'index.html',
-              location.href
-            ).href +
-            '?exam=' +
-            x.id;
+              '/job/exam/' + encodeURIComponent(String(x.id)),
+              location.origin
+            ).href;
 
           return `
             <div class="examrow">
@@ -2346,11 +2344,9 @@ async function copyLink(id) {
 
   const base =
     new URL(
-      'index.html',
-      location.href
-    ).href +
-    '?exam=' +
-    id;
+      '/job/exam/' + encodeURIComponent(String(id)),
+      location.origin
+    ).href;
 
 
   try {
