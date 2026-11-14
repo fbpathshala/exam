@@ -82,7 +82,7 @@ async function editRow(r,groupRows=[r]){
   $('departmentSwitch').value=r.department||'job_care';$('materialDepartment').value=r.department||'job_care';
   await loadTaxonomy();
   $('title').value=r.title||'';$('folderNameLegacy').value=r.folder_name||'সাধারণ';$('categoryLegacy').value=r.category||'';
-  $('type').value=r.material_type||'pdf';$('description').value=r.description||'';$('textContent').value=r.content_text||'';
+  $('type').value=r.material_type||'pdf';$('description').value=cleanImageBatchCaption(r.description||'');$('textContent').value=r.content_text||'';
   $('published').value=String(!!r.published);$('order').value=r.display_order??0;
   $('categoryNode').value=r.category_id||'';updateTaxonomyChildren();
   $('subcategoryNode').value=r.subcategory_id||'';updateTaxonomyChapters();
