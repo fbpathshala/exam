@@ -2239,7 +2239,13 @@ async function loadExams() {
           return `
             <div class="examrow">
 
-              <b>
+              <b
+                role="button"
+                tabindex="0"
+                title="পরীক্ষার লিংক কপি করতে চাপ দিন"
+                style="cursor:pointer"
+                onclick="copyLink(${x.id})"
+                onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();copyLink(${x.id})}">
                 ${esc(x.exam_name)}
               </b>
 
