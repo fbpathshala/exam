@@ -23,7 +23,7 @@ a{display:inline-block;margin-top:8px;padding:11px 18px;border-radius:9px;backgr
 (async function(){
  const id=new URLSearchParams(location.search).get('id');
  const title=document.getElementById('title'),message=document.getElementById('message');
- if(!id||!/^\\d+$/.test(id)){title.textContent='লিংকটি সঠিক নয়';message.textContent='স্টাডি ম্যাটেরিয়ালের লিংকটি পরীক্ষা করুন।';return}
+ if(!id||!/^\d+$/.test(id)){title.textContent='লিংকটি সঠিক নয়';message.textContent='স্টাডি ম্যাটেরিয়ালের লিংকটি পরীক্ষা করুন।';return}
  try{
   const sb=supabase.createClient('https://ydvbnalhcnfqpxkkmywr.supabase.co','sb_publishable_xCbSWDkASsbUPl-WmygyMw_eVrJY_9a');
   const {data,error}=await sb.from('study_materials').select('id,department').eq('id',id).eq('published',true).maybeSingle();
