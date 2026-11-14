@@ -19,12 +19,25 @@
 .exam-index .btn{margin:0;padding:8px 12px;font-size:13px;white-space:nowrap}
 .exam-closed{display:inline-block;padding:7px 12px;border-radius:7px;background:#f1f5f9;color:#64748b;font-size:13px;font-weight:750}
 @media(max-width:520px){.exam-index th,.exam-index td{padding:10px 9px;font-size:12px}.exam-index .index-number{width:48px}.exam-index .index-action{width:125px}.exam-index .btn{padding:7px 9px;font-size:12px}}
-</style></head>
+
+#list.exam-index-host .exam-index-wrap{display:block!important;width:100%!important;max-width:100%;overflow-x:auto!important;visibility:visible!important;border:1px solid #cbd9e5!important;border-radius:12px;background:#fff!important}
+#list.exam-index-host table.exam-index{display:table!important;visibility:visible!important;width:100%!important;min-width:420px;border-collapse:collapse!important;border-spacing:0!important;table-layout:auto!important}
+#list.exam-index-host .exam-index thead{display:table-header-group!important}
+#list.exam-index-host .exam-index tbody{display:table-row-group!important}
+#list.exam-index-host .exam-index tr{display:table-row!important;visibility:visible!important}
+#list.exam-index-host .exam-index th,#list.exam-index-host .exam-index td{display:table-cell!important;visibility:visible!important;padding:13px 14px!important;border-bottom:1px solid #dbe5ef!important;vertical-align:middle!important;text-align:left}
+#list.exam-index-host .exam-index th{background:#eaf2f8!important;color:#173f5f!important;font-weight:800!important}
+#list.exam-index-host .exam-index td{background:#fff;color:#172033}
+#list.exam-index-host .exam-index tbody tr:nth-child(even) td{background:#f8fbfd!important}
+#list.exam-index-host .exam-index .index-number{text-align:center!important;width:68px;font-weight:800}
+#list.exam-index-host .exam-index .index-action{text-align:center!important;width:150px}
+#list.exam-index-host .exam-index .btn{margin:0!important}
+@media(max-width:520px){#list.exam-index-host .exam-index th,#list.exam-index-host .exam-index td{padding:10px 9px!important;font-size:12px!important}#list.exam-index-host .exam-index{min-width:390px!important}}</style></head>
 <body data-fp-theme="premium">
 <header class="top"><b>📚 ফেইসবুক পাঠশালা</b><div>পরীক্ষা</div></header>
 <main class="wrap">
 <section class="card"><h2>📝 পরীক্ষার তালিকা</h2><input id="search" placeholder="পরীক্ষার নাম খুঁজুন" oninput="render()"><br><br><select id="filter" onchange="render()"><option value="all">সব পরীক্ষা</option><option value="active">সক্রিয় পরীক্ষা</option></select></section>
-<section id="list" class="card muted">পরীক্ষাগুলো লোড হচ্ছে…</section>
+<section id="list" class="card muted exam-index-host">পরীক্ষাগুলো লোড হচ্ছে…</section>
 </main>
 <script>
 const sb=supabase.createClient('https://ydvbnalhcnfqpxkkmywr.supabase.co','sb_publishable_xCbSWDkASsbUPl-WmygyMw_eVrJY_9a');
