@@ -9,34 +9,39 @@
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f7fb;color:#172033}.top{background:#2563eb;color:#fff;padding:20px}.wrap{max-width:900px;margin:20px auto;padding:0 14px}.card{background:#fff;border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 4px 16px #0001}input,select{padding:12px;border:1px solid #ccd5e1;border-radius:10px;font-size:16px}input{width:100%}.exam{border:1px solid #e2e8f0;border-radius:14px;padding:16px;margin-top:12px}.btn{display:inline-block;background:#2563eb;color:#fff;padding:11px 15px;border-radius:10px;text-decoration:none;font-weight:bold;margin-top:10px}.error{background:#fee2e2;color:#991b1b}.muted{color:#64748b}
 </style>
 <style id="direct-dashboard-navigation">.direct-dashboard-nav{position:fixed;right:16px;bottom:16px;z-index:9999;display:inline-flex;align-items:center;gap:8px;padding:11px 16px;border-radius:999px;background:#1d4ed8;color:#fff!important;text-decoration:none!important;font:700 15px/1.2 Arial,sans-serif;box-shadow:0 5px 18px #0003;border:2px solid #fff}.direct-dashboard-nav:hover{background:#1e40af;transform:translateY(-1px)}@media print{.direct-dashboard-nav{display:none!important}}</style><style id="site-copy-deterrent">html,body{ -webkit-user-select:none!important; user-select:none!important; -webkit-touch-callout:none!important}input,textarea,select,[contenteditable="true"],[contenteditable=""],.allow-copy{ -webkit-user-select:text!important; user-select:text!important; -webkit-touch-callout:default!important} @media print{body{display:none!important}}</style><style id="exam-index-table-style">
-.exam-index-wrap{width:100%;overflow-x:auto;border:1px solid #dbe5ef;border-radius:12px;background:#fff}
-.exam-index{width:100%;border-collapse:collapse;min-width:420px;color:#172033}
-.exam-index th{padding:13px 14px;background:#eaf2f8;color:#173f5f;text-align:left;font-size:13px;border-bottom:1px solid #cbd9e5}
-.exam-index td{padding:13px 14px;border-bottom:1px solid #e5edf3;vertical-align:middle;font-size:14px;line-height:1.6}
-.exam-index tbody tr:last-child td{border-bottom:0}.exam-index tbody tr:nth-child(even){background:#f8fbfd}
-.exam-index .index-number{width:68px;text-align:center;font-weight:800;color:#42627c}
-.exam-index .index-title{font-weight:650}.exam-index .index-action{width:150px;text-align:center}
-.exam-index .btn{margin:0;padding:8px 12px;font-size:13px;white-space:nowrap}
-.exam-closed{display:inline-block;padding:7px 12px;border-radius:7px;background:#f1f5f9;color:#64748b;font-size:13px;font-weight:750}.exam-total{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;margin:12px 0;border-radius:13px;background:linear-gradient(120deg,#e8f2ff,#f0fdfa);border:1px solid #cbdff0}.exam-total span{font-size:15px;font-weight:750;color:#31536d}.exam-total strong{font-size:30px;line-height:1.2;color:#123b62}.exam-help{margin:8px 0 14px;color:#52677a;font-size:14px}.exam-name-link{color:#1456a0;text-decoration:none;font-weight:800}.exam-name-link:hover{text-decoration:underline}.exam-open{display:inline-block;padding:7px 12px;border-radius:7px;background:#dcfce7;color:#166534;font-size:13px;font-weight:800}
-@media(max-width:520px){.exam-index th,.exam-index td{padding:10px 9px;font-size:12px}.exam-index .index-number{width:48px}.exam-index .index-action{width:125px}.exam-index .btn{padding:7px 9px;font-size:12px}}
-
-#list.exam-index-host .exam-index-wrap{display:block!important;width:100%!important;max-width:100%;overflow-x:auto!important;visibility:visible!important;border:1px solid #cbd9e5!important;border-radius:12px;background:#fff!important}
-#list.exam-index-host table.exam-index{display:table!important;visibility:visible!important;width:100%!important;min-width:420px;border-collapse:collapse!important;border-spacing:0!important;table-layout:auto!important}
-#list.exam-index-host .exam-index thead{display:table-header-group!important}
-#list.exam-index-host .exam-index tbody{display:table-row-group!important}
-#list.exam-index-host .exam-index tr{display:table-row!important;visibility:visible!important}
-#list.exam-index-host .exam-index th,#list.exam-index-host .exam-index td{display:table-cell!important;visibility:visible!important;padding:13px 14px!important;border-bottom:1px solid #dbe5ef!important;vertical-align:middle!important;text-align:left}
-#list.exam-index-host .exam-index th{background:#eaf2f8!important;color:#173f5f!important;font-weight:800!important}
-#list.exam-index-host .exam-index td{background:#fff;color:#172033}
-#list.exam-index-host .exam-index tbody tr:nth-child(even) td{background:#f8fbfd!important}
-#list.exam-index-host .exam-index .index-number{text-align:center!important;width:68px;font-weight:800}
-#list.exam-index-host .exam-index .index-action{text-align:center!important;width:150px}
-#list.exam-index-host .exam-index .btn{margin:0!important}
-@media(max-width:520px){#list.exam-index-host .exam-index th,#list.exam-index-host .exam-index td{padding:10px 9px!important;font-size:12px!important}#list.exam-index-host .exam-index{min-width:390px!important}}</style></head>
+.materials-index-wrap{width:100%;overflow-x:auto;margin:14px 0 22px;border:2px solid #526b7c;border-radius:4px;background:#fff;box-shadow:0 4px 14px #102a4312}
+.materials-index{display:table;width:100%;min-width:480px;border-collapse:collapse;border:0;table-layout:fixed;background:#fff;color:#172b3a;font-family:inherit}
+.materials-index caption{caption-side:top;padding:12px 10px;background:#f4f0e6;color:#253f50;font-size:17px;font-weight:800;letter-spacing:.3px;border-bottom:1px solid #9aabb6}
+.materials-index th,.materials-index td{border:1px solid #8497a5;padding:13px 12px;vertical-align:middle;font-size:14px;line-height:1.65}
+.materials-index th{background:#e7edf1;color:#183b52;text-align:center;font-weight:800;border-bottom:2px solid #526b7c}
+.materials-index tbody tr:nth-child(even) td{background:#f7f8f6}
+.materials-index tbody tr:hover td{background:#eef5f8}
+.materials-index .index-number{width:72px;text-align:center;font-weight:800;color:#294e66}
+.materials-index .index-title{font-weight:650;text-align:left;overflow-wrap:anywhere}
+.materials-index .index-status{width:125px;text-align:center}
+.materials-index .status-chip{display:inline-block;padding:7px 12px;border:1px solid #8da7b8;border-radius:3px;background:#f0f5f8;color:#174b6b;font-size:13px;font-weight:800;white-space:nowrap}
+.materials-index .status-chip.open{background:#e8f5ed;border-color:#8db99b;color:#17633a}
+.materials-index .status-chip.closed{background:#f1f3f5;border-color:#aab5bd;color:#596875}
+.exam-name-link{color:#174b6b;text-decoration:none;font-weight:750}
+.exam-name-link:hover{text-decoration:underline;color:#0f766e}
+#list.exam-index-host .materials-index-wrap{display:block!important;width:100%!important;max-width:100%;overflow-x:auto!important;visibility:visible!important;border:2px solid #526b7c!important;border-radius:4px!important;background:#fff!important}
+#list.exam-index-host table.materials-index{display:table!important;visibility:visible!important;width:100%!important;min-width:480px!important;border:0!important;border-collapse:collapse!important;border-spacing:0!important;table-layout:fixed!important;background:#fff!important}
+#list.exam-index-host .materials-index caption{display:table-caption!important}
+#list.exam-index-host .materials-index thead{display:table-header-group!important}
+#list.exam-index-host .materials-index tbody{display:table-row-group!important}
+#list.exam-index-host .materials-index tr{display:table-row!important;visibility:visible!important}
+#list.exam-index-host .materials-index th,#list.exam-index-host .materials-index td{display:table-cell!important;visibility:visible!important;padding:13px 12px!important;border:1px solid #8497a5!important;vertical-align:middle!important}
+#list.exam-index-host .materials-index th{background:#e7edf1!important;color:#183b52!important;text-align:center!important;font-weight:800!important;border-bottom:2px solid #526b7c!important}
+#list.exam-index-host .materials-index tbody tr:nth-child(even) td{background:#f7f8f6!important}
+#list.exam-index-host .materials-index .index-number{text-align:center!important;width:72px!important}
+#list.exam-index-host .materials-index .index-title{text-align:left!important}
+#list.exam-index-host .materials-index .index-status{text-align:center!important;width:125px!important}
+@media(max-width:520px){.materials-index{min-width:480px!important}.materials-index th,.materials-index td{padding:10px 9px!important;font-size:12px!important}.materials-index .index-number{width:58px!important}.materials-index .index-status{width:105px!important}}
+</style></head>
 <body data-fp-theme="premium">
-<header class="top"><b>📚 ফেইসবুক পাঠশালা</b><div>পরীক্ষা</div></header>
+<header class="hero"><h1>📝 পরীক্ষার সূচিপত্র</h1><p>ফেসবুক পাঠশালা • পরীক্ষা দিন, প্রস্তুতি যাচাই করুন</p></header>
 <main class="wrap">
-<section class="card"><h2>📝 পরীক্ষার সূচিপত্র</h2><div class="exam-total"><span>মোট পরীক্ষা</span><strong id="examTotal">লোড হচ্ছে…</strong></div><p class="exam-help">পরীক্ষায় অংশগ্রহণ করতে পরীক্ষার নামের ওপর ক্লিক করুন।</p><input id="search" placeholder="পরীক্ষার নাম খুঁজুন" oninput="render()"><br><br><select id="filter" onchange="render()"><option value="all">সব পরীক্ষা</option><option value="active">চালু পরীক্ষা</option><option value="closed">বন্ধ পরীক্ষা</option></select></section>
+<section class="card"><h2>💼 জব কেয়ার — পরীক্ষা</h2><div class="exam-total"><span>মোট পরীক্ষা</span><strong id="examTotal">লোড হচ্ছে…</strong></div><p class="exam-help">পরীক্ষায় অংশগ্রহণ করতে পরীক্ষার নামের ওপর ক্লিক করুন।</p><input id="search" placeholder="পরীক্ষার নাম খুঁজুন" oninput="render()"><br><br><select id="filter" onchange="render()"><option value="all">সব পরীক্ষা</option><option value="active">চালু পরীক্ষা</option><option value="closed">বন্ধ পরীক্ষা</option></select></section>
 <section id="list" class="card muted exam-index-host">পরীক্ষাগুলো লোড হচ্ছে…</section>
 </main>
 <script>
@@ -58,7 +63,7 @@ function render(){
  const q=document.getElementById('search').value.toLowerCase().trim(),f=document.getElementById('filter').value;
  document.getElementById('examTotal').textContent=bn(exams.length);
  const rows=exams.filter(e=>{const active=String(e.status||'').toLowerCase()==='active';return (f==='all'||(f==='active'?active:!active))&&(!q||String(e.exam_name||'').toLowerCase().includes(q))});
- document.getElementById('list').innerHTML=rows.length?'<div class="exam-index-wrap"><table class="exam-index"><thead><tr><th scope="col">ক্রম</th><th scope="col">পরীক্ষার নাম</th><th scope="col">পরীক্ষার স্ট্যাটাস</th></tr></thead><tbody>'+rows.map((e,i)=>{const active=String(e.status||'').toLowerCase()==='active';return '<tr><td class="index-number">'+bn(i+1)+'</td><td class="index-title"><a class="exam-name-link" href="/job/exam/'+encodeURIComponent(e.id)+'">'+esc(e.exam_name||'নামহীন পরীক্ষা')+'</a></td><td class="index-action">'+(active?'<span class="exam-open">চালু</span>':'<span class="exam-closed">বন্ধ</span>')+'</td></tr>'}).join('')+'</tbody></table></div>':'কোনো পরীক্ষা পাওয়া যায়নি';
+ document.getElementById('list').innerHTML=rows.length?'<div class="materials-index-wrap"><table class="materials-index"><caption>সূচিপত্র</caption><colgroup><col style="width:72px"><col><col style="width:125px"></colgroup><thead><tr><th scope="col">ক্রমিক</th><th scope="col">পরীক্ষার নাম</th><th scope="col">পরীক্ষার স্ট্যাটাস</th></tr></thead><tbody>'+rows.map((e,i)=>{const active=String(e.status||'').toLowerCase()==='active';return '<tr><td class="index-number">'+bn(i+1)+'</td><td class="index-title"><a class="exam-name-link" href="/job/exam/'+encodeURIComponent(e.id)+'">'+esc(e.exam_name||'নামহীন পরীক্ষা')+'</a></td><td class="index-status"><span class="status-chip '+(active?'open':'closed')+'">'+(active?'চালু':'বন্ধ')+'</span></td></tr>'}).join('')+'</tbody></table></div>':'কোনো পরীক্ষা পাওয়া যায়নি';
 }
 load();
 </script>
