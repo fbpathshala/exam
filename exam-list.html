@@ -57,7 +57,7 @@ async function load(){
 function render(){
  const q=document.getElementById('search').value.toLowerCase().trim(),f=document.getElementById('filter').value;
  const rows=exams.filter(e=>(f==='all'||String(e.status||'').toLowerCase()==='active')&&(!q||String(e.exam_name||'').toLowerCase().includes(q)));
- document.getElementById('list').innerHTML=rows.length?'<div class="exam-index-wrap"><table class="exam-index"><thead><tr><th scope="col">ক্রমিক</th><th scope="col">পরীক্ষার নাম</th><th scope="col">পরীক্ষার লিংক</th></tr></thead><tbody>'+rows.map((e,i)=>{const active=String(e.status||'').toLowerCase()==='active';return '<tr><td class="index-number">'+bn(i+1)+'</td><td class="index-title">'+esc(e.exam_name||'নামহীন পরীক্ষা')+'</td><td class="index-action">'+(active?'<a class="btn" href="index.html?exam='+encodeURIComponent(e.id)+'">পরীক্ষা শুরু করুন</a>':'<span class="exam-closed">বন্ধ</span>')+'</td></tr>'}).join('')+'</tbody></table></div>':'কোনো পরীক্ষা পাওয়া যায়নি';
+ document.getElementById('list').innerHTML=rows.length?'<div class="exam-index-wrap"><table class="exam-index"><thead><tr><th scope="col">ক্রমিক</th><th scope="col">পরীক্ষার নাম</th><th scope="col">বিস্তারিত</th></tr></thead><tbody>'+rows.map((e,i)=>{const active=String(e.status||'').toLowerCase()==='active';return '<tr><td class="index-number">'+bn(i+1)+'</td><td class="index-title">'+esc(e.exam_name||'নামহীন পরীক্ষা')+'</td><td class="index-action">'+(active?'<a class="btn" href="index.html?exam='+encodeURIComponent(e.id)+'">পরীক্ষা শুরু করুন</a>':'<span class="exam-closed">বন্ধ</span>')+'</td></tr>'}).join('')+'</tbody></table></div>':'কোনো পরীক্ষা পাওয়া যায়নি';
 }
 load();
 </script>
