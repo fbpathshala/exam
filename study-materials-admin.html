@@ -37,7 +37,7 @@ const db=window.db||(window.supabase?.createClient?window.supabase.createClient(
 function cleanImageBatchCaption(value){return String(value||'').replace(/\s*•\s*ছবি\s*\d+\s*\/\s*\d+\s*$/,'').replace(/ছবি\s*\d+\s*\/\s*\d+\s*$/,'').trim()}
 function materialGroups(rows){const groups=new Map();for(const r of rows){const isImage=r.material_type==='image';const key=isImage?[r.department||'',r.folder_name||'',r.title||'',r.category_id||'',r.subcategory_id||'',r.chapter_id||'',r.set_id||'',r.created_at||'',cleanImageBatchCaption(r.description)].join('¦'):'single¦'+r.id;if(!groups.has(key))groups.set(key,{first:r,rows:[]});groups.get(key).rows.push(r)}return [...groups.values()].map(g=>{g.rows.sort((a,b)=>(a.display_order||0)-(b.display_order||0));return g})}
 function toBnNumber(value){return String(value).replace(/\d/g,d=>'০১২৩৪৫৬৭৮৯'[Number(d)])}
-function assignAdminPostNumbers(rows){postNumberById=new Map();const groups=materialGroups(rows);groups.sort((a,b)=>{const at=Date.parse(a.first.created_at||0)||0,bt=Date.parse(b.first.created_at||0)||0;return bt-at||String(b.first.id).localeCompare(String(a.first.id),undefined,{numeric:true})});const counters=new Map();for(const g of groups){const key=String(g.first.subcategory_id||'no-subcategory');const n=(counters.get(key)||0)+1;counters.set(key,n);for(const row of g.rows)postNumberById.set(String(row.id),n)}}
+function compareAdminPostOrder(a,b){const at=Date.parse(a.first.created_at||0)||0,bt=Date.parse(b.first.created_at||0)||0;return bt-at||String(b.first.id).localeCompare(String(a.first.id),undefined,{numeric:true})}function assignAdminPostNumbers(rows){postNumberById=new Map();const groups=materialGroups(rows).sort(compareAdminPostOrder);groups.forEach((g,i)=>g.rows.forEach(row=>postNumberById.set(String(row.id),i+1)))}
 function publicMaterialUrl(row){const page=row.department==='academic_care'?'academic-study-materials.html':'study-materials.html';const url=new URL(page,location.href);url.hash='material-'+row.id;return url.href}
 function updateStats(){const groups=materialGroups(allMaterialRows),total=groups.length,published=groups.filter(g=>g.rows.some(r=>!!r.published)).length;$('statTotal').textContent=String(total);$('statPublished').textContent=String(published);$('statDraft').textContent=String(total-published)}
 function msg(id,t){$(id).textContent=t;$(id).classList.remove('hidden')}
@@ -57,13 +57,13 @@ function updateTaxonomySets(){const academic=$('departmentSwitch').value==='acad
 function safeName(s){return String(s||'file').normalize('NFKD').replace(/[^a-zA-Z0-9._-]+/g,'-').replace(/^-+|-+$/g,'').slice(-100)||'file'}
 async function load(){
  $('listMessage').textContent='লোড হচ্ছে…';$('items').replaceChildren();
- const {data,error}=await db.from('study_materials').select('*').eq('department',$('departmentSwitch').value).order('folder_name').order('display_order').order('created_at',{ascending:false});
+ const {data,error}=await db.from('study_materials').select('*').eq('department',$('departmentSwitch').value).order('created_at',{ascending:false}).order('id',{ascending:false});
  if(error){$('listMessage').textContent='লোড করা যায়নি: '+error.message;return}
  allMaterialRows=data||[];assignAdminPostNumbers(allMaterialRows);updateStats();$('listMessage').textContent='মোট '+allMaterialRows.length+'টি উপকরণ • '+new Set(allMaterialRows.map(r=>(r.folder_name||'সাধারণ').trim()||'সাধারণ')).size+'টি ফোল্ডার';renderMaterialList();}
 function renderMaterialRows(rows){
  $('items').replaceChildren();
  $('adminDetail').classList.add('hidden');$('adminDetail').replaceChildren();
- const groups=materialGroups(rows);
+ const groups=materialGroups(rows).sort(compareAdminPostOrder);groups.forEach((g,i)=>g.rows.forEach(row=>postNumberById.set(String(row.id),i+1)));
  $('listMessage').textContent='মোট '+materialGroups(allMaterialRows).length+'টি • দেখানো হচ্ছে '+groups.length+'টি উপকরণ';
  for(const g of groups){
   const r=g.first,ids=g.rows.map(x=>x.id),el=document.createElement('article');el.className='item toc-admin-item';
