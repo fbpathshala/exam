@@ -36,7 +36,7 @@ function render(){
   if(g.kind==='image'){
    const imgs=g.rows.slice().sort((a,b)=>{const ai=Number((String(a.description||'').match(/ছবি\s*(\d+)\s*\//)||[])[1]||0),bi=Number((String(b.description||'').match(/ছবি\s*(\d+)\s*\//)||[])[1]||0);return ai&&bi?ai-bi:(a.display_order||0)-(b.display_order||0)});
    
-   return '<article class="item" id="material-'+esc(x.id)+'"><h2>'+esc(x.title)+'</h2><div class="meta">'+esc(meta)+'</div><div class="image-gallery">'+imgs.map(img=>'<figure class="image-entry"><img src="'+esc(img.file_path)+'" alt="'+esc(x.title)+'" loading="lazy" draggable="false" oncontextmenu="return false">'+(cleanBatchCaption(x.description)?'<figcaption class="content image-caption">'+esc(cleanBatchCaption(x.description))+'</figcaption>':'')+'</figure>').join('')+'</div></article>';
+   return '<article class="item" id="material-'+esc(x.id)+'"><h2>'+esc(x.title)+'</h2><div class="meta">'+esc(meta)+'</div><div class="image-gallery">'+imgs.map(img=>'<figure class="image-entry"><img src="'+esc(img.file_path)+'" alt="'+esc(x.title)+'" loading="lazy" draggable="false" oncontextmenu="return false"></figure>').join('')+'</div>'+(cleanBatchCaption(x.description)?'<div class="content image-caption">'+esc(cleanBatchCaption(x.description))+'</div>':'')+'</article>';
   }
   return '<article class="item" id="material-'+esc(x.id)+'"><h2>'+esc(x.title)+'</h2><div class="meta">'+esc(meta)+(x.description?' · '+esc(x.description):'')+'</div>'+(x.material_type==='text'?'<div class="content">'+esc(x.content_text)+'</div>':'<a class="filelink" href="'+esc(x.file_path)+'" target="_blank" rel="noopener">📄 PDF খুলুন / দেখুন</a>')+'</article>';
  }).join('')).join('');
