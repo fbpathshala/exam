@@ -132,7 +132,7 @@ function applySourceFilter(){
   if(department==="all"||department==="job_care")addGroup("জব কেয়ার — পরীক্ষা",sourceCache.jobExams,r=>new Option(r.exam_name+" • পরীক্ষা","exams:"+r.id));
   if(department==="all"||department==="academic_care")addGroup("একাডেমিক কেয়ার — পরীক্ষা",sourceCache.academicExams,r=>new Option(r.title+" • পরীক্ষা","academic_care_exams:"+r.public_token));
  }
- if(kind==="all"||kind==="material")addGroup("স্টাডি ম্যাটেরিয়াল",sourceCache.materials.filter(r=>department==="all"||r.department===department),r=>{const dept=r.department==="academic_care"?"একাডেমিক কেয়ার":"জব কেয়ার";const label=[dept,r.category,r.folder_name,r.title].filter(Boolean).join(" • ");return new Option(label,"study_materials:"+r.id)});
+ if(kind==="all"||kind==="material")addGroup("স্টাডি ম্যাটেরিয়াল",sourceCache.materials.filter(r=>department==="all"||r.department===department),r=>new Option(String(r.title||"শিরোনামহীন পোস্ট").trim(),"study_materials:"+r.id));
  if([...select.options].some(o=>o.value===keep))select.value=keep;
 }
 function sourceChanged(){
