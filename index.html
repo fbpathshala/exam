@@ -329,7 +329,12 @@ function showResult(){
   resultMessage.textContent=String(settings.thank_you_message||"").trim()||defaultThanks;
   resultMessage.hidden=false;resultMessage.classList.remove("hidden");resultMessage.style.display="block";resultMessage.style.visibility="visible";
   score.classList.add("hidden");
-  document.querySelector("#resultPage .result-grid").classList.toggle("hidden",!show);
+  const resultGrid=document.querySelector("#resultPage .result-grid");
+  resultGrid.classList.toggle("hidden",!show&&settings.show_rank===false);
+  [".metric-total",".metric-participation",".metric-correct",".metric-wrong",".metric-score"].forEach(selector=>{
+    const box=resultGrid.querySelector(selector);
+    if(box)box.classList.toggle("hidden",!show);
+  });
   score.textContent=bn(d.score||0)+" / "+bn(d.total_marks||0);
   marks.textContent=bn(d.score||0);
   rank.textContent=d.rank?bn(d.rank):"—";
