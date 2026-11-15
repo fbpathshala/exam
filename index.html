@@ -117,13 +117,8 @@ async function loadExam(){
         itemsBySourceId.set(String(item.source_question_id),item);
       }
     });
-    const sourceIds=[...new Set((questions||[]).map(x=>x.id).filter(x=>x!=null).map(String))];
-    let sourceRows=[];
-    if(sourceIds.length){
-      const sr=await sb.from("questions").select("id,correct_answer,explanation,question_type,reference_answer").in("id",sourceIds);
-      if(!sr.error)sourceRows=sr.data||[];
-    }
-    const sourceById=new Map(sourceRows.map(x=>[String(x.id),x]));
+    // Correct answers are loaded only from the settings-aware post-submit RPC.
+    const sourceById=new Map();
     questions=questions.map(x=>{
       const item=itemsBySourceId.get(String(x.id));
       const source=sourceById.get(String(x.id));
@@ -252,36 +247,45 @@ function nextQuestion(){if(currentQuestion<questions.length-1){currentQuestion++
 function startTimer(){clearInterval(timerInterval);updateTimer();timerInterval=setInterval(()=>{timeLeft--;updateTimer();if(timeLeft<=0){clearInterval(timerInterval);submitExam(true)}},1000)}
 function updateTimer(){timer.textContent=String(Math.floor(Math.max(0,timeLeft)/60)).padStart(2,"0")+":"+String(Math.max(0,timeLeft)%60).padStart(2,"0")}
 
-function buildExactStudentReview(){
+function buildExactStudentReview(serverReview=[]){
+  const savedById=new Map((serverReview||[]).map(item=>[String(item.question_id),item]));
   return questions.map((q,i)=>{
+    const saved=savedById.get(String(q.id))||{};
     const isCQ=String(q.question_type||"mcq").toLowerCase()==="cq";
     if(isCQ){
-      const v=answers[q.id];const written=typeof v==="string"?v:(v?.written_answer||"");
-      return {question_id:q.id,display_order:i,question_text:q.question_text,question_type:"cq",written_answer:written,reference_answer:q.reference_answer||"",marks_awarded:0,max_marks:Number(q.marks??settings.marks_per_question??1),is_correct:false};
+      const v=answers[q.id];const written=saved.written_answer??(typeof v==="string"?v:(v?.written_answer||""));
+      return {question_id:q.id,display_order:i,question_text:q.question_text,question_type:"cq",written_answer:written,reference_answer:settings.show_answers===true?(saved.reference_answer||""):"",marks_awarded:saved.marks_awarded??0,max_marks:Number(saved.max_marks??q.marks??settings.marks_per_question??1),reviewed_at:saved.reviewed_at||null};
     }
     const map=(optionMaps[q.id]||["A","B","C","D"]).slice();
-    const v=answers[q.id];const selected=String(typeof v==="string"?v:(v?.selected_option||"")).toUpperCase();
-    const correct=String(q.correct_answer||"").toUpperCase();
-    const isCorrect=!!selected&&selected===correct;
-    const questionMarks=Number(q.marks??settings.marks_per_question??1);
-    const negativeMarks=Number(q.negative_mark??settings.negative_mark??0);
-    const marksAwarded=!selected?0:(isCorrect?questionMarks:-negativeMarks);
-    return {question_id:q.id,display_order:i,question_text:q.question_text,question_type:"mcq",options:map.map((original,j)=>({display_letter:String.fromCharCode(65+j),original_letter:original,text:q["option_"+original.toLowerCase()]||"",selected:original===selected,correct:original===correct})),selected_option:selected||null,correct_option:correct||null,is_correct:isCorrect,marks_awarded:marksAwarded,explanation:q.explanation||""};
+    const selected=String(saved.selected_option||"").toUpperCase();
+    const correct=settings.show_answers===true?String(saved.correct_option||"").toUpperCase():"";
+    const options=map.map((original,j)=>({display_letter:String.fromCharCode(65+j),original_letter:original,text:q["option_"+original.toLowerCase()]||"",selected:original===selected,correct:!!correct&&original===correct}));
+    return {question_id:q.id,display_order:i,question_text:q.question_text,question_type:"mcq",options,selected_option:selected||null,correct_option:correct||null,is_correct:settings.show_answers===true&&!!saved.is_correct,marks_awarded:saved.marks_awarded??0,explanation:settings.show_answers===true?(saved.explanation||""):""};
   });
 }
 
 async function submitExam(auto){if(!auto&&!confirm("আপনি কি পরীক্ষা জমা দিতে চান?"))return;clearInterval(timerInterval);submitBtn.disabled=true;try{
 let r=await sb.rpc("submit_exam",{p_exam_id:exam.id,p_name:student.name,p_facebook_name:student.facebookName,p_district:student.district,p_mobile:student.mobile,p_device_token:deviceToken,p_answers:Object.fromEntries(Object.entries(answers).map(([k,v])=>[String(k),typeof v==="string"?v:{question_type:"cq",written_answer:String(v?.written_answer||"")}]))});
 if(r.error)throw r.error;if(!r.data?.success)throw Error(r.data?.message||"পরীক্ষা জমা দেওয়া যায়নি।");
-resultData=r.data;
+const submitted=r.data;
+// Read the saved attempt through the settings-aware RPC so hidden scores,
+// ranks, answer keys and answer papers are not exposed in the student response.
+const safeResult=await sb.rpc("get_previous_exam_result",{p_exam_id:exam.id,p_mobile:student.mobile,p_attempt_date:dhaka()});
+if(!safeResult.error&&safeResult.data?.success){
+  resultData={...safeResult.data,attempt_id:submitted.attempt_id,result_token:submitted.result_token};
+  resultData.review=buildExactStudentReview(safeResult.data.review||[]);
+}else{
+  // If the follow-up read fails, show only the permitted result state and no answer paper.
+  resultData={...submitted,review:[]};
+}
 resultData.total_questions=+resultData.total_questions||questions.length;
-resultData.total_marks=+resultData.total_marks||(+settings.total_marks||questions.length*(+settings.marks_per_question||1));
-resultData.percentage=resultData.total_marks?(+resultData.score||0)/resultData.total_marks*100:0;
-
-/* সবচেয়ে গুরুত্বপূর্ণ fix:
-   Result review আর database-এর original/random order থেকে পুনর্গঠন করা হচ্ছে না।
-   একই questions + optionMaps + answers ব্যবহার করা হচ্ছে যা student পরীক্ষার সময় দেখেছিল। */
-resultData.review=buildExactStudentReview();
+if(settings.show_result!==false){
+  resultData.total_marks=+resultData.total_marks||(+settings.total_marks||questions.length*(+settings.marks_per_question||1));
+  resultData.percentage=resultData.total_marks?(+resultData.score||0)/resultData.total_marks*100:0;
+}else{
+  resultData.total_marks=null;
+  resultData.percentage=null;
+}
 
 /* Attempt reload-এর জন্য browser-এ exact view রেখে দিচ্ছি। */
 if(resultData.attempt_id){try{localStorage.setItem("mcq_attempt_view_"+resultData.attempt_id,JSON.stringify({question_order:questions.map(q=>q.id),option_maps:optionMaps,review:resultData.review}))}catch(_){}}
