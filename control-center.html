@@ -82,17 +82,6 @@ main{padding:16px;max-width:1600px;margin:0 auto}
 <body>
 
 <div class="layout">
-<aside><button class="menu-toggle" id="menuToggle" type="button" aria-label="সেকশন মেনু খুলুন" title="সেকশন মেনু" aria-expanded="false" aria-controls="nav">☰</button><nav class="nav" id="nav" aria-label="কেন্দ্রীয় সেকশন" hidden>
-<button data-section="question-create">১. প্রশ্ন তৈরি</button>
-<button data-section="question-bank">২. প্রশ্ন ব্যাংক</button>
-<button data-section="exam-create">৩. পরীক্ষা তৈরি</button>
-<button data-section="exam-manage">৪. পরীক্ষা পরিচালনা</button>
-<button data-section="results">৫. ফলাফল পর্যালোচনা</button>
-<button data-section="materials">৬. স্টাডি ম্যাটেরিয়ালস</button>
-<button data-section="important-links">৭. গুরুত্বপূর্ণ তথ্য ও পোস্ট লিংক</button>
-<button data-section="breaking-news">৮. নোটিশ</button>
-<button data-section="social-links">৯. ফেইসবুক পাঠশালা লিংক</button>
-</nav></aside>
 <main>
 <div class="toolbar"><div class="title" id="sectionTitle">প্রশ্ন তৈরি</div><label for="care" id="careLabel">বিভাগ:</label><select id="care"><option value="">বিভাগ নির্বাচন করুন</option><option value="job">Job Care</option><option value="academic">Academic Care</option></select><button type="button" id="managementToggle" class="header-link" hidden>⚙ ব্যবস্থাপনা খুলুন</button><a class="central-return" id="centralReturn" href="https://fbpathshala.github.io/home.html">⌂ মূল মেনু / হোম পেইজে ফিরুন</a></div>
 <div class="management-options" id="managementOptions" hidden aria-label="ব্যবস্থাপনার ধরন"></div>
@@ -210,10 +199,8 @@ function resizeEmbeddedFrame(frame,which){try{const doc=frame.contentDocument;if
 function cleanEmbeddedManagement(){cleanEmbeddedFrame(managementFrame,"central-management-navigation-cleanup");if(active==="materials")resizeEmbeddedFrame(managementFrame,"management")}
 workspaceFrame.addEventListener("load",()=>{cleanEmbeddedSection();resizeNoticeFrame();if(active==="materials"&&!managementView)resizeEmbeddedFrame(workspaceFrame,"workspace")});
 managementFrame.addEventListener("load",cleanEmbeddedManagement);
-document.getElementById("nav").addEventListener("click",e=>{const b=e.target.closest("[data-section]");if(!b)return;active=b.dataset.section;managementView=false;activeManagementLevel=0;selectedReviewType="ALL";document.getElementById("nav").classList.remove("open");document.getElementById("nav").hidden=true;document.getElementById("menuToggle").setAttribute("aria-expanded","false");render()});
 document.getElementById("managementToggle").addEventListener("click",()=>{managementView=!managementView;activeManagementLevel=0;render()});
 document.getElementById("reviewTypeFilter").addEventListener("change",e=>{selectedReviewType=e.target.value||"ALL";render()});
-document.getElementById("menuToggle").addEventListener("click",()=>{const nav=document.getElementById("nav"),toggle=document.getElementById("menuToggle"),open=nav.hidden;nav.hidden=!open;nav.classList.toggle("open",open);toggle.setAttribute("aria-expanded",String(open));});
 document.getElementById("care").addEventListener("change",()=>{activeManagementLevel=0;selectedReviewType="ALL";render()});
 document.getElementById("centralReturn").addEventListener("click",e=>{
   const r=routes[active], care=document.getElementById("care");
