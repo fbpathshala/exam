@@ -43,21 +43,32 @@ function updateForm(){
 function trail(n){const a=[n.name];let p=n.parent_id,guard=0;while(p&&guard++<10){const x=nodes.find(z=>String(z.id)===String(p));if(!x)break;a.unshift(x.name);p=x.parent_id}return a.join(' › ')}
 function typeLabel(type){return levels().find(x=>x[0]===type)?.[1]||type}
 function makeButton(label,cls,handler){const b=document.createElement('button');b.type='button';b.className=cls;b.textContent=label;b.addEventListener('click',handler);return b}
+function renderNodeList(){
+ $('list').replaceChildren();
+ const type=$('level').value, parentId=$('parent').value;
+ let visible=nodes.filter(n=>n.node_type===type);
+ if(type!=='category'&&parentId)visible=visible.filter(n=>String(n.parent_id)===String(parentId));
+ visible.sort((a,b)=>(Number(a.display_order)||0)-(Number(b.display_order)||0)||a.name.localeCompare(b.name,'bn'));
+ if(!visible.length){
+  const p=document.createElement('p');p.className='muted';
+  p.textContent=type==='subcategory'&&!parentId?'সাব-ক্যাটাগরি দেখতে উপরের “কোনটির অধীনে যোগ হবে?” থেকে একটি ক্যাটাগরি নির্বাচন করুন।':'এই নির্বাচনের অধীনে এখনো কোনো '+typeLabel(type)+' নেই।';
+  $('list').append(p);return;
+ }
+ for(const n of visible){
+  const el=document.createElement('div');el.className='item';
+  const title=document.createElement('strong');title.textContent=trail(n);el.append(title);
+  const meta=document.createElement('div');meta.className='muted';meta.textContent=typeLabel(n.node_type)+' · ক্রম '+n.display_order;el.append(meta);
+  el.append(makeButton('সম্পাদনা','secondary',()=>{editingId=n.id;updateForm();renderNodeList();say('নির্বাচিত: '+trail(n)+'। পরিবর্তন করে সংরক্ষণ করুন।');window.scrollTo({top:0,behavior:'smooth'})}));
+  el.append(makeButton('মুছুন','danger',()=>deleteNode(n)));
+  $('list').append(el);
+ }
+}
 async function load(){
  $('list').replaceChildren();say('কাঠামো লোড হচ্ছে…');
  const {data,error}=await db.from('study_material_taxonomy').select('id,department,node_type,parent_id,name,display_order').eq('department',$('department').value).order('display_order').order('name');
  if(error){say('কাঠামো লোড হয়নি: '+error.message);return}
- nodes=data||[];updateForm();
- if(!nodes.length){const p=document.createElement('p');p.textContent='এখনো কোনো কাঠামো নেই। প্রথম স্তর যোগ করে শুরু করুন।';$('list').append(p)}
- for(const n of nodes){
-  const el=document.createElement('div');el.className='item';
-  const title=document.createElement('strong');title.textContent=trail(n);el.append(title);
-  const meta=document.createElement('div');meta.className='muted';meta.textContent=typeLabel(n.node_type)+' · ক্রম '+n.display_order;el.append(meta);
-  el.append(makeButton('সম্পাদনা','secondary',()=>{editingId=n.id;updateForm();say('নির্বাচিত: '+trail(n)+'। পরিবর্তন করে সংরক্ষণ করুন।');window.scrollTo({top:0,behavior:'smooth'})}));
-  el.append(makeButton('মুছুন','danger',()=>deleteNode(n)));
-  $('list').append(el);
- }
- say('মোট '+nodes.length+'টি স্তর লোড হয়েছে।');
+ nodes=data||[];updateForm();renderNodeList();
+ say('মোট '+nodes.length+'টি স্তর লোড হয়েছে। তালিকায় নির্বাচিত স্তর ও অভিভাবকের অধীনের নাম দেখানো হচ্ছে।');
 }
 async function deleteNode(n){
  if(busy)return;
@@ -72,7 +83,8 @@ async function deleteNode(n){
  if(String(editingId)===String(n.id))editingId=null;say('স্তরটি মুছে ফেলা হয়েছে।');await load();
 }
 $('department').addEventListener('change',()=>{editingId=null;load()});
-$('level').addEventListener('change',()=>{if(editingId){editingId=null;say('নতুন স্তর যোগের মোডে ফিরে এসেছেন।')}updateForm()});
+$('level').addEventListener('change',()=>{if(editingId){editingId=null;say('নতুন স্তর যোগের মোডে ফিরে এসেছেন।')}updateForm();renderNodeList()});
+$('parent').addEventListener('change',()=>{editingId=null;renderNodeList();say('নির্বাচিত অভিভাবকের অধীনের নামগুলো দেখানো হচ্ছে।')});
 $('save').addEventListener('click',async()=>{
  if(!session){say('অ্যাডমিন লগইন প্রয়োজন।');return}if(busy)return;
  const type=$('level').value,name=$('name').value.trim(),ls=levels(),ix=ls.findIndex(x=>x[0]===type),parent_id=ix===0?null:Number($('parent').value);
