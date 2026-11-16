@@ -40,11 +40,8 @@ function showQuestionCountLoading(){const el=$('questionCount');if(el)el.textCon
 async function login(){msg('loginMsg','Login হচ্ছে...');const{error}=await dbx().auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)return msg('loginMsg',error.message,true);init()}async function logout(){await dbx().auth.signOut();location.reload()}
 let activeDivision='job';
 function setupDivisionFilters(){
- const selector=$('filterDivision');if(!selector)return;
  const requested=new URLSearchParams(location.search).get('division');
- if(requested==='academic')selector.value='academic';
- activeDivision=selector.value;
- selector.addEventListener('change',async()=>{activeDivision=selector.value;$('jobFilters').classList.toggle('hidden',activeDivision!=='job');$('academicFilters').classList.toggle('hidden',activeDivision!=='academic');$('editBox').classList.add('hidden');showQuestionCountLoading();await loadQuestions();});
+ activeDivision=requested==='academic'?'academic':'job';
  $('jobFilters').classList.toggle('hidden',activeDivision!=='job');$('academicFilters').classList.toggle('hidden',activeDivision!=='academic');
  $('acFilterCategory').addEventListener('change',async()=>{await loadAcademicFilterFolders();await loadQuestions()});
  $('acFilterFolder').addEventListener('change',async()=>{await loadAcademicFilterChapters();await loadQuestions()});
