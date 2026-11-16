@@ -21,6 +21,7 @@ const bnDigits="০১২৩৪৫৬৭৮৯",letters={A:"ক",B:"খ",C:"গ"
 const districts=["ঢাকা","চট্টগ্রাম","কুমিল্লা","ফেনী","নোয়াখালী","লক্ষ্মীপুর","চাঁদপুর","ব্রাহ্মণবাড়িয়া","খাগড়াছড়ি","রাঙামাটি","বান্দরবান","কক্সবাজার","সিলেট","মৌলভীবাজার","হবিগঞ্জ","সুনামগঞ্জ","রাজশাহী","নাটোর","নওগাঁ","চাঁপাইনবাবগঞ্জ","পাবনা","সিরাজগঞ্জ","বগুড়া","জয়পুরহাট","খুলনা","যশোর","সাতক্ষীরা","ঝিনাইদহ","মাগুরা","নড়াইল","কুষ্টিয়া","চুয়াডাঙ্গা","মেহেরপুর","বরিশাল","ভোলা","পটুয়াখালী","বরগুনা","ঝালকাঠি","পিরোজপুর","রংপুর","দিনাজপুর","ঠাকুরগাঁও","পঞ্চগড়","নীলফামারী","লালমনিরহাট","কুড়িগ্রাম","গাইবান্ধা","ময়মনসিংহ","জামালপুর","শেরপুর","নেত্রকোণা","টাঙ্গাইল","গাজীপুর","নারায়ণগঞ্জ","নরসিংদী","মানিকগঞ্জ","মুন্সীগঞ্জ","ফরিদপুর","গোপালগঞ্জ","মাদারীপুর","শরীয়তপুর","রাজবাড়ী"];
 let exam=null,settings={},questions=[],answers={},optionMaps={},currentQuestion=0,timerInterval,timeLeft=0,student={},deviceToken="",resultData=null;
 const bn=n=>String(n).replace(/\d/g,d=>bnDigits[d]),esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+const formatQuestionHTML=v=>esc(v).replace(/&lt;u&gt;/gi,"<u>").replace(/&lt;\\/u&gt;/gi,"</u>");
 function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function eid(){const p=new URLSearchParams(location.search);const full=p.get("exam");if(full&&/^\d+$/.test(full))return Number(full);const short=p.get("e");if(!short||!/^[0-9a-z]+$/i.test(short))return null;const decoded=parseInt(short,36);return Number.isSafeInteger(decoded)&&decoded>0?decoded:null}
 function status(t,c="status"){let e=document.getElementById("startStatus");e.className=c;e.textContent=t}
@@ -212,7 +213,7 @@ function renderQuestion(){
   const draw=(q,i,container)=>{
     const isCQ=String(q.question_type||"mcq").toLowerCase()==="cq";
     const w=document.createElement("div");w.className="question-block";
-    const prompt=document.createElement("div");prompt.className="question";prompt.textContent=bn(i+1)+". "+(q.question_text||"")+(isCQ?" (লিখিত উত্তর)":"");w.appendChild(prompt);
+    const prompt=document.createElement("div");prompt.className="question";prompt.innerHTML=bn(i+1)+". "+formatQuestionHTML(q.question_text||"")+(isCQ?" (লিখিত উত্তর)":"");w.appendChild(prompt);
     if(isCQ){
       const ta=document.createElement("textarea");ta.rows=5;ta.maxLength=20000;ta.placeholder="এখানে লিখিত উত্তর লিখুন…";ta.style.cssText="width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:9px;font:inherit;line-height:1.7;resize:vertical";
       ta.value=typeof answers[q.id]==="string"?answers[q.id]:(answers[q.id]?.written_answer||"");
@@ -381,14 +382,14 @@ function renderReview(items,showCorrect=true,showMarks=true){
   items.forEach((r,i)=>{
     let div=document.createElement("div");
     div.className="review-item"+(showCorrect?(r.is_correct?" review-correct":" review-wrong"):"");
-    if(String(r.question_type||"mcq").toLowerCase()==="cq"){div.innerHTML="<div><b>"+bn(i+1)+". "+esc(r.question_text)+"</b>"+(showMarks?" <span class=\"muted\">("+bn(r.marks_awarded??0)+" নম্বর"+(r.max_marks!=null?" / "+bn(r.max_marks):"")+")</span>":"")+"</div><div style=\"margin-top:10px;white-space:pre-wrap\"><b>তোমার উত্তর:</b> "+esc(r.written_answer||"উত্তর দেওয়া হয়নি")+"</div>"+(showCorrect&&r.reference_answer?"<div style=\"margin-top:8px;white-space:pre-wrap\"><b>নমুনা উত্তর:</b> "+esc(r.reference_answer)+"</div>":"");review.appendChild(div);return;}
+    if(String(r.question_type||"mcq").toLowerCase()==="cq"){div.innerHTML="<div><b>"+bn(i+1)+". "+formatQuestionHTML(r.question_text)+"</b>"+(showMarks?" <span class=\"muted\">("+bn(r.marks_awarded??0)+" নম্বর"+(r.max_marks!=null?" / "+bn(r.max_marks):"")+")</span>":"")+"</div><div style=\"margin-top:10px;white-space:pre-wrap\"><b>তোমার উত্তর:</b> "+esc(r.written_answer||"উত্তর দেওয়া হয়নি")+"</div>"+(showCorrect&&r.reference_answer?"<div style=\"margin-top:8px;white-space:pre-wrap\"><b>নমুনা উত্তর:</b> "+esc(r.reference_answer)+"</div>":"");review.appendChild(div);return;}
     const optionHtml=(r.options||[]).map(o=>{
       const letter=letters[o.display_letter];
       const classes=showCorrect?(o.selected&&!o.correct?"paper-wrong":o.correct?"paper-right":""):"";
       return `<div class="${classes}"><b>${letter}.</b> ${esc(o.text)}${showCorrect&&o.correct?" ✓":""}</div>`;
     }).join("");
     const markLabel=showMarks?` <span class="muted">(${bn(r.marks_awarded??0)} নম্বর)</span>`:"";
-    div.innerHTML=`<div><b>${bn(i+1)}. ${esc(r.question_text)}</b>${markLabel}</div><div class="paper-opts">${optionHtml}</div><div style="margin-top:10px"><b>তোমার উত্তর:</b> ${r.selected_option?letters[(r.options.find(o=>o.original_letter===r.selected_option)||{}).display_letter]+". "+esc((r.options.find(o=>o.original_letter===r.selected_option)||{}).text||""):"দেওয়া হয়নি"}</div>${showCorrect?`<div style="margin-top:5px"><b>সঠিক উত্তর:</b> ${r.correct_option?letters[(r.options.find(o=>o.original_letter===r.correct_option)||{}).display_letter]+". "+esc((r.options.find(o=>o.original_letter===r.correct_option)||{}).text||""):"—"}</div>${r.explanation?`<div style="margin-top:8px"><b>ব্যাখ্যা:</b> ${esc(r.explanation)}</div>`:""}`:""}`;
+    div.innerHTML=`<div><b>${bn(i+1)}. ${formatQuestionHTML(r.question_text)}</b>${markLabel}</div><div class="paper-opts">${optionHtml}</div><div style="margin-top:10px"><b>তোমার উত্তর:</b> ${r.selected_option?letters[(r.options.find(o=>o.original_letter===r.selected_option)||{}).display_letter]+". "+esc((r.options.find(o=>o.original_letter===r.selected_option)||{}).text||""):"দেওয়া হয়নি"}</div>${showCorrect?`<div style="margin-top:5px"><b>সঠিক উত্তর:</b> ${r.correct_option?letters[(r.options.find(o=>o.original_letter===r.correct_option)||{}).display_letter]+". "+esc((r.options.find(o=>o.original_letter===r.correct_option)||{}).text||""):"—"}</div>${r.explanation?`<div style="margin-top:8px"><b>ব্যাখ্যা:</b> ${esc(r.explanation)}</div>`:""}`:""}`;
     review.appendChild(div);
   });
 }
