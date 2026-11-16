@@ -189,7 +189,8 @@ async function init() {
 async function loadSubjects() {
   const {data,error} = await client().from('subjects').select('id,name').order('id');
   if (error) return msg('loginMsg', error.message, true);
-  subjects = data || [];
+  const subjectOrder=['বাংলা সাহিত্য','বাংলা ভাষা','ইংরেজি সাহিত্য','ইংরেজি ভাষা','গণিত','বাংলাদেশ','আন্তর্জাতিক','দৈনন্দিন বিজ্ঞান','কম্পিউটার ও তথ্য প্রযুক্তি','ভূগোল ও দুর্যোগ ব্যবস্থাপনা','মানসিক দক্ষতা','সুশাসন ও নৈতিকতা'];
+   subjects = (data || []).slice().sort((a,b)=>subjectOrder.indexOf(a.name)-subjectOrder.indexOf(b.name));
   const el = $('subject');
   if (el) {
     el.innerHTML = '<option value="">বিষয় নির্বাচন করুন</option>' + subjects.map(x => `<option value="${x.id}">${esc(x.name)}</option>`).join('');
