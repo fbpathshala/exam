@@ -439,10 +439,10 @@ function cleanRichHTML(html){const t=document.createElement('template');t.innerH
 function captureRichSelection(){const sel=window.getSelection();if(!sel||!sel.rangeCount)return;const range=sel.getRangeAt(0);const node=range.commonAncestorContainer;const el=node.nodeType===1?node:node.parentElement;if(el?.closest?.('.rich-editor'))richSavedRange=range.cloneRange()}
 document.addEventListener('selectionchange',captureRichSelection);
 function restoreRichSelection(e){e.focus();if(richSavedRange){const sel=window.getSelection();sel.removeAllRanges();sel.addRange(richSavedRange)}}
-function insertMathMarkup(e,latex){restoreRichSelection(e);const safe=String(latex).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');document.execCommand('insertHTML',false,'<span class="math-inline">\\\\('+safe+'\\\\)</span>')}
+function insertMathMarkup(e,latex){restoreRichSelection(e);const safe=String(latex).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');document.execCommand('insertHTML',false,'<span class="math-inline">\\('+safe+'\\)</span>')}
 function formatEditor(id,cmd){const e=$(id);if(!e)return;restoreRichSelection(e);document.execCommand(cmd,false,null)}
 function insertMath(id){const e=$(id);if(!e)return;restoreRichSelection(e);const latex=prompt('LaTeX সূত্র লিখুন (যেমন: x^2+2x+1)');if(latex===null||!latex.trim())return;insertMathMarkup(e,latex.trim())}
-function insertFraction(id){const e=$(id);if(!e)return;restoreRichSelection(e);const numerator=prompt('ভগ্নাংশের লব (উপরের অংশ) লিখুন:');if(numerator===null||!numerator.trim())return;const denominator=prompt('ভগ্নাংশের হর (নিচের অংশ) লিখুন:');if(denominator===null||!denominator.trim())return;insertMathMarkup(e,'\\\\frac{'+numerator.trim()+'}{'+denominator.trim()+'}')}
+function insertFraction(id){const e=$(id);if(!e)return;restoreRichSelection(e);const numerator=prompt('ভগ্নাংশের লব (উপরের অংশ) লিখুন:');if(numerator===null||!numerator.trim())return;const denominator=prompt('ভগ্নাংশের হর (নিচের অংশ) লিখুন:');if(denominator===null||!denominator.trim())return;insertMathMarkup(e,'\\frac{'+numerator.trim()+'}{'+denominator.trim()+'}')}
 function syncQuestionType(){const type=$('questionType')?.value||'mcq';$('mcqFields')?.classList.toggle('hidden',type!=='mcq');$('cqFields')?.classList.toggle('hidden',type!=='cq');}
 async function addManual(){
  const folderId=$('questionFolder')?.value,setId=$('questionSet')?.value,type=$('questionType')?.value||'mcq';
