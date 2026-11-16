@@ -454,17 +454,17 @@ async function addManual(){
  let questionNumber=null;if(qnoRaw){const n=Number(qnoRaw);if(!Number.isInteger(n)||n<=0)return msg('manualMsg','প্রশ্ন নম্বর অবশ্যই ০-এর চেয়ে বড় পূর্ণসংখ্যা হতে হবে।',true);questionNumber=n;}
  let payload={folder_id:Number(folderId),set_id:Number(setId),subject_id:Number(subjectId),category:CATS[cat],question_number:questionNumber,question_text:question,question_type:type};
  if(type==='mcq'){
-  const a=cleanRichHTML($('optionA')?.innerHTML||'').trim(),b=cleanRichHTML($('optionB')?.innerHTML||'').trim(),c=cleanRichHTML($('optionC')?.innerHTML||'').trim(),d=cleanRichHTML($('optionD')?.innerHTML||'').trim(),correct=$('correctAnswer')?.value.trim().toUpperCase(),explanation=$('explanation')?.value.trim()||null;
+  const a=cleanRichHTML($('optionA')?.innerHTML||'').trim(),b=cleanRichHTML($('optionB')?.innerHTML||'').trim(),c=cleanRichHTML($('optionC')?.innerHTML||'').trim(),d=cleanRichHTML($('optionD')?.innerHTML||'').trim(),correct=$('correctAnswer')?.value.trim().toUpperCase(),explanation=cleanRichHTML($('explanation')?.innerHTML||'').trim()||null;
   if(!a||!b||!c||!d||!correct)return msg('manualMsg','MCQ-এর চারটি অপশন ও সঠিক উত্তর পূরণ করুন।',true);
   if(!['A','B','C','D'].includes(correct))return msg('manualMsg','সঠিক উত্তর A, B, C অথবা D হতে হবে।',true);
   payload={...payload,option_a:a,option_b:b,option_c:c,option_d:d,correct_answer:correct,explanation,reference_answer:null};
  }else{
-  payload={...payload,option_a:'',option_b:'',option_c:'',option_d:'',correct_answer:null,reference_answer:$('referenceAnswer')?.value.trim()||null,explanation:$('cqExplanation')?.value.trim()||null};
+  payload={...payload,option_a:'',option_b:'',option_c:'',option_d:'',correct_answer:null,reference_answer:$('referenceAnswer')?.value.trim()||null,explanation:cleanRichHTML($('cqExplanation')?.innerHTML||'').trim()||null};
  }
  const {error}=await client().from('questions').insert(payload);
  if(error)return msg('manualMsg','প্রশ্ন সংরক্ষণ হয়নি: '+error.message,true);
  msg('manualMsg',type==='mcq'?'✅ MCQ প্রশ্ন ব্যাংকে সংরক্ষিত হয়েছে।':'✅ CQ প্রশ্ন ব্যাংকে সংরক্ষিত হয়েছে।');
- ['question','optionA','optionB','optionC','optionD'].forEach(id=>{if($(id))$(id).innerHTML='';});['questionNumber','explanation','referenceAnswer','cqExplanation'].forEach(id=>{if($(id))$(id).value='';});
+ ['question','optionA','optionB','optionC','optionD','explanation','cqExplanation'].forEach(id=>{if($(id))$(id).innerHTML='';});['questionNumber','explanation','referenceAnswer','cqExplanation'].forEach(id=>{if($(id))$(id).value='';});
  if($('correctAnswer'))$('correctAnswer').value='';
  if($('subject'))$('subject').value='';
 }
