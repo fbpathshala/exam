@@ -3,6 +3,8 @@ function captureRichSelection(){const sel=window.getSelection();if(!sel||!sel.ra
 document.addEventListener('selectionchange',captureRichSelection);
 function placeMobileCaret(editor,x,y){
  if(!editor)return;
+ const current=window.getSelection();
+ if(current&&current.rangeCount&&!current.isCollapsed){const active=current.getRangeAt(0).commonAncestorContainer;const activeEl=active.nodeType===1?active:active.parentElement;if(activeEl?.closest?.('#editQuestion.rich-editor'))return}
  editor.focus({preventScroll:true});
  let range=null;
  try{
