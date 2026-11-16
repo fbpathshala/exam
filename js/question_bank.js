@@ -1,6 +1,32 @@
 let CATS=['নিয়োগ পরীক্ষা','যাচাই পরীক্ষা','সাম্প্রতিক প্রশ্ন'];const $=id=>document.getElementById(id),bn=n=>String(n??'').replace(/\d/g,d=>'০১২৩৪৫৬৭৮৯'[d]),esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));const dbx=()=>window.db;const SUBJECTS=['বাংলা সাহিত্য','বাংলা ব্যাকরণ','গণিত','ইংরেজি সাহিত্য','ইংরেজি ব্যাকরণ','বাংলাদেশ','আন্তর্জাতিক','বিজ্ঞান','কম্পিউটার ও তথ্য প্রযুক্তি','ভূগোল','সাম্প্রতিক প্রশ্নোত্তর'];function cleanRichHTML(html){const t=document.createElement('template');t.innerHTML=html;const allowed=new Set(['B','STRONG','I','EM','U','BR','P','DIV','SPAN','SUB','SUP']);function walk(n){for(const x of [...n.childNodes]){if(x.nodeType===1){if(!allowed.has(x.tagName)){x.replaceWith(document.createTextNode(x.textContent||''));continue;}[...x.attributes].forEach(a=>{if(x.tagName==='SPAN'&&a.name==='class'&&a.value==='math-inline')return;x.removeAttribute(a.name)});walk(x)}else if(x.nodeType!==3)x.remove()}}walk(t.content);return t.innerHTML}function formatQuestionText(v){let s=esc(v).replace(/&lt;(\/?)((?:b|strong|i|em|u|sub|sup|p|div|br))&gt;/gi,'<$1$2>').replace(/&lt;span class=&quot;math-inline&quot;&gt;/gi,'<span class="math-inline">').replace(/&lt;\/span&gt;/gi,'</span>');return cleanRichHTML(s)}let richSavedRange=null;
 function captureRichSelection(){const sel=window.getSelection();if(!sel||!sel.rangeCount)return;const range=sel.getRangeAt(0);const node=range.commonAncestorContainer;const el=node.nodeType===1?node:node.parentElement;if(el?.closest?.('.rich-editor'))richSavedRange=range.cloneRange()}
 document.addEventListener('selectionchange',captureRichSelection);
+function placeMobileCaret(editor,x,y){
+ if(!editor)return;
+ editor.focus({preventScroll:true});
+ let range=null;
+ try{
+  if(document.caretPositionFromPoint){
+   const pos=document.caretPositionFromPoint(x,y);
+   if(pos&&editor.contains(pos.offsetNode)){range=document.createRange();range.setStart(pos.offsetNode,pos.offset);range.collapse(true)}
+  }else if(document.caretRangeFromPoint){
+   const found=document.caretRangeFromPoint(x,y);
+   if(found&&editor.contains(found.startContainer)){range=found.cloneRange();range.collapse(true)}
+  }
+ }catch(_){}
+ if(range){const sel=window.getSelection();sel.removeAllRanges();sel.addRange(range);richSavedRange=range.cloneRange()}
+}
+document.addEventListener('touchend',function(ev){
+ const t=ev.target,editor=t?.closest?.('#editQuestion.rich-editor');
+ if(!editor||!ev.changedTouches?.length)return;
+ const p=ev.changedTouches[0];
+ setTimeout(()=>placeMobileCaret(editor,p.clientX,p.clientY),0);
+},{passive:true});
+document.addEventListener('pointerup',function(ev){
+ const editor=ev.target?.closest?.('#editQuestion.rich-editor');
+ if(editor&&ev.pointerType==='touch')setTimeout(()=>placeMobileCaret(editor,ev.clientX,ev.clientY),0);
+});
+
 function restoreRichSelection(e){e.focus();if(richSavedRange){const sel=window.getSelection();sel.removeAllRanges();sel.addRange(richSavedRange)}}
 function insertMathMarkup(e,latex){restoreRichSelection(e);const safe=String(latex).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');document.execCommand('insertHTML',false,'<span class="math-inline">\\('+safe+'\\)</span>')}
 function formatEditor(id,cmd){const e=$(id);if(!e)return;restoreRichSelection(e);document.execCommand(cmd,false,null)}
