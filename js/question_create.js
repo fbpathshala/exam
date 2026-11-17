@@ -442,8 +442,7 @@ document.addEventListener('selectionchange',captureRichSelection);
 function restoreRichSelection(e){e.focus();if(richSavedRange){const sel=window.getSelection();sel.removeAllRanges();sel.addRange(richSavedRange)}}
 function insertMathMarkup(e,latex){restoreRichSelection(e);const safe=String(latex).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');document.execCommand('insertHTML',false,'<span class="math-inline">\\('+safe+'\\)</span>')}
 function formatEditor(id,cmd){const e=$(id);if(!e)return;restoreRichSelection(e);document.execCommand(cmd,false,null)}
-function insertMath(id){const e=$(id);if(!e)return;restoreRichSelection(e);const latex=prompt('LaTeX সূত্র লিখুন (যেমন: x^2+2x+1)');if(latex===null||!latex.trim())return;insertMathMarkup(e,latex.trim())}
-function insertFraction(id){const e=$(id);if(!e)return;restoreRichSelection(e);const numerator=prompt('ভগ্নাংশের লব (উপরের অংশ) লিখুন:');if(numerator===null||!numerator.trim())return;const denominator=prompt('ভগ্নাংশের হর (নিচের অংশ) লিখুন:');if(denominator===null||!denominator.trim())return;insertMathMarkup(e,'\\frac{'+numerator.trim()+'}{'+denominator.trim()+'}')}
+function insertFraction(id){const e=$(id);if(!e)return;restoreRichSelection(e);const numerator=prompt('লব / উপরের অংশ লিখুন (যেমন: x+1 অথবা (x+1)^2):');if(numerator===null||!numerator.trim())return;const denominator=prompt('হর / নিচের অংশ লিখুন (যেমন: x-3 অথবা (x-3)^2):');if(denominator===null||!denominator.trim())return;insertMathMarkup(e,'\\frac{'+numerator.trim()+'}{'+denominator.trim()+'}')}
 function syncQuestionType(){const type=$('questionType')?.value||'mcq';$('mcqFields')?.classList.toggle('hidden',type!=='mcq');$('cqFields')?.classList.toggle('hidden',type!=='cq');}
 async function addManual(){
  const folderId=$('questionFolder')?.value,setId=$('questionSet')?.value,type=$('questionType')?.value||'mcq';
@@ -470,7 +469,7 @@ async function addManual(){
 }
 
 
-window.formatEditor=formatEditor;window.insertMath=insertMath;window.syncQuestionType=syncQuestionType;window.template=template;window.previewImport=previewImport;window.importRows=importRows;window.addManual=addManual;window.selectCategory=selectCategory;window.createFolder=createFolder;window.createSet=createSet;window.renameSelectedFolder=renameSelectedFolder;window.deleteSelectedFolder=deleteSelectedFolder;window.renameSelectedSet=renameSelectedSet;window.deleteSelectedSet=deleteSelectedSet;window.login=login;window.logout=logout;
+window.formatEditor=formatEditor;window.insertFraction=insertFraction;window.syncQuestionType=syncQuestionType;window.template=template;window.previewImport=previewImport;window.importRows=importRows;window.addManual=addManual;window.selectCategory=selectCategory;window.createFolder=createFolder;window.createSet=createSet;window.renameSelectedFolder=renameSelectedFolder;window.deleteSelectedFolder=deleteSelectedFolder;window.renameSelectedSet=renameSelectedSet;window.deleteSelectedSet=deleteSelectedSet;window.login=login;window.logout=logout;
 
 document.addEventListener('DOMContentLoaded',()=>{
   $('manageFolder')?.addEventListener('change',()=>syncFolderSelection('manageFolder'));
