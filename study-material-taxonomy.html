@@ -33,7 +33,7 @@ function updateForm(){
  $('parentWrap').classList.toggle('hidden',ix===0);
  $('parentLabel').textContent=(ls[ix-1]?.[1]||'অভিভাবক')+' নির্বাচন করুন';
  $('parent').replaceChildren();
- const first=document.createElement('option');first.value='';first.textContent='— নির্বাচন করুন —';$('parent').append(first);
+ const first=document.createElement('option');first.value='';first.textContent=type==='subcategory'?'— সব ক্যাটেগরির সাব-ক্যাটেগরি দেখান —':'— নির্বাচন করুন —';$('parent').append(first);
  parents.forEach(n=>{const o=document.createElement('option');o.value=String(n.id);o.textContent=n.name;$('parent').append(o)});
  if(node?.parent_id)$('parent').value=String(node.parent_id);
  $('name').value=node?.name||'';
@@ -83,7 +83,7 @@ async function deleteNode(n){
  if(String(editingId)===String(n.id))editingId=null;say('স্তরটি মুছে ফেলা হয়েছে।');await load();
 }
 $('department').addEventListener('change',()=>{editingId=null;load()});
-$('level').addEventListener('change',()=>{if(editingId){editingId=null;say('নতুন স্তর যোগের মোডে ফিরে এসেছেন।')}updateForm();renderNodeList()});
+$('level').addEventListener('change',()=>{if(editingId){editingId=null;say('নতুন স্তর যোগের মোডে ফিরে এসেছেন।')}updateForm();if($('level').value==='subcategory')$('parent').value='';renderNodeList();if($('level').value==='subcategory')say('সব ক্যাটেগরির সাব-ক্যাটেগরি দেখানো হচ্ছে। অভিভাবক নির্বাচন করলে শুধু সেই ক্যাটেগরিরগুলো দেখাবে।')});
 $('parent').addEventListener('change',()=>{editingId=null;renderNodeList();say('নির্বাচিত অভিভাবকের অধীনের নামগুলো দেখানো হচ্ছে।')});
 $('save').addEventListener('click',async()=>{
  if(!session){say('অ্যাডমিন লগইন প্রয়োজন।');return}if(busy)return;
