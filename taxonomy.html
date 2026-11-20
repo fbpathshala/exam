@@ -23,6 +23,8 @@
 <div id="parentFields" class="row"></div>
 <div class="flow" id="flow"></div>
 <div class="field"><label id="itemLabel" for="itemSelect">আইটেম নির্বাচন</label><select id="itemSelect"></select></div>
+<div class="row"><div class="field"><label for="serialNumber">ক্রম নম্বর</label><input id="serialNumber" type="number" min="1" step="1" inputmode="numeric" placeholder="ক্রম নম্বর লিখুন"></div><div class="field" style="justify-content:end"><label>&nbsp;</label><button id="saveSerialBtn" class="secondary" type="button">ক্রম নম্বর সংরক্ষণ</button></div></div>
+<div class="actions"><button id="fillSerialBtn" class="secondary" type="button">অনুপস্থিত ক্রম নম্বর পূরণ</button></div>
 <div class="field"><label id="newLabel" for="newName">নতুন নাম</label><input id="newName" maxlength="160" placeholder="নাম লিখুন"></div>
 <div class="actions"><button id="addBtn">＋ যোগ করুন</button><button id="renameBtn" class="secondary">নাম পরিবর্তন</button><button id="deleteBtn" class="danger">নিরাপদে মুছুন</button><button id="refreshBtn" class="secondary">রিফ্রেশ</button></div>
 <p id="status" class="status" role="status" aria-live="polite"></p>
@@ -94,6 +96,8 @@ function drawItems(parentOverride){
  if($("section").value==="academic"&&l===3){items=items.filter(x=>x.chapter_id?String(x.chapter_id)===String(parent):String(x.folder_id)===String($("parent_1")?.value||""))}
  currentItems=items;opts($("itemSelect"),items,"-- "+c.labels[l]+" নির্বাচন --");
  const chosen=$("itemSelect").value;if(chosen)$("itemSelect").value=chosen;
+ const syncSerial=()=>{const selected=currentItems.find(x=>String(x.id)===String($("itemSelect").value));$("serialNumber").value=selected&&Number(selected.display_order)>0?String(selected.display_order):""};
+ $("itemSelect").onchange=syncSerial;syncSerial();
  $("addBtn").textContent="＋ "+c.labels[l]+" যোগ করুন";$("renameBtn").textContent="✏️ নাম পরিবর্তন";$("deleteBtn").textContent="🗑️ নিরাপদে মুছুন";
 }
 function buildLevels(){if(isStudyMode){$("section").value=studyDepartment==="job_care"?"job":"academic";$("section").closest(".field").classList.add("hidden");$("pageHeading").textContent="স্টাডি ম্যাটেরিয়ালস — "+(studyDepartment==="job_care"?"Job Care":"Academic Care");$("newName").closest(".field").classList.remove("hidden");$("newLabel").textContent="নতুন নাম লিখুন";$("addBtn").classList.add("hidden");}const section=$("section").value; $("managementFields").classList.toggle("hidden",!section);if(!section||!cfg[section]){cache={};currentItems=[];$("level").innerHTML="<option value=\"\">আগে বিভাগ নির্বাচন করুন</option>";$("level").disabled=true;$("parentFields").innerHTML="";$("flow").textContent="";$("itemLabel").textContent="আইটেম নির্বাচন";$("itemSelect").innerHTML="<option value=\"\">আগে বিভাগ নির্বাচন করুন</option>";$("itemSelect").disabled=true;$("newName").value="";$("newName").disabled=true;["addBtn","renameBtn","deleteBtn"].forEach(id=>$(id).disabled=true);say("বিভাগ নির্বাচন করলে সংশ্লিষ্ট ড্রপডাউন স্বয়ংক্রিয়ভাবে চালু হবে।");return}$("level").disabled=false;$("itemSelect").disabled=false;$("newName").disabled=false;["addBtn","renameBtn","deleteBtn"].forEach(id=>$(id).disabled=false);const c=hierarchy();opts($("level"),c.labels.map((name,id)=>({id,name})), "স্তর নির্বাচন");selectedParentValues={};const requestedLevel=Number(new URLSearchParams(location.search).get("level"));$("level").value=Number.isInteger(requestedLevel)&&requestedLevel>=0&&requestedLevel<c.labels.length?String(requestedLevel):"0";loadAll().catch(e=>say("তথ্য লোড হয়নি: "+e.message,true))}
@@ -134,7 +138,37 @@ async function deleteItem(){
  if(!confirm("নির্বাচিত "+c.labels[l]+" মুছবেন? এই কাজটি ফিরিয়ে আনা যাবে না।"))return;
  const {error}=isStudyMode?await sb.from("study_material_taxonomy").delete().eq("id",id).eq("department",studyDepartment):await sb.from(c.tables[l]).delete().eq("id",id);if(error){say("মুছতে সমস্যা: "+error.message,true);return}await loadAll();say(c.labels[l]+" মুছে ফেলা হয়েছে। কোনো প্রশ্ন বা শিক্ষার্থী রেকর্ড মুছে ফেলা হয়নি।");
 }
-$("section").onchange=buildLevels;$("level").onchange=()=>loadAll().catch(e=>say(e.message,true));$("addBtn").onclick=()=>addItem().catch(e=>say(e.message,true));$("renameBtn").onclick=()=>renameItem().catch(e=>say(e.message,true));$("deleteBtn").onclick=()=>deleteItem();$("refreshBtn").onclick=()=>loadAll().catch(e=>say(e.message,true));$("loginBtn").onclick=async()=>{const {error}=await sb.auth.signInWithPassword({email:$("email").value.trim(),password:$("password").value});if(error){$("loginMsg").textContent="লগইন হয়নি: "+error.message;return}await start()};
+async function saveSerialNumber(){
+ const id=$("itemSelect").value,number=Number($("serialNumber").value),c=hierarchy(),l=level();
+ if(!isStudyMode){say("ক্রম নম্বর ব্যবস্থাপনা স্টাডি ম্যাটেরিয়ালসের জন্য চালু আছে।",true);return}
+ if(!id){say("আগে একটি আইটেম নির্বাচন করুন।",true);return}
+ if(!Number.isInteger(number)||number<1){say("ক্রম নম্বর ১ বা তার বেশি পূর্ণসংখ্যা হতে হবে।",true);return}
+ const selected=currentItems.find(x=>String(x.id)===String(id));if(!selected){say("নির্বাচিত আইটেম পাওয়া যায়নি। রিফ্রেশ করুন।",true);return}
+ const duplicate=(cache[l]||[]).find(x=>String(x.id)!==String(id)&&String(x.parent_id||"")===String(selected.parent_id||"")&&Number(x.display_order)===number);
+ if(duplicate){say("এই একই স্তর ও অভিভাবকের অধীনে ক্রম নম্বর "+number+" আগে থেকেই ব্যবহৃত হচ্ছে।",true);return}
+ const {data,error}=await sb.from("study_material_taxonomy").update({display_order:number,updated_at:new Date().toISOString()}).eq("id",id).eq("department",studyDepartment).select("id,display_order").maybeSingle();
+ if(error){say("ক্রম নম্বর সংরক্ষণ হয়নি: "+error.message,true);return}
+ if(!data){say("ক্রম নম্বর সংরক্ষণ হয়নি: আইটেমটি পাওয়া যায়নি বা অনুমতি নেই।",true);return}
+ await loadAll();$("itemSelect").value=id;$("serialNumber").value=String(number);say("ক্রম নম্বর সংরক্ষণ হয়েছে। নাম, আইডি ও parent সম্পর্ক অপরিবর্তিত আছে।");
+}
+async function fillMissingSerialNumbers(){
+ if(!isStudyMode){say("এই সুবিধা স্টাডি ম্যাটেরিয়ালসের জন্য।",true);return}
+ const l=level(),c=hierarchy(),rows=(cache[l]||[]).slice();
+ if(l>0&&!parentId()&&rows.length===0){say("এই স্তরে কোনো আইটেম নেই।",true);return}
+ const groups=new Map();for(const row of rows){const key=String(row.parent_id||"");if(!groups.has(key))groups.set(key,[]);groups.get(key).push(row)}
+ let updated=0;
+ for(const siblings of groups.values()){
+  let next=Math.max(0,...siblings.map(x=>Number(x.display_order)||0))+1;
+  const missing=siblings.filter(x=>!(Number(x.display_order)>0)).sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""),"bn"));
+  for(const row of missing){
+   const {data,error}=await sb.from("study_material_taxonomy").update({display_order:next,updated_at:new Date().toISOString()}).eq("id",row.id).eq("department",studyDepartment).select("id").maybeSingle();
+   if(error)throw error;if(!data)throw new Error("একটি আইটেমের ক্রম নম্বর আপডেট করা যায়নি (ID: "+row.id+")");
+   next++;updated++;
+  }
+ }
+ await loadAll();say(updated?updated+"টি অনুপস্থিত ক্রম নম্বর পূরণ হয়েছে। আগে থেকে থাকা ক্রম নম্বর অপরিবর্তিত আছে।":"সব আইটেমের ক্রম নম্বর আগে থেকেই দেওয়া আছে।");
+}
+$("section").onchange=buildLevels;$("level").onchange=()=>loadAll().catch(e=>say(e.message,true));$("addBtn").onclick=()=>addItem().catch(e=>say(e.message,true));$("renameBtn").onclick=()=>renameItem().catch(e=>say(e.message,true));$("deleteBtn").onclick=()=>deleteItem();$("refreshBtn").onclick=()=>loadAll().catch(e=>say(e.message,true));$("saveSerialBtn").onclick=()=>saveSerialNumber().catch(e=>say(e.message,true));$("fillSerialBtn").onclick=()=>fillMissingSerialNumbers().catch(e=>say("ক্রম নম্বর পূরণ হয়নি: "+e.message,true));$("loginBtn").onclick=async()=>{const {error}=await sb.auth.signInWithPassword({email:$("email").value.trim(),password:$("password").value});if(error){$("loginMsg").textContent="লগইন হয়নি: "+error.message;return}await start()};
 async function start(){const {data:{session}}=await sb.auth.getSession();if(!session){$("login").classList.remove("hidden");$("app").classList.add("hidden");return}$("login").classList.add("hidden");$("app").classList.remove("hidden");buildLevels()}
 start();
 </script><div class="central-section-return"><a href="https://fbpathshala.github.io/home.html">⌂ মূল মেনু / হোম পেইজে ফিরুন</a></div></body></html>
