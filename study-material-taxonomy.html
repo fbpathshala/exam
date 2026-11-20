@@ -58,6 +58,7 @@ function renderNodeList(){
   const el=document.createElement('div');el.className='item';
   const title=document.createElement('strong');title.textContent=trail(n);el.append(title);
   const meta=document.createElement('div');meta.className='muted';meta.textContent=typeLabel(n.node_type)+' · ক্রম '+n.display_order;el.append(meta);
+  el.append(makeButton('নাম পরিবর্তন','secondary',()=>renameNode(n)));
   el.append(makeButton('সম্পাদনা','secondary',()=>{editingId=n.id;updateForm();renderNodeList();say('নির্বাচিত: '+trail(n)+'। পরিবর্তন করে সংরক্ষণ করুন।');window.scrollTo({top:0,behavior:'smooth'})}));
   el.append(makeButton('মুছুন','danger',()=>deleteNode(n)));
   $('list').append(el);
@@ -69,6 +70,24 @@ async function load(){
  if(error){say('কাঠামো লোড হয়নি: '+error.message);return}
  nodes=data||[];updateForm();renderNodeList();
  say('মোট '+nodes.length+'টি স্তর লোড হয়েছে। তালিকায় নির্বাচিত স্তর ও অভিভাবকের অধীনের নাম দেখানো হচ্ছে।');
+}
+async function renameNode(n){
+ if(busy)return;
+ const nextName=prompt('নতুন নাম লিখুন:',n.name);
+ if(nextName===null)return;
+ const name=nextName.trim();
+ if(!name){say('নাম খালি রাখা যাবে না।');return}
+ const duplicate=nodes.find(x=>x.id!==n.id&&x.node_type===n.node_type&&String(x.parent_id||'')===String(n.parent_id||'')&&x.name.trim().toLocaleLowerCase()===name.toLocaleLowerCase());
+ if(duplicate){say('একই অভিভাবকের অধীনে এই নামটি আগে থেকেই আছে।');return}
+ if(name===n.name){say('নামে কোনো পরিবর্তন করা হয়নি।');return}
+ busy=true;say('নাম পরিবর্তন হচ্ছে…');
+ const {data,error}=await db.from('study_material_taxonomy').update({name,updated_at:new Date().toISOString()}).eq('id',n.id).eq('department',$('department').value).select('id').maybeSingle();
+ busy=false;
+ if(error){say('নাম পরিবর্তন হয়নি: '+error.message);return}
+ if(!data){say('নাম পরিবর্তন হয়নি। রেকর্ড পাওয়া যায়নি অথবা আপনার সম্পাদনার অনুমতি নেই।');return}
+ if(String(editingId)===String(n.id))editingId=null;
+ say('নাম সফলভাবে পরিবর্তন হয়েছে। ক্রমিক নম্বর অপরিবর্তিত আছে।');
+ await load();
 }
 async function deleteNode(n){
  if(busy)return;
