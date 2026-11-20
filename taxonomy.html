@@ -82,12 +82,12 @@ function draw(){
   opts(sel,items,"-- "+c.labels[i]+" নির্বাচন --");if(previous[i]&&Array.from(sel.options).some(o=>o.value===previous[i]))sel.value=previous[i];
   selectedParentValues[i]=sel.value||"";
   if(i>0){const prev=$("parent_"+(i-1));if(prev)sel.disabled=!prev.value}
-  sel.onchange=()=>{selectedParentValues[i]=sel.value||"";for(let j=i+1;j<l;j++)selectedParentValues[j]="";if(isStudyMode&&l===1){drawItems();const count=currentItems.length;say(count?count+"টি সাব-ক্যাটাগরি পাওয়া গেছে।":"এই ক্যাটাগরির অধীনে সাব-ক্যাটাগরি পাওয়া যায়নি।",!count)}else{draw()}};
+  sel.onchange=()=>{const selected=sel.value||"";selectedParentValues[i]=selected;for(let j=i+1;j<l;j++)selectedParentValues[j]="";if(isStudyMode&&l===1){drawItems(selected);const count=currentItems.length;say(count?count+"টি সাব-ক্যাটাগরি পাওয়া গেছে।":"এই ক্যাটাগরির অধীনে সাব-ক্যাটাগরি পাওয়া যায়নি।",!count)}else{draw()}};
  }
  drawItems();
 }
-function drawItems(){
- const c=hierarchy(),l=level(),parent=parentId();
+function drawItems(parentOverride){
+ const c=hierarchy(),l=level(),parent=parentOverride!==undefined?parentOverride:parentId();
  let items=(cache[l]||[]).map(x=>({...x,name:x[c.nameCols[l]]}));
  if(l>0){const col=c.parents[l];if(isStudyMode){if(parent)items=items.filter(x=>String(x.parent_id??"")===String(parent))}else if(!($("section").value==="job"&&l===1))items=items.filter(x=>String(x[col]??"")===String(parent??""))}
  if(!isStudyMode&&$("section").value==="job"&&l===1){const cat=cache[0].find(x=>String(x.id)===String(parent));items=items.filter(x=>x.category_id?String(x.category_id)===String(parent):x.sub_category===cat?.name)}
