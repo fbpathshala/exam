@@ -82,7 +82,7 @@ function draw(){
   opts(sel,items,"-- "+c.labels[i]+" নির্বাচন --");if(previous[i]&&Array.from(sel.options).some(o=>o.value===previous[i]))sel.value=previous[i];
   selectedParentValues[i]=sel.value||"";
   if(i>0){const prev=$("parent_"+(i-1));if(prev)sel.disabled=!prev.value}
-  sel.onchange=()=>{selectedParentValues[i]=sel.value||"";for(let j=i+1;j<l;j++)selectedParentValues[j]="";draw()};
+  sel.onchange=()=>{selectedParentValues[i]=sel.value||"";for(let j=i+1;j<l;j++)selectedParentValues[j]="";if(isStudyMode&&l===1){drawItems();const count=currentItems.length;say(count?count+"টি সাব-ক্যাটাগরি পাওয়া গেছে।":"এই ক্যাটাগরির অধীনে সাব-ক্যাটাগরি পাওয়া যায়নি।",!count)}else{draw()}};
  }
  drawItems();
 }
