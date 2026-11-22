@@ -101,34 +101,61 @@ async function loadAcademicQuestions(){
 }
 
 async function init(){
+ const countEl=$('questionCount');
+ if(countEl)countEl.textContent='প্রশ্ন ব্যাংক চালু হচ্ছে…';
+ const watchdog=setTimeout(()=>{
+  if(countEl&&countEl.textContent.includes('চালু হচ্ছে')){
+   countEl.textContent='প্রশ্ন ব্যাংক চালু হতে বেশি সময় নিচ্ছে। নিচের বার্তাটি দেখুন বা পেজটি রিফ্রেশ করুন।';
+   msg('filterMsg','Supabase থেকে সাড়া পেতে দেরি হচ্ছে। ইন্টারনেট সংযোগ পরীক্ষা করে আবার চেষ্টা করুন।',true);
+  }
+ },20000);
  try{
   const {data,error}=await dbx().auth.getSession();
   if(error)throw new Error('অ্যাডমিন সেশন যাচাই করা যায়নি: '+error.message);
-  if(!data.session){msg('filterMsg','প্রশ্ন ব্যাংক দেখতে আগে কেন্দ্রীয় হোমপেজে অ্যাডমিন হিসেবে লগইন করুন।',true);return;}
-  const requestedType=new URLSearchParams(location.search).get('type');
+  if(!data.session)throw new Error('প্রশ্ন ব্যাংক দেখতে আগে কেন্দ্রীয় হোমপেজে অ্যাডমিন হিসেবে লগইন করুন।');
+  const params=new URLSearchParams(location.search);
+  const requestedType=params.get('type');
   if(['mcq','cq'].includes(requestedType)&&$('filterType'))$('filterType').value=requestedType;
-  const {data:categoryRows,error:categoryError}=await dbx().from('question_bank_categories').select('name').order('name');
-  if(!categoryError&&categoryRows)CATS=categoryRows.map(x=>x.name);
-  $('filterCategory').innerHTML='<option value="">সব ক্যাটাগরি</option>'+CATS.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+  injectCompactActionStyle();
+  setupDivisionFilters();
+
+  // আগে প্রশ্ন দেখাই; ফিল্টারের সহায়ক তালিকা লোড হতে দেরি হলেও প্রশ্ন আটকে থাকবে না।
+  if(activeDivision==='academic'){
+   await loadQuestions();
+   await loadAcademicFilterCategories();
+  }else{
+   const hasSourceCategory=!!params.get('category');
+   if(hasSourceCategory){
+    const {data:categoryRows,error:categoryError}=await dbx().from('question_bank_categories').select('name').order('name');
+    if(categoryError)throw new Error('ক্যাটাগরি লোড হয়নি: '+categoryError.message);
+    CATS=(categoryRows||[]).map(x=>x.name);
+    $('filterCategory').innerHTML='<option value="">সব ক্যাটাগরি</option>'+CATS.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+    await applySourceTarget();
+   }
+   await loadQuestions();
+   if(!hasSourceCategory){
+    const {data:categoryRows,error:categoryError}=await dbx().from('question_bank_categories').select('name').order('name');
+    if(!categoryError&&categoryRows){
+     CATS=categoryRows.map(x=>x.name);
+     $('filterCategory').innerHTML='<option value="">সব ক্যাটাগরি</option>'+CATS.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+    }
+    await loadFolders();
+   }
+  }
+
   $('filterSubject').innerHTML='<option value="">সব বিষয়</option>'+SUBJECTS.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
   const {data:subjectRows,error:subjectError}=await dbx().from('subjects').select('id,name').order('name');
   if(subjectError)msg('filterMsg','বিষয় লোড হয়নি: '+subjectError.message,true);
   $('editSubject').innerHTML='<option value="">বিষয় নির্বাচন করুন</option>'+SUBJECTS.map(name=>{const x=(subjectRows||[]).find(v=>v.name===name);return x?`<option value="${x.id}">${esc(x.name)}</option>`:''}).join('');
   $('editCategory').innerHTML=CATS.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
-  injectCompactActionStyle();
-  setupDivisionFilters();
-  if(activeDivision==='academic'){
-   await loadAcademicFilterCategories();
-  }else{
-   await applySourceTarget();
-   if(!new URLSearchParams(location.search).get('category'))await loadFolders();
-  }
-  await loadQuestions();
   highlightSourceQuestion();
   setupMenu();
  }catch(e){
   console.error('Question Bank init failed:',e);
+  if(countEl)countEl.textContent='প্রশ্ন ব্যাংক লোড করা যায়নি।';
   msg('filterMsg','প্রশ্ন লোড করা যায়নি: '+(e?.message||String(e)),true);
+ }finally{
+  clearTimeout(watchdog);
  }
 }
 function sourceHref(x){const p=new URLSearchParams({category:x.category||'',folder:String(x.folder_id||''),set:String(x.set_id||''),question:String(x.id)});return 'question_bank.html?'+p.toString()+'#question-'+x.id}function highlightSourceQuestion(){const id=new URLSearchParams(location.search).get('question');if(!id)return;const el=document.getElementById('question-'+id);if(!el)return;el.scrollIntoView({behavior:'smooth',block:'center'});el.style.outline='3px solid #f59e0b';el.style.outlineOffset='4px';setTimeout(()=>{el.style.outline='';el.style.outlineOffset=''},3000)}async function applySourceTarget(){const p=new URLSearchParams(location.search),c=p.get('category'),f=p.get('folder'),s=p.get('set');if(!c||!CATS.includes(c))return;$('filterCategory').value=c;await loadFolders('filterFolder','',f||'');if(f)await loadSets('filterSet',f,s||'')}function injectCompactActionStyle(){if(document.getElementById('qbCompactActionStyle'))return;const s=document.createElement('style');s.id='qbCompactActionStyle';s.textContent='.qb-card-meta{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px}.qb-subject{margin-left:auto;text-align:right;max-width:65%;overflow-wrap:anywhere;font-size:13px;font-weight:600;color:#2563eb}.qb-pagination{display:flex;justify-content:center;align-items:center;gap:12px;padding:14px;flex-wrap:wrap}.qb-pagination button:disabled{opacity:.45;cursor:not-allowed}.qb-actions{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.qb-actions button{padding:4px 8px!important;font-size:12px!important;line-height:1.2!important;min-height:30px!important;border-radius:6px!important;white-space:nowrap}';document.head.appendChild(s)}async function loadFolders(target='filterFolder',category='',selected=''){const e=$(target);if(!e)return;const selectedCategory=target==='filterFolder'?($('filterCategory')?.value||''):target==='editFolder'?(category||$('editCategory')?.value||''):'';if(target==='editFolder'&&!selectedCategory){e.innerHTML='<option value="">আগে ক্যাটাগরি নির্বাচন করুন</option>';e.value='';e.disabled=true;if($('editSet')){$('editSet').innerHTML='<option value="">আগে সাব-ক্যাটাগরি নির্বাচন করুন</option>'; $('editSet').value='';$('editSet').disabled=true;}return}let q=dbx().from('question_bank_folders').select('id,folder_name,sub_category').order('folder_name');if(selectedCategory)q=q.eq('sub_category',selectedCategory);const{data,error}=await q;if(error)return msg('filterMsg',error.message,true);e.innerHTML='<option value="">'+(target==='filterFolder'?'সব সাব-ক্যাটাগরি':'সাব-ক্যাটাগরি নির্বাচন করুন')+'</option>'+(data||[]).map(x=>`<option value="${x.id}">${esc(x.folder_name)}</option>`).join('');if(target!=='filterFolder')e.disabled=!(data||[]).length;if(selected)e.value=String(selected);if(target==='filterFolder')await loadSets('filterSet',e.value);else if(target==='editFolder')await loadSets('editSet',e.value)}async function loadSets(target='filterSet',folder='',selected=''){const id=folder||($(target==='filterSet'?'filterFolder':target==='editSet'?'editFolder':target==='currentMoveSet'?'currentMoveFolder':'moveFolder')?.value||'');const e=$(target);if(!e)return;if(!id){e.innerHTML='<option value="">'+(target==='filterSet'?'সব সেট':'আগে সাব-ক্যাটাগরি নির্বাচন করুন')+'</option>';e.value='';if(target!=='filterSet')e.disabled=true;return}const{data,error}=await dbx().from('question_bank_sets').select('id,set_name').eq('folder_id',Number(id)).order('set_name');if(error)return msg('filterMsg',error.message,true);e.innerHTML='<option value="">'+(target==='filterSet'?'সব সেট':'Set নির্বাচন করুন')+'</option>'+(data||[]).map(x=>`<option value="${x.id}">${esc(x.set_name)}</option>`).join('');if(target!=='filterSet')e.disabled=!(data||[]).length;if(selected)e.value=String(selected)}let currentQuestionPage=0,lastQuestionFilterKey='';function renderQuestionPager(total){const pages=Math.max(1,Math.ceil(total/1000)),el=$('questionPager');if(!el)return;el.innerHTML=pages>1?`<div class="qb-pagination"><button class="secondary" ${currentQuestionPage===0?'disabled':''} onclick="changeQuestionPage(${currentQuestionPage-1})">আগের পৃষ্ঠা</button><span>${Array.from({length:pages},(_,i)=>`<button class="secondary" ${i===currentQuestionPage?'disabled':''} onclick="changeQuestionPage(${i})">${bn(i+1)}</button>`).join(' ')} <small>মোট ${bn(pages)} পৃষ্ঠা</small></span><button class="secondary" ${currentQuestionPage>=pages-1?'disabled':''} onclick="changeQuestionPage(${currentQuestionPage+1})">পরের পৃষ্ঠা</button></div>`:'';}async function changeQuestionPage(page){currentQuestionPage=Math.max(0,page);await loadQuestions(true)}async function loadQuestions(keepPage=false){showQuestionCountLoading();if(activeDivision==='academic')return loadAcademicQuestions();const filterKey=JSON.stringify([$('filterCategory').value,$('filterFolder').value,$('filterSet').value,$('filterSubject').value,$('search').value.trim(),$('filterType')?.value||'']);if(!keepPage&&filterKey!==lastQuestionFilterKey)currentQuestionPage=0;lastQuestionFilterKey=filterKey;showQuestionCountLoading();if(activeDivision==='academic')return loadAcademicQuestions();let q=dbx().from('questions').select('id,question_text,question_type,reference_answer,option_a,option_b,option_c,option_d,correct_answer,explanation,question_number,category,folder_id,set_id,subject_id,subjects(name),question_bank_folders(folder_name),question_bank_sets(set_name)',{count:'exact'}).order('set_id',{ascending:false,nullsFirst:false}).order('question_number',{ascending:true,nullsFirst:false}).order('id',{ascending:true}).range(currentQuestionPage*1000,currentQuestionPage*1000+999);const c=$('filterCategory').value,f=$('filterFolder').value,s=$('filterSet').value,sub=$('filterSubject').value,t=$('search').value.trim(),type=$('filterType')?.value||'';if(type)q=q.eq('question_type',type);if(c)q=q.eq('category',c);if(f)q=q.eq('folder_id',+f);if(s)q=q.eq('set_id',+s);if(sub){const sid=SUBJECTS.indexOf(sub);const{data}=await dbx().from('subjects').select('id').eq('name',sub).maybeSingle();if(data?.id)q=q.eq('subject_id',data.id)}if(t)q=q.ilike('question_text','%'+t+'%');const{data,error,count}=await q;if(error){showQuestionCount(0,'job','(লোডে সমস্যা হয়েছে)');return msg('filterMsg',error.message,true)}const total=count??(data||[]).length;showQuestionCount(total,'job');renderQuestionPager(total);msg('filterMsg','এই পৃষ্ঠায় '+bn((data||[]).length)+'টি; মোট '+bn(total)+'টি প্রশ্ন পাওয়া গেছে।');$('questions').innerHTML=(data||[]).map((x,i)=>{const isCQ=x.question_type==='cq',subjectName=x.subjects?.name||'বিষয় নির্ধারিত নয়',cor={A:'ক',B:'খ',C:'গ',D:'ঘ'}[x.correct_answer]||x.correct_answer;const copy=encodeURIComponent(JSON.stringify({no:currentQuestionPage*1000+i+1,q:x.question_text,a:x.option_a,b:x.option_b,c:x.option_c,d:x.option_d,cor,ex:x.explanation||'',ref:x.reference_answer||'',type:x.question_type||'mcq'}));return `<div class="q" id="question-${x.id}"><div class="qb-card-meta"><span class="tag">${isCQ?'CQ':'MCQ'}</span><span class="qb-subject">${esc(subjectName)}</span></div><b>${bn(currentQuestionPage*1000+i+1)}. ${formatQuestionText(x.question_text)}</b>${isCQ?`<div class="qb-answer">নমুনা উত্তর: ${esc(x.reference_answer||'নমুনা উত্তর দেওয়া হয়নি।')}</div>`:`<div>ক. ${formatQuestionText(x.option_a)}<br>খ. ${formatQuestionText(x.option_b)}<br>গ. ${formatQuestionText(x.option_c)}<br>ঘ. ${formatQuestionText(x.option_d)}</div><div class="qb-answer">সঠিক উত্তর: ${esc(cor)}</div>`}<div class="qb-explanation" data-copy="${encodeURIComponent(JSON.stringify(x.explanation||'ব্যাখ্যা দেওয়া হয়নি।'))}" style="cursor:pointer" title="চেপে ধরে ব্যাখ্যা কপি করুন" onpointerdown="startExplanationCopy(this.dataset.copy)" onpointerup="cancelExplanationCopy()" onpointerleave="cancelExplanationCopy()" onpointercancel="cancelExplanationCopy()" oncontextmenu="event.preventDefault();copyExplanationNow(this.dataset.copy)">ব্যাখ্যা: ${esc(x.explanation||'ব্যাখ্যা দেওয়া হয়নি।')} <small style="opacity:.65">(চেপে ধরে কপি)</small></div><div class="qb-source"><a href="${sourceHref(x)}" style="color:inherit;text-decoration:underline">Source: ${esc(x.category||'')} / ${esc(x.question_bank_folders?.folder_name||'')} / ${esc(x.question_bank_sets?.set_name||'')} / প্রশ্ন নং ${esc(x.question_number??'')}</a></div><div class="qb-actions"><button onclick="editQuestion(${x.id})">✏️ Edit</button><button class="secondary" onclick="deleteQuestion(${x.id})">🗑️ Remove</button><button onclick="openMove(${x.id},${x.folder_id||0},${x.set_id||0})">📁 Move</button><button onclick="copyQuestion('${copy}')">📋 Copy</button></div></div>`}).join('')||'কোনো প্রশ্ন নেই';typesetMath($('questions'))}function normalizeCopiedMath(text){return String(text??'').replace(/\\[()]/g,'').replace(/\\(?:dfrac|tfrac|frac)\s*\{([^{}]*)\}\s*\{([^{}]*)\}/g,'$1/$2').replace(/\(\s*([^()\n]+?)\s*\)\s*\/\s*\(\s*([^()\n]+?)\s*\)/g,'$1/$2').replace(/\\sqrt\s*\{([^{}]*)\}/g,'√($1)').replace(/\\times\b/g,'×').replace(/\\cdot\b/g,'·').replace(/\\div\b/g,'÷').replace(/\\leq?\b/g,'≤').replace(/\\geq?\b/g,'≥').replace(/\\neq\b/g,'≠').replace(/\\pm\b/g,'±').replace(/\\(?:left|right)\b/g,'').replace(/\\[a-zA-Z]+/g,'').replace(/[{}]/g,'').replace(/\\(?=[%#$&_])/g,'').replace(/([০-৯0-9])\s+([০-৯0-9])/g,'$1$2').replace(/(\/[০-৯0-9]+)\s+([০-৯0-9]+)/g,'$1$2').replace(/([০-৯0-9]+\/[০-৯0-9]+)(?=[\u0980-\u09FF])(?![০-৯])/g,'$1 ').replace(/[ \t]+/g,' ').trim()}
