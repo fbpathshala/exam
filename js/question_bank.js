@@ -4,7 +4,10 @@ document.addEventListener('selectionchange',captureRichSelection);
 function placeMobileCaret(editor,x,y){
  if(!editor)return;
  const current=window.getSelection();
- if(current&&current.rangeCount&&!current.isCollapsed){const active=current.getRangeAt(0).commonAncestorContainer;const activeEl=active.nodeType===1?active:active.parentElement;if(activeEl?.closest?.('#editQuestion.rich-editor'))return}
+ if(current&&current.rangeCount&&!current.isCollapsed){
+  const active=current.getRangeAt(0).commonAncestorContainer;
+  if(editor.contains(active)||editor.contains(active.parentElement))return;
+ }
  editor.focus({preventScroll:true});
  let range=null;
  try{
@@ -16,19 +19,25 @@ function placeMobileCaret(editor,x,y){
    if(found&&editor.contains(found.startContainer)){range=found.cloneRange();range.collapse(true)}
   }
  }catch(_){}
- if(range){const sel=window.getSelection();sel.removeAllRanges();sel.addRange(range);richSavedRange=range.cloneRange()}
+ if(range){
+  const sel=window.getSelection();
+  if(sel&&!sel.isCollapsed)return;
+  sel?.removeAllRanges();sel?.addRange(range);richSavedRange=range.cloneRange();
+ }
 }
 document.addEventListener('touchend',function(ev){
- const t=ev.target,editor=t?.closest?.('#editQuestion.rich-editor');
+ const editor=ev.target?.closest?.('.rich-editor[contenteditable="true"]');
  if(!editor||!ev.changedTouches?.length)return;
  const p=ev.changedTouches[0];
- setTimeout(()=>placeMobileCaret(editor,p.clientX,p.clientY),0);
+ setTimeout(()=>{
+  const sel=window.getSelection();
+  if(sel&&sel.rangeCount&&!sel.isCollapsed){
+   const node=sel.getRangeAt(0).commonAncestorContainer;
+   if(editor.contains(node)||editor.contains(node.parentElement))return;
+  }
+  placeMobileCaret(editor,p.clientX,p.clientY);
+ },80);
 },{passive:true});
-document.addEventListener('pointerup',function(ev){
- const editor=ev.target?.closest?.('#editQuestion.rich-editor');
- if(editor&&ev.pointerType==='touch')setTimeout(()=>placeMobileCaret(editor,ev.clientX,ev.clientY),0);
-});
-
 function restoreRichSelection(e){e.focus();if(richSavedRange){const sel=window.getSelection();sel.removeAllRanges();sel.addRange(richSavedRange)}}
 function insertMathMarkup(e,latex){restoreRichSelection(e);const safe=String(latex).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');document.execCommand('insertHTML',false,'<span class="math-inline">\\('+safe+'\\)</span>')}
 function formatEditor(id,cmd){const e=$(id);if(!e)return;restoreRichSelection(e);document.execCommand(cmd,false,null)}
