@@ -183,7 +183,6 @@ function sourceHref(x){const p=new URLSearchParams({category:x.category||'',fold
      out+=converted.every(Boolean)?converted.join(''):ch+'('+arg.value+')';
      i=arg.next;continue;
     }
-   }
    if(ch==='{'){
     const arg=readArgument(s,i);out+=arg.value;i=arg.next;continue;
    }
