@@ -41,11 +41,12 @@
   function count() {
     const visible = visibleQuestions();
 
+    say("selectedQuestionCount", `নির্বাচিত প্রশ্ন: ${bn(chosen.size)}টি`);
+
     say(
       "questionCount",
       `সেটে মোট প্রশ্ন: ${bn(qs.length)}টি | ` +
-      `এখন দেখানো হচ্ছে: ${bn(visible.length)}টি | ` +
-      `নির্বাচিত মোট: ${bn(chosen.size)}টি`
+      `এখন দেখানো হচ্ছে: ${bn(visible.length)}টি`
     );
   }
 
