@@ -108,6 +108,18 @@
       overflow-wrap: anywhere;
     }
 
+    .selected-question-counter {
+      display: inline-block;
+      margin: 12px 0 4px;
+      padding: 11px 16px;
+      border: 1px solid #93c5fd;
+      border-radius: 10px;
+      background: #eff6ff;
+      color: #1e3a8a;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
     .hint {
       color: #596579;
       font-size: 14px;
@@ -221,6 +233,7 @@ table td{color:#243b53}
 
       <button id="loadQuestions" type="button">প্রশ্ন দেখুন</button>
 
+      <p id="selectedQuestionCount" class="selected-question-counter" aria-live="polite">নির্বাচিত প্রশ্ন: ০টি</p>
       <p id="questionCount">প্রথমে ক্যাটাগরি, সাব-ক্যাটাগরি ও সেট নির্বাচন করুন।</p>
 
       <div id="questionList"></div>
@@ -246,7 +259,7 @@ table td{color:#243b53}
   </main>
 
   <script src="js/supabase.js"></script>
-  <script src="js/create-exam.js?v=20261020-final-ui-fix2"></script>
+  <script src="js/create-exam.js?v=20261125-selected-count1"></script>
 <script id="site-copy-deterrent-script">(function(){function editable(t){return !!(t&&t.closest&&t.closest('input,textarea,select,[contenteditable="true"],[contenteditable=""]'))}document.addEventListener('contextmenu',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('selectstart',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('copy',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('cut',function(e){if(!editable(e.target))e.preventDefault()});document.addEventListener('keydown',function(e){if(editable(e.target))return;var k=(e.key||'').toLowerCase();if((e.ctrlKey||e.metaKey)&&['c','x','u','s','p'].includes(k)){e.preventDefault();e.stopPropagation()}if(e.key==='PrintScreen'){e.preventDefault()}} ,true)})();</script>
 <div class="central-section-return"><a href="https://fbpathshala.github.io/home.html">⌂ মূল মেনু / হোম পেইজে ফিরুন</a></div></body>
 </html>
